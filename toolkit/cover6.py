@@ -1,0 +1,12 @@
+from render6 import *
+s = skia.Surface(W, H); cv = s.getCanvas()
+atmosphere(cv, 6.0)
+cv.drawCircle(540, 960, 520, P(RED, .10, blur=70))
+for r, a in [(430, .4), (500, .22), (580, .12)]: cv.drawCircle(540, 960, r, P(RED, a, stroke=2.5))
+plate3d(cv, 540, 790, .84, 12, -12, 'K', 'FN 56', 1, 0.9, hl=1, glow=.8)
+plate3d(cv, 540, 1035, .7, 14, -10, 'EU', 'FN 12', .75, 0.9)
+plate3d(cv, 540, 1245, .7, 16, -8, 'NEA', 'FN 7', .75, 0.9)
+text(cv, 'Warum nur', 540, 430, 96, WHITE, 1, 'c')
+text(cv, 'ein K?', 540, 560, 110, RED, 1, 'c')
+tracked(cv, 'function.', 540, 1610, 96, RED, 1, -.03)
+s.makeImageSnapshot().save('../out/kennzeichen_cover.png', skia.kPNG)

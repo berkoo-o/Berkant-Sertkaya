@@ -4,3 +4,6 @@ toolkit/*.mp4
 toolkit/*.raw
 toolkit/*.json
 __pycache__/
+out/
+toolkit/parts/
+toolkit/*.raw
