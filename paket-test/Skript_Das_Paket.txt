@@ -6,7 +6,7 @@ Stand: 14.11.2026 – Stimme: ElevenLabs „Rupert“
 Zahl: 12 Mio. – Pakete pro Tag in Deutschland
 
 [2] Abholung & Nachtfahrt (5–12 s) – Transporter, Lkw mit Wechselbrücke, Nachtautobahn
-„Erst holt ein Transporter es ab. Nachts bringt ein Lkw es ins Paketzentrum – allein DHL hat davon 36.“
+„Erst holt ein Transporter es ab. Nachts bringt ein Lkw es ins Paketzentrum – allein DHL hat davon 38.“
 
 [3] Entladen & Scanner (12–22 s) – Teleskopband im Anhänger, Scanner-Tunnel mit roten Laserlinien
 „Ein Band zieht die Pakete aus dem Anhänger. Ein Scanner liest den Barcode von allen Seiten. Niemand muss die Adresse lesen.“
@@ -29,4 +29,4 @@ Zahl: 4,37 Mrd.
 Quellen:
 - KEP-Studie 2026 (BPEX): 4,37 Mrd. Sendungen 2025 (≈ 12 Mio./Tag), via logistik-heute.de
 - DHL Group / verkehrsrundschau.de: Paketzentrum Aschheim bis 72.000 Sendungen/Std.
-- transport-online.de: 36 DHL-Paketzentren in Deutschland (Zahl vor Final noch bei DHL prüfen)
+- DHL Group, Datenblatt Köln-Eifeltor (09/2026): 38 Paketzentren in Deutschland
