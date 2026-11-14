@@ -1,7 +1,7 @@
 import numpy as np, subprocess
 from scipy.io import wavfile
 from scipy.signal import butter, sosfilt
-SR = 48000; DUR = 61.9; N = int(SR * DUR)
+SR = 48000; DUR = 59.9; O = 56.9; N = int(SR * DUR)
 rng = np.random.default_rng(11)
 t = np.arange(N) / SR
 def lp(x, f, o=2): return sosfilt(butter(o, f, 'low', fs=SR, output='sos'), x)
@@ -45,7 +45,7 @@ while pos < DUR:
         if b % 2 == 1:
             sn = int(0.2 * SR); add(music, bp(rng.standard_normal(sn), 900, 4000) * env(sn, 0.002, 0.06) * 0.05, pos + b*beat)
     pos += bar; k += 1
-music *= np.clip((DUR - t) / 2.0, 0, 1) * np.clip(t / 0.8, 0, 1)
+music *= np.clip((O + 2.8 - t) / 1.8, 0, 1) * np.clip(t / 0.8, 0, 1)  # music ends ~1 s after outro start, fades over 1.8 s
 
 # ---------------- SFX
 fx = np.zeros(N)
@@ -124,15 +124,18 @@ passby(50.3, 53.9, 50.9, 60, 0.2)
 sn = int(2.0 * SR); st = np.arange(sn) / SR
 add(fx, np.sin(2*np.pi*880*st) * np.sin(np.pi*st/2.0) * 0.04, 54.4)
 add(fx, beep, 56.4, 0.14)
-fx *= np.clip((58.5 - t) / 1.2, 0, 1)
-# outro (toolkit standard): whoosh into outro, bass hit + chime when the logo appears (outro start 58.5, logo +1.5 s)
-O0 = 58.5
+fx *= np.clip((O + 0.8 - t) / 1.0, 0, 1)
+# outro (styleguide 6b): whoosh at flight start, soft low impact + click at landing, bell chord, one tick per letter
 wn = int(.7 * SR); wt = np.arange(wn) / SR
-add(fx, bp(rng.standard_normal(wn), 300, 2600) * np.sin(np.pi*np.clip(wt/.7, 0, 1))**2, O0 - .35, 0.22)
-bn_ = int(.9 * SR); bt_ = np.arange(bn_) / SR; fb = 45 + 30*np.exp(-bt_*8)
-add(fx, np.sin(2*np.pi*np.cumsum(fb)/SR) * np.exp(-bt_*4), O0 + 1.5, 0.6)
-cn = int(2.5 * SR); ct = np.arange(cn) / SR
-add(fx, sum(np.sin(2*np.pi*mtof(n)*ct)*np.exp(-ct*2) for n in (81, 88, 93)) * np.minimum(1, ct/.01), O0 + 1.45, 0.07)
+add(fx, bp(rng.standard_normal(wn), 300, 2600) * np.sin(np.pi*np.clip(wt/.7, 0, 1))**2, O + 0.25, 0.22)
+bn_ = int(.6 * SR); bt_ = np.arange(bn_) / SR; fb = 60 + 60*np.exp(-bt_*10)
+add(fx, np.sin(2*np.pi*np.cumsum(fb)/SR) * np.exp(-bt_*6) * np.minimum(1, bt_/.004), O + 1.08, 0.5)
+cn_ = int(.02 * SR); ct_ = np.arange(cn_) / SR
+add(fx, np.sin(2*np.pi*2600*ct_) * np.exp(-ct_*250), O + 1.08, 0.12)
+cn = int(2.4 * SR); ct = np.arange(cn) / SR
+add(fx, sum(np.sin(2*np.pi*mtof(n)*ct) for n in (76, 83, 88)) * np.exp(-ct*1.6) * np.minimum(1, ct/.01), O + 1.1, 0.06)
+tn_ = int(.03 * SR); tt_ = np.arange(tn_) / SR
+for i in range(8): add(fx, np.sin(2*np.pi*2200*tt_) * np.exp(-tt_*150), O + 1.0 + i*0.055, 0.05)
 
 # ---------------- voice + ducking
 subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', 'voice.mp3', '-ac', '1', '-ar', str(SR), '-f', 'f32le', 'voice.raw'], check=True)

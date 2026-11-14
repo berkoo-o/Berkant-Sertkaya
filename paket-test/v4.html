@@ -14,6 +14,7 @@ canvas{position:absolute;left:0;top:0}
 #src{position:absolute;left:84px;bottom:200px;color:rgba(255,255,255,.6);font-weight:500;font-size:24px}
 #logo{position:absolute;left:84px;bottom:110px;color:#E01E2B;font-weight:500;font-size:58px;letter-spacing:-1px}
 </style></head><body>
+<canvas id="oc" width="1080" height="1920"></canvas>
 <div id="ov"><div id="num"></div><div id="sub"></div><div id="src"></div><div id="logo">function.</div></div>
 <script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
 <script type="module">
@@ -97,7 +98,7 @@ function makeParcel(w,h,d,seed,hero){
   const lw=Math.min(w/2-tw/2-0.035,0.2),lh=lw*340/512;
   const lab=new THREE.Mesh(new THREE.PlaneGeometry(lw,lh),new THREE.MeshStandardMaterial({map:labelTex(seed,hero),roughness:.55}));
   lab.rotation.x=-Math.PI/2;lab.position.set(-w/2+lw/2+0.02,h+0.004,-d/2+lh/2+0.03);g.add(lab);
-  g.userData={w,h,d,lab,lw,lh};return g;
+  g.userData={w,h,d,lab,lw,lh,tapes:[t1,...g.children.filter(c=>c.material===tm&&c!==t1)],tw};return g;
 }
 const sizes=[[.5,.3,.38],[.42,.26,.34],[.56,.24,.4],[.38,.32,.32],[.46,.28,.36]];
 const HERO=[.5,.3,.4];
@@ -380,9 +381,9 @@ const shots=[
  {t0:45.3,t1:47.4,set:'depot',name:'depot'},
  {t0:47.4,t1:50.3,set:'street',name:'door'},
  {t0:50.3,t1:53.9,set:'street',name:'crane'},
- {t0:53.9,t1:58.5,set:'street',name:'macro'},
+ {t0:53.9,t1:59.9,set:'street',name:'macro'},
 ];
-const END=58.5;
+const END=59.9;const O=56.9; // outro start = right after the last spoken sentence
 // voice segments (from silence analysis of the Rupert take)
 const subs=[
  [0.0,3.6,'Rund zwölf Millionen Pakete werden in Deutschland verschickt …'],
@@ -403,7 +404,7 @@ const subs=[
  [45.3,47.4,'Dort wird es nach Tour sortiert –'],
  [47.4,50.3,'und landet wenig später vor deiner Tür.'],
  [50.3,54.1,'4,37 Milliarden Sendungen im Jahr.'],
- [54.1,58.5,'Und jede folgt nur einem Code.'],
+ [54.1,O+0.35,'Und jede folgt nur einem Code.'],
 ];
 const nums=[
  [0.3,7.4,'12 Mio.','Pakete werden in Deutschland verschickt – pro Tag','Quelle: KEP-Studie 2026 (BPEX), 4,37 Mrd. Sendungen 2025'],
@@ -411,7 +412,7 @@ const nums=[
  [18.9,23.8,'360°','Kameras lesen den Barcode von allen Seiten','Quelle: DHL Group, Sortiertechnik'],
  [33.2,38.6,'72.000','Pakete pro Stunde im Paketzentrum Aschheim','Quelle: DHL Group, Paketzentrum Aschheim'],
  [38.6,41.4,'20','Pakete pro Sekunde','Quelle: DHL Group, Paketzentrum Aschheim'],
- [50.4,58.5,'4,37 Mrd.','Sendungen in Deutschland im Jahr 2025','Quelle: KEP-Studie 2026 (BPEX)'],
+ [50.4,O+0.3,'4,37 Mrd.','Sendungen in Deutschland im Jahr 2025','Quelle: KEP-Studie 2026 (BPEX)'],
 ];
 const numEl=document.getElementById('num'),subEl=document.getElementById('sub'),srcEl=document.getElementById('src');
 const up=new THREE.Vector3(0,1,0),tA=new THREE.Vector3(),tB=new THREE.Vector3();
@@ -499,7 +500,12 @@ function setTime(t){
   else if(n==='macro'){
     scene.fog.density=0.025;key.intensity=0.5;key.color.set(0x9db4e0);hemi.intensity=0.32;van.visible=false;
     const hd=heroDoor.userData;heroDoor.updateMatrixWorld();tA.copy(hd.lab.position);heroDoor.localToWorld(tA);
-    cam.position.set(tA.x+0.12-u*0.03,tA.y+0.42-u*0.12,tA.z+0.28-u*0.08);cam.lookAt(tA.x,tA.y,tA.z);cam.fov=40;
+    const um=clamp((t-sh.t0)/(O-sh.t0),0,1),ko=ease((t-O)/3.0),pe=ease((t-55.7)/1.2);
+    const tp=new THREE.Vector3(0,hd.h,0);heroDoor.localToWorld(tp);
+    const p0=new THREE.Vector3(tA.x+0.12-um*0.03,tA.y+0.42-um*0.12,tA.z+0.28-um*0.08);
+    const p1=new THREE.Vector3(tp.x+0.3,tp.y+0.8+ko*0.15,tp.z+1.05+ko*0.2);
+    const l1=new THREE.Vector3(tp.x,tp.y+0.3,tp.z);
+    cam.position.copy(p0.lerp(p1,pe));cam.lookAt(tA.clone().lerp(l1,pe));cam.fov=40;
     key.position.set(-6,15,14);key.target.position.set(0,0,3);}
   // laser sweep over hero label in macro shot
   macroLaser.visible=(n==='macro'&&t>54.4&&t<56.4);
@@ -510,16 +516,54 @@ function setTime(t){
   cam.updateProjectionMatrix();
   // overlay
   const s=subs.find(o=>t>=o[0]&&t<o[1]);subEl.innerHTML=s?s[2]:'';
-  subEl.style.opacity=s?Math.min(1,(t-s[0])/0.15+0.2):0;
+  subEl.style.opacity=s?Math.min(1,(t-s[0])/0.15+0.2)*(t>O?clamp((O+0.35-t)/0.35,0,1):1):0;
+  logoEl.style.opacity=1-eo((t-O)/0.35);
+  heroDoor.userData.tapes.forEach(m=>m.visible=!(t>=O+0.3));
   const nm=nums.find(o=>t>=o[0]&&t<o[1]);
   if(nm){numEl.innerHTML=nm[2]+'<small>'+nm[3]+'</small><i></i>';const op=Math.min(clamp((t-nm[0])/0.35,0,1),clamp((nm[1]-t)/0.25,0,1));numEl.style.opacity=op;srcEl.textContent=nm[4];srcEl.style.opacity=op;}
   else{numEl.style.opacity=0;srcEl.style.opacity=0;}
   // cut dips + final fade
-  const dIn=si===0?clamp(t/0.5,0,1):clamp((t-sh.t0)/0.2,0,1);const dOut=si===shots.length-1?clamp((END-t)/1.0,0,1):clamp((sh.t1-t)/0.2,0,1);
+  const dIn=si===0?clamp(t/0.5,0,1):clamp((t-sh.t0)/0.2,0,1);const dOut=si===shots.length-1?1:clamp((sh.t1-t)/0.2,0,1);
   return Math.min(dIn,dOut);
 }
 const macroLaser=new THREE.Mesh(new THREE.PlaneGeometry(0.004,0.16),emis(0xff2a35));macroLaser.rotation.x=-Math.PI/2;heroDoor.add(macroLaser);
 
+// =================================================================== OUTRO (styleguide 6b, themed: red parcel tape -> logo dot)
+const logoEl=document.getElementById('logo');
+const eo=x=>{x=clamp(x,0,1);return 1-(1-x)**3};const eio=x=>{x=clamp(x,0,1);return x<.5?4*x**3:1-(-2*x+2)**3/2};
+const oc=document.getElementById('oc').getContext('2d');
+const LETTERS='function'.split('');
+let LAY=null;
+function layout(){oc.font='500 170px Poppins';const all='function.'.split('');const ws=all.map(c=>oc.measureText(c).width);
+  const tot=ws.reduce((a,b)=>a+b,0)-7*(all.length-1);let x=540-tot/2;const xs=[];all.forEach((c,i)=>{xs.push(x);x+=ws[i]-7;});
+  const m=oc.measureText('.');const L=m.actualBoundingBoxLeft,Rr=m.actualBoundingBoxRight;
+  const dcx=xs[8]+(Rr-L)/2,dcy=1010-(m.actualBoundingBoxAscent-m.actualBoundingBoxDescent)/2,dr=(Rr+L)/2;
+  return {xs,ws,dcx,dcy,dr};}
+const proj=v=>{const p=v.clone().project(cam);return [(p.x+1)/2*W,(1-p.y)/2*H];};
+let SP=null;
+function drawOutro(t){oc.clearRect(0,0,W,H);const o=t-O;if(o<0)return;if(!LAY)LAY=layout();
+  // vignette
+  const va=eo(o/1.0);const g=oc.createRadialGradient(540,960,0,540,960,1150);g.addColorStop(0,`rgba(26,23,19,${.74*va})`);g.addColorStop(1,`rgba(9,8,6,${.97*va})`);oc.fillStyle=g;oc.fillRect(0,0,W,H);
+  // start point = red tape on the parcel, projected (fixed at outro start)
+  const hd=heroDoor.userData;
+  const tp=new THREE.Vector3(0,hd.h+0.002,hd.lab.position.z);heroDoor.localToWorld(tp);
+  const tq=new THREE.Vector3(hd.tw/2,hd.h+0.002,hd.lab.position.z);heroDoor.localToWorld(tq);
+  const [sx,sy]=proj(tp),[qx,qy]=proj(tq);const r0=clamp(Math.hypot(qx-sx,qy-sy),8,30);
+  const ex=LAY.dcx,ey=LAY.dcy,r1=LAY.dr;
+  const cx=(sx+ex)/2+240,cy=Math.min(sy,ey)-300;
+  const pos=k=>{const q=eio(k);const a=(1-q)*(1-q),b=2*(1-q)*q,c=q*q;return [a*sx+b*cx+c*ex,a*sy+b*cy+c*ey];};
+  const dot=(x,y,r,glow,al)=>{oc.save();oc.globalAlpha=al;oc.shadowColor='#E01E2B';oc.shadowBlur=glow;oc.fillStyle='#E01E2B';oc.beginPath();oc.arc(x,y,r,0,7);oc.fill();oc.restore();};
+  // letters f-u-n-c-t-i-o-n
+  oc.font='500 170px Poppins';oc.fillStyle='#E01E2B';
+  LETTERS.forEach((ch,i)=>{const k=eo((o-1.0-i*0.055)/0.5);if(k<=0)return;oc.save();oc.globalAlpha=k;oc.filter=`blur(${(10*(1-k)).toFixed(2)}px)`;oc.fillText(ch,LAY.xs[i],1010+34*(1-k));oc.restore();});
+  // flying dot
+  if(o<0.3){dot(sx,sy,r0,34,eo(o/0.3));}
+  else{const k=clamp((o-0.3)/0.78,0,1);
+    for(let gI=6;gI>=1;gI--){const kg=clamp((o-0.3-gI*0.03)/0.78,0,1);if(kg<=0||k>=1)continue;const [gx,gy]=pos(kg);dot(gx,gy,lerp(r0,r1,kg),lerp(34,12,kg),0.16*(1-gI/7));}
+    const [x,y]=pos(k);dot(x,y,lerp(r0,r1,k),lerp(34,12,k),1);}
+  // landing ring (the only allowed ring)
+  const rk=(o-1.08)/0.87;if(rk>0&&rk<1){oc.save();oc.strokeStyle='#E01E2B';oc.globalAlpha=0.75*(1-rk);oc.lineWidth=lerp(6,1,rk);oc.beginPath();oc.arc(ex,ey,r1+190*eo(rk),0,7);oc.stroke();oc.restore();}
+}
 // ---------- post
 const rt=new THREE.WebGLRenderTarget(W,H,{samples:4,type:THREE.HalfFloatType});
 const postScene=new THREE.Scene(),postCam=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
@@ -539,6 +583,6 @@ window.TOTAL=Math.round(END*30);
 window.renderAt=async(f)=>{const fade=setTime(f/30);
   renderer.setRenderTarget(rt);renderer.render(scene,cam);renderer.setRenderTarget(null);
   post.uniforms.seed.value=(f*7.13)%100;post.uniforms.fade.value=fade;
-  renderer.render(postScene,postCam);return true;};
+  renderer.render(postScene,postCam);drawOutro(f/30);return true;};
 window.ready=true;
 </script></body></html>
