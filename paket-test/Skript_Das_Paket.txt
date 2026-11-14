@@ -12,7 +12,7 @@ Zahl: 12 Mio. – Pakete pro Tag in Deutschland
 „Ein Band zieht die Pakete aus dem Anhänger. Ein Scanner liest den Barcode von allen Seiten. Niemand muss die Adresse lesen.“
 Zahl: 360°
 
-[4] Sorter (22–36 s) – farbige Kippschalen fahren im Kreis, Schale kippt an Rutsche 42
+[4] Sorter (22–36 s) – graue Kippschalen fahren im Kreis, Schale kippt an Rutsche 42
 „Dann geht es auf den Sorter: Jedes Paket fährt auf einer eigenen Schale. An der richtigen Rutsche kippt sie – und das Paket rutscht zu seinem Ziel.“
 
 [5] Tempo (36–42 s) – Totale der Anlage, viele Schalen gleichzeitig
