@@ -125,17 +125,25 @@ sn = int(2.0 * SR); st = np.arange(sn) / SR
 add(fx, np.sin(2*np.pi*880*st) * np.sin(np.pi*st/2.0) * 0.04, 54.4)
 add(fx, beep, 56.4, 0.14)
 fx *= np.clip((O + 0.8 - t) / 1.0, 0, 1)
-# outro (styleguide 6b): whoosh at flight start, soft low impact + click at landing, bell chord, one tick per letter
-wn = int(.7 * SR); wt = np.arange(wn) / SR
-add(fx, bp(rng.standard_normal(wn), 300, 2600) * np.sin(np.pi*np.clip(wt/.7, 0, 1))**2, O + 0.25, 0.22)
-bn_ = int(.6 * SR); bt_ = np.arange(bn_) / SR; fb = 60 + 60*np.exp(-bt_*10)
-add(fx, np.sin(2*np.pi*np.cumsum(fb)/SR) * np.exp(-bt_*6) * np.minimum(1, bt_/.004), O + 1.08, 0.5)
-cn_ = int(.02 * SR); ct_ = np.arange(cn_) / SR
-add(fx, np.sin(2*np.pi*2600*ct_) * np.exp(-ct_*250), O + 1.08, 0.12)
+# outro (themed: tape peels off, flies and writes the logo, its end becomes the dot)
+# tape peel 0.3-0.9: sticky crackle (dense tiny clicks over band-passed noise)
+pn = int(0.65 * SR); pt = np.arange(pn) / SR
+peel = bp(rng.standard_normal(pn), 1200, 6000) * (0.4 + 0.6*np.sin(np.pi*pt/0.65))
+cr = np.zeros(pn)
+for k in rng.integers(0, pn - 200, 160): cr[k:k+120] += rng.standard_normal(120) * np.exp(-np.arange(120)/25)
+add(fx, (peel * 0.5 + bp(cr, 1500, 8000)) * np.minimum(1, pt/0.03), O + 0.3, 0.28)
+# flight whoosh
+wn = int(.75 * SR); wt = np.arange(wn) / SR
+add(fx, bp(rng.standard_normal(wn), 300, 2600) * np.sin(np.pi*np.clip(wt/.75, 0, 1))**2, O + 0.35, 0.22)
+# writing swish 0.95-2.0 (soft, like a marker)
+sn_ = int(1.05 * SR); st_ = np.arange(sn_) / SR
+sw = bp(rng.standard_normal(sn_), 2500, 7000) * (0.6 + 0.4*np.sin(2*np.pi*7.6*st_)**2) * np.clip(np.minimum(st_/0.08, (1.05 - st_)/0.15), 0, 1)
+add(fx, sw, O + 0.95, 0.08)
+# dot: soft pop + bell chord
+pp = int(.15 * SR); ptt = np.arange(pp) / SR
+add(fx, np.sin(2*np.pi*(700 + 500*np.exp(-ptt*40))*ptt) * np.exp(-ptt*35), O + 1.95, 0.25)
 cn = int(2.4 * SR); ct = np.arange(cn) / SR
-add(fx, sum(np.sin(2*np.pi*mtof(n)*ct) for n in (76, 83, 88)) * np.exp(-ct*1.6) * np.minimum(1, ct/.01), O + 1.1, 0.06)
-tn_ = int(.03 * SR); tt_ = np.arange(tn_) / SR
-for i in range(8): add(fx, np.sin(2*np.pi*2200*tt_) * np.exp(-tt_*150), O + 1.0 + i*0.055, 0.05)
+add(fx, sum(np.sin(2*np.pi*mtof(n)*ct) for n in (76, 83, 88)) * np.exp(-ct*1.6) * np.minimum(1, ct/.01), O + 2.0, 0.06)
 
 # ---------------- voice + ducking
 subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', 'voice.mp3', '-ac', '1', '-ar', str(SR), '-f', 'f32le', 'voice.raw'], check=True)

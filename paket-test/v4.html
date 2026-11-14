@@ -541,28 +541,49 @@ function layout(){oc.font='500 170px Poppins';const all='function.'.split('');co
   return {xs,ws,dcx,dcy,dr};}
 const proj=v=>{const p=v.clone().project(cam);return [(p.x+1)/2*W,(1-p.y)/2*H];};
 let SP=null;
+const LOGOC=document.createElement('canvas');LOGOC.width=1080;LOGOC.height=1920;
 function drawOutro(t){oc.clearRect(0,0,W,H);const o=t-O;if(o<0)return;if(!LAY)LAY=layout();
-  // vignette
-  const va=eo(o/1.0);const g=oc.createRadialGradient(540,960,0,540,960,1150);g.addColorStop(0,`rgba(26,23,19,${.74*va})`);g.addColorStop(1,`rgba(9,8,6,${.97*va})`);oc.fillStyle=g;oc.fillRect(0,0,W,H);
-  // start point = red tape on the parcel, projected (fixed at outro start)
+  // themed outro: the red parcel tape peels off, flies as a ribbon and writes the logo
+  const va=eo(o/1.0);const g=oc.createRadialGradient(540,960,0,540,960,1150);g.addColorStop(0,`rgba(20,18,16,${.6*va})`);g.addColorStop(1,`rgba(8,7,6,${.95*va})`);oc.fillStyle=g;oc.fillRect(0,0,W,H);
   const hd=heroDoor.userData;
-  const tp=new THREE.Vector3(0,hd.h+0.002,hd.lab.position.z);heroDoor.localToWorld(tp);
-  const tq=new THREE.Vector3(hd.tw/2,hd.h+0.002,hd.lab.position.z);heroDoor.localToWorld(tq);
-  const [sx,sy]=proj(tp),[qx,qy]=proj(tq);const r0=clamp(Math.hypot(qx-sx,qy-sy),8,30);
-  const ex=LAY.dcx,ey=LAY.dcy,r1=LAY.dr;
-  const cx=(sx+ex)/2+240,cy=Math.min(sy,ey)-300;
-  const pos=k=>{const q=eio(k);const a=(1-q)*(1-q),b=2*(1-q)*q,c=q*q;return [a*sx+b*cx+c*ex,a*sy+b*cy+c*ey];};
-  const dot=(x,y,r,glow,al)=>{oc.save();oc.globalAlpha=al;oc.shadowColor='#E01E2B';oc.shadowBlur=glow;oc.fillStyle='#E01E2B';oc.beginPath();oc.arc(x,y,r,0,7);oc.fill();oc.restore();};
-  // letters f-u-n-c-t-i-o-n
-  oc.font='500 170px Poppins';oc.fillStyle='#E01E2B';
-  LETTERS.forEach((ch,i)=>{const k=eo((o-1.0-i*0.055)/0.5);if(k<=0)return;oc.save();oc.globalAlpha=k;oc.filter=`blur(${(10*(1-k)).toFixed(2)}px)`;oc.fillText(ch,LAY.xs[i],1010+34*(1-k));oc.restore();});
-  // flying dot
-  if(o<0.3){dot(sx,sy,r0,34,eo(o/0.3));}
-  else{const k=clamp((o-0.3)/0.78,0,1);
-    for(let gI=6;gI>=1;gI--){const kg=clamp((o-0.3-gI*0.03)/0.78,0,1);if(kg<=0||k>=1)continue;const [gx,gy]=pos(kg);dot(gx,gy,lerp(r0,r1,kg),lerp(34,12,kg),0.16*(1-gI/7));}
-    const [x,y]=pos(k);dot(x,y,lerp(r0,r1,k),lerp(34,12,k),1);}
-  // landing ring (the only allowed ring)
-  const rk=(o-1.08)/0.87;if(rk>0&&rk<1){oc.save();oc.strokeStyle='#E01E2B';oc.globalAlpha=0.75*(1-rk);oc.lineWidth=lerp(6,1,rk);oc.beginPath();oc.arc(ex,ey,r1+190*eo(rk),0,7);oc.stroke();oc.restore();}
+  const P3=(x,y,z)=>{const v=new THREE.Vector3(x,y,z);heroDoor.localToWorld(v);return proj(v);};
+  // tape polyline on the parcel: back side -> top -> front side (front end = where the peel starts)
+  const tape=[];const N=10;
+  for(let k=0;k<=4;k++)tape.push(P3(0,hd.h*0.58+hd.h*0.42*k/4,-hd.d/2-0.002));
+  for(let k=1;k<=N;k++)tape.push(P3(0,hd.h+0.002,-hd.d/2+hd.d*k/N));
+  for(let k=1;k<=4;k++)tape.push(P3(0,hd.h-hd.h*0.42*k/4,hd.d/2+0.002));
+  tape.reverse(); // index 0 = back bottom ... last = front bottom
+  const tw0=clamp(Math.hypot(...(()=>{const a=P3(-hd.tw/2,hd.h,0),b=P3(hd.tw/2,hd.h,0);return [a[0]-b[0],a[1]-b[1]];})()),10,140);
+  // flight: from front end of tape up and over into the logo start
+  const [fx,fy]=tape[tape.length-1];const lx0=LAY.xs[0]-10,ly=968;
+  const cxp=(fx+lx0)/2+260,cyp=Math.min(fy,ly)-420;const flight=[];
+  for(let k=1;k<=40;k++){const q=k/40;flight.push([(1-q)**2*fx+2*(1-q)*q*cxp+q*q*lx0,(1-q)**2*fy+2*(1-q)*q*cyp+q*q*ly]);}
+  // writing path: a wave through every letter of "function", then into the dot
+  const write=[];const xe=LAY.dcx;
+  for(let i=0;i<8;i++){const x0=LAY.xs[i],w=LAY.ws[i];for(let k=1;k<=10;k++){const q=k/10;write.push([x0+w*q,ly-10*Math.sin(q*2*Math.PI)]);}}
+  write.push([xe,LAY.dcy]);
+  const path=[...tape,...flight,...write];const cum=[0];for(let k=1;k<path.length;k++)cum.push(cum[k-1]+Math.hypot(path[k][0]-path[k-1][0],path[k][1]-path[k-1][1]));
+  const sT=cum[tape.length-1],sF=cum[tape.length+flight.length-1],sE=cum[cum.length-1];
+  const at=s=>{s=clamp(s,0,sE);let k=1;while(k<cum.length-1&&cum[k]<s)k++;const a=cum[k-1],b=cum[k],q=b>a?(s-a)/(b-a):0;return [lerp(path[k-1][0],path[k][0],q),lerp(path[k-1][1],path[k][1],q)];};
+  // head / tail timing
+  let head;if(o<0.3)head=sT;else if(o<0.95)head=lerp(sT,sF,eio((o-0.3)/0.65));else head=lerp(sF,sE,clamp((o-0.95)/1.05,0,1)**0.9);
+  const Lw=lerp(120,0,clamp((o-0.95)/1.05,0,1));const Lmax=o<0.95?sT:Math.max(Lw,sT*(1-eio((o-0.95)/0.3)));const tail=Math.max(0,head-Lmax);
+  // logo letters revealed behind the ribbon head
+  const [hx,hy]=at(head);
+  if(head>sF){const lc=LOGOC.getContext('2d');lc.globalCompositeOperation='source-over';lc.clearRect(0,0,W,H);lc.font='500 170px Poppins';lc.fillStyle='#E01E2B';
+    LETTERS.forEach((ch,i)=>lc.fillText(ch,LAY.xs[i],1010));
+    if(head<sE-1){const gr=lc.createLinearGradient(hx-110,0,hx-10,0);gr.addColorStop(0,'rgba(0,0,0,1)');gr.addColorStop(1,'rgba(0,0,0,0)');lc.globalCompositeOperation='destination-in';lc.fillStyle=gr;lc.fillRect(0,0,W,H);}
+    oc.drawImage(LOGOC,0,0);}
+  // the ribbon (tape) itself
+  if(o>=0.3&&head-tail>1){const pts=[];const st=Math.max(4,(head-tail)/60);for(let s2=tail;s2<head;s2+=st)pts.push(at(s2));pts.push([hx,hy]);
+    const wv=lerp(tw0,16,eio(clamp((o-0.3)/0.6,0,1)));
+    oc.save();oc.lineJoin='round';oc.lineCap='butt';oc.shadowColor='rgba(224,30,43,.6)';oc.shadowBlur=18;
+    oc.strokeStyle='#C8141F';oc.lineWidth=wv;oc.beginPath();pts.forEach((p,k)=>k?oc.lineTo(...p):oc.moveTo(...p));oc.stroke();
+    oc.shadowBlur=0;oc.strokeStyle='#E01E2B';oc.lineWidth=wv*0.72;oc.stroke();
+    oc.strokeStyle='rgba(255,140,140,.55)';oc.lineWidth=Math.max(1.5,wv*0.12);oc.stroke(); // glossy tape sheen
+    oc.restore();}
+  // the end of the tape becomes the dot
+  const dk=eo((o-1.95)/0.35);if(dk>0){const sc=lerp(1.35,1,dk);oc.save();oc.globalAlpha=Math.min(1,dk*1.5);oc.shadowColor='#E01E2B';oc.shadowBlur=lerp(24,8,dk);oc.fillStyle='#E01E2B';oc.beginPath();oc.arc(LAY.dcx,LAY.dcy,LAY.dr*sc,0,7);oc.fill();oc.restore();}
 }
 // ---------- post
 const rt=new THREE.WebGLRenderTarget(W,H,{samples:4,type:THREE.HalfFloatType});
