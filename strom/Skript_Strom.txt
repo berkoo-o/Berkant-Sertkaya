@@ -1,5 +1,5 @@
 function. – „Wie kommt der Strom in deine Steckdose?“ – Skriptentwurf (~60 s, ca. 140 Wörter)
-Stand: 15.11.2026 – Stimme: ElevenLabs „Rupert“ – Look: Nacht-Diorama (Mini-Stadt + Windpark auf dunkler Bühne)
+Stand: 15.11.2026 – Stimme: ElevenLabs „Tom Magic“ (v4) – Look: Nacht-Diorama (Mini-Stadt + Windpark auf dunkler Bühne)
 Roter Faden: das rote Warnlicht auf der Gondel des Helden-Windrads (+ roter Energie-Impuls in den Leitungen)
 
 [1] Hook – Nacht-Stadt als Diorama, ein Stecker geht in die Steckdose, ein Fenster leuchtet warm auf. Kamera fliegt aus dem Fenster über die Stadt zum Windpark am Horizont (rote Lichter blinken).

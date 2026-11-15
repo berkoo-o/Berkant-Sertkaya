@@ -1,4 +1,4 @@
-function. – „Wie kommt der Strom in deine Steckdose?“ – Sprechertext für ElevenLabs „Rupert“ (Eleven v3, Audio-Tags)
+function. – „Wie kommt der Strom in deine Steckdose?“ – Sprechertext für ElevenLabs „Tom Magic“ (eleven_v4, Audio-Tags)
 Stand: 15.11.2026 – komplett ins Textfeld kopieren
 
 [calm][curious] Stecker rein, Licht an. [short pause] [intrigued] Aber woher kommt dieser Strom eigentlich?
