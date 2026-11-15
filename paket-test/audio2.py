@@ -66,9 +66,19 @@ fx += (lp(noise, 260) * 0.22 + 0.06*np.sin(2*np.pi*120*t)) * win(23.8, 41.4)
 for x in np.arange(23.85, 41.4, 0.8):
     cn = int(0.05 * SR); add(fx, bp(rng.standard_normal(cn), 600, 3000) * env(cn, 0.001, 0.015), x, 0.12)
 # whooshes at cuts
-for c in [7.5, 9.7, 12.9, 16.0, 18.7, 23.8, 28.5, 33.0, 41.4, 45.3, 47.4, 50.3, 53.9]:
-    wn = int(0.8 * SR); wt = np.arange(wn) / SR
-    add(fx, bp(rng.standard_normal(wn), 300, 2500) * np.sin(np.pi*wt/0.8)**2, c - 0.4, 0.22)
+# user-supplied Epidemic Sound samples (soft swooshes + UI clicks) instead of synthetic whooshes
+def _seg(fn, a, b, peak):
+    _r, _x = wavfile.read(fn); _x = _x.astype(np.float64)[int(a*_r):int(b*_r)]
+    if _x.ndim > 1: _x = _x.mean(1)
+    _f = np.minimum(1, np.arange(len(_x))/(0.003*SR)) * np.minimum(1, (len(_x) - np.arange(len(_x)))/(0.02*SR))
+    return _x / (np.max(np.abs(_x)) + 1e-9) * peak * _f
+SFXD = '../sfx/'
+WH = [(_seg(SFXD+'whoosh.wav', 0.0, 0.85, 0.30), 0.293), (_seg(SFXD+'whoosh.wav', 1.45, 2.4, 0.30), 0.263)]
+CK = [_seg(SFXD+'clicks.wav', 0.0, 0.3, 0.22), _seg(SFXD+'clicks.wav', 0.55, 0.9, 0.22), _seg(SFXD+'clicks.wav', 1.12, 1.27, 0.22)]
+for i, c in enumerate([7.5, 9.7, 12.9, 16.0, 18.7, 23.8, 28.5, 33.0, 41.4, 45.3, 47.4, 50.3, 53.9]):
+    w, pk = WH[i % 2]; add(fx, w, c - pk, 1.0)
+# UI click when a big number pops in
+for i, c in enumerate([0.3, 13.0, 18.9, 33.2, 38.6, 50.4]): add(fx, CK[i % 3], c, 1.0)
 # van pass-by (7.5-9.7): engine + tyres, peak at ~8.9
 def passby(a, b, peak, f0, g):
     n = int((b - a) * SR); tt = np.arange(n) / SR
@@ -137,15 +147,14 @@ cr = np.zeros(pn)
 for k in rng.integers(0, pn - 200, 160): cr[k:k+120] += rng.standard_normal(120) * np.exp(-np.arange(120)/25)
 add(fx, (peel * 0.5 + bp(cr, 1500, 8000)) * np.minimum(1, pt/0.03), O + 0.3, 0.28)
 # flight whoosh
-wn = int(.75 * SR); wt = np.arange(wn) / SR
-add(fx, bp(rng.standard_normal(wn), 300, 2600) * np.sin(np.pi*np.clip(wt/.75, 0, 1))**2, O + 0.35, 0.22)
+add(fx, WH[0][0], O + 0.6 - WH[0][1], 1.0)
 # writing swish 0.95-2.0 (soft, like a marker)
 sn_ = int(1.05 * SR); st_ = np.arange(sn_) / SR
 sw = bp(rng.standard_normal(sn_), 2500, 7000) * (0.6 + 0.4*np.sin(2*np.pi*7.6*st_)**2) * np.clip(np.minimum(st_/0.08, (1.05 - st_)/0.15), 0, 1)
 add(fx, sw, O + 0.95, 0.08)
 # dot: soft pop + bell chord
 pp = int(.15 * SR); ptt = np.arange(pp) / SR
-add(fx, np.sin(2*np.pi*(700 + 500*np.exp(-ptt*40))*ptt) * np.exp(-ptt*35), O + 1.95, 0.25)
+add(fx, CK[1], O + 1.95, 1.0)
 cn = int(2.4 * SR); ct = np.arange(cn) / SR
 add(fx, sum(np.sin(2*np.pi*mtof(n)*ct) for n in (76, 83, 88)) * np.exp(-ct*1.6) * np.minimum(1, ct/.01), O + 2.0, 0.06)
 
