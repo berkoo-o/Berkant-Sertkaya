@@ -46,6 +46,10 @@ while pos < DUR:
             sn = int(0.2 * SR); add(music, bp(rng.standard_normal(sn), 900, 4000) * env(sn, 0.002, 0.06) * 0.05, pos + b*beat)
     pos += bar; k += 1
 music *= np.clip((O + 2.8 - t) / 1.8, 0, 1) * np.clip(t / 0.8, 0, 1)  # music ends ~1 s after outro start, fades over 1.8 s
+import os
+if os.environ.get('MUSIC'):  # alternative music track (already faded), e.g. music_A.wav
+    _sr, _m = wavfile.read(os.environ['MUSIC']); _m = _m.astype(np.float64)
+    music = np.zeros(N); music[:min(N, len(_m))] = _m[:N]
 
 # ---------------- SFX
 fx = np.zeros(N)
@@ -158,7 +162,8 @@ def norm(x, peak): return x / (np.max(np.abs(x)) + 1e-9) * peak
 mus = norm(music, 1.0) * 0.16 * duck
 sfx = norm(fx, 1.0) * 0.35 * (1 - 0.35 * np.clip(ve * 6, 0, 1))
 vo = norm(voice, 1.0) * 0.9
-for name, mix in [('mix4_music.wav', vo + mus + sfx), ('mix4_fx.wav', vo + sfx)]:
+PFX = os.environ.get('PFX', 'mix4')
+for name, mix in [(PFX + '_music.wav', vo + mus + sfx), (PFX + '_fx.wav', vo + sfx)]:
     m = mix / max(1.0, np.max(np.abs(mix)) / 0.95)
     wavfile.write(name, SR, np.stack([m, m], 1).astype(np.float32))
 print('ok')
