@@ -7,5 +7,11 @@
   - Nicht gemocht: einfacher fliegender Punkt mit dunkler Vignette (Styleguide 6b in der Grundform) und die alte Partikel-Outro aus dem Branch `add-function-toolkit` (render.py → outro()).
 - **Musik:** im schraffuren-Stil (Instagram „schraffuren“, Original-Audio): weicher tiefer Puls ~100 BPM, Sub-Bass, leise luftige Fläche, fast keine Melodie/Hi-Hats, ca. 15 dB unter der Stimme (Referenz: `paket-test/music_variants.py` → `track_D`).
 - **Übergangs-Sounds:** keine Standard-Synth-Whooshes („hat jeder auf TikTok“). Für Wischer/Szenenwechsel die vom Nutzer gelieferten Epidemic-Sounds verwenden: `paket-test/sfx_epidemic/whoosh.mp3` (2 weiche Swooshes) und `clicks.mp3` (3 UI-Klicks, z. B. wenn eine Zahl erscheint).
-- **Cover:** exakt nach den alten Covern im Branch `add-function-toolkit` (cover6.py/cover7.py): Hintergrund „atmosphere“ (render3.py), roter Glow + 3 Ringe um das Motiv bei (540, 960), Titel ZENTRIERT – Zeile 1 weiß Poppins Bold 96 px Grundlinie y=430, Zeile 2 rot 110 px y=560 (Fragestil), Logo „function.“ Poppins Medium 96 px, Tracking −0,03, zentriert y=1610. Vorlage: `paket-test/cover.html`.
+- **Cover:** exakt wie das BER-Cover (Vorlage vom Nutzer, pixelgenau vermessen) – Template `paket-test/cover3.html` (Titel per URL `?l1=…&l2=…`):
+  - Hintergrund: radialer Verlauf #1A1D23 → #0A0B0E mit feinen Sternpunkten.
+  - Titel LINKSBÜNDIG (Tinte ab x=82): Zeile 1 weiß, Poppins Bold, Oberkante y≈335, Grundlinie y=441; Zeile 2 rot #E01E2B, Poppins Bold, Großbuchstaben-Oberkante y=506, Grundlinie y=639. Schlichter Titel („Flughafen BER“, „Das Paket“).
+  - Roter Strich x 80–240, y 706–714, abgerundet.
+  - Liegender roter Ring: Ellipse Mitte (540, 1248), außen rx 474,5 / ry 100, 7 px mit Glow, dünner dunkelroter Außenring #6E0F16 (rx 524 / ry 112,5), leichter roter Schimmer innen. Motiv steht mittig auf dem Ring.
+  - Logo „function.“ Poppins Medium, zentriert, Tinte x 311–765, f-Oberkante y=1548, Grundlinie y=1641.
+  - Nicht verwenden: zentrierte Fragetitel mit Kreisringen (alte cover6/7-Variante).
 - Referenz-Umsetzung: `paket-test/v4.html` → `drawOutro()`, Ton in `paket-test/audio2.py` (Abschnitt „outro (themed …)“).
