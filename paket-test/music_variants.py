@@ -112,5 +112,32 @@ def track_C():
         pos += bar; k += 1
     return finish(m)
 
-for name, fn in [('A', track_A), ('B', track_B), ('C', track_C)]:
+import sys
+if 'D' not in sys.argv:
+  for name, fn in [('A', track_A), ('B', track_B), ('C', track_C)]:
     x = fn(); wavfile.write(f'music_{name}.wav', SR, x.astype(np.float32)); print(name, 'ok')
+
+# ---------------------------------------------------------------- D: schraffuren-style minimal pulse (measured from reference: ~100 BPM soft sub pulse, airy pad, almost no melody/hats)
+def track_D():
+    rng = np.random.default_rng(4); m = np.zeros(N)
+    bpm = 100; beat = 60 / bpm; bar = 4 * beat
+    chords = [[50, 57, 64, 69], [47, 54, 62, 66], [43, 50, 57, 64], [45, 52, 59, 64]]  # Dsus2-ish, Bm(add11), G(add9), Asus
+    pos = 0.0; k = 0
+    while pos < DUR:
+        ch = chords[k % 4]; n = int(bar*SR*2.2); tt = np.arange(n)/SR
+        pad = sum(sum(np.sin(2*np.pi*mtof(x)*d*tt + 0.15*np.sin(2*np.pi*0.3*tt)) for d in (1, 1.002, 0.998)) for x in ch[1:])
+        air = bp(rng.standard_normal(n), 2500, 6000) * 0.05
+        e = np.minimum(1, tt/1.2) * np.clip((bar*2.2 - tt)/1.0, 0, 1)
+        if k % 2 == 0: add(m, (lp(pad, 1400) + air) * e, pos, 0.018)
+        for b in range(4):
+            kn = int(.45*SR); kt = np.arange(kn)/SR
+            kick = np.sin(2*np.pi*(44 + 38*np.exp(-kt*22))*kt) * np.exp(-kt*6.5) * np.minimum(1, kt/0.004)
+            add(m, lp(kick, 160), pos + b*beat, 0.34)
+            bn = int(beat*SR*0.9); bt = np.arange(bn)/SR
+            add(m, lp(np.sin(2*np.pi*mtof(ch[0]-12)*bt), 120) * np.sin(np.pi*np.clip(bt/(beat*0.9), 0, 1))**1.5, pos + b*beat + 0.02, 0.10)
+            tk = int(.02*SR); add(m, bp(rng.standard_normal(tk), 3000, 8000) * np.exp(-np.arange(tk)/SR*300), pos + b*beat + beat/2, 0.012)
+        pos += bar; k += 1
+    return finish(m)
+
+if __name__ == '__main__' and 'D' in __import__('sys').argv:
+    x = track_D(); wavfile.write('music_D.wav', SR, x.astype(np.float32)); print('D ok')
