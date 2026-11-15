@@ -3,60 +3,75 @@
 <style>
 @font-face{font-family:Poppins;font-weight:500;src:url(node_modules/@fontsource/poppins/files/poppins-latin-500-normal.woff2)}
 @font-face{font-family:Poppins;font-weight:700;src:url(node_modules/@fontsource/poppins/files/poppins-latin-700-normal.woff2)}
-html,body{margin:0;width:1080px;height:1920px;overflow:hidden;font-family:Poppins}
-body{background:radial-gradient(ellipse at 50% 55%,#1A1D23 0%,#0A0B0E 75%)}
-#stars,#gl{position:absolute;left:0;top:0}
-#title{position:absolute;left:96px;top:270px;line-height:.98}
-#t1{color:#fff;font-weight:700;font-size:126px;letter-spacing:-2px}
-#t2{color:#E01E2B;font-weight:700;font-size:108px;letter-spacing:-2px}
-#bar{width:110px;height:9px;background:#E01E2B;border-radius:5px;margin-top:30px}
-#logo{position:absolute;left:0;right:0;bottom:120px;text-align:center;color:#E01E2B;font-weight:500;font-size:120px;letter-spacing:-2px}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#0A0B0E}
+canvas{position:absolute;left:0;top:0}
 </style></head><body>
-<canvas id="stars" width="1080" height="1920"></canvas>
-<div id="title"><div id="t1">Das</div><div id="t2">Paket</div><div id="bar"></div></div>
-<div id="logo">function.</div>
+<canvas id="bg" width="1080" height="1920"></canvas>
+<canvas id="fg" width="1080" height="1920"></canvas>
 <script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
 <script type="module">
+// Layout 1:1 from the old covers (toolkit cover6.py / cover7.py, render3.atmosphere)
 import * as THREE from 'three';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
-await Promise.all(['500 20px Poppins','700 96px Poppins'].map(f=>document.fonts.load(f)));
-// stars
-{const c=document.getElementById('stars').getContext('2d');let s=7;const r=()=>(s=(s*16807)%2147483647)/2147483647;
- for(let i=0;i<260;i++){const x=r()*1080,y=r()*1920,a=.15+r()*.55,R=r()<.1?1.6:0.9;c.fillStyle=`rgba(255,255,255,${a})`;c.beginPath();c.arc(x,y,R,0,7);c.fill();}}
-const W=1080,H=1920;
+await Promise.all(['500 96px Poppins','700 96px Poppins','600 30px Poppins'].map(f=>document.fonts.load(f)));
+const W=1080,H=1920,RED='#E01E2B',v=6.0;
+const cl=x=>Math.max(0,Math.min(1,x));
+let seed=21;const R=()=>(seed=(seed*16807)%2147483647)/2147483647;const U=(a,b)=>a+(b-a)*R();
+const DUST=[...Array(140)].map(()=>[R()*W,R()*H,U(.8,2.4),U(6,30),R(),U(.3,1)]);
+const BOKEH=[...Array(22)].map(()=>[R()*W,U(300,1500),U(18,60),U(.15,.5),R()]);
+const EMBER=[...Array(34)].map(()=>[R()*W,R(),U(40,110),U(1.5,3.5),R()]);
+const bg=document.getElementById('bg').getContext('2d');
+const circ=(c,x,y,r,col,a,blur=0)=>{c.save();c.globalAlpha=Math.max(0,Math.min(1,a));if(blur)c.filter=`blur(${blur}px)`;c.fillStyle=col;c.beginPath();c.arc(x,y,r,0,7);c.fill();c.restore();};
+function rgba(h,a){const n=parseInt(h.slice(1),16);return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`;}
+// ---- atmosphere(cv, 6.0)
+bg.fillStyle='#0A0B0E';bg.fillRect(0,0,W,H);
+{const g=bg.createRadialGradient(540+60*Math.sin(v*.2),820,0,540+60*Math.sin(v*.2),820,1150);g.addColorStop(0,'#17191F');g.addColorStop(1,'#0A0B0E');bg.fillStyle=g;bg.fillRect(0,0,W,H);}
+[[200,600,420],[900,1100,480],[600,300,360]].forEach(([bx,by,r],i)=>{const x=bx+120*Math.sin(v*.13+i*2),y=by+90*Math.cos(v*.11+i);
+  const g=bg.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,rgba(RED,.07));g.addColorStop(1,rgba(RED,0));bg.fillStyle=g;bg.beginPath();bg.arc(x,y,r,0,7);bg.fill();});
+{const hz=980,vp=540;bg.strokeStyle=rgba('#C9CDD4',.035);bg.lineWidth=1.5;
+ for(let k=-9;k<=9;k++){bg.beginPath();bg.moveTo(vp+k*26,hz);bg.lineTo(vp+k*260,1700);bg.stroke();}
+ for(let j=0;j<14;j++){const y=hz+(1700-hz)*((j+(v*.6)%1)/14)**2;const a=.05*cl((y-hz)/200);bg.strokeStyle=rgba('#C9CDD4',a);bg.beginPath();bg.moveTo(0,y);bg.lineTo(W,y);bg.stroke();}}
+for(const [x,y,r,sp,ph] of BOKEH){const xx=((x+v*14*sp)%(W+200))-100,yy=y+30*Math.sin(v*sp+ph*6);circ(bg,xx,yy,r,'#9AA0AA',.035+.025*Math.sin(v*.7+ph*5),r*.45);}
+for(const [x,y,r,sp,ph,dp] of DUST){const yy=(((y-v*sp)%H)+H)%H,xx=((x+18*Math.sin(v*.35+ph*6)+v*6*dp)%W+W)%W;circ(bg,xx,yy,r*dp,'#B8BEC8',(.12+.1*Math.sin(v*1.3+ph*9))*dp);}
+for(const [x,y0,sp,r,ph] of EMBER){const yy=H-((y0*H+v*sp)%(H+200)),xx=x+25*Math.sin(v*.8+ph*7);const a=.35*(.5+.5*Math.sin(v*2+ph*11));circ(bg,xx,yy,r*2.6,RED,a*.35,r*2);circ(bg,xx,yy,r*.7,'#FF7A82',a);}
+// ---- red glow + rings behind the motif (cover6)
+circ(bg,540,960,520,RED,.10,70);
+for(const [r,a] of [[430,.4],[500,.22],[580,.12]]){bg.save();bg.globalAlpha=a;bg.strokeStyle=RED;bg.lineWidth=2.5;bg.beginPath();bg.arc(540,960,r,0,7);bg.stroke();bg.restore();}
+
+// ---- 3D parcel (motif) centred in the rings
 const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});
-renderer.setSize(W,H);renderer.setPixelRatio(1);renderer.domElement.id='gl';
-renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;renderer.outputColorSpace=THREE.SRGBColorSpace;
-renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
-document.body.insertBefore(renderer.domElement,document.getElementById('title'));
-const scene=new THREE.Scene();
-const pm=new THREE.PMREMGenerator(renderer);scene.environment=pm.fromScene(new RoomEnvironment(),0.04).texture;scene.environmentIntensity=0.5;
-const cam=new THREE.PerspectiveCamera(30,W/H,0.1,100);cam.position.set(2.2,2.23,6.36);cam.lookAt(0,0.35,0);
-// shift view so the parcel sits slightly below center
-cam.setViewOffset(W,H,0,-150,W,H);
+renderer.setSize(W,H);renderer.setPixelRatio(1);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.domElement.style.position='absolute';document.body.insertBefore(renderer.domElement,document.getElementById('fg'));
+const scene=new THREE.Scene();const pm=new THREE.PMREMGenerator(renderer);scene.environment=pm.fromScene(new RoomEnvironment(),0.04).texture;scene.environmentIntensity=0.5;
+const cam=new THREE.PerspectiveCamera(30,W/H,0.1,100);cam.position.set(2.35,2.3,5.4);cam.lookAt(0,0.3,0);
 scene.add(new THREE.HemisphereLight(0xdfe8ff,0x1a0a0a,0.6));
-const key=new THREE.DirectionalLight(0xfff4e6,2.6);key.position.set(-3,5,4);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.radius=6;scene.add(key);
-const rim=new THREE.DirectionalLight(0xff4050,1.4);rim.position.set(3,1.5,-3);scene.add(rim);
+const key=new THREE.DirectionalLight(0xfff4e6,2.6);key.position.set(-3,5,4);scene.add(key);
+const rim=new THREE.DirectionalLight(0xff4050,1.6);rim.position.set(3,1.5,-3);scene.add(rim);
 function canvasTex(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t;}
-let s=3;const rnd=()=>(s=(s*16807)%2147483647)/2147483647;
-const kraft=canvasTex(512,512,(g,w,h)=>{g.fillStyle='#b48a5e';g.fillRect(0,0,w,h);for(let i=0;i<9000;i++){const a=rnd()*.06;g.fillStyle=rnd()>.5?`rgba(80,50,25,${a})`:`rgba(235,200,150,${a})`;g.fillRect(rnd()*w,rnd()*h,2+rnd()*10,1);}});
+let s2=3;const rr=()=>(s2=(s2*16807)%2147483647)/2147483647;
+const kraft=canvasTex(512,512,(g,w,h)=>{g.fillStyle='#b48a5e';g.fillRect(0,0,w,h);for(let i=0;i<9000;i++){const a=rr()*.06;g.fillStyle=rr()>.5?`rgba(80,50,25,${a})`:`rgba(235,200,150,${a})`;g.fillRect(rr()*w,rr()*h,2+rr()*10,1);}});
 const label=canvasTex(512,340,(g)=>{g.fillStyle='#f4f2ec';g.fillRect(0,0,512,340);g.fillStyle='#222';g.font='600 30px Poppins';g.fillText('AN: M. Muster',28,52);
   g.font='500 24px Poppins';g.fillText('Beispielweg 11',28,88);g.fillText('10485 Stadt',28,120);let x=28,q=7;const r=()=>(q=(q*48271)%2147483647)/2147483647;g.fillStyle='#111';while(x<484){const w=2+Math.floor(r()*6);if(r()>.4)g.fillRect(x,150,w,130);x+=w+2;}});
-const w=1.0,h=0.6,d=0.8,S=1.0;
-const g=new THREE.Group();scene.add(g);g.rotation.y=-0.35;g.scale.setScalar(1.0);
-const b=new THREE.Mesh(new RoundedBoxGeometry(w,h,d,4,0.02),new THREE.MeshStandardMaterial({color:0xffffff,map:kraft,roughness:.85}));b.position.y=h/2;b.castShadow=true;g.add(b);
+const w=1.0,h=0.6,d=0.8;const gp=new THREE.Group();scene.add(gp);gp.rotation.y=-0.35;gp.position.y=0.02;
+const b=new THREE.Mesh(new RoundedBoxGeometry(w,h,d,4,0.02),new THREE.MeshStandardMaterial({color:0xffffff,map:kraft,roughness:.85}));b.position.y=h/2;gp.add(b);
 const tm=new THREE.MeshStandardMaterial({color:0xd8141f,roughness:.3,envMapIntensity:1.3,emissive:0x2a0000});
-const t1=new THREE.Mesh(new THREE.BoxGeometry(.15,.004,d+.006),tm);t1.position.y=h+.002;g.add(t1);
-for(const z of [-1,1]){const t=new THREE.Mesh(new THREE.BoxGeometry(.15,h*.42,.004),tm);t.position.set(0,h*.79,z*(d/2+.002));g.add(t);}
-const lab=new THREE.Mesh(new THREE.PlaneGeometry(.3,.2),new THREE.MeshStandardMaterial({map:label,roughness:.55}));lab.rotation.x=-Math.PI/2;lab.position.set(-.3,h+.005,-.22);g.add(lab);
-// floor for shadow only
-const sh=new THREE.Mesh(new THREE.PlaneGeometry(10,10),new THREE.ShadowMaterial({opacity:.55}));sh.rotation.x=-Math.PI/2;sh.receiveShadow=true;scene.add(sh);
-// lying red ring (glow) around parcel on the ground
-const ringR=0.86;
-function ring(r,tube,color,op){const m=new THREE.Mesh(new THREE.TorusGeometry(r,tube,16,160),new THREE.MeshBasicMaterial({color,transparent:true,opacity:op,depthWrite:false,blending:THREE.AdditiveBlending}));m.rotation.x=-Math.PI/2;m.position.y=.005;scene.add(m);return m;}
-ring(ringR,.012,0xff2a35,1);ring(ringR,.03,0xE01E2B,.35);ring(ringR,.07,0xE01E2B,.12);ring(ringR+.09,.006,0x6E0F16,1);
-const sh2=new THREE.Mesh(new THREE.CircleGeometry(ringR,96),new THREE.MeshBasicMaterial({color:0xE01E2B,transparent:true,opacity:.07,depthWrite:false}));sh2.rotation.x=-Math.PI/2;sh2.position.y=.003;scene.add(sh2);
+const t1=new THREE.Mesh(new THREE.BoxGeometry(.15,.004,d+.006),tm);t1.position.y=h+.002;gp.add(t1);
+for(const z of [-1,1]){const t=new THREE.Mesh(new THREE.BoxGeometry(.15,h*.42,.004),tm);t.position.set(0,h*.79,z*(d/2+.002));gp.add(t);}
+const lab=new THREE.Mesh(new THREE.PlaneGeometry(.3,.2),new THREE.MeshStandardMaterial({map:label,roughness:.55}));lab.rotation.x=-Math.PI/2;lab.position.set(-.3,h+.005,-.22);gp.add(lab);
+// centre the parcel on (540,960)
+cam.updateMatrixWorld();const c3=new THREE.Vector3(0,h/2,0).project(cam);const py=(1-c3.y)/2*H;cam.setViewOffset(W,H,0,py-960,W,H);
 renderer.render(scene,cam);
+// soft contact shadow under the parcel
+{const p=new THREE.Vector3(0,0,0).project(cam);}
+
+// ---- text exactly like the old covers (cover6): centred title, logo at 1610
+const fg=document.getElementById('fg').getContext('2d');
+function text(s,x,y,sz,col,align){fg.font=`700 ${sz}px Poppins`;const wd=fg.measureText(s).width;if(align==='c')x-=wd/2;fg.fillStyle=col;fg.fillText(s,x,y);}
+function tracked(s,x,y,sz,col,track){fg.font=`500 ${sz}px Poppins`;const ws=[...s].map(ch=>fg.measureText(ch).width);const tot=ws.reduce((a,b)=>a+b,0)+track*sz*(s.length-1);let xx=x-tot/2;fg.fillStyle=col;[...s].forEach((ch,i)=>{fg.fillText(ch,xx,y);xx+=ws[i]+track*sz;});}
+const P=new URLSearchParams(location.search);
+text(P.get('l1')||'Wie findet dein',540,430,96,'#FFFFFF','c');
+text(P.get('l2')||'Paket den Weg?',540,560,110,RED,'c');
+tracked('function.',540,1610,96,RED,-.03);
 window.ready=true;
 </script></body></html>
