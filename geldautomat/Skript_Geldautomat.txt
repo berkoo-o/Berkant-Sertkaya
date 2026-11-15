@@ -1,4 +1,4 @@
-function. – „Der Geldautomat“ – Skriptentwurf (~60 s, 130 Wörter)
+function. – „Der Geldautomat“ – Skriptentwurf (~60 s, 128 Wörter)
 Stand: 15.11.2026 – Stimme: ElevenLabs „Rupert“ – Look: schraffuren-Stil
 
 [1] Hook – Automat von außen, kurzer Röntgenblick auf das Geld im Inneren
