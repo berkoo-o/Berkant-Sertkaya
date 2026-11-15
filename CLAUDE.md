@@ -1,6 +1,7 @@
 # function. – Projektanweisungen
 
 - Für jedes function.-Erklärvideo gilt der Skill „function-erklaervideo“ (Styleguide).
+- **Texte (Wunsch des Nutzers, 15.11.2026):** Alles, was ich schreibe (Chat-Antworten, Skripte, Sprechertexte, Beschreibungen), flüssig, natürlich und korrekt formulieren: ganze Sätze, die gut ineinander übergehen. Nichts Verkrampftes oder Abgehacktes, keine Stichwort-Fragmente und keine aneinandergereihten Gedankenstriche.
 - **Outro immer ans Thema anpassen** (Wunsch des Nutzers, 14.11.2026): Jedes Video bekommt eine eigene Outro, die aus dem Hauptmotiv heraus das Logo „function.“ entstehen lässt. Das rote Detail des Hauptmotivs (roter Faden des Videos) ist dabei der Hauptdarsteller, und die Kamera fährt vorher so weit zurück, dass es gut sichtbar ist.
   - Paket (14.11.2026, vom Nutzer gewählt): Das rote Klebeband löst sich vom Paket, fliegt als rotes Band im Bogen nach oben und schreibt das Logo Buchstabe für Buchstabe. Das Ende des Bands wird zum Punkt. Ton: Abzieh-Knistern, Whoosh, leises Schreib-Wischen, Pop und Glocken-Akkord beim Punkt.
   - Strom (15.11.2026, vom Nutzer gewählt): Ein kleines Flugzeug fliegt nachts über den Windpark, unter ihm gehen die roten Warnlichter der Windräder nacheinander an und schreiben „function.“; das Licht des Helden-Windrads wird zum Punkt.
