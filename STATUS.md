@@ -14,10 +14,13 @@ Frühere Videos außerhalb des Repos: Elbphilharmonie, Flughafen BER, Weißes Ha
 ## Aktueller Look (seit Strom v3)
 Ein einziges schlichtes Low-Poly-Modell auf einer dunklen Platte, wie im schraffuren-Reel. Die Geschichte wird über Licht erzählt, es gibt keine Schnitte und die Kamera fährt langsam. Abgelehnt wurden viele einzelne 3D-Szenen und das fotorealistische Higgsfield-Diorama.
 
-## Neues Video
-- **Thema:** _noch offen, hier eintragen_
-- **Ordner:** _z. B. `thema-name/`_
-- **Aktuelle Etappe:** 0, Thema festlegen
+## Aktuelles Video: Der Strom („Wie kommt der Strom in deine Steckdose?“)
+- **Ordner:** `strom/`, die aktuelle Version liegt in `strom/v3/` (`modell.html`, `render.mjs`, `audio_modell.py`)
+- **Stand:** v3 ist fertig gerendert (`Der_Strom_mit_Musik.mp4`, `Der_Strom_nur_Effekte.mp4`), Cover und Beschreibungen liegen ebenfalls vor
+- **Skript:** `strom/Skript_Strom.txt`, Sprechertext in `strom/Sprechertext_mit_Tags.txt`
+- **Outro:** Die roten Warnlichter steigen von den Windrädern auf und werden zu den Buchstaben, das Licht des vordersten Windrads landet als Punkt
+- **Aktuelle Etappe:** Überarbeitung von v3 nach dem Feedback des Nutzers
+- **Offene Änderungswünsche:** _(hier eintragen)_
 
 ## Etappen
 Nach jeder Etappe wird diese Datei aktualisiert, danach `/clear` und im neuen Chat mit `@STATUS.md` weitermachen.
@@ -35,4 +38,4 @@ Nach jeder Etappe wird diese Datei aktualisiert, danach `/clear` und im neuen Ch
 - _(hier sammeln: Skriptversion, Szenen, Lichter, Timing, gewählte Outro …)_
 
 ## Nächster Schritt
-Thema für das neue Video festlegen.
+Am Strom-Video v3 weiterarbeiten: Feedback des Nutzers aufnehmen und nur die betroffenen Stellen neu rendern.
