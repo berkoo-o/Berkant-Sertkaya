@@ -22,4 +22,6 @@
   - Liegender roter Ring: Ellipse Mitte (540, 1248), außen rx 474,5 / ry 100, 7 px mit Glow, dünner dunkelroter Außenring #6E0F16 (rx 524 / ry 112,5), leichter roter Schimmer innen. Motiv steht mittig auf dem Ring.
   - Logo „function.“ Poppins Medium, zentriert, Tinte x 311–765, f-Oberkante y=1548, Grundlinie y=1641.
   - Nicht verwenden: zentrierte Fragetitel mit Kreisringen (alte cover6/7-Variante).
+- **Schrift für Titel (Wunsch des Nutzers, 16.11.2026):** Inter Tight (ExtraBold 800, leicht enge Laufweite) statt Poppins, weil sie moderner wirkt. Das Logo „function.“ bleibt in Poppins Medium. Paket: `@fontsource/inter-tight`.
+- **Cover, freie moderne Variante (16.11.2026, Entwurf, Rückmeldung des Nutzers steht noch aus):** `geldautomat/cover_atm_modern.html`. Roter Kicker „SO FUNKTIONIERT“, sehr großer weißer Titel in Inter Tight, kurze Unterzeile, großes Motiv mit Röntgenblick ins Innere und drei Beschriftungen, Logo unten links.
 - Referenz-Umsetzung: `paket-test/v4.html` → `drawOutro()`, Ton in `paket-test/audio2.py` (Abschnitt „outro (themed …)“).
