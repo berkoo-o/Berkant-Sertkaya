@@ -31,6 +31,7 @@ Ein einziges schlichtes Low-Poly-Modell auf einer dunklen Platte, wie im schraff
 - Elektronen: Nahaufnahme auf das Kabel vor dem Haus als Glasröhre, die Elektronen schwingen sichtbar auf der Stelle, eines ist rot markiert. Danach fährt die Kamera zurück und drei schnelle rote Wellen laufen vom Windrad bis zum Haus.
 - Die rote Linie zum Windrad folgt jetzt der Hügeloberfläche und verschwindet nicht mehr im Gras. Außerdem läuft der Strom im Umspannwerk und am Haus nicht mehr durch Gehäuse und Hausecke.
 - Titel und Zahlen in Inter Tight ExtraBold, leichte dunkle Verläufe oben und unten für die Lesbarkeit.
+- Häuser (zweiter Wunsch vom 16.11.2026): zehn gedeckte Fassadenfarben statt einheitlichem Sandton, dazu Sockel, Gesims, Fensterbänke, Balkone, Haustüren mit Vordach und Lampe, Markisen über den Schaufenstern, Fallrohre, drei Fensterformate und Satteldächer mit Schornstein auf einigen niedrigen Häusern. Das Haus mit dem roten Dach bleibt als einziges rot.
 
 ### Rendern
 Im Ordner `strom/v4`: `npm install`, `npx http-server -p 8769 -c-1 .`, dann `seq 0 120 1800 | xargs -P 4 -I{} ./chunk.sh {}` (Bilder landen in `fr/`). Ton mit `python3 audio_modell.py` (braucht `sfx/whoosh.wav` und `sfx/clicks.wav`, aus `paket-test/sfx_epidemic/*.mp3` umgewandelt). Für Prüfansichten mit freier Kamera gibt es `dbgcam.mjs`.

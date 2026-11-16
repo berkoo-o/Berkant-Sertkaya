@@ -97,20 +97,22 @@ const koLine=(a,b,r,step=0.05)=>{const n=Math.max(1,Math.ceil(Math.hypot(b[0]-a[
 const town=new THREE.Group();scene.add(town);
 const BLD=[];const WIN=[];
 const WALL=0xa69b8b,EM=new THREE.Color(0xb9a58c);
+const rnd3=(s=>()=>(s=(s*69621)%2147483647)/2147483647)(9091);
+const PAL=[0xa69b8b,0xb89a68,0xa9745c,0x8a9a7c,0x7f92a6,0xc2b8a4,0x9c8fa0,0xb0866e,0x8fa39c,0xbba77a];let lastCol=-1;const pickCol=()=>{let i;do{i=Math.floor(rnd3()*PAL.length);}while(i===lastCol);lastCol=i;return PAL[i];};
 const PVM=new THREE.MeshStandardMaterial({color:0x16233d,roughness:.3,metalness:.5,emissive:0x1c3058,emissiveIntensity:.55});
-function building(x,z,w,d,h,opt={}){const mk=k=>{const m=new THREE.MeshStandardMaterial({color:opt.color||WALL,roughness:.92,emissive:EM.clone(),emissiveIntensity:0});m.userData.k=k;return m;};
+function building(x,z,w,d,h,opt={}){const col=new THREE.Color(opt.color||pickCol());const mk=k=>{const m=new THREE.MeshStandardMaterial({color:col,roughness:.92,emissive:opt.color?EM.clone():col.clone().multiplyScalar(1.1),emissiveIntensity:0});m.userData.k=k;return m;};
   const ms=[mk(0.78),mk(1.0),mk(0.66)];const o=mesh(town,new THREE.BoxGeometry(w,h,d),[ms[0],ms[0],ms[2],ms[2],ms[1],ms[1]],x,h/2,z);
   const pool=new THREE.Mesh(new THREE.PlaneGeometry(w+2.0,d+2.0),new THREE.MeshBasicMaterial({map:poolTex,color:new THREE.Color(0.2,0.183,0.16),transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false}));pool.rotation.x=-Math.PI/2;pool.position.set(x,0.012,z);town.add(pool);
-  const b={x,z,w,d,h,ms,pool,L:1,i:BLD.length,hero:!!opt.hero,order:rnd()};BLD.push(b);
+  const b={x,z,w,d,h,ms,pool,L:1,i:BLD.length,hero:!!opt.hero,order:rnd()};BLD.push(b);b.col=col;b.gable=!opt.hero&&h<=0.9&&rnd3()<0.8;b.ws=opt.hero?[1,1]:[[1,1],[1.25,0.86],[0.82,1.08],[1,1]][Math.floor(rnd3()*4)];b.balc=rnd3()<0.7;
   const cols=Math.max(1,Math.floor((w-0.12)/0.2)),colsD=Math.max(1,Math.floor((d-0.12)/0.2)),rows=Math.max(1,Math.floor((h-0.1)/0.215));
   if(!opt.noWin)for(let r=0;r<rows;r++){const y=0.17+r*((h-0.2)/Math.max(1,rows-0.4));
     for(let c=0;c<cols;c++)WIN.push({b,p:[x-w/2+(c+0.5)*w/cols,y,z+d/2+0.004],ry:0,thr:rnd()<0.2?2:0.06+rnd()*0.9});
     for(let c=0;c<colsD;c++)WIN.push({b,p:[x+w/2+0.004,y,z-d/2+(c+0.5)*d/colsD],ry:Math.PI/2,thr:rnd()<0.2?2:0.06+rnd()*0.9});}
-  if(!opt.hero){const q=rnd2(),G=[];for(const [bw,bd,px,pz] of [[w,0.03,0,d/2-0.015],[w,0.03,0,-d/2+0.015],[0.03,d-0.06,w/2-0.015,0],[0.03,d-0.06,-w/2+0.015,0]]){const g=new THREE.BoxGeometry(bw,0.035,bd);g.translate(px,h+0.0175,pz);G.push(g);}
+  if(!opt.hero){const q=rnd2(),G=[];if(!b.gable){for(const [bw,bd,px,pz] of [[w,0.03,0,d/2-0.015],[w,0.03,0,-d/2+0.015],[0.03,d-0.06,w/2-0.015,0],[0.03,d-0.06,-w/2+0.015,0]]){const g=new THREE.BoxGeometry(bw,0.035,bd);g.translate(px,h+0.0175,pz);G.push(g);}
     if(q<0.62){const g=new THREE.BoxGeometry(0.2,0.1,0.16);g.translate(-w/4,h+0.05,-d/4);G.push(g);if(q<0.3){G.push(rodGeo([-w/4+0.05,h+0.1,-d/4],[-w/4+0.05,h+0.3,-d/4],0.004,4).toNonIndexed());}}
     if(q>0.8||q<0.12){const g=new THREE.BoxGeometry(0.1,0.05,0.07);g.translate(-w/4+0.02,h+0.025,d/4);G.push(g);}
     mesh(town,mergeGeometries(G.map(g=>g.index?g.toNonIndexed():g)),ms[0],x,0,z);
-    if(q>0.42){const P=[];for(const fx of [0.12,0.3])for(const fz of [-0.25,0,0.25]){const g=new THREE.BoxGeometry(0.11,0.005,0.062);g.rotateX(0.38);g.translate(w*fx,h+0.03,d*fz);P.push(g);}mesh(town,mergeGeometries(P),PVM,x,0,z);}}
+    if(q>0.42){const P=[];for(const fx of [0.12,0.3])for(const fz of [-0.25,0,0.25]){const g=new THREE.BoxGeometry(0.11,0.005,0.062);g.rotateX(0.38);g.translate(w*fx,h+0.03,d*fz);P.push(g);}mesh(town,mergeGeometries(P),PVM,x,0,z);}}}
   return b;}
 // streets: dashes
 const ST={A:{z:1.95,x0:-5.0,x1:3.6},B:{x:0.75,z0:-0.95,z1:5.0},C:{x:-1.9,z0:-0.95,z1:5.0},D:{z:-0.95,x0:-5.0,x1:3.6},F:{x:3.6,z0:-0.95,z1:1.95},G:{z:5.0,x0:-5.0,x1:0.75},W:{x:-5.0,z0:-0.95,z1:5.0}};
@@ -138,10 +140,10 @@ const HH=[2.35,4.1];const hero=building(HH[0],HH[1],0.98,0.74,0.5,{hero:true,noW
  for(const dz of [-0.17,0.17]){const w2=new THREE.Mesh(new THREE.PlaneGeometry(0.15,0.17),wm());w2.rotation.y=Math.PI/2;w2.position.set(HH[0]+0.494,0.27,HH[1]+dz);town.add(w2);hero.wins.push(w2);}}
 // windows (instanced)
 const winMesh=new THREE.InstancedMesh(new THREE.PlaneGeometry(0.1,0.118),new THREE.MeshBasicMaterial({color:0xffffff}),WIN.length);
-{const M=new THREE.Matrix4(),Q=new THREE.Quaternion(),E=new THREE.Euler();WIN.forEach((w,i)=>{E.set(0,w.ry,0);Q.setFromEuler(E);M.compose(new THREE.Vector3(...w.p),Q,new THREE.Vector3(1,1,1));winMesh.setMatrixAt(i,M);winMesh.setColorAt(i,new THREE.Color(0,0,0));});town.add(winMesh);}
+{const M=new THREE.Matrix4(),Q=new THREE.Quaternion(),E=new THREE.Euler();WIN.forEach((w,i)=>{E.set(0,w.ry,0);Q.setFromEuler(E);M.compose(new THREE.Vector3(...w.p),Q,new THREE.Vector3(w.b.ws[0],w.b.ws[1],1));winMesh.setMatrixAt(i,M);winMesh.setColorAt(i,new THREE.Color(0,0,0));});town.add(winMesh);}
 const WON=new THREE.Color(1.0,0.83,0.5),WOFF=new THREE.Color(0x0b0b0d);
 WIN.forEach(w=>{const k=0.8+0.38*rnd2();w.col=rnd2()<0.14?new THREE.Color(0.82*k,0.92*k,1.04*k):new THREE.Color(1.0*k,(0.79+0.08*rnd2())*k,0.5*k);w.tv=rnd2()<0.022?1+rnd2()*9:0;});
-const SHOPS=[];{const B_=(x,z)=>BLD.find(b=>b.x===x&&b.z===z);const shop=(b,face)=>{const m=new THREE.MeshBasicMaterial({color:0x101114});const wd=(face==='z'?b.w:b.d)-0.16;const p=new THREE.Mesh(new THREE.PlaneGeometry(wd,0.085),m);if(face==='z')p.position.set(b.x,0.058,b.z+b.d/2+0.006);else{p.rotation.y=Math.PI/2;p.position.set(b.x+b.w/2+0.006,0.058,b.z);}town.add(p);SHOPS.push({b,m,c:SHOPS.length%2?new THREE.Color(0.92,0.74,0.48):new THREE.Color(0.7,0.79,0.92)});};
+const SHOPS=[];{const B_=(x,z)=>BLD.find(b=>b.x===x&&b.z===z);const shop=(b,face)=>{const m=new THREE.MeshBasicMaterial({color:0x101114});const wd=(face==='z'?b.w:b.d)-0.16;const p=new THREE.Mesh(new THREE.PlaneGeometry(wd,0.085),m);if(face==='z')p.position.set(b.x,0.058,b.z+b.d/2+0.006);else{p.rotation.y=Math.PI/2;p.position.set(b.x+b.w/2+0.006,0.058,b.z);}town.add(p);SHOPS.push({b,m,face,c:SHOPS.length%2?new THREE.Color(0.92,0.74,0.48):new THREE.Color(0.7,0.79,0.92)});};
  shop(B_(1.68,1.08),'z');shop(B_(-4.15,1.08),'z');shop(B_(-0.1,2.88),'x');shop(B_(-2.95,2.88),'x');shop(B_(-0.1,0.02),'x');shop(B_(2.78,1.08),'z');shop(B_(2.75,2.82),'z');}
 // trees
 for(let i=0;i<26;i++){const k=Math.floor(rnd()*4);const s=[ST.A,ST.D,ST.B,ST.C][k];const u=rnd();const side=rnd()<0.5?-1:1;const p=k<2?[lerp(s.x0+0.3,s.x1-0.3,u),0,s.z+side*0.36]:[s.x+side*0.36,0,lerp(s.z0+0.3,s.z1-0.3,u)];
@@ -306,8 +308,32 @@ const SLAMPS=[];{const add=(x,z,ux,uz)=>{if(BLD.some(b=>Math.abs(x-b.x)<b.w/2+0.
  for(const [k,sides] of [['A',[-1,1]],['D',[1]],['G',[-1]]]){const s=ST[k];let i=0;for(let x=s.x0+1.0;x<s.x1-0.2;x+=0.9,i++){if(rnd2()<0.3)continue;add(x,s.z+sides[i%sides.length]*0.36);}}
  for(const [k,sides] of [['B',[-1,1]],['C',[1,-1]],['W',[1]]]){const s=ST[k];let i=0;for(let z=s.z0+0.95;z<s.z1-0.2;z+=0.9,i++){if(rnd2()<0.3)continue;add(s.x+sides[i%sides.length]*0.36,z);}}}
 // trees (instanced), kept clear of roads, paths, lamps and the cable route on the hill
-{const TR=TREES.filter(p=>roadDist(p[0],p[2])>=0.335&&!blocked(p[0],p[2],0.03));const cg=new THREE.IcosahedronGeometry(0.1,1);cg.translate(0,0.19,0);const tg=new THREE.CylinderGeometry(0.012,0.016,0.12,5);tg.translate(0,0.06,0);const TREEM=new THREE.MeshStandardMaterial({color:0x4f7a3c,roughness:.95,emissive:0x4f7a3c,emissiveIntensity:0.26});const a=new THREE.InstancedMesh(cg,TREEM,TR.length),b=new THREE.InstancedMesh(tg,mat(0x3a2c22,.95),TR.length);a.castShadow=true;
+let TRF=[];{const TR=TREES.filter(p=>roadDist(p[0],p[2])>=0.335&&!blocked(p[0],p[2],0.03));TRF=TR;const cg=new THREE.IcosahedronGeometry(0.1,1);cg.translate(0,0.19,0);const tg=new THREE.CylinderGeometry(0.012,0.016,0.12,5);tg.translate(0,0.06,0);const TREEM=new THREE.MeshStandardMaterial({color:0x4f7a3c,roughness:.95,emissive:0x4f7a3c,emissiveIntensity:0.26});const a=new THREE.InstancedMesh(cg,TREEM,TR.length),b=new THREE.InstancedMesh(tg,mat(0x3a2c22,.95),TR.length);a.castShadow=true;
  const M=new THREE.Matrix4();TR.forEach((p,i)=>{const s=0.75+rnd()*0.55;M.compose(new THREE.Vector3(p[0],p[1],p[2]),new THREE.Quaternion(),new THREE.Vector3(s,s,s));a.setMatrixAt(i,M);b.setMatrixAt(i,M);});town.add(a,b);}
+// =================================================================== BUILDING DETAILS (plinth, cornice, window sills, balconies, doors with a lamp, awnings, gabled roofs, downpipes)
+{const ROOFC=[0x5a524b,0x6b5446,0x4a515a,0x7a5a48],AWN=[0x3f5a48,0x34435a,0x8a6a3a,0x5a3f48,0x46505a];const SILL=[];const shopOn=(b,f)=>SHOPS.some(s=>s.b===b&&s.face===f);
+ BLD.forEach(b=>{if(b.hero)return;const {x,z,w,d,h}=b;const mk=(k,f)=>{const c=b.col.clone().multiplyScalar(f);const m=new THREE.MeshStandardMaterial({color:c,roughness:.9,emissive:c.clone().multiplyScalar(1.1),emissiveIntensity:0});m.userData.k=k;b.ms.push(m);return m;};const trim=mk(0.95,1.2),base=mk(0.7,0.68);
+  const T=[],Bs=[];const bx=(arr,sx,sy,sz,px,py,pz)=>{const g=new THREE.BoxGeometry(sx,sy,sz);g.translate(px,py,pz);arr.push(g);};
+  bx(Bs,w+0.008,0.1,d+0.008,0,0.05,0);if(!b.gable)bx(T,w+0.014,0.022,d+0.014,0,h-0.03,0);Bs.push(rodGeo([w/2+0.005,0,d/2+0.005],[w/2+0.005,h-0.02,d/2+0.005],0.0045,5));
+  const cols=Math.max(1,Math.floor((w-0.12)/0.2)),colsD=Math.max(1,Math.floor((d-0.12)/0.2)),rows=Math.max(1,Math.floor((h-0.1)/0.215));const wy=r=>0.17+r*((h-0.2)/Math.max(1,rows-0.4));const [sx,sy]=b.ws;
+  // balconies under every second window, from the second floor up, never where a tree stands
+  if(b.balc&&rows>=2)for(let r=1;r<rows;r++){const yb=wy(r)-0.059*sy-0.014,bw=0.1*sx+0.022;
+    for(let c=0;c<cols;c++){if((c+b.i+r)%2)continue;const lx=-w/2+(c+0.5)*w/cols;if(TRF.some(t=>Math.hypot(t[0]-(x+lx),t[2]-(z+d/2))<0.22))continue;bx(T,bw,0.008,0.038,lx,yb,d/2+0.019);bx(Bs,bw,0.032,0.004,lx,yb+0.02,d/2+0.036);for(const s of [-1,1])bx(Bs,0.004,0.032,0.036,lx+s*(bw/2-0.002),yb+0.02,d/2+0.018);}
+    for(let c=0;c<colsD;c++){if((c+b.i+r)%2===0)continue;const lz=-d/2+(c+0.5)*d/colsD;if(TRF.some(t=>Math.hypot(t[0]-(x+w/2),t[2]-(z+lz))<0.22))continue;bx(T,0.038,0.008,bw,w/2+0.019,yb,lz);bx(Bs,0.004,0.032,bw,w/2+0.036,yb+0.02,lz);for(const s of [-1,1])bx(Bs,0.036,0.032,0.004,w/2+0.018,yb+0.02,lz+s*(bw/2-0.002));}}
+  // front door with a small canopy and a lamp
+  {const face=!shopOn(b,'z')?'z':(!shopOn(b,'x')?'x':null);if(face){const len=face==='z'?w:d;const u=b.x===-0.58?0.55:(rnd3()-0.5)*len*0.4;const dm=new THREE.Mesh(new THREE.PlaneGeometry(0.05,0.082),new THREE.MeshBasicMaterial({color:[0x3a2a22,0x2d3540,0x33402f][b.i%3]}));b.doorL=glowMat(0xffd9a0,0);
+    if(face==='z'){dm.position.set(x+u,0.041,z+d/2+0.0065);bx(T,0.078,0.008,0.03,u,0.092,d/2+0.015);mesh(town,new THREE.SphereGeometry(0.006,6,5),b.doorL,x+u+0.037,0.074,z+d/2+0.012,false,false);}
+    else{dm.rotation.y=Math.PI/2;dm.position.set(x+w/2+0.0065,0.041,z+u);bx(T,0.03,0.008,0.078,w/2+0.015,0.092,u);mesh(town,new THREE.SphereGeometry(0.006,6,5),b.doorL,x+w/2+0.012,0.074,z+u+0.037,false,false);}town.add(dm);}}
+  // gabled roof with a chimney on some of the lower houses
+  if(b.gable){const ax=w>=d;const span=(ax?d:w)/2+0.04,len=(ax?w:d)+0.08,rh=0.2+0.1*rnd3();const s=new THREE.Shape();s.moveTo(-span,0);s.lineTo(span,0);s.lineTo(0,rh);s.closePath();const g=new THREE.ExtrudeGeometry(s,{depth:len,bevelEnabled:false});g.translate(0,0,-len/2);if(ax)g.rotateY(Math.PI/2);g.translate(0,h,0);
+    const rc=new THREE.Color(ROOFC[b.i%ROOFC.length]);b.roofM=new THREE.MeshStandardMaterial({color:rc,roughness:.85,emissive:rc.clone().multiplyScalar(0.7),emissiveIntensity:.25});mesh(town,g,b.roofM,x,0,z);
+    const cl=len*0.24,co=span*0.4,cy=h+rh*(1-0.4)-0.02;const cm=new THREE.MeshStandardMaterial({color:0x6b5248,roughness:.9,emissive:0x6b5248,emissiveIntensity:.3});box(town,0.05,0.14,0.05,cm,x+(ax?cl:co),cy+0.07,z+(ax?co:cl));box(town,0.06,0.012,0.06,mat(0x3a3533,.9),x+(ax?cl:co),cy+0.146,z+(ax?co:cl));}
+  mesh(town,mergeGeometries(T.map(g=>g.index?g.toNonIndexed():g)),trim,x,0,z);mesh(town,mergeGeometries(Bs.map(g=>g.index?g.toNonIndexed():g)),base,x,0,z);});
+ // awnings over the shop fronts
+ SHOPS.forEach((s,i)=>{const b=s.b;const wd=(s.face==='z'?b.w:b.d)-0.14;const c=new THREE.Color(AWN[i%AWN.length]);const m=new THREE.MeshStandardMaterial({color:c,roughness:.8,emissive:c,emissiveIntensity:.35});let g;if(s.face==='z'){g=new THREE.BoxGeometry(wd,0.005,0.046);g.rotateX(0.35);g.translate(0,0.096,b.d/2+0.022);}else{g=new THREE.BoxGeometry(0.046,0.005,wd);g.rotateZ(-0.35);g.translate(b.w/2+0.022,0.096,0);}mesh(town,g,m,b.x,0,b.z);});
+ // window sills (instanced)
+ {const sm=new THREE.MeshStandardMaterial({color:0xcfc7b8,roughness:.8,emissive:0xcfc7b8,emissiveIntensity:.14});const im=new THREE.InstancedMesh(new THREE.BoxGeometry(0.114,0.008,0.016),sm,WIN.length);const M=new THREE.Matrix4(),Q=new THREE.Quaternion(),E=new THREE.Euler();
+  WIN.forEach((w,i)=>{E.set(0,w.ry,0);Q.setFromEuler(E);const n=w.ry?[1,0]:[0,1];M.compose(new THREE.Vector3(w.p[0]+n[0]*0.003,w.p[1]-0.059*w.b.ws[1]-0.005,w.p[2]+n[1]*0.003),Q,new THREE.Vector3(w.b.ws[0],1,1));im.setMatrixAt(i,M);});im.castShadow=false;town.add(im);}}
 // cable close-up: the cable in front of the house becomes a glass tube with the electrons inside
 const cab=new THREE.Group();scene.add(cab);cab.visible=false;const CLEN=CAB.x1-CAB.x0,CCX=(CAB.x0+CAB.x1)/2;
 const cabTr=new THREE.Mesh(new THREE.PlaneGeometry(CLEN+0.08,0.14),new THREE.MeshBasicMaterial({color:0x08080a,transparent:true,opacity:0}));cabTr.rotation.x=-Math.PI/2;cabTr.position.set(CCX,0.011,CAB.z);cab.add(cabTr);
@@ -392,7 +418,7 @@ function setTime(t){
   setCam(t);tags.forEach(e=>e.style.opacity=0);STREAK.forEach(S=>{S.l.visible=S.head.visible=S.pool.visible=false;});const o=t-O;const OF=k=>o>0?1-ease((o-0.08-k*0.55)/0.22):1;
   {let lb=0;if(o>0){for(let i=0;i<8;i++)lb+=Math.min(1.3,letterB(i,o));lb/=8;}logoL.intensity=0.55*lb;const pk=o>0?lerp(1,0.3,ease(o/0.8)):1;PLED.forEach(([m,c])=>m.color.copy(c).multiplyScalar(pk));}
   // town lights
-  BLD.forEach(b=>{const L=townL(b,t)*(b.hero?1:lerp(1,0.32,ease((t-51.0)/1.6)))*OF(b.hero?1.3:b.order);b.L=L;b.ms.forEach(m=>m.emissiveIntensity=L*0.4*m.userData.k);b.pool.material.opacity=0.8*L;});
+  BLD.forEach(b=>{const L=townL(b,t)*(b.hero?1:lerp(1,0.32,ease((t-51.0)/1.6)))*OF(b.hero?1.3:b.order);b.L=L;b.ms.forEach(m=>m.emissiveIntensity=L*0.4*m.userData.k);if(b.roofM)b.roofM.emissiveIntensity=0.2+0.3*L;if(b.doorL)b.doorL.color.copy(hdr(0xffd9a0,0.12+2.6*L));b.pool.material.opacity=0.8*L;});
   PARKM.forEach(pm=>{let a=0,n=0;BLD.forEach(b=>{if(Math.hypot(b.x-pm.userData.c[0],b.z-pm.userData.c[1])<2.2){a+=b.L;n++;}});pm.material.emissiveIntensity=0.06+0.42*(n?a/n:0);});
   WIN.forEach((w,i)=>{if(w.b.L>w.thr){if(w.tv){CL.setRGB(0.42,0.6,1.0).multiplyScalar(0.62+0.38*Math.sin(t*9+w.tv)*Math.sin(t*3.1+w.tv*2));winMesh.setColorAt(i,CL);}else winMesh.setColorAt(i,w.col);}else winMesh.setColorAt(i,WOFF);});winMesh.instanceColor.needsUpdate=true;
   SHOPS.forEach(s=>s.m.color.copy(WOFF).lerp(s.c,clamp(s.b.L,0,1)));{let a=0;BLD.forEach(b=>a+=b.L);a/=BLD.length;AGM.forEach(m=>m.emissiveIntensity=lerp(0.24,0.44,a));}
