@@ -4,6 +4,21 @@
 @font-face{font-family:Poppins;font-weight:500;src:url(node_modules/@fontsource/poppins/files/poppins-latin-500-normal.woff2)}
 @font-face{font-family:Poppins;font-weight:600;src:url(node_modules/@fontsource/poppins/files/poppins-latin-600-normal.woff2)}
 @font-face{font-family:Poppins;font-weight:700;src:url(node_modules/@fontsource/poppins/files/poppins-latin-700-normal.woff2)}
+@font-face{font-family:'Inter Tight';font-weight:600;src:url(node_modules/@fontsource/inter-tight/files/inter-tight-latin-600-normal.woff2)}
+@font-face{font-family:'Inter Tight';font-weight:700;src:url(node_modules/@fontsource/inter-tight/files/inter-tight-latin-700-normal.woff2)}
+@font-face{font-family:'Inter Tight';font-weight:800;src:url(node_modules/@fontsource/inter-tight/files/inter-tight-latin-800-normal.woff2)}
+@font-face{font-family:'Plus Jakarta Sans';font-weight:600;src:url(node_modules/@fontsource/plus-jakarta-sans/files/plus-jakarta-sans-latin-600-normal.woff2)}
+@font-face{font-family:'Plus Jakarta Sans';font-weight:700;src:url(node_modules/@fontsource/plus-jakarta-sans/files/plus-jakarta-sans-latin-700-normal.woff2)}
+@font-face{font-family:'Plus Jakarta Sans';font-weight:800;src:url(node_modules/@fontsource/plus-jakarta-sans/files/plus-jakarta-sans-latin-800-normal.woff2)}
+@font-face{font-family:'Manrope';font-weight:600;src:url(node_modules/@fontsource/manrope/files/manrope-latin-600-normal.woff2)}
+@font-face{font-family:'Manrope';font-weight:700;src:url(node_modules/@fontsource/manrope/files/manrope-latin-700-normal.woff2)}
+@font-face{font-family:'Manrope';font-weight:800;src:url(node_modules/@fontsource/manrope/files/manrope-latin-800-normal.woff2)}
+@font-face{font-family:'Sora';font-weight:600;src:url(node_modules/@fontsource/sora/files/sora-latin-600-normal.woff2)}
+@font-face{font-family:'Sora';font-weight:700;src:url(node_modules/@fontsource/sora/files/sora-latin-700-normal.woff2)}
+@font-face{font-family:'Sora';font-weight:800;src:url(node_modules/@fontsource/sora/files/sora-latin-800-normal.woff2)}
+@font-face{font-family:'Outfit';font-weight:600;src:url(node_modules/@fontsource/outfit/files/outfit-latin-600-normal.woff2)}
+@font-face{font-family:'Outfit';font-weight:700;src:url(node_modules/@fontsource/outfit/files/outfit-latin-700-normal.woff2)}
+@font-face{font-family:'Outfit';font-weight:800;src:url(node_modules/@fontsource/outfit/files/outfit-latin-800-normal.woff2)}
 html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#0A0B0E}
 canvas{position:absolute;left:0;top:0}
 </style></head><body>
@@ -24,7 +39,8 @@ import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
 import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
 import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
-await Promise.all(['500 100px Poppins','700 100px Poppins','600 30px Poppins'].map(f=>document.fonts.load(f)));
+const TF=new URLSearchParams(location.search).get('font')||'Poppins',TW=new URLSearchParams(location.search).get('w')||'700',TS=+(new URLSearchParams(location.search).get('ls')||0);
+await Promise.all(['500 100px Poppins','700 100px Poppins','600 30px Poppins',`${TW} 100px "${TF}"`].map(f=>document.fonts.load(f)));
 const W=1080,H=1920,RED='#E01E2B';
 const P=new URLSearchParams(location.search);const L1=P.get('l1')||'Der',L2=P.get('l2')||'Geldautomat';
 const bg=document.getElementById('bg').getContext('2d'),fg=document.getElementById('fg').getContext('2d');
@@ -104,13 +120,13 @@ const shp=new THREE.Mesh(new THREE.PlaneGeometry(10,10),new THREE.ShadowMaterial
 const o=new THREE.Vector3(0,0,0).project(cam);const ox=(o.x+1)/2*W,oy=(1-o.y)/2*H;cam.setViewOffset(W,H,ox-CX,oy-CY,W,H);
 renderer.render(scene,cam);
 // title + bar + logo, sizes calibrated to the measured template glyph heights
-function calib(weight,ch,target,useCap){fg.font=`${weight} 100px Poppins`;const m=fg.measureText(ch);return 100*target/m.actualBoundingBoxAscent;}
-const s1=calib(700,'l',441-338)*0.951,s2_=calib(700,'B',639-506)*1.015;
-fg.fillStyle='#FFFFFF';fg.font=`700 ${s1}px Poppins`;{const m=fg.measureText(L1);fg.fillText(L1,82-m.actualBoundingBoxLeft*-1+0,441);}
-fg.fillStyle=RED;fg.font=`700 ${s2_}px Poppins`;{let m=fg.measureText(L2);let z=s2_;if(m.width>900){z=s2_*900/m.width;fg.font=`700 ${z}px Poppins`;m=fg.measureText(L2);}fg.fillText(L2,82+m.actualBoundingBoxLeft,601);}
-fg.fillStyle=RED;fg.beginPath();fg.roundRect(80,654,160,8,4);fg.fill();
+function calib(weight,ch,target,useCap){fg.font=`${weight} 100px "${TF}"`;const m=fg.measureText(ch);return 100*target/m.actualBoundingBoxAscent;}
+const s1=calib(TW,'l',441-338)*0.951,s2_=calib(TW,'B',639-506)*1.015;
+fg.fillStyle='#FFFFFF';fg.letterSpacing=Math.round(TS*s1)+'px';fg.font=`${TW} ${s1}px "${TF}"`;{const m=fg.measureText(L1);fg.fillText(L1,82-m.actualBoundingBoxLeft*-1+0,441);}
+fg.fillStyle=RED;fg.font=`${TW} ${s2_}px "${TF}"`;{let m=fg.measureText(L2);let z=s2_;if(m.width>900){z=s2_*900/m.width;fg.font=`${TW} ${z}px "${TF}"`;m=fg.measureText(L2);}fg.fillText(L2,82+m.actualBoundingBoxLeft,601);}
+fg.letterSpacing='0px';fg.fillStyle=RED;fg.beginPath();fg.roundRect(80,654,160,8,4);fg.fill();
 // logo: Poppins 500, size from f-height (1641-1548), tracking solved so total ink width = 454 px, centred
-{const sz=calib(500,'f',1641-1548);fg.font=`500 ${sz}px Poppins`;const s='function.';const ws=[...s].map(c=>fg.measureText(c).width);
+{fg.font='500 100px Poppins';const sz=100*(1641-1548)/fg.measureText('f').actualBoundingBoxAscent;fg.font=`500 ${sz}px Poppins`;const s='function.';const ws=[...s].map(c=>fg.measureText(c).width);
  const mF=fg.measureText('f'),mD=fg.measureText('.');const base=ws.reduce((a,b)=>a+b,0);
  const ink0=base-ws[8]+(mD.actualBoundingBoxRight)+(mF.actualBoundingBoxLeft);const tr=(454-ink0)/8;
  let x=311+mF.actualBoundingBoxLeft;fg.fillStyle=RED;[...s].forEach((c,i)=>{fg.fillText(c,x,1641);x+=ws[i]+tr;});}
