@@ -31,7 +31,9 @@ Zahl: 50 Hz
 [8] Zurück zum Windpark bei Nacht. Ein kleines Flugzeug nähert sich, erst dann gehen die roten Lichter an.
 „Und die roten Lichter? Seit 2025 sollen Windräder nachts nur noch blinken, wenn ein Flugzeug in der Nähe ist.“
 
-[9] Outro (themenbezogen, Variante wird noch gewählt)
+[9] Outro: LED-Leuchtschrift (Stadt wird dunkel, „function“ schaltet sich als rote LED-Schrift ein, das Warnlicht des vorderen Windrads wird der Punkt)
+
+Hinweis zu v4 (16.11.2026): Der Sprechertext ist unverändert. Im Bild gibt es kein Flugzeug mehr, die Warnlichter gehen aus und wieder an. Szene [7] zeigt die Elektronen als Nahaufnahme im Kabel vor dem Haus, danach laufen drei schnelle rote Wellen über die ganze Strecke.
 
 Quellen:
 - ZDF / Verbände (BWE, VDMA): rund 29.000 Windräder an Land (Mitte 2025: 28.925); 2025 kamen 958 neue dazu

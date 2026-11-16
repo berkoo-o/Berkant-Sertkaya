@@ -51,11 +51,11 @@ def _seg(fn, a, b, peak):
     if _x.ndim > 1: _x = _x.mean(1)
     _f = np.minimum(1, np.arange(len(_x))/(0.003*SR)) * np.minimum(1, (len(_x) - np.arange(len(_x)))/(0.02*SR))
     return _x / (np.max(np.abs(_x)) + 1e-9) * peak * _f
-S = '../sfx/'
+S = 'sfx/'
 WH = [(_seg(S+'whoosh.wav', 0.0, 0.85, 0.30), 0.293), (_seg(S+'whoosh.wav', 1.45, 2.4, 0.30), 0.263)]
 CK = [_seg(S+'clicks.wav', 0.0, 0.3, 0.22), _seg(S+'clicks.wav', 0.55, 0.9, 0.22), _seg(S+'clicks.wav', 1.12, 1.27, 0.22)]
 # camera moves: user's Epidemic swooshes (big moves full level, small moves quieter)
-for i, (c, g) in enumerate([(2.75, 1.0), (5.9, 0.6), (13.05, 0.9), (16.9, 0.7), (19.6, 0.5), (26.5, 0.8), (31.9, 0.6), (35.1, 0.5), (38.5, 0.8), (41.6, 0.8), (50.95, 0.7)]):
+for i, (c, g) in enumerate([(2.75, 1.0), (5.9, 0.6), (13.05, 0.9), (16.9, 0.7), (19.6, 0.5), (26.5, 0.8), (31.9, 0.6), (35.1, 0.5), (38.5, 0.8), (41.75, 0.7), (48.35, 0.8), (50.95, 0.7)]):
     add(WH[i % 2][0], c - WH[i % 2][1], g)
 # numbers appear: user's Epidemic clicks
 for i, c in enumerate([7.0, 10.6, 19.9, 26.5, 29.25, 31.7, 32.5, 33.3, 34.1, 38.6, 45.3, 52.4]): add(CK[i % 3], c, 0.8)
@@ -83,6 +83,7 @@ def swish(at, g=1.0):
 add(bp(noise(.6), 900, 3600) * np.sin(np.pi*np.linspace(0, 1, int(.6*SR)))**2, 0.25, 0.045)
 add(clack(0.9, 300, 2200, 0.02), 0.84); add(thud(0.32, 110), 0.84)
 add(clack(0.4, 1500, 6000, 0.008), 1.42); add(tone(mtof(88), 0.5, 0.18), 1.44, 0.03)
+add(sweep(520, 190, 1.0, 0.028), 3.15)
 # route tease: soft rising tone while the red line runs back to the wind park
 add(sweep(220, 520, 2.3, 0.035), 3.1)
 # wind park: night wind and slow blade swishes
@@ -94,7 +95,8 @@ fx += np.sin(2*np.pi*np.cumsum(300 + 220*np.clip((t - 14.8)/1.0, 0, 1))/SR) * wi
 for c in np.arange(13.3, 15.0, 1.5): swish(c, 0.14)
 # tower: pulse travels down, transformer hum
 add(blip(1.7, 1300, 380, 0.5), 17.0); fx += hum(18.5, 19.6, 0.035)
-# substation
+# substation (LED flood lights switch on with a soft clunk)
+add(clack(0.45, 200, 1500, 0.03), 19.7); add(thud(0.14, 80), 19.7)
 fx += hum(19.6, 23.3, 0.04)
 for c in np.arange(19.9, 23.2, 0.93): add(blip(0.35, 1500, 900, 0.22), c)
 # power line
@@ -111,30 +113,42 @@ for c in [32.5, 33.6]: add(blip(0.8, 1200, 600, 0.22), c)
 # kiosk: ground opens (soft sweep), pulses through the cable
 fx += hum(35.6, 38.2, 0.022)
 add(blip(1.4, 1300, 620, 0.4), 36.3); add(blip(1.4, 1250, 600, 0.35), 37.05)
-# copper: gentle shimmer, oscillation, energy waves
-sh = bp(rng.standard_normal(N), 5000, 10000) * win(41.9, 50.8, 0.5) * (0.6 + 0.4*np.sin(2*np.pi*0.9*t))
-fx += sh * 0.018
-fx += np.sin(2*np.pi*200*t) * (0.5 + 0.5*np.sin(2*np.pi*5*t)) * win(45.1, 48.4, 0.3) * 0.022
-for c in [48.55, 49.3, 50.05]: add(blip(0.6, 700, 2400, 0.5), c)
-# lights: wind, lights off, distant plane, lights on
+# cable close-up: faint shimmer, one electron is marked, then the slow 50 Hz swing, then three fast energy waves
+sh = bp(rng.standard_normal(N), 5000, 10000) * win(42.3, 48.3, 0.5) * (0.6 + 0.4*np.sin(2*np.pi*0.9*t))
+fx += sh * 0.012
+add(tone(mtof(86), 0.35, 0.12), 43.6, 0.035)
+fx += (np.sin(2*np.pi*100*t) + 0.3*np.sin(2*np.pi*200*t)) * (0.5 + 0.5*np.sin(2*np.pi*2.3*(t - 45.15) - np.pi/2)) * win(45.15, 48.2, 0.4) * 0.03
+for c in [49.15, 49.8, 50.4]:
+    add(blip(0.45, 600, 2600, 0.5), c); add(tone(mtof(91), 0.3, 0.1), c + 0.42, 0.03)
+# warning lights: night wind, the lights switch off one by one (53.3 s), come back together (56.15 s); a plane is only heard very faintly, far away
 fx += wind(50.9, O + 3.4, 0.04)
 for c in np.arange(51.6, O, 1.9): swish(c, 0.13)
-for i in range(6): add(tone(1500 - i*60, 0.05, 0.02), 52.3 + i*0.09, 0.03)
-pd = np.clip((t - 53.8)/2.6, 0, 1) * np.clip((O + 1.6 - t)/1.2, 0, 1)
-prop = lp(rng.standard_normal(N), 600) * (0.6 + 0.4*np.sin(2*np.pi*36*t)) + 0.25*np.sin(2*np.pi*(90 + 5*np.sin(2*np.pi*0.2*t))*t)
-fx += prop * pd * 0.05
-for i in range(6): add(tone(1700 + i*70, 0.06, 0.02), 55.75 + i*0.07, 0.03)
+for i in range(5): add(tone(1500 - i*70, 0.05, 0.02), 53.3 + i*0.13, 0.03); add(clack(0.12, 900, 3000, 0.008), 53.3 + i*0.13)
+pd = np.clip((t - 55.4)/1.6, 0, 1) * np.clip((O + 0.9 - t)/1.2, 0, 1)
+prop = lp(rng.standard_normal(N), 500) * (0.6 + 0.4*np.sin(2*np.pi*36*t)) + 0.25*np.sin(2*np.pi*(90 + 5*np.sin(2*np.pi*0.2*t))*t)
+fx += prop * pd * 0.02
+add(clack(0.3, 700, 2600, 0.012), 56.15); add(sum(tone(f, 0.12, 0.04) for f in (1700, 2100)), 56.15, 0.02)
 fx *= np.clip((O + 2.6 - t) / 1.0, 0, 1)
-# outro: lights lift off (soft shimmer), a tick per letter, dot lands: soft pop + bell chord
-sn = int(1.2*SR); st = np.arange(sn)/SR
-add(bp(noise(1.2), 3000, 9000) * np.sin(np.pi*st/1.2)**2, O + 0.2, 0.05); add(sweep(500, 1300, 1.0, 0.03), O + 0.25)
-for i in range(8): add(tone(2200, 0.03, 0.008), O + 1.0 + i*0.055, 0.045)
-add(thud(0.28, 70), O + 1.41); add(CK[1], O + 1.39, 0.8)
+# outro (LED sign): the town powers down, the letters flicker on with a short buzz each, the warning light flies over and clicks in as the dot
+add(sweep(560, 170, 0.9, 0.035), O + 0.08)
+for i in range(6): add(clack(0.22, 250, 1600, 0.02), O + 0.12 + i*0.13 + rng.uniform(0, 0.03))
+def buzz(d, g=1.0):
+    n = int(d*SR); tt = np.arange(n)/SR
+    s = np.sign(np.sin(2*np.pi*100*tt)) * 0.6 + np.sin(2*np.pi*50*tt)
+    return bp(s + 0.4*rng.standard_normal(n), 90, 2600) * np.minimum(1, tt/0.003) * np.minimum(1, (d - tt)/0.006) * g
+for i in range(8):
+    c = O + 0.85 + i*0.1
+    add(tone(2200, 0.03, 0.008), c, 0.045); add(buzz(0.035, 0.05), c); add(buzz(0.035, 0.04), c + 0.1); add(buzz(0.07, 0.022), c + 0.2)
+hum_e = np.clip((t - O - 1.0)/0.8, 0, 1) * np.clip((DUR - 0.25 - t)/0.5, 0, 1)
+fx += (np.sin(2*np.pi*100*t) + 0.4*np.sin(2*np.pi*200*t) + 0.15*np.sin(2*np.pi*300*t)) * hum_e * 0.012
+sn = int(1.0*SR); st = np.arange(sn)/SR
+add(bp(noise(1.0), 3000, 9000) * np.sin(np.pi*st/1.0)**2, O + 1.0, 0.045); add(sweep(480, 1250, 0.9, 0.028), O + 1.05)
+add(thud(0.28, 70), O + 1.95); add(CK[1], O + 1.93, 0.8); add(buzz(0.22, 0.035), O + 1.95)
 cn = int(2.4*SR); ct = np.arange(cn)/SR
-add(sum(np.sin(2*np.pi*mtof(n)*ct) for n in (76, 83, 88)) * np.exp(-ct*1.6) * np.minimum(1, ct/.01), O + 1.44, 0.06)
+add(sum(np.sin(2*np.pi*mtof(n)*ct) for n in (76, 83, 88)) * np.exp(-ct*1.6) * np.minimum(1, ct/.01), O + 1.98, 0.06)
 
 # ---------------- voice + ducking
-subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', 'voice.mp3', '-ac', '1', '-ar', str(SR), '-f', 'f32le', 'voice.raw'], check=True)
+subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', '../voice/Strom_Sprecher_Tom_v4.mp3', '-ac', '1', '-ar', str(SR), '-f', 'f32le', 'voice.raw'], check=True)
 v = np.fromfile('voice.raw', dtype=np.float32).astype(np.float64)
 voice = np.zeros(N); voice[:min(N, len(v))] = v[:N]
 ve = lp(np.abs(voice), 4); ve = ve / (ve.max() + 1e-9)
@@ -144,6 +158,6 @@ mus = norm(music, 1.0) * 0.16 * duck
 sfx = norm(fx, 1.0) * 0.30 * (1 - 0.4 * np.clip(ve * 6, 0, 1))
 vo = norm(voice, 1.0) * 0.9
 for name, mix in [('mix_music.wav', vo + mus + sfx), ('mix_fx.wav', vo + sfx)]:
-    m = mix / max(1.0, np.max(np.abs(mix)) / 0.95)
+    m = mix / max(1.0, np.max(np.abs(mix)) / 0.95) * np.clip((DUR - t) / 0.3, 0, 1)
     wavfile.write(name, SR, np.stack([m, m], 1).astype(np.float32))
 print('ok')

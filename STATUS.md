@@ -7,20 +7,33 @@
 |---|---|---|
 | `paket-test/` | Das Paket | fertig (v4), Referenz für Cover (`cover3.html`), Musik (`track_D`) und Outro |
 | `geldautomat/` | Der Geldautomat | fertig, mit Cover und Beschreibungen |
-| `strom/` | Der Strom | fertig als **v3**, das ist die Referenz für den neuen Look (`strom/v3/modell.html`) |
+| `strom/` | Der Strom | fertig als **v4** (`strom/v4/modell.html`), das ist die Referenz für Look, LED-Licht und Details |
 
 Frühere Videos außerhalb des Repos: Elbphilharmonie, Flughafen BER, Weißes Haus (v3) und Pfandflasche (v5).
 
-## Aktueller Look (seit Strom v3)
+## Aktueller Look (seit Strom v3, verfeinert in v4)
 Ein einziges schlichtes Low-Poly-Modell auf einer dunklen Platte, wie im schraffuren-Reel. Die Geschichte wird über Licht erzählt, es gibt keine Schnitte und die Kamera fährt langsam. Abgelehnt wurden viele einzelne 3D-Szenen und das fotorealistische Higgsfield-Diorama.
 
 ## Aktuelles Video: Der Strom („Wie kommt der Strom in deine Steckdose?“)
-- **Ordner:** `strom/`, die aktuelle Version liegt in `strom/v3/` (`modell.html`, `render.mjs`, `audio_modell.py`)
-- **Stand:** v3 ist fertig gerendert (`Der_Strom_mit_Musik.mp4`, `Der_Strom_nur_Effekte.mp4`), Cover und Beschreibungen liegen ebenfalls vor
-- **Skript:** `strom/Skript_Strom.txt`, Sprechertext in `strom/Sprechertext_mit_Tags.txt`
-- **Outro:** Die roten Warnlichter steigen von den Windrädern auf und werden zu den Buchstaben, das Licht des vordersten Windrads landet als Punkt
-- **Aktuelle Etappe:** Überarbeitung von v3 nach dem Feedback des Nutzers
+- **Ordner:** `strom/`, die aktuelle Version liegt in `strom/v4/` (`modell.html`, `render.mjs`, `chunk.sh`, `audio_modell.py`). `strom/v3/` bleibt als Stand vor der Überarbeitung erhalten.
+- **Stand:** v4 ist fertig gerendert (`strom/Der_Strom_mit_Musik.mp4`, `strom/Der_Strom_nur_Effekte.mp4`, Kontrolle in `strom/Kontaktbogen_Final.jpg`). Cover und Beschreibungen sind unverändert von v3.
+- **Skript:** `strom/Skript_Strom.txt`, Sprechertext in `strom/Sprechertext_mit_Tags.txt`, Stimme unverändert (`strom/voice/Strom_Sprecher_Tom_v4.mp3`)
+- **Outro:** LED-Leuchtschrift. Die Stadt wird dunkel, „function“ schaltet sich als rote LED-Schrift ein, das Warnlicht des vordersten Windrads rastet als Punkt ein.
+- **Aktuelle Etappe:** v4 liegt beim Nutzer zur Abnahme.
 - **Offene Änderungswünsche:** _(hier eintragen)_
+
+### Was in v4 geändert wurde (Feedback vom 16.11.2026)
+- Mehr Licht mit LED: kühlweiße LED-Straßenlampen, LED-Band um die Platte, LED-Flutlicht am Umspannwerk, kleine LEDs an den Windrädern (Türlicht am Turmfuß, rote Turmbefeuerung auf halber Höhe), Park-Poller, Bushaltestelle mit LED-Tafel, Schaufenster, einzelne kühle Fenster und Fernseher-Flackern.
+- Flugzeug entfernt. Die Warnlichter gehen bei 53,3 s nacheinander aus und bei 56,15 s gemeinsam wieder an, ein Flugzeug ist nur sehr leise in der Ferne zu hören.
+- Verkehr: 14 fahrende Autos mit Scheinwerferkegeln, geparkte Autos, 7 Radfahrer, rund 35 Fußgänger (einer mit Hund, ein Kind), E-Auto an der Wallbox am Haus. Dafür gibt es drei neue Randstraßen, damit alles auf geschlossenen Runden fährt.
+- Kleine Details: Dachaufbauten und Solarmodule, Fenstersprossen und Türgriff am Haus, helles Trafohäuschen mit Türen, Bänke.
+- Roter Strom: kurzer Lichtstreifen mit hellem Kopf statt roter Kugel. Die Warnlichter blinken im echten Takt der Nachtkennzeichnung (1 s an, 0,5 s aus, 1 s an, 1,5 s aus) und werfen rotes Licht auf die Gondel.
+- Elektronen: Nahaufnahme auf das Kabel vor dem Haus als Glasröhre, die Elektronen schwingen sichtbar auf der Stelle, eines ist rot markiert. Danach fährt die Kamera zurück und drei schnelle rote Wellen laufen vom Windrad bis zum Haus.
+- Die rote Linie zum Windrad folgt jetzt der Hügeloberfläche und verschwindet nicht mehr im Gras. Außerdem läuft der Strom im Umspannwerk und am Haus nicht mehr durch Gehäuse und Hausecke.
+- Titel und Zahlen in Inter Tight ExtraBold, leichte dunkle Verläufe oben und unten für die Lesbarkeit.
+
+### Rendern
+Im Ordner `strom/v4`: `npm install`, `npx http-server -p 8769 -c-1 .`, dann `seq 0 120 1800 | xargs -P 4 -I{} ./chunk.sh {}` (Bilder landen in `fr/`). Ton mit `python3 audio_modell.py` (braucht `sfx/whoosh.wav` und `sfx/clicks.wav`, aus `paket-test/sfx_epidemic/*.mp3` umgewandelt). Für Prüfansichten mit freier Kamera gibt es `dbgcam.mjs`.
 
 ## Etappen
 Nach jeder Etappe wird diese Datei aktualisiert, danach `/clear` und im neuen Chat mit `@STATUS.md` weitermachen.
@@ -38,4 +51,4 @@ Nach jeder Etappe wird diese Datei aktualisiert, danach `/clear` und im neuen Ch
 - _(hier sammeln: Skriptversion, Szenen, Lichter, Timing, gewählte Outro …)_
 
 ## Nächster Schritt
-Am Strom-Video v3 weiterarbeiten: Feedback des Nutzers aufnehmen und nur die betroffenen Stellen neu rendern.
+Rückmeldung des Nutzers zu Strom v4 abwarten und danach nur die betroffenen Stellen neu rendern.
