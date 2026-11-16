@@ -18,9 +18,9 @@ import * as THREE from 'three';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
 await Promise.all(['500 100px Poppins','500 30px "Inter Tight"','600 30px "Inter Tight"','700 30px "Inter Tight"','800 30px "Inter Tight"'].map(f=>document.fonts.load(f)));
-const W=1080,H=1920,RED='#E01E2B';
+const W=1080,H=1920,RED='#E01E2B';const MODE=new URLSearchParams(location.search).get('mode')||'full';
 const bg=document.getElementById('bg').getContext('2d'),fg=document.getElementById('fg').getContext('2d');
-const CX=470,CY=1545;
+const CX=MODE==='full'?470:540,CY=MODE==='clean'?1420:1545;
 // ---------- background ----------
 {bg.fillStyle='#07070B';bg.fillRect(0,0,W,H);
  const blob=(x,y,r,c)=>{const g=bg.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,c);g.addColorStop(1,'rgba(0,0,0,0)');bg.fillStyle=g;bg.fillRect(0,0,W,H);};
@@ -34,7 +34,7 @@ const CX=470,CY=1545;
  // red light pool under the machine
  bg.save();bg.translate(CX,CY);bg.scale(1,0.24);const g=bg.createRadialGradient(0,0,0,0,0,430);g.addColorStop(0,'rgba(224,30,43,0.55)');g.addColorStop(.55,'rgba(224,30,43,0.16)');g.addColorStop(1,'rgba(224,30,43,0)');bg.fillStyle=g;bg.beginPath();bg.arc(0,0,430,0,7);bg.fill();bg.restore();
  // top vignette for the title
- const v=bg.createLinearGradient(0,0,0,700);v.addColorStop(0,'rgba(7,7,11,.85)');v.addColorStop(1,'rgba(7,7,11,0)');bg.fillStyle=v;bg.fillRect(0,0,W,700);}
+ const v=bg.createLinearGradient(0,0,0,700);v.addColorStop(0,MODE==='clean'?'rgba(7,7,11,.4)':'rgba(7,7,11,.85)');v.addColorStop(1,'rgba(7,7,11,0)');bg.fillStyle=v;bg.fillRect(0,0,W,700);}
 // ---------- 3D ----------
 const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});
 renderer.setSize(W,H);renderer.setPixelRatio(1);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;renderer.outputColorSpace=THREE.SRGBColorSpace;
@@ -50,7 +50,7 @@ const rim=new THREE.DirectionalLight(0xff3344,2.4);rim.position.set(4,2.5,-3);sc
 const rim2=new THREE.DirectionalLight(0x8a78ff,1.2);rim2.position.set(-4,2,-2);scene.add(rim2);
 function canvasTex(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t;}
 const M=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:.45,metalness:.15,...o});
-const gp=new THREE.Group();scene.add(gp);gp.rotation.y=-0.52;gp.scale.setScalar(0.95);
+const gp=new THREE.Group();scene.add(gp);gp.rotation.y=-0.52;gp.scale.setScalar(MODE==='clean'?1.12:0.95);
 const BODY=M(0x5257b8),PAN=M(0x24205e,{roughness:.35}),KEY=M(0xa48cff,{roughness:.3}),DARK=M(0x0c0a26,{roughness:.25});
 const REDM=new THREE.MeshBasicMaterial({color:0xff2a3a,toneMapped:false});
 const RB=(par,w,h,d,m,x,y,z,r=0.03)=>{const o=new THREE.Mesh(new RoundedBoxGeometry(w,h,d,3,r),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;par.add(o);return o;};
@@ -105,10 +105,11 @@ const o=new THREE.Vector3(0,0,0).project(cam);cam.setViewOffset(W,H,(o.x+1)/2*W-
 renderer.render(scene,cam);
 // soft glow over everything bright (cheap bloom, keeps the transparent background)
 fg.save();fg.globalCompositeOperation='lighter';fg.filter='blur(22px) brightness(1.1)';fg.globalAlpha=.24;fg.drawImage(renderer.domElement,0,0);fg.restore();
+if(MODE!=='full'){window.call=()=>{};}
 // ---------- call-outs ----------
 gp.updateMatrixWorld(true);
 const px=(x,y,z)=>{const v=new THREE.Vector3(x,y,z).applyMatrix4(gp.matrixWorld).project(cam);return [(v.x+1)/2*W,(1-v.y)/2*H];};
-const call=(p,ly,t1,t2)=>{const [x,y]=px(...p);const lx=800;fg.save();fg.strokeStyle='rgba(255,255,255,.75)';fg.lineWidth=2;fg.beginPath();fg.moveTo(x,y);fg.lineTo(lx-46,ly);fg.lineTo(lx-14,ly);fg.stroke();
+const call=(p,ly,t1,t2)=>{if(MODE!=='full')return;const [x,y]=px(...p);const lx=800;fg.save();fg.strokeStyle='rgba(255,255,255,.75)';fg.lineWidth=2;fg.beginPath();fg.moveTo(x,y);fg.lineTo(lx-46,ly);fg.lineTo(lx-14,ly);fg.stroke();
  fg.fillStyle='#fff';fg.beginPath();fg.arc(x,y,6,0,7);fg.fill();fg.fillStyle=RED;fg.beginPath();fg.arc(x,y,3,0,7);fg.fill();
  fg.fillStyle='#fff';fg.font='700 34px "Inter Tight"';fg.textBaseline='middle';fg.fillText(t1,lx,ly-(t2?17:0));if(t2){fg.fillStyle='rgba(215,210,255,.8)';fg.font='500 25px "Inter Tight"';fg.fillText(t2,lx,ly+19);}fg.restore();};
 call([PX+0.07,1.08,0.37],1010,'Sensor','prüft jeden Schein');
@@ -117,12 +118,13 @@ call([0.5,0.3,0.4],1370,'Tresor','hinter Stahl');
 // ---------- typography ----------
 fg.textBaseline='alphabetic';
 // kicker pill
-{fg.font='700 30px "Inter Tight"';fg.letterSpacing='5px';const t='SO FUNKTIONIERT';const w=fg.measureText(t).width;fg.fillStyle=RED;fg.beginPath();fg.roundRect(80,262,w+44,58,29);fg.fill();fg.fillStyle='#fff';fg.fillText(t,104,302);fg.letterSpacing='0px';}
+if(MODE==='clean'){window.ready=true;}else{
+if(MODE==='full'){fg.font='700 30px "Inter Tight"';fg.letterSpacing='5px';const t='SO FUNKTIONIERT';const w=fg.measureText(t).width;fg.fillStyle=RED;fg.beginPath();fg.roundRect(80,262,w+44,58,29);fg.fill();fg.fillStyle='#fff';fg.fillText(t,104,302);fg.letterSpacing='0px';}
 fg.fillStyle='#fff';fg.font='800 150px "Inter Tight"';fg.letterSpacing='-4px';fg.fillText('Der',74,466);
 {let z=178;fg.font=`800 ${z}px "Inter Tight"`;let m=fg.measureText('Geldautomat');z=z*928/m.width;fg.font=`800 ${z}px "Inter Tight"`;fg.fillText('Geldautomat',74,466+z*0.93);window.T2=466+z*0.93;}
-fg.letterSpacing='0px';fg.fillStyle='rgba(222,218,255,.86)';fg.font='500 44px "Inter Tight"';fg.fillText('Was im Inneren passiert,',80,window.T2+88);fg.fillText('wenn du Geld abhebst.',80,window.T2+142);
+fg.letterSpacing='0px';if(MODE==='full'){fg.fillStyle='rgba(222,218,255,.86)';fg.font='500 44px "Inter Tight"';fg.fillText('Was im Inneren passiert,',80,window.T2+88);fg.fillText('wenn du Geld abhebst.',80,window.T2+142);}
 // logo bottom left + tag right
 fg.fillStyle=RED;fg.font='500 74px Poppins';fg.letterSpacing='-1.5px';fg.fillText('function.',78,1806);fg.letterSpacing='0px';
-fg.fillStyle='rgba(255,255,255,.6)';fg.font='600 28px "Inter Tight"';fg.textAlign='right';fg.letterSpacing='3px';fg.fillText('ERKLÄRT IN 60 SEKUNDEN',1004,1800);
+if(MODE==='full'){fg.fillStyle='rgba(255,255,255,.6)';fg.font='600 28px "Inter Tight"';fg.textAlign='right';fg.letterSpacing='3px';fg.fillText('ERKLÄRT IN 60 SEKUNDEN',1004,1800);}}
 window.ready=true;
 </script></body></html>
