@@ -107,8 +107,8 @@ renderer.render(scene,cam);
 function calib(weight,ch,target,useCap){fg.font=`${weight} 100px Poppins`;const m=fg.measureText(ch);return 100*target/m.actualBoundingBoxAscent;}
 const s1=calib(700,'l',441-338)*0.951,s2_=calib(700,'B',639-506)*1.015;
 fg.fillStyle='#FFFFFF';fg.font=`700 ${s1}px Poppins`;{const m=fg.measureText(L1);fg.fillText(L1,82-m.actualBoundingBoxLeft*-1+0,441);}
-fg.fillStyle=RED;fg.font=`700 ${s2_}px Poppins`;{let m=fg.measureText(L2);let z=s2_;if(m.width>900){z=s2_*900/m.width;fg.font=`700 ${z}px Poppins`;m=fg.measureText(L2);}fg.fillText(L2,82+m.actualBoundingBoxLeft,639);}
-fg.fillStyle=RED;fg.beginPath();fg.roundRect(80,706,160,8,4);fg.fill();
+fg.fillStyle=RED;fg.font=`700 ${s2_}px Poppins`;{let m=fg.measureText(L2);let z=s2_;if(m.width>900){z=s2_*900/m.width;fg.font=`700 ${z}px Poppins`;m=fg.measureText(L2);}fg.fillText(L2,82+m.actualBoundingBoxLeft,601);}
+fg.fillStyle=RED;fg.beginPath();fg.roundRect(80,654,160,8,4);fg.fill();
 // logo: Poppins 500, size from f-height (1641-1548), tracking solved so total ink width = 454 px, centred
 {const sz=calib(500,'f',1641-1548);fg.font=`500 ${sz}px Poppins`;const s='function.';const ws=[...s].map(c=>fg.measureText(c).width);
  const mF=fg.measureText('f'),mD=fg.measureText('.');const base=ws.reduce((a,b)=>a+b,0);
