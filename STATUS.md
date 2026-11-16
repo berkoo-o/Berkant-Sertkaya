@@ -16,7 +16,7 @@ Ein einziges schlichtes Low-Poly-Modell auf einer dunklen Platte, wie im schraff
 
 ## Aktuelles Video: Der Strom („Wie kommt der Strom in deine Steckdose?“)
 - **Ordner:** `strom/`, die aktuelle Version liegt in `strom/v4/` (`modell.html`, `render.mjs`, `chunk.sh`, `audio_modell.py`). `strom/v3/` bleibt als Stand vor der Überarbeitung erhalten.
-- **Stand:** v4 ist fertig gerendert (`strom/Der_Strom_mit_Musik.mp4`, `strom/Der_Strom_nur_Effekte.mp4`, Kontrolle in `strom/Kontaktbogen_Final.jpg`). Cover und Beschreibungen sind unverändert von v3.
+- **Stand:** v4 ist fertig gerendert (`strom/Der_Strom_mit_Musik.mp4`, `strom/Der_Strom_nur_Effekte.mp4`, Kontrolle in `strom/Kontaktbogen_Final.jpg`). Das Cover ist neu im cleanen Stil (`strom/Cover_Der_Strom.png`, Vorlage `strom/v4/cover_strom.html`, gerendert mit `node cover.mjs`): ein Windrad mit gläserner Gondel und gläsernem Turm, das rote Kabel läuft vom Generator bis zum Stecker. Das alte Cover liegt als `Cover_Der_Strom_alt.png` daneben. Die Beschreibungen sind unverändert von v3.
 - **Skript:** `strom/Skript_Strom.txt`, Sprechertext in `strom/Sprechertext_mit_Tags.txt`, Stimme unverändert (`strom/voice/Strom_Sprecher_Tom_v4.mp3`)
 - **Outro:** LED-Leuchtschrift. Die Stadt wird dunkel, „function“ schaltet sich als rote LED-Schrift ein, das Warnlicht des vordersten Windrads rastet als Punkt ein.
 - **Aktuelle Etappe:** v4 liegt beim Nutzer zur Abnahme.
