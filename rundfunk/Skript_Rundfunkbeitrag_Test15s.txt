@@ -1,0 +1,16 @@
+function. – „Wohin geht dein Rundfunkbeitrag?“ – Test, 15 Sekunden (zwei Stile, gleiches Skript)
+Stand: 17.11.2026 – Stimme: ElevenLabs „Tom Magic“ (eleven_v4)
+
+Sprechertext (ca. 35 Wörter):
+„18 Euro 36 zahlt jeder Haushalt im Monat. Aber wohin geht das Geld? Fast 13 Euro an die ARD, knapp 5 ans ZDF, der Rest an Deutschlandradio und die Medienaufsicht. Zu viel oder fair? Schreib's in die Kommentare.“
+
+Zahlen im Bild:
+18,36 € (pro Wohnung und Monat) → 12,78 € ARD · 4,69 € ZDF · 0,54 € Deutschlandradio · 0,35 € Landesmedienanstalten
+Quellzeile: ARD, ZDF, Deutschlandradio Beitragsservice (Jahresbericht 2025), § 9 RFinStV · Stand 17.11.2026
+
+Hintergrund, nicht im Text: Der Beitrag ist seit August 2021 unverändert. Die KEF hatte 18,94 € empfohlen, die Länder haben das nicht umgesetzt, ARD und ZDF klagen. Das Bundesverfassungsgericht hat am 23.06.2026 verhandelt, ein Urteil steht noch aus (FAZ, 12.11.2026). Die KEF empfiehlt inzwischen 18,64 € ab 2027. Die Beitragserträge lagen 2025 bei rund 8,72 Mrd. €.
+
+Quellen:
+- Beitragsservice, Jahresbericht 2025 (rundfunkbeitrag.de)
+- Rundfunkfinanzierungsstaatsvertrag § 9 (Aufteilung der Mittel)
+- ver.di M, LTO (Verhandlung BVerfG 23.06.2026)
