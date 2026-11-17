@@ -53,7 +53,7 @@ add(CK[1], 5.52, 0.5); add(CK[2], 9.22, 0.5)
 # out to the LED columns: whoosh, the number clicks in, one soft shimmer as the three columns rise
 whoosh(10.9, 0.45, 0)
 add(CK[0], 11.02, 0.55)
-add(cut(sz('shimmer'), 0.0, 2.4, 0.01, 1.2), 11.2, 0.16)
+add(cut(sz('shimmer'), 0.0, 2.4, 0.01, 1.2), 11.7, 0.16)
 # outro (LED sign): the town powers down, the letters strike like a neon tube, the red lamp of the lectern clicks in as the dot
 hit('power_down', O + 0.12, 0.3, 0.063)
 hit('switch', O + 0.14, 0.2, 0.009)

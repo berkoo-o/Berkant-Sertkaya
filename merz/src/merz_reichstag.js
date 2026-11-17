@@ -115,4 +115,4 @@ const COLS=[];{const z=1.62;[[0.42,'Mai',16],[0.78,'Sep.',13],[1.14,'Okt.',10]].
   const m=glowMat(0xd8e6ff,0);const g=new THREE.BoxGeometry(0.15,1,0.15);g.translate(0,0.5,0);const c=mesh(town,g,m,x,PAVE_H+0.03,z,false,false);c.scale.y=0.001;
   const cap=mesh(town,new THREE.BoxGeometry(0.165,0.016,0.165),glowMat(0xffffff,0),x,PAVE_H+0.04,z,false,false);
   const p=new THREE.Mesh(new THREE.PlaneGeometry(1.4,1.4),new THREE.MeshBasicMaterial({map:poolTex,color:hdr(0xd8e6ff,0.45),transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false}));p.rotation.x=-Math.PI/2;p.position.set(x,PAVE_H+0.006,z);town.add(p);
-  COLS.push({c,m,cap,p,pl,x,z,v,lab,t0:11.25+i*0.42});KO.push([x,z,0.18]);});}
+  COLS.push({c,m,cap,p,pl,x,z,v,lab,t0:11.75+i*0.4});KO.push([x,z,0.18]);});}

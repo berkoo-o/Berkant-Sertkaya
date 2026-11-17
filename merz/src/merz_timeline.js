@@ -6,8 +6,8 @@ const SEG=[
  [2.3,5.4,C(-0.45,0.45,-0.1,21.8,37,39.5),C(-0.6,0.17,-1.4,2.6,28,38),'io'],
  [5.4,9.0,C(-0.6,0.17,-1.4,2.6,28,38),C(-0.6,0.21,-1.6,0.98,22,24),'io'],
  [9.0,10.8,C(-0.6,0.21,-1.6,0.98,22,24),C(-0.6,0.21,-1.6,0.92,20,23.5),'lin'],
- [10.8,12.9,C(-0.6,0.21,-1.6,0.92,20,23.5),C(0.62,0.42,1.25,4.4,10,20),'io'],
- [12.9,O,C(0.62,0.42,1.25,4.4,10,20),C(0.62,0.42,1.25,4.25,11,20.5),'lin'],
+ [10.8,12.3,C(-0.6,0.21,-1.6,0.92,20,23.5),C(0.62,0.42,1.25,4.4,10,20),'io'],
+ [12.3,O,C(0.62,0.42,1.25,4.4,10,20),C(0.62,0.42,1.25,4.25,11,20.5),'lin'],
  [O,O+1.4,C(0.62,0.42,1.25,4.25,11,20.5),C(-0.6,2.3,-1.0,22,36,32),'io'],
  [O+1.4,END+0.1,C(-0.6,2.3,-1.0,22,36,32),C(-0.6,2.32,-1.0,21.8,36.4,32),'lin'],
 ];
@@ -25,7 +25,7 @@ function letterB(i,o){const u=o-0.85-i*0.1;if(u<0)return 0;const s=LSEED[i];let 
 const logoL=new THREE.DirectionalLight(RED,0);logoL.position.set(1.5,10,5);scene.add(logoL);
 const DOORON=new THREE.Color(1.05,0.86,0.55);
 function setTime(t){
-  setCam(t);setFocus(t>=O?Math.max(0,1-ease((t-O-0.1)/0.5)):1-0.55*win(t,4.8,10.95,0.8));tags.forEach(e=>e.style.opacity=0);const o=t-O;const OF=k=>o>0?1-ease((o-0.08-k*0.55)/0.22):1;
+  setCam(t);setFocus(t>=O?Math.max(0,1-ease((t-O-0.1)/0.5)):1-0.55*win(t,4.8,11.5,0.8));tags.forEach(e=>e.style.opacity=0);const o=t-O;const OF=k=>o>0?1-ease((o-0.08-k*0.55)/0.22):1;
   {let lb=0;if(o>0){for(let i=0;i<8;i++)lb+=Math.min(1.3,letterB(i,o));lb/=8;}logoL.intensity=0.55*lb;const pk=o>0?lerp(1,0.3,ease(o/0.8)):1;PLED.forEach(([m,c])=>m.color.copy(c).multiplyScalar(pk));}
   BLD.forEach(b=>{const L=OF(b.order);b.L=L;b.ms.forEach(m=>m.emissiveIntensity=L*0.4*m.userData.k);if(b.roofM)b.roofM.emissiveIntensity=0.2+0.3*L;if(b.doorL)b.doorL.color.copy(hdr(0xffd9a0,0.12+2.6*L));b.pool.material.opacity=0.8*L;});
   PARKM.forEach(pm=>{pm.material.emissiveIntensity=0.06+0.42*OF(0.6);});
