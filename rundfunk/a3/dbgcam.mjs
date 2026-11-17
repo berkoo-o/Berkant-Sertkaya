@@ -7,5 +7,5 @@ p.on('pageerror',e=>console.log('ERR',e.message));
 await p.goto('http://localhost:8773/modell.html');
 await p.waitForFunction('window.ready===true',null,{timeout:300000});
 await p.evaluate(([c,f])=>{window.DBG=c.map(Number);document.getElementById('ov').style.display='none';document.getElementById('shade').style.display='none';return renderAt(+f);},[c,f]);
-await p.screenshot({path:out,type:'jpeg',quality:92});
+await p.screenshot({path:out,type:'jpeg',quality:94,timeout:240000});
 await b.close();
