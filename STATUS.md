@@ -86,5 +86,14 @@ Der Nutzer hat das Bundestag-Paket abgebrochen und stattdessen dieses Thema best
 
 - **Ganzes Video (Wunsch des Nutzers nach dem Test):** `merz/full/modell.html` (Server Port 8776, 1316 Bilder, `seq 0 120 1315 | TOTAL=1316 xargs -P 4 -I{} ./chunk.sh {}` im Ordner `merz/full`), Ton `python3 audio_full.py`, Video `./build_full.sh` im Ordner `merz/`. Ergebnis: `merz/Merz_unbeliebtester_Kanzler_mit_Musik.mp4` und `_nur_Effekte.mp4`. Neue Szenen: eine Schranke „Schuldenbremse“ auf dem Platz rechts, die sich hebt, mit Münzregen auf fünf Stapel (500 Mrd. €); 64 der 100 Lichter leuchten kühl (unglaubwürdig, Ipsos); eine Fabrikhalle mit Sheddach und LED-Kurve (+0,2 %); die November-Säule (12 %); die Schlussfrage in der Totale.
 
+- **Überarbeitung v2 (Wunsch des Nutzers, 17.11.2026):** Stil, Farben, Musik, Stimme und Storyboard bleiben gleich. Neu sind:
+  - eine durchgehende Kamerafahrt über Keyframes (monotone kubische Interpolation, `KEYS` in `merz/src/merz_timeline.js`) mit leichter Drift und Kranfahrten aus dem Saal
+  - eine neue Merz-Figur mit natürlichen Proportionen im Maßstab der Sitze; sie atmet und schaut sich um
+  - etwa 350 sitzende Abgeordnete, von denen einige den Kopf drehen
+  - Fußgänger mit schwingenden Armen, Rauch aus dem Fabrikschornstein und ein zweites Ausflugsboot
+  - die Schulden-Szene: Münzen fliegen einzeln im Bogen auf fünf Stapel und setzen sich, jeder fertige Stapel leuchtet auf und zeigt „100 Mrd.“, und der Zähler folgt den gelandeten Münzen
+  - Säulen mit leichtem Nachfedern, Titel und Zahlen gleiten aus einer Unschärfe ein
+  - Ergebnis: `merz/Merz_unbeliebtester_Kanzler_v2_*.mp4` in 1080 × 1920
+
 ## Nächster Schritt
-Rückmeldung des Nutzers zum ganzen Merz-Video abwarten. Danach kommen auf Wunsch Cover-Varianten und die Beschreibungen. Das Bundestag-Paket wurde vom Nutzer abgebrochen. Danach erzeugt der Nutzer (oder auf Wunsch Claude über die Connectoren) die Stimme mit Tom und die Higgsfield-Bilder und Clips, dann werden die Zeiten an die Stimme angepasst. Rundfunk A3 ist geliefert. Metricool-Entwürfe erst, wenn der Nutzer sie wieder möchte.
+Rückmeldung des Nutzers zur Fassung v2 abwarten. Danach kommen auf Wunsch Cover-Varianten und die Beschreibungen. Das Bundestag-Paket wurde vom Nutzer abgebrochen. Danach erzeugt der Nutzer (oder auf Wunsch Claude über die Connectoren) die Stimme mit Tom und die Higgsfield-Bilder und Clips, dann werden die Zeiten an die Stimme angepasst. Rundfunk A3 ist geliefert. Metricool-Entwürfe erst, wenn der Nutzer sie wieder möchte.

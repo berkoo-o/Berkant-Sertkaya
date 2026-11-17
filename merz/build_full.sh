@@ -1,7 +1,7 @@
 #!/bin/sh
 # frames + both mixes -> final videos and contact sheet: ./build_full.sh  (after rendering full/fr and python3 audio_full.py)
 set -e
-nf=1316; name=Merz_unbeliebtester_Kanzler
+nf=1316; name=Merz_unbeliebtester_Kanzler_v2
 n=$(ls full/fr | wc -l); [ "$n" -eq $nf ] || { echo "frames missing: $n/$nf"; exit 1; }
 ffmpeg -loglevel error -y -framerate 30 -start_number 0 -i full/fr/f%05d.jpg -c:v libx264 -preset slow -crf 17 -pix_fmt yuv420p -movflags +faststart full/video.mp4
 for m in music:mit_Musik fx:nur_Effekte; do

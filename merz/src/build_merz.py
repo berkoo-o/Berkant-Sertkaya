@@ -81,12 +81,28 @@ out += tl
 out += L[i_oc:]
 html = '\n'.join(out)
 
+# smooth camera: setCam reads the keyframe spline; a tiny slow drift keeps the picture alive; the near plane follows the distance for the close-ups
+i = html.index('function setCam(t){'); j = html.index('cam.setViewOffset(W,H,0,-40,W,H);cam.updateProjectionMatrix();cam.updateMatrixWorld();}', i) + len('cam.setViewOffset(W,H,0,-40,W,H);cam.updateProjectionMatrix();cam.updateMatrixWorld();}')
+html = html[:i] + """function setCam(t){const v=camAt(t);const tg=[v[0],v[1],v[2]];const d=KD*Math.exp(v[3]);const az=(v[4]+0.35*Math.sin(t*0.23)+0.2*Math.sin(t*0.51+1.3))*Math.PI/180,el=(v[5]+0.18*Math.sin(t*0.31+0.7))*Math.PI/180;
+  CAMT[0]=tg[0];CAMT[1]=tg[1];CAMT[2]=tg[2];CAMD=d;cam.position.set(tg[0]+d*Math.sin(az)*Math.cos(el),tg[1]+d*Math.sin(el),tg[2]+d*Math.cos(az)*Math.cos(el));cam.lookAt(tg[0],tg[1],tg[2]);
+  if(window.DBG){const [x,y,z,dd,a2,e2]=window.DBG;const D=KD*dd,A=a2*Math.PI/180,E=e2*Math.PI/180;cam.position.set(x+D*Math.sin(A)*Math.cos(E),y+D*Math.sin(E),z+D*Math.cos(A)*Math.cos(E));cam.lookAt(x,y,z);}
+  cam.near=clamp(d*0.03,0.03,0.5);cam.setViewOffset(W,H,0,-40,W,H);cam.updateProjectionMatrix();cam.updateMatrixWorld();}""" + html[j:]
+# pedestrians with natural proportions and swinging arms
+i = html.index('const PEDG={'); j = html.index('return {G,legs,I};}', i) + len('return {G,legs,I};}')
+html = html[:i] + """const PEDG={leg:(()=>{const g=new THREE.CylinderGeometry(0.0042,0.0035,0.038,6);g.translate(0,-0.019,0);return g;})(),torso:(()=>{const g=new THREE.CapsuleGeometry(0.0071,0.0165,4,10);g.scale(0.7,1,1);return g;})(),arm:(()=>{const g=new THREE.CylinderGeometry(0.0027,0.0023,0.03,5);g.translate(0,-0.015,0);return g;})(),head:new THREE.SphereGeometry(0.0072,10,8)};const SKIN=[0xdcbfa2,0xc9a182,0x9c7558,0xe3c9ae];
+function mkPed(col,sc=1){const G=new THREE.Group();town.add(G);const I=new THREE.Group();I.scale.setScalar(sc);G.add(I);const legs=[];for(const s of [-1,1])legs.push(mesh(I,PEDG.leg,am(0x2b2d33),0,0.038,s*0.0046,true,false));
+  mesh(I,PEDG.torso,am(col),0,0.0535,0,true,false);const arms=[];for(const s of [-1,1])arms.push(mesh(I,PEDG.arm,am(col),0,0.0655,s*0.0098,true,false));mesh(I,PEDG.head,am(SKIN[Math.floor(rnd2()*4)]),0,0.0772,0,true,false);return {G,legs,I,arms};}""" + html[j:]
+html = html.replace('legs:o.legs,', 'legs:o.legs,arms:o.arms,').replace('legs:c.legs,', 'legs:c.legs,arms:c.arms,')
+a = "a.legs[0].rotation.z=0.55*Math.sin(ph);a.legs[1].rotation.z=-0.55*Math.sin(ph);"
+assert a in html
+html = html.replace(a, a + "if(a.arms){a.arms[0].rotation.z=-0.42*Math.sin(ph);a.arms[1].rotation.z=0.42*Math.sin(ph);}")
+# the Spree glitters a little
 # street keys: there is no road G any more
 html = html.replace(",['G',[-1]]", '')
 # outro dot starts at the red lamp on the lectern; no letter in this video
 html = html.replace('wpos(tower.lamp,[0,0,0])', 'wpos(rs.lamp,[0,0,0])')
 html = html.replace('setTime(t);placeLetter(t);composer.render()', 'setTime(t);composer.render()')
-html = html.replace('<div class="tag" id="tag2"></div>', '<div class="tag" id="tag2"></div><div class="tag" id="tag3"></div>')
+html = html.replace('<div class="tag" id="tag2"></div>', '<div class="tag" id="tag2"></div><div class="tag" id="tag3"></div><div class="tag" id="tag4"></div>')
 html = html.replace('<div id="title">Wohin geht dein<br>Rundfunkbeitrag?</div>', '<div id="title"></div>')
 for bad in ['tower.', 'MEDIA', 'hero.', 'placeLetter', 'updateCoins', 'busAd', 'ecLed', 'WAVE1']:
     if bad in html:

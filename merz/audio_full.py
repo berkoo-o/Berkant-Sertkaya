@@ -53,10 +53,10 @@ hit('switch', 3.78, 0.42, 0.009)
 # three LED columns rise; later the November column
 add(cut(sz('shimmer'), 0.0, 2.4, 0.01, 1.2), 11.7, 0.16)
 add(cut(sz('shimmer'), 0.0, 1.4, 0.01, 0.8), 36.75, 0.12)
-# Schuldenbremse: the barrier arm lifts at "lockerte", then coins rain onto five stacks, the last ones settle
+# Schuldenbremse: the barrier arm lifts at "lockerte", then coins fly in one by one and stack up on five piles, the last pile settles
 add(cut(sz('arm_raise'), 2.75, 1.2, 0.08, 0.15), 17.65, 0.5)
-add(cut(sz('coins_falling'), 0.0, 2.7, 0.05, 0.6), 19.45, 0.55)
-hit('coins_stack', 21.95, 0.3, 0.122)
+add(cut(sz('coins_falling'), 0.0, 3.9, 0.08, 0.6), 18.5, 0.45)
+hit('coins_stack', 22.2, 0.3, 0.122)
 # 64 lights switch on (one soft switch), the LED chart on the factory draws its line (a little electric hum)
 hit('switch', 22.95, 0.25, 0.009)
 add(cut(sz('neon_flicker'), 12.0, 1.6, 0.3, 0.5), 27.6, 0.16)
