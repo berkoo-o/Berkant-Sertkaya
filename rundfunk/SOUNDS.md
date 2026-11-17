@@ -14,6 +14,8 @@ Alles kommt aus dem Epidemic-Sound-Connector (Wunsch des Nutzers vom 17.11.2026)
 | switch | 2b2e2214-2f82-4614-a840-75eb7bff59b7 | Light Switch, On, Off | A: Fenster gehen an, Outro |
 | power_down | cc6d5f26-731e-4734-afe3-847fa0ac89a0 | Scifi, Machine, Power Down 01 | A, Outro: Stadt wird dunkel |
 | neon_on | 19ddf9c6-5d70-4513-af64-90f82e4d16ec | Fluorescent Light, Neon Tube, Turned On | A, Outro: Leuchtschrift springt an |
+| envelope_flap | 3c4bcbd5-7781-4843-9cbc-086fb37aa0c1 | Paper, Handle, Envelope, Flap, Open | A3: die Lasche des Briefs geht auf |
+| envelope_open | d09076fc-ff2c-49da-8af1-5f0ecb6e1de8 | Paper, Handle, Opening Envelope | A3: die Rechnung wird aus dem Umschlag gezogen |
 | neon_flicker | 41f45a4d-ae2c-4260-842b-f6338714ae0d | Flickering Neon Light | A, Outro: Brummen der Leuchtschrift |
 
 Dazu die Epidemic-Sounds, die der Nutzer früher geliefert hat (`sfx/whoosh.wav` für Kamerafahrten, `sfx/clicks.wav` wenn eine Zahl erscheint).

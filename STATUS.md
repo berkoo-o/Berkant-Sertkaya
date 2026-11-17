@@ -62,5 +62,7 @@ Der Nutzer wollte ein Thema, unter dem viel diskutiert wird, und hat „Wohin ge
 - Ton komplett aus dem Epidemic-Sound-Connector, Musik „Radar Focus“ (Blue Saga): `rundfunk/audio_test.py a2`, Liste in `rundfunk/SOUNDS.md`.
 - Rendern: Server in `rundfunk/a2` auf Port 8772, `seq 0 120 840 | xargs -P 5 -I{} ./chunk.sh {}`, danach `./build_test.sh a2` im Ordner `rundfunk`.
 
+- Fassung A3 (`rundfunk/a3/modell.html`, ca. 34 s plus Logo, Wünsche vom 17.11.2026): Straßen aus Asphalt mit Gehwegen, Bordsteinen und Zebrastreifen, kräftig helles Gras, ein Brief mit Rechnung („Rundfunkbeitrag (früher GEZ)“) zum Einstieg vor der ganzen Stadt, ein neues ZDF-Gebäude im Stil der ARD (kleiner, Stadionform mit Glasband und rundem Studioturm), Bimetall-Euromünzen mit Spiegelungen. Die Stimme läuft im natürlichen Tempo und nennt alle vier Beträge (`rundfunk/voice34/voice.mp3`, Skript `rundfunk/Skript_Rundfunkbeitrag_36s.txt`). Ton: `python3 audio_test.py a3`, Video: `./build_test.sh a3`.
+
 ## Nächster Schritt
-Rückmeldung des Nutzers zu Fassung A2 abwarten, danach Cover, Beschreibungen und Metricool-Entwürfe.
+Rückmeldung des Nutzers zu Fassung A3 abwarten, danach Cover, Beschreibungen und Metricool-Entwürfe.

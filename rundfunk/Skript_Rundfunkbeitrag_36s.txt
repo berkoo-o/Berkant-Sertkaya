@@ -1,0 +1,14 @@
+function. – „Wohin geht dein Rundfunkbeitrag?“ – Fassung A3, ca. 34 Sekunden plus Logo
+Stand: 17.11.2026 – Stimme: ElevenLabs „Tom Magic“ (eleven_v4), natürliches Tempo, Take 2 unverändert (rundfunk/voice34/voice.mp3)
+
+Sprechertext (alle Beträge werden ausgesprochen):
+„18 Euro 36 zahlt jeder Haushalt in Deutschland, jeden Monat. Egal, ob du ARD und ZDF überhaupt einschaltest. Das sind zusammen mehr als 8,7 Milliarden Euro im Jahr. Aber wohin geht das Geld? 12 Euro 78 bekommt die ARD, 4 Euro 69 das ZDF, 54 Cent das Deutschlandradio und 35 Cent die Landesmedienanstalten. Und ab 2027 empfiehlt die Finanzkommission sogar 18 Euro 64. Abschaffen, senken oder so lassen? Schreib's in die Kommentare.“
+
+Bild:
+- Einstieg: Die ganze Stadt ist zu sehen. Ein Brief „Rundfunkbeitrag (früher GEZ) – An alle Haushalte“ schwebt davor, die Lasche geht auf, die Rechnung kommt heraus („Rechnung · Monatsbeitrag 18,36 € · jeden Monat, für jeden Haushalt“, rot unterstrichen), dann fliegt der Brief in das Haus mit dem roten Dach.
+- Aus allen Häusern steigen Euro-Münzen auf (8,7 Mrd. € im Jahr), dann fliegt das Geld zu ARD, ZDF, Deutschlandradio und Landesmedienanstalten, die beim Ankommen aufleuchten.
+- „Und ab 2027?“: eine zweite Münzwelle, die Zahl steigt auf 18,64 €.
+- Schlussfrage „Abschaffen, senken oder so lassen?“, danach die LED-Leuchtschrift „function.“ mit dem Licht des Fernsehturms als Punkt.
+
+Zahlen und Quellen wie in Skript_Rundfunkbeitrag_26s.txt (Beitragsservice Jahresbericht 2025, § 9 RFinStV, KEF).
+Idee für den angepinnten Kommentar: „Abschaffen 🔴, senken 🟡 oder so lassen 🟢? Antworte nur mit der Farbe.“

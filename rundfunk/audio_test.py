@@ -3,8 +3,8 @@ import sys, numpy as np, subprocess
 from scipy.io import wavfile
 from scipy.signal import butter, sosfilt
 V = sys.argv[1]
-SR = 48000; O = 25.95 if V == 'a2' else 15.45; DUR = {'a': 17.7, 'b': 18.0, 'a2': 25.95 + 2.25}[V]; N = int(SR * DUR); VOFF = 0.2
-VOICE = 'voice25/voice.mp3' if V == 'a2' else 'voice/voice.mp3'
+SR = 48000; O = {'a2': 25.95, 'a3': 34.05}.get(V, 15.45); DUR = {'a': 17.7, 'b': 18.0, 'a2': 25.95 + 2.25, 'a3': 34.05 + 2.25}[V]; N = int(SR * DUR); VOFF = 0.2
+VOICE = {'a2': 'voice25/voice.mp3', 'a3': 'voice34/voice.mp3'}.get(V, 'voice/voice.mp3')
 rng = np.random.default_rng(5)
 t = np.arange(N) / SR
 def lp(x, f, o=2): return sosfilt(butter(o, f, 'low', fs=SR, output='sos'), x)
@@ -55,7 +55,26 @@ def tick(at, g, rate=1.0):
 if V in ('a', 'b'):
     for i, c in enumerate([5.7, 7.75, 9.55, 10.9]): add(CK[[0, 1, 2, 1][i]], c, 0.55)
 
-if V == 'a2':
+if V == 'a3':
+    # intro: the letter swooshes in, the flap opens, the invoice is pulled out, then the letter flies into the house with the red roof
+    whoosh(0.75, 0.45, 1); hit('envelope_flap', 1.05, 0.5, 0.35); add(sz('envelope_open'), 1.05, 0.45); whoosh(4.75, 0.4, 0)
+    # every house pays: one bright shimmer as the coins lift out of the roofs
+    add(cut(sz('shimmer'), 0.0, 4.2, 0.01, 1.8), 5.05, 0.2)
+    for i, c in enumerate([9.5, 14.4, 17.1, 19.45, 21.6, 28.05]): add(CK[i % 3], c, 0.55)
+    whoosh(13.3, 0.55, 1); whoosh(18.2, 0.35, 0); whoosh(25.6, 0.6, 1)
+    # the money arrives: one cascade per broadcaster, smaller each time; the ARD building switches its LEDs on
+    hit('coins_handful', 15.3, 0.5, 0.40); hit('switch', 15.5, 0.22, 0.009)
+    hit('coins_drop', 18.1, 0.35, 0.074, 1.05)
+    hit('coin_single', 20.35, 0.30, 0.023)
+    hit('coin_single', 22.5, 0.22, 0.023, 1.12)
+    # 2027: a second, smaller stream of coins
+    hit('coins_stack', 27.2, 0.32, 0.122, 0.95)
+    hit('power_down', O + 0.12, 0.3, 0.063)
+    hit('switch', O + 0.14, 0.2, 0.009)
+    hit('neon_on', O + 0.86, 0.4, 1.306)
+    add(cut(sz('neon_flicker'), 12.0, DUR - O - 0.9, 0.4, 0.5), O + 0.9, 0.45)
+    add(CK[1], O + 1.93, 1.2); hit('switch', O + 1.95, 0.35, 1.064)
+elif V == 'a2':
     # 26-s version: coins lift out of the houses with one bright shimmer, the camera rises, the numbers click in
     add(cut(sz('shimmer'), 0.0, 4.2, 0.01, 1.8), 0.5, 0.2)
     for i, c in enumerate([7.3, 12.0, 13.9, 15.45, 16.7, 21.05]): add(CK[i % 3], c, 0.55)
