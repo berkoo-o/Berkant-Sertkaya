@@ -158,17 +158,37 @@ const KI=[1.32,3.82];let kioskLamp,kioskGlow;
 
 // =================================================================== WIND PARK
 const TH=1.55;const turbines=[];
-const bladeGeo=(()=>{const s=new THREE.Shape();const L=0.6;s.moveTo(-0.014,0);s.lineTo(0.014,0);s.lineTo(0.034,0.1);s.lineTo(0.008,L);s.lineTo(-0.004,L);s.lineTo(-0.022,0.1);s.closePath();const g=new THREE.ExtrudeGeometry(s,{depth:0.008,bevelEnabled:false});g.translate(0,0.02,-0.004);return g;})();
+// turbine parts, modelled after the Higgsfield reference sheet (strom/v4/ref): long slim blades with red-white tips, pointed spinner, angular nacelle
+const BL=0.68;const bChord=y=>y<0.035?0.021:(y<0.17?lerp(0.021,0.05,(y-0.035)/0.135):lerp(0.05,0.009,(y-0.17)/(BL-0.17)));const bLE=y=>-0.38*bChord(y),bTE=y=>0.62*bChord(y);
+const bladeGeo=(()=>{const s=new THREE.Shape();const Y=[];for(let i=0;i<=24;i++)Y.push(0.012+(BL-0.012)*i/24);s.moveTo(bLE(Y[0]),Y[0]);Y.forEach(y=>s.lineTo(bTE(y),y));[...Y].reverse().forEach(y=>s.lineTo(bLE(y),y));s.closePath();
+  const g=new THREE.ExtrudeGeometry(s,{depth:0.006,bevelEnabled:true,bevelThickness:0.003,bevelSize:0.002,bevelSegments:1,curveSegments:2});g.translate(0,0,-0.003);return g;})();
+const bandGeo=(y0,y1)=>{const q=new THREE.Shape();q.moveTo(bLE(y0)-0.003,y0);q.lineTo(bTE(y0)+0.003,y0);q.lineTo(bTE(y1)+0.003,y1);q.lineTo(bLE(y1)-0.003,y1);q.closePath();const g=new THREE.ExtrudeGeometry(q,{depth:0.0136,bevelEnabled:false});g.translate(0,0,-0.0068);return g;};
+const BANDS=mergeGeometries([bandGeo(BL*0.8,BL*0.86),bandGeo(BL*0.93,BL)]);
+const spinGeo=(()=>{const P=[[0.0,-0.032],[0.056,-0.032],[0.056,-0.006],[0.05,0.022],[0.036,0.046],[0.018,0.062],[0.0,0.068]].map(p=>new THREE.Vector2(p[0],p[1]));const g=new THREE.LatheGeometry(P,28);g.rotateX(Math.PI/2);return g;})();
+const pitchGeo=(()=>{const g=new THREE.CylinderGeometry(0.019,0.019,0.012,16);g.translate(0,0.045,0);return g;})();
+const nacGeo=(()=>{const P=[[-0.052,-0.03],[-0.04,-0.05],[0.04,-0.05],[0.052,-0.03],[0.052,0.032],[0.034,0.05],[-0.034,0.05],[-0.052,0.032]];const sh=new THREE.Shape();sh.moveTo(...P[0]);P.slice(1).forEach(p=>sh.lineTo(...p));sh.closePath();
+  const g=new THREE.ExtrudeGeometry(sh,{depth:0.3,bevelEnabled:true,bevelThickness:0.006,bevelSize:0.004,bevelSegments:1});g.translate(0,0,-0.2);return g;})();
+const tMat={red:new THREE.MeshStandardMaterial({color:0xd8242f,roughness:.5,emissive:0x8a0d16,emissiveIntensity:.7}),grey:new THREE.MeshStandardMaterial({color:0x8d939c,roughness:.5,metalness:.3,emissive:0x5c6270,emissiveIntensity:.35}),
+  dark:new THREE.MeshStandardMaterial({color:0x4a4f58,roughness:.6,emissive:0x2a2e36,emissiveIntensity:.4}),fan:new THREE.MeshBasicMaterial({color:0x1d2026})};
 const hillH=(x,z)=>0.62*Math.sqrt(Math.max(0,1-((x+2.95)/2.25)**2-((z+3.1)/1.95)**2));
 {const hill=mesh(town,new THREE.SphereGeometry(1,64,24,0,Math.PI*2,0,Math.PI/2),new THREE.MeshStandardMaterial({color:0x3d5230,roughness:.95,emissive:0x3d5230,emissiveIntensity:0.27}),-2.95,0,-3.1);hill.scale.set(2.25,0.62,1.95);}
 const hillN=(x,z)=>new THREE.Vector3((x+2.95)/2.25**2,Math.max(hillH(x,z),0.03)/0.62**2,(z+3.1)/1.95**2).normalize();
 function turbine(x,z,isHero){const y=hillH(x,z)-0.02;const T=new THREE.Group();T.position.set(x,y,z);T.rotation.y=Math.PI/4;town.add(T);const h=isHero?TH+0.1:TH;
   const white=_m.tw||(_m.tw=new THREE.MeshStandardMaterial({color:0xd6dae2,roughness:.6,emissive:0xaab4cc,emissiveIntensity:0.32}));const towerMat=isHero?new THREE.MeshStandardMaterial({color:0xd6dae2,roughness:.6,transparent:true,emissive:0xaab4cc,emissiveIntensity:0.32}):white;
-  mesh(T,new THREE.CylinderGeometry(0.026,0.05,h,12),towerMat,0,h/2,0);
+  mesh(T,new THREE.CylinderGeometry(0.025,0.05,h,20),towerMat,0,h/2,0);const rT=yy=>lerp(0.05,0.025,yy/h);
+  for(const f of [0.27,0.76])mesh(T,new THREE.TorusGeometry(rT(f*h)+0.0008,0.0022,5,24).rotateX(Math.PI/2),tMat.grey,0,f*h,0,false,false);
   const shellMat=isHero?new THREE.MeshStandardMaterial({color:0xdde1e8,roughness:.55,transparent:true,emissive:0xaab4cc,emissiveIntensity:0.32}):white;
-  mesh(T,new THREE.BoxGeometry(0.1,0.1,0.3),shellMat,0,h+0.04,-0.05);
-  const rotor=new THREE.Group();rotor.position.set(0,h+0.04,0.13);T.add(rotor);mesh(rotor,new THREE.SphereGeometry(0.045,14,10),white,0,0,-0.01);for(let i=0;i<3;i++){const b=mesh(rotor,bladeGeo,white);b.rotation.z=i*Math.PI*2/3;}
-  const lamp=new THREE.Group();lamp.position.set(0,h+0.098,-0.14);T.add(lamp);const bm=glowMat(RED,4);for(const sx of [-1,1]){mesh(lamp,new THREE.CylinderGeometry(0.011,0.013,0.012,8),mat(0x3a3d44,.6,.4),sx*0.024,0,0,false,false);mesh(lamp,new THREE.SphereGeometry(0.0115,10,8,0,6.2832,0,1.5708),bm,sx*0.024,0.006,0,false,false);}
+  mesh(T,nacGeo,shellMat,0,h+0.04,0);
+  // yaw bearing, main bearing collar, side vents, roof: cooler with two fans, hatch, railing and the wind sensor mast at the rear
+  mesh(T,new THREE.CylinderGeometry(0.031,0.033,0.016,20),tMat.grey,0,h-0.004,0);mesh(T,new THREE.CylinderGeometry(0.042,0.046,0.03,24).rotateX(Math.PI/2),shellMat,0,h+0.04,0.108);
+  for(const sx of [-1,1]){const v=new THREE.Mesh(new THREE.PlaneGeometry(0.06,0.03),tMat.dark);v.rotation.y=sx*Math.PI/2;v.position.set(sx*0.0571,h+0.042,-0.14);T.add(v);}
+  {const RT=h+0.096;const cm=isHero?shellMat:white;mesh(T,new THREE.BoxGeometry(0.058,0.022,0.07),cm,0,RT+0.006,-0.06);for(const dz of [-0.017,0.017]){const f=new THREE.Mesh(new THREE.CircleGeometry(0.012,16),tMat.fan);f.rotation.x=-Math.PI/2;f.position.set(0,RT+0.0175,-0.06+dz);T.add(f);}
+   const hatch=new THREE.Mesh(new THREE.PlaneGeometry(0.036,0.03),tMat.grey);hatch.rotation.x=-Math.PI/2;hatch.position.set(0,RT-0.0035,0.03);T.add(hatch);
+   const rails=[];for(const sx of [-1,1]){rails.push(rodGeo([sx*0.03,RT+0.012,-0.12],[sx*0.03,RT+0.012,0.06],0.0013,3));for(const zz of [-0.12,-0.03,0.06])rails.push(rodGeo([sx*0.03,RT-0.004,zz],[sx*0.03,RT+0.012,zz],0.0013,3));}mesh(T,mergeGeometries(rails),tMat.grey,0,0,0,false,false);
+   const mz=-0.18;mesh(T,mergeGeometries([rodGeo([0,RT-0.004,mz],[0,RT+0.06,mz],0.0022,4),rodGeo([-0.022,RT+0.05,mz],[0.022,RT+0.05,mz],0.0016,4),rodGeo([-0.02,RT+0.05,mz],[-0.02,RT+0.062,mz],0.0012,3),rodGeo([0.02,RT+0.05,mz],[0.02,RT+0.058,mz],0.0012,3)]),tMat.grey,0,0,0,false,false);
+   for(const dx of [-0.026,-0.014])mesh(T,new THREE.SphereGeometry(0.0042,8,6),tMat.dark,dx,RT+0.064,mz,false,false);{const vane=new THREE.Mesh(new THREE.PlaneGeometry(0.016,0.012),tMat.grey);vane.rotation.y=Math.PI/2;vane.position.set(0.02,RT+0.064,mz-0.008);T.add(vane);}}
+  const rotor=new THREE.Group();rotor.position.set(0,h+0.04,0.155);T.add(rotor);mesh(rotor,spinGeo,white,0,0,0);for(let i=0;i<3;i++){const B=new THREE.Group();B.rotation.z=i*Math.PI*2/3;rotor.add(B);mesh(B,bladeGeo,white);mesh(B,BANDS,tMat.red,0,0,0,false,false);mesh(B,pitchGeo,tMat.grey,0,0,0,false,false);}
+  const lamp=new THREE.Group();lamp.position.set(0,h+0.102,-0.145);T.add(lamp);const bm=glowMat(RED,4);for(const sx of [-1,1]){mesh(lamp,new THREE.CylinderGeometry(0.009,0.011,0.012,10),mat(0x3a3d44,.6,.4),sx*0.036,0,0,false,false);mesh(lamp,new THREE.SphereGeometry(0.0105,12,8,0,6.2832,0,1.5708),bm,sx*0.036,0.006,0,false,false);}
   const bulb={material:bm};const hl=halo(lamp,RED,1.25,0.2);hl.position.y=0.012;const pl=new THREE.PointLight(RED,0,1.5,2);pl.position.y=0.06;lamp.add(pl);
   const ringM=glowMat(RED,1.6);const rg=new THREE.TorusGeometry(0.0395,0.0045,6,18);rg.rotateX(Math.PI/2);mesh(T,rg,ringM,0,h*0.52,0,false,false);
   mesh(T,new THREE.CylinderGeometry(0.075,0.09,0.08,14),mat(0x77777a,.9),0,0.0,0);
