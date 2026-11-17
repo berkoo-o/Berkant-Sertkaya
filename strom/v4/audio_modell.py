@@ -138,41 +138,40 @@ fx += (lp(rng.standard_normal(N), 200) * 0.5 + 0.22*np.sin(2*np.pi*86*t) + 0.08*
 fx += np.sin(2*np.pi*np.cumsum(300 + 220*np.clip((t - 14.8)/1.0, 0, 1))/SR) * win(14.8, 16.8, 0.4) * 0.018
 for c in np.arange(13.3, 15.0, 1.5): swish(c, 0.14)
 # tower: the current runs down, the transformer in the tower hums
-flow(17.0, 1.7, 0.85, 0.05, 0.25, 0.9); spark(18.68, 0.3); flow(19.1, 1.1, 0.75); spark(20.15, 0.3)
+flow(17.0, 1.7, 0.85, 0.05, 0.35, 0.9); spark(18.68, 0.25)
 bed('transformer_hum', 18.5, 19.6, 2.0, 0.22, 0.3)
 # substation: the LED flood lights switch on, the transformers hum, pulses leave towards the pylons
 hit('switch_on', 19.7, 0.6, 0.037, 0.8)
 bed('transformer_hum', 19.6, 23.3, 6.0, 0.3, 0.4)
-for c in [20.2, 21.21, 22.22, 23.23]: flow(c, 0.5, 0.75, 0.015, 0.25)
+fx += bp(rng.standard_normal(N), 2500, 7000) * win(20.3, 26.2, 0.8) * (0.75 + 0.25*np.sin(2*np.pi*0.31*t)) * 0.006
 # power line
 bed('soft_wind', 23.2, 26.2, 24.0, 0.1, 0.6)
-for c in [22.9, 23.73, 24.57, 25.4]: flow(c, 0.5, 0.65, 0.015, 0.25)
 # network spreads: small ticks as the lines light up
-for i in range(28): hit('tick', 26.6 + i*0.07 + rng.uniform(0, 0.02), 0.09 + 0.05*rng.random(), 0.011, 0.9 + 0.25*rng.random())
+_n = int(2.4*SR); _tt = np.arange(_n)/SR
+add(bp(rng.standard_normal(_n), 1800, 6000) * np.sin(np.pi*_tt/2.4)**2 * (0.4 + 0.6*_tt/2.4), 26.6, 0.035)
 # globe: rises out of the park (soft swoosh), then one tick per ring, in step with the counter 1..47, slowly rising in pitch
 add(WH[0][0], 29.0 - WH[0][1], 0.45)
-for k in range(47):
-    c = 29.3 + 1.7*(1 - (1 - (k + 0.5)/47) ** (1/3))
-    hit('tick', c, 0.16, 0.011, 0.92 + 0.008*k)
+_n = int(1.6*SR); _tt = np.arange(_n)/SR; _u = 1 - (1 - _tt/1.6)**3
+_f = 420 + 380*_u; add((np.sin(2*np.pi*np.cumsum(_f)/SR) + 0.35*np.sin(2*np.pi*np.cumsum(2*_f)/SR)) * np.minimum(1, _tt/0.15) * np.clip((1.6 - _tt)/0.5, 0, 1), 29.3, 0.022)
 add(sum(np.sin(2*np.pi*mtof(m)*np.arange(int(1.6*SR))/SR) for m in (79, 86)) * np.exp(-np.arange(int(1.6*SR))/SR*2.2), 30.65, 0.02)
 # voltage steps down: a switch clicks at every step, the current runs into town
-for i, c in enumerate([31.7, 32.5, 33.3, 34.1]): hit('switch_off', c, 0.32, 0.007, 1.0 - 0.06*i); add(tone(mtof(84 - i*5), 0.24, 0.09), c + 0.02, 0.025)
-flow(31.4, 3.0, 0.5, 0.2, 0.5); flow(33.3, 2.0, 0.4, 0.2, 0.5); spark(34.4, 0.28)
+for i, c in enumerate([31.7, 32.5, 33.3, 34.1]): add(tone(mtof(84 - i*5), 0.24, 0.09), c + 0.02, 0.03)
+flow(31.4, 3.0, 0.45, 0.3, 0.8)
 # kiosk: the transformer hums, pulses run through the cable to the house
 bed('transformer_hum', 35.6, 38.2, 14.0, 0.17, 0.4)
-for c in [36.3, 37.21]: flow(c, 0.9, 0.8, 0.02, 0.25); spark(c + 0.88, 0.28)
+flow(36.3, 1.0, 0.7, 0.05, 0.35); spark(37.18, 0.22)
 # cable close-up: faint shimmer, one electron is marked, then the slow 50 Hz swing (real mains hum, swelling with the swing), then three fast energy waves
 sh = bp(rng.standard_normal(N), 5000, 10000) * win(42.3, 48.3, 0.5) * (0.6 + 0.4*np.sin(2*np.pi*0.9*t))
 fx += sh * 0.008
 add(tone(mtof(86), 0.35, 0.12), 43.6, 0.035)
 _h = np.zeros(N); _y = seg('transformer_hum', 20.0, 3.2, 0.3, 0.4); _i = int(45.15*SR); _h[_i:_i+len(_y)] = _y[:N-_i]
 fx += _h * (0.35 + 0.65*(0.5 + 0.5*np.sin(2*np.pi*2.3*(t - 45.15) - np.pi/2))) * 0.3
-for c in [49.15, 49.8, 50.4]:
-    flow(c, 0.45, 1.0, 0.01, 0.12, 1.25); spark(c + 0.43, 0.35); add(tone(mtof(91), 0.3, 0.1), c + 0.42, 0.02)
+flow(49.1, 1.75, 0.6, 0.05, 0.5, 1.15); spark(49.58, 0.25)
+for c in [49.15, 49.8, 50.4]: add(tone(mtof(91), 0.3, 0.1), c + 0.42, 0.018)
 # warning lights: night wind, the lights switch off one by one (53.3 s), come back together (56.15 s); a plane is only heard very faintly, far away
 bed('soft_wind', 50.9, O + 3.4, 26.0, 0.15, 0.8)
 for c in np.arange(51.6, O, 1.9): swish(c, 0.13)
-for i in range(5): hit('switch_off', 53.3 + i*0.13, 0.22, 0.007, 1.08 - 0.03*i)
+hit('switch_off', 53.3, 0.2, 0.007)
 pd = np.clip((t - 55.4)/1.6, 0, 1) * np.clip((O + 0.9 - t)/1.2, 0, 1)
 prop = lp(rng.standard_normal(N), 500) * (0.6 + 0.4*np.sin(2*np.pi*36*t)) + 0.25*np.sin(2*np.pi*(90 + 5*np.sin(2*np.pi*0.2*t))*t)
 fx += prop * pd * 0.02
@@ -180,17 +179,15 @@ hit('switch_on', 56.15, 0.45, 0.037)
 fx *= np.clip((O + 2.6 - t) / 1.0, 0, 1)
 # outro (LED sign): the town powers down with real switches, the letters strike on like a neon tube, the warning light flies over and clicks in as the dot
 hit('power_down', O + 0.1, 0.22, 0.205)
-for i in range(6): hit('switch_off', O + 0.12 + i*0.13 + rng.uniform(0, 0.03), 0.14 + 0.08*rng.random(), 0.007, 0.9 + 0.2*rng.random())
+for i, g in [(0, 0.2), (3, 0.13)]: hit('switch_off', O + 0.12 + i*0.13, g, 0.007, 0.95 + 0.05*i)
 LSEEDS = [0.0, 0.6, 0.25, 0.85, 0.4, 0.1, 0.7, 0.5]
 STRIKES = [0.06, 2.16, 8.16, 10.4, 11.0, 14.76]
-for i in range(8):
-    c = O + 0.85 + i*0.1
-    add(seg('fluorescent_flicker', STRIKES[i % 6], 0.16, 0.002, 0.06, mode='peak'), c - 0.02, 0.32)
-    if LSEEDS[i] > 0.55: add(seg('fluorescent_flicker', STRIKES[(i + 3) % 6], 0.12, 0.002, 0.05, mode='peak'), c + 0.42, 0.18)
+add(seg('fluorescent_flicker', STRIKES[0], 0.16, 0.002, 0.06, mode='peak'), O + 0.83, 0.3)
+add(seg('fluorescent_flicker', STRIKES[3], 0.12, 0.002, 0.05, mode='peak'), O + 0.85 + 3*0.1 + 0.42, 0.14)
 bed('fluorescent_flicker', O + 1.0, DUR - 0.2, 4.0, 0.12, 0.6)
 sn = int(1.0*SR); st = np.arange(sn)/SR
-add(bp(noise(1.0), 3000, 9000) * np.sin(np.pi*st/1.0)**2, O + 1.05, 0.03); flow(O + 1.05, 0.9, 0.35, 0.2, 0.3)
-add(thud(0.28, 70), O + 1.95); add(CK[1], O + 1.93, 0.8); spark(O + 1.95, 0.2)
+add(bp(noise(1.0), 3000, 9000) * np.sin(np.pi*st/1.0)**2, O + 1.05, 0.03)
+add(thud(0.28, 70), O + 1.95); add(CK[1], O + 1.93, 0.8)
 cn = int(2.4*SR); ct = np.arange(cn)/SR
 add(sum(np.sin(2*np.pi*mtof(n)*ct) for n in (76, 83, 88)) * np.exp(-ct*1.6) * np.minimum(1, ct/.01), O + 1.98, 0.06)
 
