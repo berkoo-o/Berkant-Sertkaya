@@ -1,0 +1,27 @@
+function. – „Was verdient ein Bundestagsabgeordneter?“ – Sprechertext für ElevenLabs „Tom“ (eleven_v4, mit Audio-Tags)
+Stand: 17.11.2026 – komplett ins Textfeld kopieren. Zahlen sind ausgeschrieben, damit Tom sie sicher richtig ausspricht.
+
+[serious] Elftausendachthundertdreiunddreißig Euro. [short pause] So viel bekommt jeder Abgeordnete im Bundestag. Jeden Monat. [short pause] [intrigued] Und das ist längst nicht alles.
+
+[matter-of-fact] Das ist die Diät, also das Gehalt der Abgeordneten. Sie wird ganz normal versteuert [short pause] und ist mehr als zweieinhalbmal so hoch wie das, was ein Vollzeitjob in Deutschland im Mittel bringt.
+
+[explaining] Dazu kommen fünftausendvierhundertsiebenundsechzig Euro im Monat, steuerfrei. [short pause] Davon zahlen sie zum Beispiel ihr Büro im Wahlkreis, eine Wohnung in Berlin und ihre Fahrten. [short pause] [slightly amused] Belege brauchen sie dafür keine.
+
+[matter-of-fact] Für Mitarbeiter gibt es noch einmal über siebenundzwanzigtausend Euro im Monat. [short pause] Dieses Geld bekommen sie aber nicht selbst. Die Gehälter zahlt der Bundestag direkt aus.
+
+[calm] Bahnfahren ist für sie übrigens kostenlos, quer durch Deutschland.
+
+[intrigued] Und jetzt kommt der Teil, über den am meisten gestritten wird: [short pause] [serious] Schon nach vier Jahren im Bundestag gibt es ab siebenundsechzig rund tausendeinhundertachtzig Euro Altersversorgung im Monat. [short pause] Eingezahlt haben sie dafür selbst keinen Cent.
+
+[curious] Und wer bestimmt die Diäten? [short pause] [explaining] Seit zweitausendvierzehn steigen sie jedes Jahr automatisch mit den Löhnen. [short pause] Für zweitausendsechsundzwanzig haben die Abgeordneten darauf verzichtet. [short pause] Sonst wären es jetzt zwölftausenddreihundertdreißig Euro.
+
+[serious] Für alle sechshundertdreißig Abgeordneten zusammen sind das bis zu achtundzwanzig Millionen Euro. [short pause] Jeden Monat.
+
+[curious] Zu viel, genau richtig oder sogar zu wenig für diesen Job? [short pause] [warm] Schreib's in die Kommentare.
+
+
+Einstellungen:
+- Stimme: Tom (Tom Magic), Modell eleven_v4, Sprache Deutsch, Stability „Natural“
+- Natürliches Tempo, nichts beschleunigen und keine Pausen herausschneiden
+- Erwartete Länge: etwa 80 bis 85 Sekunden, danach kommen noch rund 3 Sekunden Outro
+- Als eine durchgehende MP3 exportieren

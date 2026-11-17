@@ -66,5 +66,12 @@ Der Nutzer wollte ein Thema, unter dem viel diskutiert wird, und hat „Wohin ge
 
 - Cover und Texte (17.11.2026): Das erste Cover (Fernseher mit Münzschlitz, `rundfunk/cover/cover_rundfunk.html`) gefiel dem Nutzer nicht. Aus drei Varianten (`rundfunk/social/Cover_Varianten.jpg`: Fernsehturm, Sparschwein `cover_schwein.html`, Mini-Stadt) hat er den Fernsehturm gewählt: `rundfunk/cover/cover_turm.html` (Server Port 8774, `PAGE=cover_turm.html node cover.mjs out.png`). Thumbnails und Beschreibungen für TikTok, Instagram und YouTube in `rundfunk/social/`. Metricool hat der Nutzer vorerst zurückgestellt.
 
+## Bundestag: „Was verdient ein Bundestagsabgeordneter?“ (Paket vom 17.11.2026)
+Der Nutzer hat seine Arbeitsweise neu festgelegt (siehe CLAUDE.md: Claude für Recherche, Drehbuch und Prompts, Higgsfield für die Bilder, ElevenLabs Tom für die Stimme, Lieferung A bis I, 60 bis 90 Sekunden). Dazu kam ein Reichstag-Prompt. Daraus ist das Thema Abgeordnetenbezüge geworden.
+- Paket A bis I: `bundestag/Paket_Was_verdient_ein_Abgeordneter.md`, Sprechertext für Tom: `bundestag/Sprechertext_Tom.txt` (etwa 83 s plus 3 s Outro).
+- Stilreferenzen für Higgsfield (saubere Standbilder aus `rundfunk/a3`, ohne Schrift): `bundestag/higgsfield/`.
+- Zahlen: Diät 11.833,47 € (Erhöhung 2026 auf 12.330,48 € ausgesetzt), Kostenpauschale 5.467,27 €, Mitarbeiter bis 27.396 €, Bahn frei, Altersentschädigung 2,5 % je Jahr, 630 Abgeordnete, Median Vollzeit 2025 54.066 €. www.bundestag.de ist aus dieser Umgebung nicht erreichbar, die Zahlen stammen aus Suchtreffern auf bundestag.de, Gesetzestexten und Destatis.
+- Roter Faden: ein kleines rotes Licht in der Reichstagskuppel, das im Outro zum Punkt von „function.“ wird.
+
 ## Nächster Schritt
-Rückmeldung des Nutzers zu Video A3, Cover und Beschreibungen abwarten. Metricool-Entwürfe erst, wenn der Nutzer sie wieder möchte.
+Rückmeldung des Nutzers zum Bundestag-Paket abwarten. Danach erzeugt der Nutzer (oder auf Wunsch Claude über die Connectoren) die Stimme mit Tom und die Higgsfield-Bilder und Clips, dann werden die Zeiten an die Stimme angepasst. Rundfunk A3 ist geliefert. Metricool-Entwürfe erst, wenn der Nutzer sie wieder möchte.

@@ -1,5 +1,25 @@
 # function. – Projektanweisungen
 
+- **Rolle und Lieferformat (Wunsch des Nutzers, 17.11.2026):** Claude ist persönlicher Creative Director, Drehbuchautor und Produktionsplaner für den Kanal. Das Produktionssystem des Nutzers ist fest: Claude für Recherche, Drehbuch, Szenenplanung und Prompts, Higgsfield für Bilder und Animationen, ElevenLabs mit der Stimme „Tom“ für alle Sprechertexte. Keine weiteren Programme vorschlagen, ausdrücklich kein CapCut und kein Blender.
+  - **Stil:** Der bestehende visuelle Stil bleibt unverändert. Das betrifft Diorama-Look, Farben, Licht, Typografie, Szenenaufbau und Wiedererkennungswert. Verbessern darf Claude Animationen, Kamerafahrten, Übergänge und Effekte, aber keinen neuen Stil erfinden.
+  - **Ziel und Länge:** Ziel sind möglichst schnell 10.000 Follower auf TikTok, deshalb sind die ersten zwei Sekunden, Zuschauerbindung, Informationsdichte, visuelle Abwechslung, Neugier, Teilbarkeit und Kommentare besonders wichtig. Die Laufzeit liegt bei 60 bis 90 Sekunden, wenn das Thema es hergibt.
+  - **Lieferung bei jedem Video:**
+    - A. drei Hook-Varianten
+    - B. die beste Hook mit Begründung
+    - C. das vollständige Drehbuch
+    - D. den separaten Sprechertext für Tom
+    - E. den Szenenplan (Zeit, Sprechertext, Bild, Higgsfield-Prompt, Animation, Kamera, Licht, Übergang)
+    - F. Higgsfield-Prompts für jede Szene
+    - G. Animations- und Kameraanweisungen
+    - H. Übergänge und Sounddesign
+    - I. TikTok-Titel, Beschreibung und Hashtags
+  - **Higgsfield-Prompts:**
+    - Die Prompts sind auf Englisch und direkt verwendbar.
+    - Pro Szene gibt es ein Startbild (Bildmodell mit Referenzbildern) und einen Bewegungs-Prompt (Videomodell mit Start- und Endbild).
+    - Das Endbild jeder Szene ist das Startbild der nächsten. So entsteht eine durchgehende Fahrt durch ein einziges Modell ohne harte Schnitte.
+    - Als Stilreferenz dienen saubere Standbilder ohne Schrift, z. B. `bundestag/higgsfield/Stil_Referenz_*.jpg`.
+    - Das früher abgelehnte „fotorealistische Higgsfield-Diorama“ hatte den Look verfehlt. Deshalb beschreiben die Prompts den Modell-Look genau: einfaches Low-Poly-Modell auf dunkler Platte mit LED-Kante, dunkles Zimmer, Bücherregal, kühles Licht von rechts, warme Fenster und Rot nur als roter Faden.
+  - **Referenz:** `bundestag/Paket_Was_verdient_ein_Abgeordneter.md`.
 - Für jedes function.-Erklärvideo gilt der Skill „function-erklaervideo“ (Styleguide).
 - **Texte (Wunsch des Nutzers, 15.11.2026):** Alles, was ich schreibe (Chat-Antworten, Skripte, Sprechertexte, Beschreibungen), flüssig, natürlich und korrekt formulieren: ganze Sätze, die gut ineinander übergehen. Nichts Verkrampftes oder Abgehacktes, keine Stichwort-Fragmente und keine aneinandergereihten Gedankenstriche.
 - **Look: schlichtes Modell wie bei schraffuren (Wunsch des Nutzers, 15./16.11.2026).** Vorlage ist das schraffuren-Reel „KI-Firmen bereiten sich auf Tag X vor“ (Bildschirmaufnahme des Nutzers). Zwei andere Ansätze wurden abgelehnt: viele einzelne 3D-Szenen mit Schnitten („gefällt mir gar nicht“) und ein fotorealistisches KI-Diorama von Higgsfield („du hast nichts davon umgesetzt“). Der Stil der Vorlage, der genau getroffen werden soll:
