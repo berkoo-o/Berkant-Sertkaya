@@ -171,13 +171,13 @@ const nacGeo=(()=>{const P=[[-0.052,-0.03],[-0.04,-0.05],[0.04,-0.05],[0.052,-0.
 const tMat={red:new THREE.MeshStandardMaterial({color:0xd8242f,roughness:.5,emissive:0x8a0d16,emissiveIntensity:.7}),grey:new THREE.MeshStandardMaterial({color:0x8d939c,roughness:.5,metalness:.3,emissive:0x5c6270,emissiveIntensity:.35}),
   dark:new THREE.MeshStandardMaterial({color:0x4a4f58,roughness:.6,emissive:0x2a2e36,emissiveIntensity:.4}),fan:new THREE.MeshBasicMaterial({color:0x1d2026})};
 const hillH=(x,z)=>0.62*Math.sqrt(Math.max(0,1-((x+2.95)/2.25)**2-((z+3.1)/1.95)**2));
-{const hill=mesh(town,new THREE.SphereGeometry(1,64,24,0,Math.PI*2,0,Math.PI/2),new THREE.MeshStandardMaterial({color:0x3d5230,roughness:.95,emissive:0x3d5230,emissiveIntensity:0.27}),-2.95,0,-3.1);hill.scale.set(2.25,0.62,1.95);}
+{const hill=mesh(town,new THREE.SphereGeometry(1,64,24,0,Math.PI*2,0,Math.PI/2),new THREE.MeshStandardMaterial({color:0x3d5230,roughness:.95,emissive:0x3d5230,emissiveIntensity:0.34}),-2.95,0,-3.1);hill.scale.set(2.25,0.62,1.95);}
 const hillN=(x,z)=>new THREE.Vector3((x+2.95)/2.25**2,Math.max(hillH(x,z),0.03)/0.62**2,(z+3.1)/1.95**2).normalize();
 function turbine(x,z,isHero){const y=hillH(x,z)-0.02;const T=new THREE.Group();T.position.set(x,y,z);T.rotation.y=Math.PI/4;town.add(T);const h=isHero?TH+0.1:TH;
-  const white=_m.tw||(_m.tw=new THREE.MeshStandardMaterial({color:0xd6dae2,roughness:.6,emissive:0xaab4cc,emissiveIntensity:0.32}));const towerMat=isHero?new THREE.MeshStandardMaterial({color:0xd6dae2,roughness:.6,transparent:true,emissive:0xaab4cc,emissiveIntensity:0.32}):white;
+  const white=_m.tw||(_m.tw=new THREE.MeshStandardMaterial({color:0xd6dae2,roughness:.6,emissive:0xaab4cc,emissiveIntensity:0.42}));const towerMat=isHero?new THREE.MeshStandardMaterial({color:0xd6dae2,roughness:.6,transparent:true,emissive:0xaab4cc,emissiveIntensity:0.42}):white;
   mesh(T,new THREE.CylinderGeometry(0.025,0.05,h,20),towerMat,0,h/2,0);const rT=yy=>lerp(0.05,0.025,yy/h);
   for(const f of [0.27,0.76])mesh(T,new THREE.TorusGeometry(rT(f*h)+0.0008,0.0022,5,24).rotateX(Math.PI/2),tMat.grey,0,f*h,0,false,false);
-  const shellMat=isHero?new THREE.MeshStandardMaterial({color:0xdde1e8,roughness:.55,transparent:true,emissive:0xaab4cc,emissiveIntensity:0.32}):white;
+  const shellMat=isHero?new THREE.MeshStandardMaterial({color:0xdde1e8,roughness:.55,transparent:true,emissive:0xaab4cc,emissiveIntensity:0.42}):white;
   mesh(T,nacGeo,shellMat,0,h+0.04,0);
   // yaw bearing, main bearing collar, side vents, roof: cooler with two fans, hatch, railing and the wind sensor mast at the rear
   mesh(T,new THREE.CylinderGeometry(0.031,0.033,0.016,20),tMat.grey,0,h-0.004,0);mesh(T,new THREE.CylinderGeometry(0.042,0.046,0.03,24).rotateX(Math.PI/2),shellMat,0,h+0.04,0.108);
@@ -194,6 +194,7 @@ function turbine(x,z,isHero){const y=hillH(x,z)-0.02;const T=new THREE.Group();T
   mesh(T,new THREE.CylinderGeometry(0.075,0.09,0.08,14),mat(0x77777a,.9),0,0.0,0);
   {const dm=new THREE.Mesh(new THREE.PlaneGeometry(0.024,0.05),new THREE.MeshBasicMaterial({color:0x2a2c31}));dm.position.set(0,0.07,0.0492);T.add(dm);mesh(T,new THREE.SphereGeometry(0.0075,8,6),glowMat(0xdfeaff,3.4),0,0.108,0.05,false,false);
    const a=Math.PI/4,px=x+0.2*Math.sin(a),pz=z+0.2*Math.cos(a);const p=new THREE.Mesh(new THREE.PlaneGeometry(0.7,0.7),new THREE.MeshBasicMaterial({map:poolTex,color:hdr(0xcfe0ff,0.3),transparent:true,opacity:0.5,blending:THREE.AdditiveBlending,depthWrite:false}));p.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),hillN(px,pz));p.position.set(px,hillH(px,pz)+0.02,pz);town.add(p);}
+  {const up=new THREE.PointLight(0xdfe8ff,0.035,1.6,2);up.position.set(0,0.06,0.32);T.add(up);}
   const o={T,rotor,lamp,bulb,hl,pl,ringM,towerMat,shellMat,h,ph:rnd()*6,x,y,z,hero:isHero};turbines.push(o);
   if(isHero){const I=new THREE.Group();I.position.set(0,h+0.04,0);T.add(I);I.visible=false;o.inner=I;
     mesh(I,new THREE.CylinderGeometry(0.014,0.014,0.12,10).rotateX(Math.PI/2),mat(0x8d949e,.4,.6),0,0,0.05);box(I,0.055,0.055,0.05,mat(0x6a7380,.5,.3),0,0,-0.01);
@@ -426,8 +427,13 @@ const SEG=[
  [O,O+1.4,C(-2.6,1.0,-2.9,15.5,47.5,35.0),C(-2.6,2.9,-2.9,17,48,33.0),'io'],
  [O+1.4,END+0.1,C(-2.6,2.9,-2.9,17,48,33.0),C(-2.6,2.95,-2.9,16.8,48.4,33.0),'lin'],
 ];
+// focus light: a soft warm spot that always follows the place the camera is looking at, from above and from the camera side
+const CAMT=[0,0,0];let CAMD=30;const focus=new THREE.SpotLight(0xffeedd,0,0,0.5,0.9,2);scene.add(focus);scene.add(focus.target);const _fd=new THREE.Vector3();
+function setFocus(k){const d=CAMD,R=clamp(d*0.15,1.7,6.8),H=R*1.9;_fd.set(cam.position.x-CAMT[0],0,cam.position.z-CAMT[2]).normalize();
+  focus.position.set(CAMT[0]+_fd.x*H*0.6,CAMT[1]+H,CAMT[2]+_fd.z*H*0.6);focus.target.position.set(CAMT[0],CAMT[1]*0.7,CAMT[2]);focus.target.updateMatrixWorld();
+  const Ld=focus.position.distanceTo(focus.target.position);focus.angle=Math.min(1.2,Math.atan(R/Ld)*1.3);focus.intensity=lerp(1.8,2.5,clamp((d-4)/30,0,1))*Ld*Ld*k;}
 function setCam(t){const s=SEG.find(q=>t>=q[0]&&t<q[1])||SEG[SEG.length-1];let u=clamp((t-s[0])/(s[1]-s[0]),0,1);u=s[4]==='io'?eio(u):u;const a=s[2],b=s[3];
-  const d=KD*Math.exp(lerp(Math.log(a.d),Math.log(b.d),u)),az=lerp(a.az,b.az,u)*Math.PI/180,el=lerp(a.el,b.el,u)*Math.PI/180;let w=u;if(Math.abs(Math.log(b.d/a.d))>0.3)w=(d/KD-a.d)/(b.d-a.d);const tg=L3(a.t,b.t,w);
+  const d=KD*Math.exp(lerp(Math.log(a.d),Math.log(b.d),u)),az=lerp(a.az,b.az,u)*Math.PI/180,el=lerp(a.el,b.el,u)*Math.PI/180;let w=u;if(Math.abs(Math.log(b.d/a.d))>0.3)w=(d/KD-a.d)/(b.d-a.d);const tg=L3(a.t,b.t,w);CAMT[0]=tg[0];CAMT[1]=tg[1];CAMT[2]=tg[2];CAMD=d;
   cam.position.set(tg[0]+d*Math.sin(az)*Math.cos(el),tg[1]+d*Math.sin(el),tg[2]+d*Math.cos(az)*Math.cos(el));cam.lookAt(tg[0],tg[1],tg[2]);
   if(window.DBG){const [x,y,z,dd,a2,e2]=window.DBG;const D=KD*dd,A=a2*Math.PI/180,E=e2*Math.PI/180;cam.position.set(x+D*Math.sin(A)*Math.cos(E),y+D*Math.sin(E),z+D*Math.cos(A)*Math.cos(E));cam.lookAt(x,y,z);}
   // keep the model in the upper-middle of the frame (title above, subtitle below)
@@ -460,7 +466,7 @@ const DOT_T0=1.05,DOT_T1=1.95,LSEED=[0.0,0.6,0.25,0.85,0.4,0.1,0.7,0.5];
 function letterB(i,o){const u=o-0.85-i*0.1;if(u<0)return 0;const s=LSEED[i];let b;if(u<0.035)b=1;else if(u<0.1)b=0.1;else if(u<0.135)b=0.85;else if(u<0.2+s*0.04)b=0.22;else b=1;if(s>0.55&&u>0.42&&u<0.46)b=0.35;const land=o-DOT_T1;if(land>0)b*=1+0.4*Math.max(0,1-land/0.45);return b;}
 const logoL=new THREE.DirectionalLight(RED,0);logoL.position.set(1.5,10,5);scene.add(logoL);
 function setTime(t){
-  setCam(t);tags.forEach(e=>e.style.opacity=0);STREAK.forEach(S=>{S.l.visible=S.head.visible=S.pool.visible=false;});const o=t-O;const OF=k=>o>0?1-ease((o-0.08-k*0.55)/0.22):1;
+  setCam(t);setFocus(t>=O?Math.max(0,1-ease((t-O-0.1)/0.5)):1);tags.forEach(e=>e.style.opacity=0);STREAK.forEach(S=>{S.l.visible=S.head.visible=S.pool.visible=false;});const o=t-O;const OF=k=>o>0?1-ease((o-0.08-k*0.55)/0.22):1;
   {let lb=0;if(o>0){for(let i=0;i<8;i++)lb+=Math.min(1.3,letterB(i,o));lb/=8;}logoL.intensity=0.55*lb;const pk=o>0?lerp(1,0.3,ease(o/0.8)):1;PLED.forEach(([m,c])=>m.color.copy(c).multiplyScalar(pk));}
   // town lights
   BLD.forEach(b=>{const L=townL(b,t)*(b.hero?1:lerp(1,0.32,ease((t-51.0)/1.6)))*OF(b.hero?1.3:b.order);b.L=L;b.ms.forEach(m=>m.emissiveIntensity=L*0.4*m.userData.k);if(b.roofM)b.roofM.emissiveIntensity=0.2+0.3*L;if(b.doorL)b.doorL.color.copy(hdr(0xffd9a0,0.12+2.6*L));b.pool.material.opacity=0.8*L;});
