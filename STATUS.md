@@ -19,7 +19,7 @@ Ein einziges schlichtes Low-Poly-Modell auf einer dunklen Platte, wie im schraff
 - **Stand:** v4 ist fertig gerendert (`strom/Der_Strom_mit_Musik.mp4`, `strom/Der_Strom_nur_Effekte.mp4`, Kontrolle in `strom/Kontaktbogen_Final.jpg`). Das Cover ist neu im cleanen Stil (`strom/Cover_Der_Strom.png`, Vorlage `strom/v4/cover_strom.html`, gerendert mit `node cover.mjs`): ein kompaktes Windrad im Stil des Geldautomaten-Covers mit gläserner Gondel und gläsernem Turm. Innen sieht man Antriebsstrang, Generator mit Kupferwicklungen, Leiter, Messkasten und Transformator, und der rote Strom läuft vom Generator bis zum Stecker in der Steckdose. Die erste, schlichtere Fassung war dem Nutzer zu wenig detailliert. Das alte Cover liegt als `Cover_Der_Strom_alt.png` daneben. Die Beschreibungen sind unverändert von v3.
 - **Skript:** `strom/Skript_Strom.txt`, Sprechertext in `strom/Sprechertext_mit_Tags.txt`, Stimme unverändert (`strom/voice/Strom_Sprecher_Tom_v4.mp3`)
 - **Outro:** LED-Leuchtschrift. Die Stadt wird dunkel, „function“ schaltet sich als rote LED-Schrift ein, das Warnlicht des vordersten Windrads rastet als Punkt ein.
-- **Aktuelle Etappe:** v4 liegt beim Nutzer zur Abnahme.
+- **Aktuelle Etappe:** Die Entwürfe für TikTok, Instagram Reels und YouTube Shorts liegen in Metricool (Marke „functionty“, alle auf den 18.11.2026 um 10:00 Uhr gelegt, aber nur als Entwurf, also nicht automatisch veröffentlicht). Thumbnails liegen in `strom/social/`.
 - **Offene Änderungswünsche:** _(hier eintragen)_
 
 ### Was in v4 geändert wurde (Feedback vom 16.11.2026)
