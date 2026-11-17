@@ -93,7 +93,8 @@ Der Nutzer hat das Bundestag-Paket abgebrochen und stattdessen dieses Thema best
   - Fußgänger mit schwingenden Armen, Rauch aus dem Fabrikschornstein und ein zweites Ausflugsboot
   - die Schulden-Szene: Münzen fliegen einzeln im Bogen auf fünf Stapel und setzen sich, jeder fertige Stapel leuchtet auf und zeigt „100 Mrd.“, und der Zähler folgt den gelandeten Münzen
   - Säulen mit leichtem Nachfedern, Titel und Zahlen gleiten aus einer Unschärfe ein
+  - nach der Kontrolle des Kontaktbogens eine zusätzliche Kranfahrt bei 0:32 (Keyframe 31.95), damit die Kamera auf dem Weg von der Fabrik zurück zu Merz nicht dicht über die Seitenwand des Reichstags streift; dafür wurden nur die Bilder 820 bis 1061 neu gerendert
   - Ergebnis: `merz/Merz_unbeliebtester_Kanzler_v2_*.mp4` in 1080 × 1920
 
 ## Nächster Schritt
-Rückmeldung des Nutzers zur Fassung v2 abwarten. Danach kommen auf Wunsch Cover-Varianten und die Beschreibungen. Das Bundestag-Paket wurde vom Nutzer abgebrochen. Danach erzeugt der Nutzer (oder auf Wunsch Claude über die Connectoren) die Stimme mit Tom und die Higgsfield-Bilder und Clips, dann werden die Zeiten an die Stimme angepasst. Rundfunk A3 ist geliefert. Metricool-Entwürfe erst, wenn der Nutzer sie wieder möchte.
+Rückmeldung des Nutzers zur Fassung v2 abwarten. Danach kommen auf Wunsch Cover-Varianten und die Beschreibungen. Metricool-Entwürfe gibt es erst, wenn der Nutzer sie wieder möchte. Das Bundestag-Paket hat der Nutzer abgebrochen, und Rundfunk A3 ist geliefert.
