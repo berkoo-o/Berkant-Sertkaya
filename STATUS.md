@@ -73,5 +73,16 @@ Der Nutzer hat seine Arbeitsweise neu festgelegt (siehe CLAUDE.md: Claude für R
 - Zahlen: Diät 11.833,47 € (Erhöhung 2026 auf 12.330,48 € ausgesetzt), Kostenpauschale 5.467,27 €, Mitarbeiter bis 27.396 €, Bahn frei, Altersentschädigung 2,5 % je Jahr, 630 Abgeordnete, Median Vollzeit 2025 54.066 €. www.bundestag.de ist aus dieser Umgebung nicht erreichbar, die Zahlen stammen aus Suchtreffern auf bundestag.de, Gesetzestexten und Destatis.
 - Roter Faden: ein kleines rotes Licht in der Reichstagskuppel, das im Outro zum Punkt von „function.“ wird.
 
+## Merz: „Ist Friedrich Merz Deutschlands unbeliebtester Bundeskanzler?“ (17.11.2026)
+Der Nutzer hat das Bundestag-Paket abgebrochen und stattdessen dieses Thema bestellt: 35 bis 50 Sekunden, belegte Umfragewerte, kurze Erklärung, Szenen von Bundestag, Plenarsaal und Merz, dynamische Statistiken, zuerst das Drehbuch und dann ein Test.
+- **Drehbuch:** `merz/Drehbuch_Merz.md` mit Faktencheck. Quellen: ARD-Deutschlandtrend Oktober 2026 (10 %, Tiefstwert seit 1997), Mai 16 %, September 13 %, November 12 %, Ipsos Januar 2026 (64 % unglaubwürdig), Destatis (BIP 2025 +0,2 %).
+- **Stimme:** Tom Magic (eleven_v4), `merz/voice/take1.mp3` (41,2 s) und `take2.mp3`, natürliches Tempo.
+- **Higgsfield:** Ein Referenzbild des aufgeschnittenen Reichstags mit Plenarsaal (`merz/ref/reichstag_ref.png`) hat 0,25 Credits gekostet. Danach ist das Guthaben leer.
+- **Test (die ersten fünf Sätze plus Logo, etwa 16 s):**
+  - Modell: `merz/test/modell.html`, gebaut aus `rundfunk/a3` mit neuer Anordnung. In der Mitte steht der aufgeschnittene Reichstag mit 630 Sitzen, Adlerwand, halber Glaskuppel und der Merz-Figur am Rednerpult, davor der Rasen mit 100 Lichtern, dahinter die Spree.
+  - Roter Faden: die rote Redezeit-Lampe am Pult. Sie wird in der Outro zum Punkt im LED-Logo.
+  - Ablauf: Server auf Port 8775, `seq 0 120 475 | TOTAL=476 xargs -P 4 -I{} ./chunk.sh {}`, dann `python3 audio_merz.py` und `./build_test.sh` im Ordner `merz/`.
+  - Die Seite wird erzeugt mit `python3 merz/src/build_merz.py`: Grundlage ist `rundfunk/a3/modell.html`, dazu kommen die Bausteine `merz/src/merz_layout.js`, `merz_reichstag.js` und `merz_timeline.js`. Änderungen gehören in diese Bausteine.
+
 ## Nächster Schritt
-Rückmeldung des Nutzers zum Bundestag-Paket abwarten. Danach erzeugt der Nutzer (oder auf Wunsch Claude über die Connectoren) die Stimme mit Tom und die Higgsfield-Bilder und Clips, dann werden die Zeiten an die Stimme angepasst. Rundfunk A3 ist geliefert. Metricool-Entwürfe erst, wenn der Nutzer sie wieder möchte.
+Rückmeldung des Nutzers zum Merz-Test abwarten. Danach das ganze Video (etwa 47 s) mit den restlichen Szenen bauen: Schuldenbremse mit Schranke und Münzen, 64 % unglaubwürdig, +0,2 % Wirtschaft, November 12 %, Frage an die Community. Das Bundestag-Paket wurde vom Nutzer abgebrochen. Danach erzeugt der Nutzer (oder auf Wunsch Claude über die Connectoren) die Stimme mit Tom und die Higgsfield-Bilder und Clips, dann werden die Zeiten an die Stimme angepasst. Rundfunk A3 ist geliefert. Metricool-Entwürfe erst, wenn der Nutzer sie wieder möchte.
