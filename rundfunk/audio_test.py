@@ -3,7 +3,8 @@ import sys, numpy as np, subprocess
 from scipy.io import wavfile
 from scipy.signal import butter, sosfilt
 V = sys.argv[1]
-SR = 48000; O = 15.45; DUR = 17.7 if V == 'a' else 18.0; N = int(SR * DUR); VOFF = 0.2
+SR = 48000; O = 25.95 if V == 'a2' else 15.45; DUR = {'a': 17.7, 'b': 18.0, 'a2': 25.95 + 2.25}[V]; N = int(SR * DUR); VOFF = 0.2
+VOICE = 'voice25/voice.mp3' if V == 'a2' else 'voice/voice.mp3'
 rng = np.random.default_rng(5)
 t = np.arange(N) / SR
 def lp(x, f, o=2): return sosfilt(butter(o, f, 'low', fs=SR, output='sos'), x)
@@ -51,9 +52,28 @@ TICK = cut(sz('coin_single'), 0.015, 0.09, 0.001, 0.05)  # the first ring of a s
 def tick(at, g, rate=1.0):
     y = TICK if rate == 1.0 else np.interp(np.arange(int(len(TICK)/rate))*rate, np.arange(len(TICK)), TICK)
     add(y, at - 0.008/rate, g)
-for c in [5.7, 7.75, 9.55, 10.9]: add(CK[[0, 1, 2, 1][[5.7, 7.75, 9.55, 10.9].index(c)]], c, 0.55)
+if V in ('a', 'b'):
+    for i, c in enumerate([5.7, 7.75, 9.55, 10.9]): add(CK[[0, 1, 2, 1][i]], c, 0.55)
 
-if V == 'a':
+if V == 'a2':
+    # 26-s version: coins lift out of the houses with one bright shimmer, the camera rises, the numbers click in
+    add(cut(sz('shimmer'), 0.0, 4.2, 0.01, 1.8), 0.5, 0.2)
+    for i, c in enumerate([7.3, 12.0, 13.9, 15.45, 16.7, 21.05]): add(CK[i % 3], c, 0.55)
+    whoosh(5.6, 0.8, 0); whoosh(11.2, 0.55, 1); whoosh(14.6, 0.35, 0); whoosh(18.8, 0.65, 1)
+    # the money arrives: one cascade per broadcaster, smaller each time; the ARD building switches its LEDs on
+    hit('coins_handful', 12.95, 0.5, 0.40); hit('switch', 13.15, 0.22, 0.009)
+    hit('coins_drop', 14.85, 0.35, 0.074, 1.05)
+    hit('coin_single', 16.4, 0.30, 0.023)
+    hit('coin_single', 17.65, 0.22, 0.023, 1.12)
+    # 2027: a second, smaller stream of coins
+    hit('coins_stack', 20.6, 0.32, 0.122, 0.95)
+    # outro (LED sign): the town powers down, the letters strike like a neon tube, the tower light clicks in as the dot
+    hit('power_down', O + 0.12, 0.3, 0.063)
+    hit('switch', O + 0.14, 0.2, 0.009)
+    hit('neon_on', O + 0.86, 0.4, 1.306)
+    add(cut(sz('neon_flicker'), 12.0, DUR - O - 0.9, 0.4, 0.5), O + 0.9, 0.45)
+    add(CK[1], O + 1.93, 1.2); hit('switch', O + 1.95, 0.35, 1.064)
+elif V == 'a':
     # hook: the coins lift out of the houses with one bright shimmer (fades out under the voice)
     add(cut(sz('shimmer'), 0.0, 4.2, 0.01, 1.8), 0.5, 0.22)
     whoosh(4.4, 0.8, 0)                       # camera rises to the whole town
@@ -90,7 +110,7 @@ else:
 fx *= np.clip((DUR - t) / 0.4, 0, 1)
 
 # ---------------- voice + ducking
-subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', 'voice/voice.mp3', '-ac', '1', '-ar', str(SR), '-f', 'f32le', '/tmp/rf_voice.raw'], check=True)
+subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', VOICE, '-ac', '1', '-ar', str(SR), '-f', 'f32le', '/tmp/rf_voice.raw'], check=True)
 v = np.fromfile('/tmp/rf_voice.raw', dtype=np.float32).astype(np.float64)
 voice = np.zeros(N); i0 = int(VOFF*SR); voice[i0:i0 + len(v)] = v[:N - i0]
 ve = lp(np.abs(voice), 4); ve = ve / (ve.max() + 1e-9)

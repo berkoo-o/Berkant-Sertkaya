@@ -55,5 +55,12 @@ Nach jeder Etappe wird diese Datei aktualisiert, danach `/clear` und im neuen Ch
 ## Entscheidungen im aktuellen Video
 - _(hier sammeln: Skriptversion, Szenen, Lichter, Timing, gewählte Outro …)_
 
+## Rundfunkbeitrag (Diskussions-Video, Stand 17.11.2026)
+Der Nutzer wollte ein Thema, unter dem viel diskutiert wird, und hat „Wohin geht dein Rundfunkbeitrag?“ gewählt. Zuerst gab es zwei 15-s-Tests: A im eigenen Diorama-Stil (`rundfunk/a/`) und B als dunkles Studio mit Münzstapeln (`rundfunk/b/`). Der Nutzer hat sich für seinen Stil entschieden.
+- Fassung A2 (`rundfunk/a2/modell.html`, ca. 26 s plus Logo): neue Stadtanordnung mit Marktplatz und Brunnen, Park mit Teich vorne links, Häuser mit abgerundeten Kanten und sechs Dachformen (flach, begrünt, Sattel-, Walm-, Pult- und Tonnendach) sowie zwei runde Türme, moderne Fassadenfarben und hellere, moderne Bäume (Kugel-, Säulen- und Kegelform). Die ARD hat jetzt ein geschwungenes Funkhaus am Fuß des Fernsehturms mit Glasbändern, LED-Linien, LED-Ringen am Turm und einer Medienwand. Deutschlandradio und Medienaufsicht sind größer, das ZDF ist unverändert.
+- Skript mit Diskussionsfrage am Ende: `rundfunk/Skript_Rundfunkbeitrag_26s.txt`, Stimme `rundfunk/voice25/voice.mp3` (Take 2, Pausen gekürzt, Tempo 1,1).
+- Ton komplett aus dem Epidemic-Sound-Connector, Musik „Radar Focus“ (Blue Saga): `rundfunk/audio_test.py a2`, Liste in `rundfunk/SOUNDS.md`.
+- Rendern: Server in `rundfunk/a2` auf Port 8772, `seq 0 120 840 | xargs -P 5 -I{} ./chunk.sh {}`, danach `./build_test.sh a2` im Ordner `rundfunk`.
+
 ## Nächster Schritt
-Strom ist veröffentlicht (17.11.2026, 12:00 Uhr). Nächstes Video: Ideen liegen vor (Wasser aus dem Hahn, Notruf 112, Müll, ICE, Internet, Ampel, Bäckerei, Winterdienst), Wahl des Nutzers abwarten.
+Rückmeldung des Nutzers zu Fassung A2 abwarten, danach Cover, Beschreibungen und Metricool-Entwürfe.
