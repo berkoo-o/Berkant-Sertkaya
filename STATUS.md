@@ -96,5 +96,12 @@ Der Nutzer hat das Bundestag-Paket abgebrochen und stattdessen dieses Thema best
   - nach der Kontrolle des Kontaktbogens eine zusätzliche Kranfahrt bei 0:32 (Keyframe 31.95), damit die Kamera auf dem Weg von der Fabrik zurück zu Merz nicht dicht über die Seitenwand des Reichstags streift; dafür wurden nur die Bilder 820 bis 1061 neu gerendert
   - Ergebnis: `merz/Merz_unbeliebtester_Kanzler_v2_*.mp4` in 1080 × 1920
 
+- **Korrektur v3 (Rückmeldung des Nutzers, 17.11.2026: „Friedrich Merz buggt im Tisch“, Hintergrundtöne etwas leiser):**
+  - Hände und Unterarme steckten in der Pultplatte. Merz steht jetzt 3 mm weiter hinten, die Hände liegen auf der geneigten Platte, und die Ellbogen hängen seitlich am Körper (Arme in der Wurzelgruppe statt im schwankenden Körper, damit nichts auf der Platte rutscht; Körperdrehung auf 0,025 rad reduziert).
+  - Am Kopf ersetzt eine geformte Kopfkugel die frühere Kieferkugel, deren harte Naht wie ein Strich übers Gesicht lief, und der graue Haarkranz sitzt nur noch hinter den Ohren.
+  - Neu gerendert wurden nur die Bilder 60 bis 399 und 925 bis 1119 (in `merz/full/fr2`, danach nach `fr` kopiert).
+  - Ton: Musik 19 statt 15 dB unter der Stimme, Effekte etwa 3 dB leiser.
+  - Ergebnis: `merz/Merz_unbeliebtester_Kanzler_v3_*.mp4` in 1080 × 1920
+
 ## Nächster Schritt
-Rückmeldung des Nutzers zur Fassung v2 abwarten. Danach kommen auf Wunsch Cover-Varianten und die Beschreibungen. Metricool-Entwürfe gibt es erst, wenn der Nutzer sie wieder möchte. Das Bundestag-Paket hat der Nutzer abgebrochen, und Rundfunk A3 ist geliefert.
+Rückmeldung des Nutzers zur Fassung v3 abwarten. Danach kommen auf Wunsch Cover-Varianten und die Beschreibungen. Metricool-Entwürfe gibt es erst, wenn der Nutzer sie wieder möchte. Das Bundestag-Paket hat der Nutzer abgebrochen, und Rundfunk A3 ist geliefert.

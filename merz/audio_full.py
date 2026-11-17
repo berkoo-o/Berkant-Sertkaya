@@ -76,8 +76,8 @@ ve = lp(np.abs(voice), 4); ve = ve / (ve.max() + 1e-9)
 duck = lp(1 - 0.65 * np.clip(ve * 6, 0, 1), 3)
 def norm(x, peak): return x / (np.max(np.abs(x)) + 1e-9) * peak
 vo = norm(voice, 0.9)
-mus = music / (np.sqrt(np.mean(music[int(SR):int(O*SR)]**2)) + 1e-9) * np.sqrt(np.mean(vo[voice != 0]**2)) * 10**(-15/20) * duck
-fxn = fx * 0.9
+mus = music / (np.sqrt(np.mean(music[int(SR):int(O*SR)]**2)) + 1e-9) * np.sqrt(np.mean(vo[voice != 0]**2)) * 10**(-19/20) * duck
+fxn = fx * 0.9 * 10**(-3/20)  # background turned down after feedback (17.11.2026): music 19 dB under the voice, effects -3 dB
 for name, mix in [('music', vo + mus + fxn), ('fx', vo + fxn)]:
     mix = mix / max(1.0, np.max(np.abs(mix)) / 0.97)
     wavfile.write('full/mix_' + name + '.wav', SR, mix.astype(np.float32))

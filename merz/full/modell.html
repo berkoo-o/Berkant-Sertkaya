@@ -231,7 +231,7 @@ const eagleTex=canvasTex(512,512,(g,w,h)=>{g.clearRect(0,0,w,h);const cx=256;g.f
   g.fillStyle='#d9dadf';g.beginPath();g.arc(cx-14,116,6,0,7);g.fill();});
 function mkMerz(par,x,y,z){const G=new THREE.Group();G.position.set(x,y,z);par.add(G);
   const MS=(c,e,i=.5,r=.7)=>new THREE.MeshStandardMaterial({color:c,roughness:r,emissive:e,emissiveIntensity:i});
-  const suit=MS(0x27355a,0x1d2944),lap=MS(0x324472,0x253458),skin=MS(0xe8c6aa,0x8f6c58,.35,.65),hairM=MS(0xd6d6d2,0x8a8a88,.35,.8),shirt=MS(0xf4f4f2,0xbdbdbb,.4,.6),tie=MS(0x2e4c9a,0x1d3270,.5,.5),shoe=MS(0x1a1b1f,0x0e0f11,.3,.5);
+  const suit=MS(0x27355a,0x1d2944),lap=MS(0x324472,0x253458),skin=MS(0xe8c6aa,0x8f6c58,.35,.65),hairM=MS(0xbdbdb8,0x75756f,.35,.85),shirt=MS(0xf4f4f2,0xbdbdbb,.4,.6),tie=MS(0x2e4c9a,0x1d3270,.5,.5),shoe=MS(0x1a1b1f,0x0e0f11,.3,.5);
   const body=new THREE.Group();G.add(body);
   for(const s of [-1,1]){mesh(body,new THREE.CylinderGeometry(0.0062,0.0052,0.056,10),suit,s*0.0068,0.028,0);box(body,0.0085,0.005,0.015,shoe,s*0.0068,0.0025,0.002,false);}
   {const g=new THREE.CylinderGeometry(0.0146,0.0118,0.034,22);g.scale(1,1,0.62);mesh(body,g,suit,0,0.073,0);}
@@ -240,14 +240,19 @@ function mkMerz(par,x,y,z){const G=new THREE.Group();G.position.set(x,y,z);par.a
    mesh(body,new THREE.BoxGeometry(0.0026,0.0135,0.001),tie,0,0.0838,0.0099,false,false);mesh(body,new THREE.BoxGeometry(0.0034,0.0022,0.0012),tie,0,0.0903,0.0099,false,false);
    for(const sd of [-1,1]){const l=new THREE.Shape();l.moveTo(sd*0.0052,0);l.lineTo(sd*0.0104,-0.0045);l.lineTo(sd*0.0014,-0.0175);l.closePath();const m=mesh(body,new THREE.ShapeGeometry(l),lap,0,0.0912,0.0097,false,false);m.rotation.y=sd*0.18;}}
   mesh(body,new THREE.CylinderGeometry(0.0041,0.0045,0.008,12),skin,0,0.0938,0);
-  const arms=[];for(const s of [-1,1]){const A=new THREE.Group();A.position.set(s*0.0152,0.0872,0);body.add(A);
-    mesh(A,mergeGeometries([rodGeo([0,0,0],[s*0.0012,-0.0225,0.007],0.0043,8),rodGeo([s*0.0012,-0.0225,0.007],[-s*0.0036,-0.0285,0.0255],0.0038,8)]),suit,0,0,0,true,false);
-    const h=mesh(A,new THREE.CapsuleGeometry(0.0029,0.004,4,8),skin,-s*0.004,-0.0283,0.0285,true,false);h.rotation.x=Math.PI/2;arms.push(A);}
+  // arms in the root group (not in the swaying body), hands resting on the tilted lectern top; elbow from a two-bone solve
+  const arms=[];{const th=0.22,c=Math.cos(th),sn=Math.sin(th),S=0.78,ZM=-0.432,hz=-0.4145,hx=0.0155;const ptop=z=>{const lz=(z+0.40-0.0025*sn)/c;return 0.044+0.0025*c-lz*sn;};
+   for(const s of [-1,1]){const H=new THREE.Vector3(s*hx/S,(ptop(hz)+0.0029*S+0.0003)/S,(hz-ZM)/S);const wz=hz-0.0032*S*c;const Wp=new THREE.Vector3(s*(hx/S-0.0004),(ptop(wz)+0.0032*S+0.0005)/S,(wz-ZM)/S);
+    // elbow beside the body, slightly out and back (searched so the forearm clears the raised back edge of the lectern top)
+    const Sh=new THREE.Vector3(s*0.0152,0.0872,0),E=new THREE.Vector3(s*0.0246,0.0711,0.0039);
+    const A=new THREE.Group();G.add(A);
+    mesh(A,mergeGeometries([rodGeo(Sh.toArray(),E.toArray(),0.0041,10),rodGeo(E.toArray(),Wp.toArray(),0.0032,10),new THREE.SphereGeometry(0.0038,12,8).translate(E.x,E.y,E.z),new THREE.SphereGeometry(0.0032,10,8).translate(Wp.x,Wp.y,Wp.z)]),suit,0,0,0,true,false);
+    const hm=mesh(A,new THREE.CapsuleGeometry(0.0029,0.004,4,8),skin,H.x,H.y,H.z,true,false);hm.rotation.x=Math.PI/2+th;arms.push(A);}}
   const head=new THREE.Group();head.position.set(0,0.1035,0);body.add(head);
-  {const g=new THREE.SphereGeometry(0.0078,24,18);g.scale(0.9,1.16,1.0);mesh(head,g,skin,0,0,0,true,false);
-   const jaw=new THREE.SphereGeometry(0.0062,16,10);jaw.scale(0.95,0.8,1.0);mesh(head,jaw,skin,0,-0.0046,0.0006,false,false);
+  {// one smooth head: ellipsoid with a slightly narrower, longer chin (no separate jaw sphere, so no hard seam across the face)
+   const g=new THREE.SphereGeometry(0.0078,48,36);g.scale(0.9,1.16,1.0);{const P=g.attributes.position;for(let k=0;k<P.count;k++){const y=P.getY(k)/0.00905;if(y<0){const q=y*y;P.setX(k,P.getX(k)*(1-0.12*q));P.setY(k,P.getY(k)*(1+0.06*q));P.setZ(k,P.getZ(k)*(1-0.05*q)+0.0006*q*Math.max(0,P.getZ(k))/0.0078);}}g.computeVertexNormals();}mesh(head,g,skin,0,0,0,true,false);
    const nose=new THREE.SphereGeometry(0.0016,10,8);nose.scale(0.75,1.25,1.0);mesh(head,nose,skin,0,-0.0006,0.0079,false,false);
-   const hg=new THREE.SphereGeometry(0.0074,24,10,Math.PI*0.85,Math.PI*1.3,Math.PI*0.42,Math.PI*0.27);hg.scale(0.95,1.16,1.05);mesh(head,hg,hairM,0,0,0,false,false);
+   const hg=new THREE.SphereGeometry(0.0075,24,10,Math.PI*0.97,Math.PI*1.06,Math.PI*0.4,Math.PI*0.3);hg.scale(0.95,1.16,1.05);mesh(head,hg,hairM,0,0,0,false,false);
    for(const sd of [-1,1]){const e=new THREE.SphereGeometry(0.0019,8,6);e.scale(0.5,1,0.8);mesh(head,e,skin,sd*0.0071,-0.0004,-0.0004,false,false);
      const br=mesh(head,new THREE.BoxGeometry(0.0034,0.0006,0.0008),hairM,sd*0.0028,0.0031,0.0074,false,false);br.rotation.z=-sd*0.12;}
    const gm=new THREE.MeshStandardMaterial({color:0xe6eef8,roughness:.1,metalness:.3,emissive:0xa9bdd2,emissiveIntensity:.55,transparent:true,opacity:.75});const fm=MS(0x9aa2ae,0x5c6270,.4,.4);
@@ -302,7 +307,7 @@ function mkMerz(par,x,y,z){const G=new THREE.Group();G.position.set(x,y,z);par.a
  for(const s of [-1,1]){mesh(G,rodGeo([s*0.008,FL+0.046,-0.388],[s*0.004,FL+0.07,-0.405],0.0005,4),mat(0x1c1d21,.5,.4),0,0,0,false,false);mesh(G,new THREE.SphereGeometry(0.0015,6,5),mat(0x1c1d21,.5,.4),s*0.004,FL+0.0705,-0.405,false,false);}
  // the red speaking-time lamp on the lectern
  {const lamp=new THREE.Group();lamp.position.set(0.02,FL+0.048,-0.386);G.add(lamp);rs.lampM=glowMat(RED,3);mesh(lamp,new THREE.SphereGeometry(0.003,12,10),rs.lampM,0,0,0,false,false);rs.lampH=halo(lamp,RED,1.2,0.06);rs.lamp=lamp;}
- rs.merz=mkMerz(G,0,FL,-0.429);rs.merz.scale.setScalar(0.78);
+ rs.merz=mkMerz(G,0,FL,-0.432);rs.merz.scale.setScalar(0.78);
  box(G,0.05,0.035,0.55,DESK,1.06,FL+0.0175,-0.47,true);box(G,0.05,0.035,0.55,DESK,-1.06,FL+0.0175,-0.47,true);
  for(const s of [-1,1]){box(G,0.14,0.02,1.7,SAND2,s*(hw-T-0.07),0.35,0.16,true);box(G,0.01,0.05,1.7,CUTM,s*(hw-T-0.145),0.38,0.16,false);}
  // seats: 630 in eight arcs around the lectern (five blocks with aisles), government and Bundesrat benches, visitors' galleries
@@ -332,7 +337,7 @@ function mkMerz(par,x,y,z){const G=new THREE.Group();G.position.set(x,y,z);par.a
  // lights: warm hall light, the spotlight on the lectern
  rs.hall=new THREE.PointLight(0xffe6c4,0,3.2,2);rs.hall.position.set(RS.x,0.8,RS.z+0.1);scene.add(rs.hall);
  rs.spot=new THREE.SpotLight(0xfff0dc,0,3,0.2,0.55,2);rs.spot.position.set(RS.x+0.4,1.15,RS.z-0.429+0.75);rs.spot.target.position.set(RS.x,FL+0.06,RS.z-0.429);scene.add(rs.spot);scene.add(rs.spot.target);
- rs.head=[RS.x,FL+0.081,RS.z-0.429];}
+ rs.head=[RS.x,FL+0.081,RS.z-0.432];}
 // =================================================================== STATS: 100 lights on the lawn (satisfaction in %) and three LED columns on the plaza (ARD-Deutschlandtrend May, September, October 2026)
 const GRID=[];{const cx=RS.x,cz=1.62,sp=0.15;const postG=new THREE.CylinderGeometry(0.006,0.008,0.05,6);postG.translate(0,0.025+PAVE_H,0);const P=[];
  for(let r=0;r<10;r++)for(let c=0;c<10;c++)P.push([cx+(c-4.5)*sp,cz+(r-4.5)*sp,r,c]);
@@ -550,7 +555,7 @@ function setTime(t){
    SAND.emissiveIntensity=0.1+0.24*L;SAND2.emissiveIntensity=0.1+0.22*L;CUTM.emissiveIntensity=0.15+0.38*L;rs.domeLed.color.copy(hdr(LED,0.12+2.6*L));rs.domeGlass.emissiveIntensity=0.08+0.24*L;rs.eagle.color.setScalar(0.25+0.62*L);
    const sp=ease((t-3.75)/0.45)*OF(0.2);rs.spot.intensity=4.2*sp;rs.hall.intensity=0.55*L*(1-0.6*sp);rs.seatM.emissiveIntensity=0.18+0.25*L*(1-0.35*sp);}
   // Merz stands at the lectern: breathing, small weight shifts, he looks around the hall
-  {const u=rs.merz.userData;u.body.scale.y=1+0.006*Math.sin(t*2.1);u.body.rotation.y=0.05*Math.sin(t*0.33+0.4);u.head.rotation.y=0.3*Math.sin(t*0.41+0.3)+0.1*Math.sin(t*1.07+1.0);u.head.rotation.x=0.05*Math.sin(t*0.77)-0.03;}
+  {const u=rs.merz.userData;u.body.scale.y=1+0.006*Math.sin(t*2.1);u.body.rotation.y=0.025*Math.sin(t*0.33+0.4);u.head.rotation.y=0.3*Math.sin(t*0.41+0.3)+0.1*Math.sin(t*1.07+1.0);u.head.rotation.x=0.05*Math.sin(t*0.77)-0.03;}
   {const mp=rs.mp,Mx=new THREE.Matrix4(),Qx=new THREE.Quaternion(),Ex=new THREE.Euler(),Px=new THREE.Vector3(),Sx=new THREE.Vector3();mp.anim.forEach(a=>{Ex.set(0.05*Math.sin(t*a.sp*1.3+a.ph),a.base+a.am*Math.sin(t*a.sp+a.ph),0,'YXZ');Qx.setFromEuler(Ex);Sx.setScalar(a.sc);Px.set(a.hp[0],a.hp[1],a.hp[2]);Mx.compose(Px,Qx,Sx);mp.Hd.setMatrixAt(a.i,Mx);Px.y+=0.0004;Mx.compose(Px,Qx,Sx);mp.Hr.setMatrixAt(a.i,Mx);});mp.Hd.instanceMatrix.needsUpdate=true;mp.Hr.instanceMatrix.needsUpdate=true;}
   // the red speaking-time lamp on the lectern (red thread): glows all the time, gone once it has flown into the logo
   {const on=o>DOT_T0?0:1;rs.lampM.color.copy(hdr(RED,0.3+3.6*on*(0.82+0.18*Math.sin(t*5))));rs.lampH.material.opacity=on;rs.lampH.scale.setScalar(clamp(rs.lamp.getWorldPosition(V).distanceTo(cam.position)*0.018,0.02,0.4));}
