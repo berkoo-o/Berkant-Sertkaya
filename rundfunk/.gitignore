@@ -1,0 +1,8 @@
+node_modules
+fr/
+stills/
+stills2/
+sfx/
+*.raw
+*.wav
+video.mp4
