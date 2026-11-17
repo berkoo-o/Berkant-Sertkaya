@@ -15,7 +15,7 @@ import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
 const W=1080,H=1920;const Q=new URLSearchParams(location.search);
 const bg=document.getElementById('bg').getContext('2d'),fg=document.getElementById('fg').getContext('2d');
-const CX=+(new URLSearchParams(location.search).get('cx')||605),CY=1490;
+const CX=+(new URLSearchParams(location.search).get('cx')||605),CY=+(new URLSearchParams(location.search).get('cy')||1490);
 // ---------- background (same recipe as geldautomat/cover_atm_modern.html?mode=clean) ----------
 {bg.fillStyle='#07070B';bg.fillRect(0,0,W,H);
  const blob=(x,y,r,c)=>{const g=bg.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,c);g.addColorStop(1,'rgba(0,0,0,0)');bg.fillStyle=g;bg.fillRect(0,0,W,H);};
