@@ -64,5 +64,7 @@ Der Nutzer wollte ein Thema, unter dem viel diskutiert wird, und hat „Wohin ge
 
 - Fassung A3 (`rundfunk/a3/modell.html`, ca. 34 s plus Logo, Wünsche vom 17.11.2026): Straßen aus Asphalt mit Gehwegen, Bordsteinen und Zebrastreifen, kräftig helles Gras, ein Brief mit Rechnung („Rundfunkbeitrag (früher GEZ)“) zum Einstieg vor der ganzen Stadt, ein neues ZDF-Gebäude im Stil der ARD (kleiner, Stadionform mit Glasband und rundem Studioturm), Bimetall-Euromünzen mit Spiegelungen. Die Stimme läuft im natürlichen Tempo und nennt alle vier Beträge (`rundfunk/voice34/voice.mp3`, Skript `rundfunk/Skript_Rundfunkbeitrag_36s.txt`). Ton: `python3 audio_test.py a3`, Video: `./build_test.sh a3`.
 
+- Cover und Texte (17.11.2026): cleanes Cover mit einem kompakten Fernseher im gläsernen Gehäuse (Testbild, Platine, Münzschale, Euro-Münze im Schlitz, rote Rutsche als roter Faden, Brief ohne Aufschrift) in `rundfunk/cover/cover_rundfunk.html` (Server Port 8774, `node cover.mjs out.png`). Thumbnails und Beschreibungen für TikTok, Instagram und YouTube in `rundfunk/social/`. Metricool hat der Nutzer vorerst zurückgestellt.
+
 ## Nächster Schritt
-Rückmeldung des Nutzers zu Fassung A3 abwarten, danach Cover, Beschreibungen und Metricool-Entwürfe.
+Rückmeldung des Nutzers zu Video A3, Cover und Beschreibungen abwarten. Metricool-Entwürfe erst, wenn der Nutzer sie wieder möchte.
