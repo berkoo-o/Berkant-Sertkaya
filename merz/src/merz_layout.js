@@ -29,7 +29,7 @@ const boat=new THREE.Group();town.add(boat);
 {const hm=new THREE.MeshStandardMaterial({color:0xe8e8ea,roughness:.5,emissive:0xb0b4bc,emissiveIntensity:.35});mesh(boat,new RoundedBoxGeometry(0.5,0.05,0.14,2,0.02),hm,0,0.03,0);mesh(boat,new RoundedBoxGeometry(0.34,0.045,0.11,2,0.015),hm,-0.03,0.075,0);
  const wl=new THREE.MeshBasicMaterial({color:hdr(0xffe0b0,1.6)});for(const s of [-1,1])box(boat,0.3,0.016,0.002,wl,-0.03,0.078,s*0.056,false);mesh(boat,new THREE.SphereGeometry(0.008,6,5),glowMat(0xd8e6ff,2.5),0.24,0.065,0,false,false);}
 // blocks: offices on the left, offices on the right (behind the plaza), a row of houses with a park at the front
-building(-4.1,-2.2,1.15,1.15,0.95,{roof:'flat'});building(-4.1,-0.7,1.15,1.05,1.35,{roof:'green'});building(-4.1,0.85,0,0,1.7,{round:0.42});building(-4.1,2.35,1.15,1.05,0.7,{roof:'barrel',shop:'x'});
+building(-4.1,-0.7,1.15,1.05,1.35,{roof:'green'});building(-4.1,0.85,0,0,1.7,{round:0.42});building(-4.1,2.35,1.15,1.05,0.7,{roof:'barrel',shop:'x'});
 building(3.5,-2.3,2.3,0.95,0.8,{roof:'barrel'});building(2.85,-0.95,1.0,1.0,1.4,{roof:'flat',shop:'x'});building(4.15,-0.95,1.0,1.0,1.05,{roof:'hip'});
 building(-4.2,4.45,1.0,0.8,0.75,{roof:'gable'});building(-2.9,4.45,1.0,0.8,1.05,{roof:'flat',shop:'z'});building(1.25,4.45,1.0,0.8,0.9,{roof:'hip',shop:'z'});building(2.55,4.45,0.95,0.8,1.3,{roof:'green'});building(3.95,4.45,0,0,1.15,{round:0.38});
 park(-2.2,0.55,3.85,5.15,9);
@@ -37,7 +37,7 @@ park(-2.2,0.55,3.85,5.15,9);
 tile(2.3,4.7,0.05,3.1,0xb3ada2,PAVE_H+0.002,0.14);
 PARKM.push(tile(-2.75,1.55,0.42,3.0,0x7cb158,PAVE_H+0.003,0));
 tile(-2.75,1.55,0.42,0.6,0xcfc9bd,PAVE_H+0.004,0.22);
-for(const z of [0.85,1.35,1.85,2.35,2.8])TREES.push([-2.55,0,z],[1.45,0,z]);
+for(const z of [0.85,1.35,1.85,2.35,2.8])TREES.push([-2.55,0,z],[1.53,0,z]);
 for(let x=-2.6;x<=1.45;x+=0.5)TREES.push([x,0,-2.75]);
 for(let x=-4.8;x<=4.8;x+=0.55){TREES.push([x+0.15*rnd(),0,-3.8]);TREES.push([x+0.2*rnd(),0,-5.05]);}
 // keep lamps and trees off the Reichstag, the lawn lights and the plaza

@@ -4,7 +4,7 @@ import re, sys
 import os
 SP = os.path.dirname(os.path.abspath(__file__)) + '/'
 SRC = SP + '../../rundfunk/a3/modell.html'
-OUT = SP + '../test/modell.html'
+OUT = SP + '../full/modell.html'
 L = open(SRC, encoding='utf-8').read().split('\n')
 def idx(prefix, start=0):
     for i in range(start, len(L)):
@@ -86,6 +86,7 @@ html = html.replace(",['G',[-1]]", '')
 # outro dot starts at the red lamp on the lectern; no letter in this video
 html = html.replace('wpos(tower.lamp,[0,0,0])', 'wpos(rs.lamp,[0,0,0])')
 html = html.replace('setTime(t);placeLetter(t);composer.render()', 'setTime(t);composer.render()')
+html = html.replace('<div class="tag" id="tag2"></div>', '<div class="tag" id="tag2"></div><div class="tag" id="tag3"></div>')
 html = html.replace('<div id="title">Wohin geht dein<br>Rundfunkbeitrag?</div>', '<div id="title"></div>')
 for bad in ['tower.', 'MEDIA', 'hero.', 'placeLetter', 'updateCoins', 'busAd', 'ecLed', 'WAVE1']:
     if bad in html:

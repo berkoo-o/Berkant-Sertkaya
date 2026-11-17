@@ -1,6 +1,6 @@
 # function. – „Ist Friedrich Merz Deutschlands unbeliebtester Bundeskanzler?“
 
-Stand: 17.11.2026 · Länge: etwa 45 Sekunden plus 2,5 Sekunden Outro · 9:16 · Stimme: Tom (ElevenLabs, eleven_v4)
+Stand: 17.11.2026 · Länge: 43,9 Sekunden mit Outro (Stimme 41,2 s) · Fertig gebaut in `merz/full/modell.html` · 9:16 · Stimme: Tom (ElevenLabs, eleven_v4)
 
 ## Hook (erste zwei Sekunden)
 
@@ -32,11 +32,11 @@ Alles spielt in einem einzigen Modell ohne harte Schnitte. Die Kamera fährt ruh
 |---|---|---|---|
 | 0:00–0:05 | „Nur zehn Prozent. So wenige waren im Oktober mit Kanzler Merz zufrieden.“ | Das ganze Modell bei Nacht: der Reichstag ist vorne aufgeschnitten wie ein Puppenhaus, darüber die Glaskuppel, davor Rasen und Spree. Auf dem Rasen leuchten 100 kleine Lichter, bei „zehn Prozent“ gehen 90 aus. | **10 %**, darunter „mit Merz zufrieden (Oktober 2026)“ |
 | 0:05–0:10 | „Schlechter stand im ARD-Deutschlandtrend noch kein Kanzler da. Nicht einmal Olaf Scholz.“ | Die Kamera gleitet in den Plenarsaal. Am Rednerpult steht die kleine Figur von Merz im Spotlicht, die Sitzreihen sind abgedunkelt. Am Pult leuchtet die rote Redezeit-Lampe. | Titel „Tiefster Wert seit 1997“, kleine Zeile „Auch Olaf Scholz lag nie so tief“ |
-| 0:10–0:13 | „Im Mai waren es noch sechzehn Prozent.“ | Neben dem Reichstag wachsen LED-Säulen aus der Platte: Mai 16, September 13, Oktober 10. Jede Säule ist kürzer als die davor. | **16 %** wird zu **10 %** |
-| 0:13–0:22 | „Aber warum? Im Wahlkampf stand Merz für die Schuldenbremse. Kurz nach der Wahl lockerte er sie, unter anderem für 500 Milliarden Euro neue Schulden.“ | Vor dem Reichstag steht eine Schranke. Sie hebt sich, und eine Kolonne aus Münzstapeln rollt hindurch. | **500 Mrd. €**, darunter „Sondervermögen auf Kredit, beschlossen im März 2025“ |
+| 0:10–0:13 | „Im Mai waren es noch sechzehn Prozent.“ | Vor dem Reichstag wachsen drei LED-Säulen aus dem Rasen: Mai 16, September 13, Oktober 10. Jede Säule ist kürzer als die davor. | **16 %** und die Werte an den Säulen |
+| 0:13–0:22 | „Aber warum? Im Wahlkampf stand Merz für die Schuldenbremse. Kurz nach der Wahl lockerte er sie, unter anderem für 500 Milliarden Euro neue Schulden.“ | Auf dem Platz neben dem Reichstag ist eine Schranke mit der Aufschrift „Schuldenbremse“ geschlossen. Bei „lockerte“ hebt sie sich, und dahinter regnen Euro-Münzen auf fünf Stapel, die schnell wachsen. | Titel „Aber warum?“, „Im Wahlkampf: für die Schuldenbremse“, „Nach der Wahl: gelockert“, dann **500 Mrd. €** (zählt hoch) mit „Sondervermögen auf Kredit (März 2025)“ |
 | 0:22–0:26 | „Fast zwei Drittel halten sein Handeln für unglaubwürdig.“ | Die 100 Lichter auf dem Rasen kommen zurück, 64 davon kühl und gedimmt. | **64 %**, darunter „halten sein Handeln für unglaubwürdig (Ipsos, Januar 2026)“ |
-| 0:26–0:31 | „Dazu kommt die Wirtschaft: Sie wuchs 2025 nur um 0,2 Prozent.“ | Am Rand der Stadt zeigt eine flache LED-Kurve über ein paar Fabrikhallen, dass sie sich kaum hebt. | **+0,2 %**, darunter „Wirtschaftswachstum 2025 (Destatis)“ |
-| 0:31–0:40 | „Also der unbeliebteste Kanzler? Laut Deutschlandtrend: ja. Auch wenn es im November wieder zwölf Prozent waren.“ | Zurück bei Merz am Pult. Die LED-Säulen bekommen die November-Säule dazu, die leicht wächst. | **12 %**, darunter „November 2026“ |
+| 0:26–0:31 | „Dazu kommt die Wirtschaft: Sie wuchs 2025 nur um 0,2 Prozent.“ | Eine Fabrikhalle mit Sheddach und Schornstein am linken Rand. Auf ihrer Seite zeichnet eine LED-Anzeige eine fast flache Linie, die am Ende nur ein kleines Stück steigt. | Titel „Dazu kommt die Wirtschaft“, dann **+0,2 %** mit „Wirtschaftswachstum 2025 (Destatis)“ |
+| 0:31–0:40 | „Also der unbeliebteste Kanzler? Laut Deutschlandtrend: ja. Auch wenn es im November wieder zwölf Prozent waren.“ | Zurück bei Merz am Pult. Danach wächst neben den drei LED-Säulen die November-Säule, etwas höher als die vom Oktober. | Titel „Der unbeliebteste Kanzler?“, „Laut Deutschlandtrend: ja.“, dann **12 %** mit „waren es im November 2026“ |
 | 0:40–0:45 | „Kann Merz das noch drehen? Schreib's in die Kommentare.“ | Die Totale auf das ganze Modell. | Titel „Kann Merz das noch drehen?“ |
 | 0:45–0:47,5 | (Outro) | Die Stadt wird dunkel und nur die rote Redezeit-Lampe am Pult bleibt. Sie steigt auf und wird zum Punkt im roten LED-Schriftzug „function.“. | Logo |
 

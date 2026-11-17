@@ -106,13 +106,57 @@ function mkMerz(par,x,y,z){const G=new THREE.Group();G.position.set(x,y,z);par.a
  rs.head=[RS.x,FL+0.15,RS.z-0.455];}
 // =================================================================== STATS: 100 lights on the lawn (satisfaction in %) and three LED columns on the plaza (ARD-Deutschlandtrend May, September, October 2026)
 const GRID=[];{const cx=RS.x,cz=1.62,sp=0.15;const postG=new THREE.CylinderGeometry(0.006,0.008,0.05,6);postG.translate(0,0.025+PAVE_H,0);const P=[];
- for(let r=0;r<10;r++)for(let c=0;c<10;c++)P.push([cx+(c-4.5)*sp,cz+(r-4.5)*sp,r]);
+ for(let r=0;r<10;r++)for(let c=0;c<10;c++)P.push([cx+(c-4.5)*sp,cz+(r-4.5)*sp,r,c]);
  const im=new THREE.InstancedMesh(postG,mat(0x3a3d44,.6,.4),P.length);const M=new THREE.Matrix4();P.forEach((p,i)=>{M.makeTranslation(p[0],0,p[1]);im.setMatrixAt(i,M);});town.add(im);
  const bulbG=new THREE.SphereGeometry(0.017,12,10);
- P.forEach(p=>{const m=new THREE.MeshBasicMaterial({color:0x000000});mesh(town,bulbG,m,p[0],PAVE_H+0.066,p[1],false,false);const h=halo(town,0xffe2b0,0.0,0.17);h.position.set(p[0],PAVE_H+0.066,p[1]);GRID.push({m,h,row:p[2],x:p[0],z:p[1]});});
+ P.forEach(p=>{const m=new THREE.MeshBasicMaterial({color:0x000000});mesh(town,bulbG,m,p[0],PAVE_H+0.066,p[1],false,false);const h=halo(town,0xffe2b0,0.0,0.17);h.position.set(p[0],PAVE_H+0.066,p[1]);GRID.push({m,h,row:p[2],col:p[3],x:p[0],z:p[1]});});
  for(let x=cx-0.9;x<=cx+0.91;x+=0.2)for(let z=cz-0.9;z<=cz+0.91;z+=0.2)KO.push([x,z,0.12]);}
-const COLS=[];{const z=1.62;[[0.42,'Mai',16],[0.78,'Sep.',13],[1.14,'Okt.',10]].forEach(([x,lab,v],i)=>{const pl=box(town,0.22,0.02,0.22,mat(0x8d939c,.5,.4),x,PAVE_H+0.01,z,true);pl.scale.set(0.001,1,0.001);
+const COLS=[];{const z=1.62;[[0.32,'Mai',16,11.75],[0.64,'Sep.',13,12.15],[0.96,'Okt.',10,12.55],[1.28,'Nov.',12,36.75]].forEach(([x,lab,v,t0],i)=>{const pl=box(town,0.22,0.02,0.22,mat(0x8d939c,.5,.4),x,PAVE_H+0.01,z,true);pl.scale.set(0.001,1,0.001);
   const m=glowMat(0xd8e6ff,0);const g=new THREE.BoxGeometry(0.15,1,0.15);g.translate(0,0.5,0);const c=mesh(town,g,m,x,PAVE_H+0.03,z,false,false);c.scale.y=0.001;
   const cap=mesh(town,new THREE.BoxGeometry(0.165,0.016,0.165),glowMat(0xffffff,0),x,PAVE_H+0.04,z,false,false);
   const p=new THREE.Mesh(new THREE.PlaneGeometry(1.4,1.4),new THREE.MeshBasicMaterial({map:poolTex,color:hdr(0xd8e6ff,0.45),transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false}));p.rotation.x=-Math.PI/2;p.position.set(x,PAVE_H+0.006,z);town.add(p);
-  COLS.push({c,m,cap,p,pl,x,z,v,lab,t0:11.75+i*0.4});KO.push([x,z,0.18]);});}
+  COLS.push({c,m,cap,p,pl,x,z,v,lab,t0});KO.push([x,z,0.18]);});}
+
+// =================================================================== DEBT: a barrier (the Schuldenbremse) across the plaza on the right; it lifts and five stacks of euro coins grow behind it (500 Mrd. € Sondervermögen on credit)
+const COIN_R=0.085;
+const coinG=(()=>{const sh=new THREE.Shape();sh.absarc(0,0,COIN_R,0,Math.PI*2,false);const hole=new THREE.Path();hole.absarc(0,0,COIN_R*0.7,0,Math.PI*2,true);sh.holes.push(hole);
+  const ring=new THREE.ExtrudeGeometry(sh,{depth:0.011,bevelEnabled:true,bevelThickness:0.003,bevelSize:0.003,bevelSegments:2,curveSegments:28});ring.translate(0,0,-0.0055);ring.clearGroups();
+  const core=new THREE.CylinderGeometry(COIN_R*0.7,COIN_R*0.7,0.015,28);core.rotateX(Math.PI/2);return mergeGeometries([ring,core.toNonIndexed()],true);})();
+const COINENV=new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(),0.04).texture;
+const coinGold=new THREE.MeshStandardMaterial({color:0xe2bb5e,metalness:.85,roughness:.28,envMap:COINENV,envMapIntensity:1.0,emissive:0x6e4c14,emissiveIntensity:.6});
+const coinSilver=new THREE.MeshStandardMaterial({color:0xe2e5ea,metalness:.85,roughness:.25,envMap:COINENV,envMapIntensity:1.0,emissive:0x5e626a,emissiveIntensity:.5});
+const BAR={x0:2.45,x1:4.55,z:2.7,t0:17.6,t1:18.4};const bar={};
+{const pm=mat(0x3a3d44,.6,.4);for(const x of [BAR.x0,BAR.x1])mesh(town,new THREE.CylinderGeometry(0.028,0.032,0.17,10),pm,x,PAVE_H+0.085,BAR.z);
+ box(town,0.1,0.13,0.1,new THREE.MeshStandardMaterial({color:0xc9ccd2,roughness:.5,emissive:0x8d939c,emissiveIntensity:.35}),BAR.x0,PAVE_H+0.065,BAR.z,true);
+ box(town,0.05,0.025,0.06,pm,BAR.x1,PAVE_H+0.172,BAR.z,false);
+ const G=new THREE.Group();G.position.set(BAR.x0,PAVE_H+0.16,BAR.z);town.add(G);bar.G=G;const L=BAR.x1-BAR.x0-0.01;bar.L=L;
+ const st=canvasTex(512,16,(g,w,h)=>{for(let i=0;i<14;i++){g.fillStyle=i%2?'#3a3d44':'#f2f2f0';g.fillRect(i*w/14,0,w/14+1,h);}});
+ const bm=new THREE.MeshStandardMaterial({map:st,roughness:.5,emissive:0xffffff,emissiveMap:st,emissiveIntensity:.3});bar.bm=bm;
+ const g=new THREE.BoxGeometry(L,0.032,0.026);g.translate(L/2,0,0);mesh(G,g,bm,0,0,0,true,false);
+ bar.leds=[];for(let i=1;i<=4;i++){const m=glowMat(LED,0);mesh(G,new THREE.SphereGeometry(0.008,8,6),m,i*L/5,0.021,0,false,false);bar.leds.push(m);}
+ KO.push([BAR.x0,BAR.z,0.16],[BAR.x1,BAR.z,0.16]);}
+const DS=[2.75,3.15,3.55,3.95,4.35],DN=36,DZ=1.75,DT0=19.55,DT1=21.95,CS=0.62,CT=0.0108,DROP=1.8,DFALL=0.4;
+const DEBT=[];const DCOINS=new THREE.InstancedMesh(coinG,[coinGold,coinSilver],DS.length*DN);DCOINS.castShadow=true;DCOINS.frustumCulled=false;town.add(DCOINS);
+{const rb=rnd2;const n=DS.length*DN;for(let k=0;k<n;k++){const si=k%DS.length,lv=Math.floor(k/DS.length);DEBT.push({x:DS[si]+(rb()-0.5)*0.008,z:DZ+(rb()-0.5)*0.008,y:PAVE_H+0.03+lv*CT+CT/2,t:DT0+(DT1-DT0)*k/(n-1),rz:rb()*6.28});}
+ DS.forEach(x=>box(town,0.15,0.03,0.15,mat(0x2a2c31,.6,.3),x,PAVE_H+0.015,DZ,true));
+ bar.pool=new THREE.Mesh(new THREE.PlaneGeometry(2.6,1.3),new THREE.MeshBasicMaterial({map:poolTex,color:hdr(0xffc870,0.5),transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false}));bar.pool.rotation.x=-Math.PI/2;bar.pool.position.set(3.55,PAVE_H+0.006,DZ);town.add(bar.pool);}
+const _DM=new THREE.Matrix4(),_DQ=new THREE.Quaternion(),_DE=new THREE.Euler(),_DS=new THREE.Vector3(CS,CS,CS),_DP=new THREE.Vector3(),_DZ=new THREE.Matrix4().makeScale(0,0,0);
+function updateDebt(t){DEBT.forEach((c,i)=>{const u=(t-(c.t-DFALL))/DFALL;if(u<0)DCOINS.setMatrixAt(i,_DZ);else{const f=Math.min(1,u);_DE.set(-Math.PI/2,0,c.rz+(1-f)*2.5);_DQ.setFromEuler(_DE);_DP.set(c.x,c.y+DROP*(1-f*f),c.z);_DM.compose(_DP,_DQ,_DS);DCOINS.setMatrixAt(i,_DM);}});DCOINS.instanceMatrix.needsUpdate=true;}
+// =================================================================== ECONOMY: a factory hall with a sawtooth roof and a chimney on the left, behind the offices; an LED chart on its side shows growth that barely rises (2025: +0.2 %)
+const fac={wins:[]};
+{const x=-4.1,z=-2.2,w=1.15,d=1.1,h=0.4;const G=new THREE.Group();G.position.set(x,0,z);town.add(G);
+ const wm=new THREE.MeshStandardMaterial({color:0xaab0b9,roughness:.8,emissive:0x8a909a,emissiveIntensity:.3});fac.wm=wm;const rm=new THREE.MeshStandardMaterial({color:0x6f757e,roughness:.7,emissive:0x50555e,emissiveIntensity:.3});fac.rm=rm;
+ box(G,w,h,d,wm,0,h/2,0);box(G,w+0.02,0.1,d+0.02,mat(0x5d6168,.85),0,0.05,0,true);
+ const n=3,tw=d/n;for(let i=0;i<n;i++){const z0=-d/2+i*tw;const s=new THREE.Shape();s.moveTo(-z0,0);s.lineTo(-(z0+tw),0.15);s.lineTo(-(z0+tw),0);s.closePath();const g=new THREE.ExtrudeGeometry(s,{depth:w,bevelEnabled:false});g.rotateY(Math.PI/2);g.translate(-w/2,h,0);mesh(G,g,rm,0,0,0);
+   fac.wins.push(litWin(G,w-0.08,0.11,0,h+0.07,z0+tw+0.003,0,0xffe4b8));}
+ for(let i=0;i<4;i++)fac.wins.push(litWin(G,0.12,0.07,w/2+0.003,0.11,-0.38+i*0.25,Math.PI/2,0xffe4b8));
+ for(const dx of [-0.25,0.25]){const p=new THREE.Mesh(new THREE.PlaneGeometry(0.22,0.24),mat(0x3d4148,.7,.3));p.position.set(dx,0.12,d/2+0.003);G.add(p);}
+ const cm=new THREE.MeshStandardMaterial({color:0xa8826a,roughness:.85,emissive:0x7a5c48,emissiveIntensity:.3});mesh(G,new THREE.CylinderGeometry(0.045,0.06,1.0,16),cm,-w/2+0.16,0.5,-d/2+0.16);
+ for(const y of [0.62,0.9])mesh(G,new THREE.TorusGeometry(0.05,0.008,6,20).rotateX(Math.PI/2),mat(0x5d6168,.6,.3),-w/2+0.16,y,-d/2+0.16);
+ // LED chart on the long side facing the Reichstag: a nearly flat line that rises only a tiny bit at the end
+ const ct=canvasTex(512,160,(g,W2,H2)=>{g.fillStyle='#0d1626';g.fillRect(0,0,W2,H2);g.strokeStyle='rgba(120,150,200,.18)';g.lineWidth=2;for(let y=30;y<H2;y+=32){g.beginPath();g.moveTo(0,y);g.lineTo(W2,y);g.stroke();}
+   g.strokeStyle='#cfe4ff';g.lineWidth=9;g.lineCap='round';g.shadowColor='#8fc2ff';g.shadowBlur=16;g.beginPath();g.moveTo(26,100);g.lineTo(440,99);g.lineTo(478,90);g.stroke();
+   g.fillStyle='#cfe4ff';g.beginPath();g.moveTo(498,86);g.lineTo(470,80);g.lineTo(476,102);g.closePath();g.fill();});
+ box(G,0.02,0.2,0.74,mat(0x2a2c31,.6,.3),w/2+0.01,0.29,0,false);
+ fac.chartTex=ct;fac.chartM=new THREE.MeshBasicMaterial({map:ct,color:0x000000});const cg=new THREE.PlaneGeometry(0.7,0.18);cg.translate(0.35,0,0);const cp=new THREE.Mesh(cg,fac.chartM);cp.rotation.y=Math.PI/2;cp.position.set(w/2+0.022,0.29,0.35);G.add(cp);fac.chart=cp;
+ for(let xx=x-0.7;xx<=x+0.71;xx+=0.2)for(let zz=z-0.7;zz<=z+0.71;zz+=0.2)KO.push([xx,zz,0.16]);}
