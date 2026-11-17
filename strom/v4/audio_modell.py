@@ -55,7 +55,7 @@ S = 'sfx/'
 WH = [(_seg(S+'whoosh.wav', 0.0, 0.85, 0.30), 0.293), (_seg(S+'whoosh.wav', 1.45, 2.4, 0.30), 0.263)]
 CK = [_seg(S+'clicks.wav', 0.0, 0.3, 0.22), _seg(S+'clicks.wav', 0.55, 0.9, 0.22), _seg(S+'clicks.wav', 1.12, 1.27, 0.22)]
 # camera moves: user's Epidemic swooshes (big moves full level, small moves quieter)
-for i, (c, g) in enumerate([(2.75, 1.0), (5.9, 0.6), (13.05, 0.9), (16.9, 0.7), (19.6, 0.5), (26.5, 0.8), (31.9, 0.6), (35.1, 0.5), (38.5, 0.8), (41.75, 0.7), (48.35, 0.8), (50.95, 0.7)]):
+for i, (c, g) in enumerate([(2.75, 1.0), (5.9, 0.6), (13.05, 0.9), (16.9, 0.7), (19.6, 0.5), (26.5, 0.8), (31.75, 0.6), (35.1, 0.5), (38.5, 0.8), (41.75, 0.7), (48.35, 0.8), (50.95, 0.7)]):
     add(WH[i % 2][0], c - WH[i % 2][1], g)
 # numbers appear: user's Epidemic clicks
 for i, c in enumerate([7.0, 10.6, 19.9, 26.5, 29.25, 31.7, 32.5, 33.3, 34.1, 38.6, 45.3, 52.4]): add(CK[i % 3], c, 0.8)
@@ -66,6 +66,22 @@ def clack(g=1.0, lo=400, hi=2600, d=0.018):
     n = int(.08*SR); return bp(noise(.08), lo, hi) * env(n, 0.001, d) * g
 def thud(g=1.0, f=90):
     n = int(.35*SR); tt = np.arange(n)/SR; return (np.sin(2*np.pi*f*tt) + 0.5*lp(noise(.35), 800)) * env(n, 0.002, 0.06) * g
+def zap(d, f0=100, f1=150, g=1.0, crack=1.0, a=0.03, rel=0.18):
+    # current running through a cable: band-limited saw buzz on the mains family, slight wobble, sparse spark crackle, soft edges
+    n = int(d*SR); tt = np.arange(n)/SR; f = f0*(f1/f0)**(tt/d); ph = np.cumsum(f)/SR
+    saw = 2*(ph % 1) - 1
+    buzz = lp(saw, 1500, 4) * 0.8 + bp(saw, 1500, 3800) * 0.25
+    buzz *= 1 + 0.22*np.sin(2*np.pi*(6.5 + 3*rng.random())*tt + rng.random()*6)
+    imp = (rng.random(n) < 90/SR) * rng.uniform(0.25, 1.0, n)
+    ker = np.exp(-np.arange(int(0.004*SR))/SR/0.0009)
+    spark = bp(np.convolve(imp * rng.choice([-1, 1], n), ker)[:n], 2600, 9000)
+    sh = np.minimum(1, tt/a) * np.minimum(1, (d - tt)/rel)
+    return (buzz*0.55 + spark*1.6*crack) * np.clip(sh, 0, 1) * g
+def zip_(g=1.0, up=True):  # short pulse leaving a station
+    return zap(0.42, 90 if up else 170, 190 if up else 95, g, 1.2, 0.012, 0.2)
+def arrive(g=1.0):  # pulse reaches its target: small contact click with a spark tail
+    n = int(0.12*SR); tt = np.arange(n)/SR
+    return (bp(noise(0.12), 1800, 7000) * np.exp(-tt/0.012) + 0.6*np.sin(2*np.pi*140*tt)*np.exp(-tt/0.03)) * g
 def blip(d=0.3, f0=1500, f1=700, g=1.0):  # soft glassy blip for the red pulse (no harsh buzz)
     n = int(d*SR); tt = np.arange(n)/SR; f = f0*(f1/f0)**(tt/d)
     return np.sin(2*np.pi*np.cumsum(f)/SR) * np.sin(np.pi*tt/d)**2 * g
@@ -85,7 +101,7 @@ add(clack(0.9, 300, 2200, 0.02), 0.84); add(thud(0.32, 110), 0.84)
 add(clack(0.4, 1500, 6000, 0.008), 1.42); add(tone(mtof(88), 0.5, 0.18), 1.44, 0.03)
 add(sweep(520, 190, 1.0, 0.028), 3.15)
 # route tease: soft rising tone while the red line runs back to the wind park
-add(sweep(220, 520, 2.3, 0.035), 3.1)
+add(zap(2.3, 150, 95, 0.09, 0.6, 0.3, 0.6), 3.0)
 # wind park: night wind and slow blade swishes
 fx += wind(4.6, 12.9, 0.045)
 for c in np.arange(6.2, 12.8, 1.9): swish(c, 0.16)
@@ -94,32 +110,37 @@ fx += (lp(rng.standard_normal(N), 200) * 0.5 + 0.22*np.sin(2*np.pi*86*t) + 0.08*
 fx += np.sin(2*np.pi*np.cumsum(300 + 220*np.clip((t - 14.8)/1.0, 0, 1))/SR) * win(14.8, 16.8, 0.4) * 0.018
 for c in np.arange(13.3, 15.0, 1.5): swish(c, 0.14)
 # tower: pulse travels down, transformer hum
-add(blip(1.7, 1300, 380, 0.5), 17.0); fx += hum(18.5, 19.6, 0.035)
+add(zap(1.7, 175, 105, 0.16), 17.0); add(arrive(0.12), 18.68); add(zap(1.1, 105, 140, 0.13), 19.1); add(arrive(0.12), 20.15); fx += hum(18.5, 19.6, 0.035)
 # substation (LED flood lights switch on with a soft clunk)
 add(clack(0.45, 200, 1500, 0.03), 19.7); add(thud(0.14, 80), 19.7)
 fx += hum(19.6, 23.3, 0.04)
-for c in np.arange(19.9, 23.2, 0.93): add(blip(0.35, 1500, 900, 0.22), c)
+for c in [20.2, 21.21, 22.22, 23.23]: add(zip_(0.17), c)
 # power line
 fx += wind(23.2, 26.2, 0.03)
-for c in np.arange(23.4, 26.0, 0.55): add(blip(0.3, 1700, 1100, 0.16), c)
+for c in [22.9, 23.73, 24.57, 25.4]: add(zip_(0.15), c)
 # network spreads
 for i in range(40): add(tone(1250 + (i % 6) * 150, 0.03, 0.008), 26.6 + i*0.05 + rng.uniform(0, 0.02), 0.022)
 # globe: thread winds around
-gn = int(1.8*SR); gt = np.arange(gn)/SR; gf = 200 + 620*(gt/1.8)**1.5
-add(np.sin(2*np.pi*np.cumsum(gf)/SR) * (0.5 + 0.5*np.sin(2*np.pi*20*gt)) * np.sin(np.pi*gt/1.8)**2, 29.3, 0.035)
+# globe: rises out of the park (soft swoosh), then one small tick per ring, in step with the counter 1..47
+add(WH[0][0], 29.0 - WH[0][1], 0.45)
+for k in range(47):
+    c = 29.3 + 1.7*(1 - (1 - (k + 0.5)/47) ** (1/3))
+    tk = int(0.03*SR); tkt = np.arange(tk)/SR
+    add((np.sin(2*np.pi*(1900 + 26*k)*tkt) * np.exp(-tkt/0.006) + 0.5*bp(rng.standard_normal(tk), 3000, 8000)*np.exp(-tkt/0.003)), c, 0.04)
+add(sum(np.sin(2*np.pi*mtof(m)*np.arange(int(1.6*SR))/SR) for m in (79, 86)) * np.exp(-np.arange(int(1.6*SR))/SR*2.2), 30.65, 0.02)
 # voltage steps down: four descending tones
 for i, c in enumerate([31.7, 32.5, 33.3, 34.1]): add(tone(mtof(84 - i*5), 0.24, 0.09), c + 0.02, 0.045)
-for c in [32.5, 33.6]: add(blip(0.8, 1200, 600, 0.22), c)
+add(zap(3.0, 120, 150, 0.1, 0.8, 0.2, 0.5), 31.4); add(zap(2.0, 140, 110, 0.07, 0.7, 0.2, 0.5), 33.3); add(arrive(0.1), 34.4)
 # kiosk: ground opens (soft sweep), pulses through the cable
 fx += hum(35.6, 38.2, 0.022)
-add(blip(1.4, 1300, 620, 0.4), 36.3); add(blip(1.4, 1250, 600, 0.35), 37.05)
+for c in [36.3, 37.21]: add(zap(0.9, 130, 175, 0.17, 1.0, 0.02, 0.25), c); add(arrive(0.1), c + 0.88)
 # cable close-up: faint shimmer, one electron is marked, then the slow 50 Hz swing, then three fast energy waves
 sh = bp(rng.standard_normal(N), 5000, 10000) * win(42.3, 48.3, 0.5) * (0.6 + 0.4*np.sin(2*np.pi*0.9*t))
 fx += sh * 0.012
 add(tone(mtof(86), 0.35, 0.12), 43.6, 0.035)
 fx += (np.sin(2*np.pi*100*t) + 0.3*np.sin(2*np.pi*200*t)) * (0.5 + 0.5*np.sin(2*np.pi*2.3*(t - 45.15) - np.pi/2)) * win(45.15, 48.2, 0.4) * 0.03
 for c in [49.15, 49.8, 50.4]:
-    add(blip(0.45, 600, 2600, 0.5), c); add(tone(mtof(91), 0.3, 0.1), c + 0.42, 0.03)
+    add(zap(0.45, 80, 320, 0.2, 1.6, 0.01, 0.12), c); add(arrive(0.13), c + 0.43); add(tone(mtof(91), 0.3, 0.1), c + 0.42, 0.025)
 # warning lights: night wind, the lights switch off one by one (53.3 s), come back together (56.15 s); a plane is only heard very faintly, far away
 fx += wind(50.9, O + 3.4, 0.04)
 for c in np.arange(51.6, O, 1.9): swish(c, 0.13)
@@ -154,6 +175,8 @@ voice = np.zeros(N); voice[:min(N, len(v))] = v[:N]
 ve = lp(np.abs(voice), 4); ve = ve / (ve.max() + 1e-9)
 duck = lp(1 - 0.65 * np.clip(ve * 6, 0, 1), 3)
 def norm(x, peak): return x / (np.max(np.abs(x)) + 1e-9) * peak
+import os
+if os.environ.get('DUMP'): np.save('fx_stem.npy', fx); np.save('voice_stem.npy', voice)
 mus = norm(music, 1.0) * 0.16 * duck
 sfx = norm(fx, 1.0) * 0.30 * (1 - 0.4 * np.clip(ve * 6, 0, 1))
 vo = norm(voice, 1.0) * 0.9

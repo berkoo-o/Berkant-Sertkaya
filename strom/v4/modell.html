@@ -346,6 +346,29 @@ const matcap=canvasTex(128,128,(g,w,h)=>{g.fillStyle='#555';g.fillRect(0,0,w,h);
 const EMESH=new THREE.InstancedMesh(new THREE.SphereGeometry(0.0105,16,12),new THREE.MeshMatcapMaterial({matcap,color:0xffffff}),EL.length);EMESH.frustumCulled=false;cab.add(EMESH);{const c=new THREE.Color(0,0,0);EL.forEach((e,i)=>EMESH.setColorAt(i,c));}
 const elMark=(()=>{const rg=new THREE.TorusGeometry(CAB.R+0.0045,0.0022,6,32);rg.rotateY(Math.PI/2);const m=new THREE.Mesh(rg,new THREE.MeshBasicMaterial({color:hdr(0xffffff,1.1),transparent:true,opacity:0}));const e=EL.find(e=>e.hero);m.position.set(e.x,CAB.y,CAB.z);cab.add(m);return m;})();const QI=new THREE.Quaternion();
 
+// =================================================================== GLOBE: a small earth rises over the left corner, 47 rings wind around it in step with the counter
+const GLB=new THREE.Group();GLB.position.set(-4.6,2.4,4.6);GLB.visible=false;scene.add(GLB);const GR=0.9;
+const earthTex=canvasTex(2048,1024,(g,w,h)=>{g.fillStyle='#1f3d63';g.fillRect(0,0,w,h);const P=(lo,la)=>[(lo+180)/360*w,(90-la)/180*h];
+  const shape=(pts,c)=>{g.fillStyle=c;g.beginPath();pts.forEach((q,i)=>{const [x,y]=P(q[0],q[1]);i?g.lineTo(x,y):g.moveTo(x,y);});g.closePath();g.fill();};const LAND='#6e8f4c',DRY='#a3925e',ICE='#d9dee6';
+  shape([[-168,66],[-162,70],[-140,70],[-125,70],[-95,72],[-80,73],[-65,62],[-55,52],[-66,45],[-70,42],[-76,35],[-81,31],[-80,25],[-83,29],[-90,30],[-97,27],[-97,21],[-90,21],[-87,16],[-83,10],[-80,8],[-78,8],[-85,12],[-92,15],[-105,20],[-110,24],[-112,29],[-117,32],[-120,34],[-124,40],[-124,48],[-130,54],[-140,60],[-152,58],[-158,56],[-165,60]],LAND);
+  shape([[-55,60],[-44,60],[-20,70],[-18,77],[-30,83],[-60,82],[-70,78],[-58,75],[-52,68]],ICE);
+  shape([[-80,8],[-73,12],[-62,10],[-50,0],[-35,-5],[-38,-13],[-40,-22],[-48,-26],[-53,-34],[-58,-38],[-65,-42],[-68,-50],[-72,-54],[-75,-50],[-73,-40],[-71,-30],[-70,-18],[-76,-14],[-81,-5],[-80,0],[-77,4]],LAND);
+  shape([[-10,36],[-9,43],[-2,44],[-5,48],[0,50],[5,53],[8,57],[5,62],[12,66],[20,70],[30,71],[42,67],[60,70],[70,73],[80,73],[100,77],[115,74],[130,72],[142,72],[160,70],[175,67],[180,65],[170,60],[163,58],[156,51],[160,61],[150,59],[140,54],[135,43],[128,38],[126,35],[122,31],[121,25],[113,22],[108,21],[106,17],[109,12],[105,9],[100,13],[100,7],[103,1],[98,8],[97,16],[92,22],[88,22],[80,15],[77,8],[73,18],[67,25],[57,25],[52,28],[48,30],[56,24],[59,22],[55,17],[45,13],[43,15],[38,22],[34,28],[32,31],[36,36],[30,36],[26,40],[23,36],[21,40],[18,40],[16,38],[12,44],[8,44],[3,43],[0,39],[-6,36]],LAND);
+  shape([[-17,21],[-16,28],[-9,32],[-6,36],[10,37],[11,33],[20,31],[32,31],[34,28],[39,16],[43,12],[51,12],[44,0],[40,-5],[40,-15],[35,-20],[33,-27],[27,-34],[20,-35],[17,-29],[12,-17],[13,-6],[9,-1],[9,4],[4,6],[-5,5],[-8,4],[-13,8],[-17,14]],LAND);
+  shape([[-12,25],[30,30],[33,22],[20,15],[-5,15],[-15,18]],DRY);shape([[40,28],[55,25],[58,20],[50,15],[43,16],[38,22]],DRY);
+  shape([[113,-22],[114,-26],[115,-34],[124,-34],[131,-31],[138,-35],[141,-38],[147,-38],[150,-37],[153,-31],[153,-25],[146,-19],[142,-11],[136,-12],[131,-12],[126,-14],[122,-18]],DRY);
+  shape([[-180,-90],[180,-90],[180,-70],[120,-66],[60,-67],[0,-70],[-60,-64],[-80,-73],[-120,-73],[-180,-78]],ICE);shape([[-180,90],[180,90],[180,84],[-180,84]],ICE);
+  shape([[-5,50],[1,51],[1,53],[-3,56],[-5,58],[-6,56],[-5,54]],LAND);shape([[130,31],[135,34],[140,35],[142,40],[141,45],[139,40],[132,34]],LAND);
+  shape([[109,1],[118,7],[119,1],[116,-4],[110,-3]],LAND);shape([[95,5],[106,-6],[104,-5],[98,2]],LAND);shape([[44,-25],[47,-25],[50,-15],[49,-12],[44,-17]],LAND);shape([[172,-34],[178,-38],[174,-41],[167,-46],[171,-44]],LAND);});
+const earth=new THREE.Mesh(new THREE.SphereGeometry(GR,64,40),new THREE.MeshStandardMaterial({map:earthTex,roughness:.8,emissive:0xffffff,emissiveMap:earthTex,emissiveIntensity:.8}));earth.rotation.order='ZYX';earth.rotation.z=0.41;GLB.add(earth);
+const glbHalo=halo(GLB,0x7fb4ff,0.4,GR*2.9);
+const glbPool=new THREE.Mesh(new THREE.PlaneGeometry(2.6,2.6),new THREE.MeshBasicMaterial({map:poolTex,color:hdr(0x7fb4ff,0.45),transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false}));glbPool.rotation.x=-Math.PI/2;glbPool.position.set(-4.6,0.02,4.6);scene.add(glbPool);
+const ringMat=lineMat(0xffffff,1.7,0.9);ringMat.color=hdr(0xffa24a,1.15);const RINGS=[];
+for(let k=0;k<47;k++){const z=1-(k+0.5)/47,rr=Math.sqrt(1-z*z),th=k*2.39996;const n=new THREE.Vector3(rr*Math.cos(th),z,rr*Math.sin(th)).normalize();
+  const a=new THREE.Vector3(0,0,1).cross(n);if(a.lengthSq()<1e-4)a.set(1,0,0);a.normalize();const b=n.clone().cross(a);const R=GR*(1.045+0.04*((k*7)%11)/10);const pts=[];
+  for(let i=0;i<=96;i++){const s=i/96*6.2832+k*0.7;pts.push([R*(a.x*Math.cos(s)+b.x*Math.sin(s)),R*(a.y*Math.cos(s)+b.y*Math.sin(s)),R*(a.z*Math.cos(s)+b.z*Math.sin(s))]);}
+  const l=line(GLB,pts,ringMat);l.frustumCulled=false;l.visible=false;RINGS.push({l,n:96,t0:29.3+1.7*(1-Math.cbrt(1-(k+0.5)/47))});}
+window.RING_T=RINGS.map(r=>r.t0);
 // =================================================================== timeline
 const O=57.6,END=61.0;
 // camera: [t0,t1, from{target,dist,az,el}, to, ease]
@@ -365,12 +388,14 @@ const SEG=[
  [23.2,24.1,C(1.85,0.35,-3.3,11.6,41.5,36.0),C(3.9,0.7,-2.6,13,36,35.0),'io'],
  [24.1,26.1,C(3.9,0.7,-2.6,13,36,35.0),C(4.0,0.6,0.3,13.5,37,35.5),'lin'],
  [26.1,27.7,C(4.0,0.6,0.3,13.5,37,35.5),C(0.15,0.15,0.35,30.5,44,40.0),'io'],
- [27.7,31.5,C(0.15,0.15,0.35,30.5,44,40.0),C(0.15,0.15,0.35,29.5,45.5,40.0),'lin'],
- [31.5,33.0,C(0.15,0.15,0.35,29.5,45.5,40.0),C(1.2,0.3,2.0,20,45,39.0),'io'],
+ [27.7,29.1,C(0.15,0.15,0.35,30.5,44,40.0),C(0.15,0.15,0.35,30.1,44.6,40.0),'lin'],
+ [29.1,30.3,C(0.15,0.15,0.35,30.1,44.6,40.0),C(-4.0,1.85,4.0,14.0,43,35.0),'io'],
+ [30.3,31.5,C(-4.0,1.85,4.0,14.0,43,35.0),C(-4.0,1.85,4.0,13.4,43.8,35.0),'lin'],
+ [31.5,33.0,C(-4.0,1.85,4.0,13.4,43.8,35.0),C(1.2,0.3,2.0,20,45,39.0),'io'],
  [33.0,34.85,C(1.2,0.3,2.0,20,45,39.0),C(1.0,0.3,2.2,19,46,39.0),'lin'],
- [34.85,36.0,C(1.0,0.3,2.2,19,46,39.0),C(1.7,0.2,3.85,9.2,40,35.0),'io'],
- [36.0,38.15,C(1.7,0.2,3.85,9.2,40,35.0),C(1.8,0.2,3.9,8.6,41,35.0),'lin'],
- [38.15,39.0,C(1.8,0.2,3.9,8.6,41,35.0),C(2.3,0.25,4.1,6.6,36,32.0),'io'],
+ [34.85,36.0,C(1.0,0.3,2.2,19,46,39.0),C(1.45,0.2,3.85,8.6,17,34.0),'io'],
+ [36.0,38.15,C(1.45,0.2,3.85,8.6,17,34.0),C(1.55,0.2,3.9,8.1,20,34.0),'lin'],
+ [38.15,39.0,C(1.55,0.2,3.9,8.1,20,34.0),C(2.3,0.25,4.1,6.6,36,32.0),'io'],
  [39.0,41.35,C(2.3,0.25,4.1,6.6,36,32.0),C(2.3,0.25,4.1,6.1,37.5,32.0),'lin'],
  [41.35,42.7,C(2.3,0.25,4.1,6.1,37.5,32.0),C(2.03,0.07,4.6,2.7,24,27.0),'io'],
  [42.7,48.0,C(2.03,0.07,4.6,2.7,24,27.0),C(2.05,0.07,4.6,2.45,27,26.0),'lin'],
@@ -454,9 +479,12 @@ function setTime(t){
     {const s=t<32.0?lerp(S_GAN+(S_ES-S_GAN)*0.6,S_ES,ease((t-31.4)/0.6)):(t<33.4?lerp(S_ES,S_JB,ease((t-32.0)/1.4)):(t<34.4?lerp(S_JB,S_KI,ease((t-33.4)/1.0)):-1));if(s>=0)showStreak(0,ROUTE,s,1,0.9);}
     if(t>33.3&&t<35.4){const u=ease((t-33.3)/2.0);showStreak(1,WESTA,u*WESTA.L,win(u,0,1,0.08),0.9);}
     for(let k=0;k<2;k++){const u=((t-36.3)*0.55+k/2)%1;if(t>36.3)showStreak(2+k,ROUTE,lerp(S_KI,S_END,u),win(u,0,1,0.1)*win(t,36.3,38.4,0.3),0.45);}
-    tag(0,'Trafohäuschen',[KI[0],0.36,KI[1]],win(t,35.3,38.0),-150,-70);}
+    tag(0,'Trafohäuschen',[KI[0],0.36,KI[1]],win(t,35.3,38.0),-10,-95);}
   if(t>19.8&&t<22.8)tag(0,'Umspannwerk',[1.6,1.0,-3.4],win(t,19.9,22.7),0,-150);
   if(t>38.5&&t<41.3)tag(0,'dein Haus',[HH[0],0.9,HH[1]],win(t,38.7,41.2),0,-120);
+  // globe with the 47 rings (counter and rings stay in step: ring k starts when the counter reaches k+1)
+  {const a=ease((t-28.95)/0.55)*(1-ease((t-31.35)/0.5));GLB.visible=a>0.004;glbPool.material.opacity=0.8*a;if(GLB.visible){GLB.scale.setScalar(Math.max(0.001,a));GLB.position.y=lerp(0.25,2.4,a);earth.rotation.y=-0.99+(t-30.2)*0.3;glbHalo.material.opacity=a;ringMat.opacity=0.9*a;
+     RINGS.forEach(r=>{const u=(t-r.t0)/0.2;if(u<=0){r.l.visible=false;return;}r.l.visible=true;r.l.geometry.instanceCount=Math.max(1,Math.floor(r.n*Math.min(1,eo(u))));});}}
   // network
   {const a=win(t,26.3,31.8,0.5);const r=eo((t-26.6)/2.6);netMat.opacity=0.9*a;NET.forEach(l=>{const u=clamp((r-l.userData.o)/0.28,0,1);l.visible=a>0.01&&u>0;if(l.visible)l.geometry.instanceCount=Math.max(1,Math.floor(l.userData.n*u));});}
   // electrons: close-up of the cable in front of the house. They stay where they are and only swing back and forth (one of them is marked red)
@@ -483,7 +511,7 @@ function setTime(t){
 // =================================================================== OUTRO overlay: the red lights rise from the wind turbines and become the logo
 const oc=document.getElementById('oc').getContext('2d');let LAY=null;
 function layout(){const sz=150;oc.font=`500 ${sz}px Poppins`;const all='function.'.split('');const ws=all.map(c=>oc.measureText(c).width);const tr=-0.04*sz;const tot=ws.reduce((a,b)=>a+b,0)+tr*8;let x=W/2-tot/2;const xs=[];all.forEach((c,i)=>{xs.push(x);x+=ws[i]+tr;});const m=oc.measureText('.');const base=640;
-  return {sz,xs,ws,base,dcx:xs[8]+(m.actualBoundingBoxRight-m.actualBoundingBoxLeft)/2+m.actualBoundingBoxLeft,dcy:base-(m.actualBoundingBoxAscent-m.actualBoundingBoxDescent)/2,dr:(m.actualBoundingBoxRight-m.actualBoundingBoxLeft)/2};}
+  return {sz,xs,ws,base,dcx:xs[8]+(m.actualBoundingBoxRight-m.actualBoundingBoxLeft)/2,dcy:base-(m.actualBoundingBoxAscent-m.actualBoundingBoxDescent)/2,dr:(m.actualBoundingBoxRight+m.actualBoundingBoxLeft)/2,m};}
 const REDC='224,30,43';function glow2(x,y,r,col,a){if(a<=0.003)return;const g=oc.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,`rgba(${col},${a})`);g.addColorStop(0.22,`rgba(${col},${a*0.55})`);g.addColorStop(1,`rgba(${col},0)`);oc.fillStyle=g;oc.beginPath();oc.arc(x,y,r,0,7);oc.fill();}
 const lampAt={};
 function drawOutro(t){oc.clearRect(0,0,W,H);const o=t-O;if(o<0)return;if(!LAY)LAY=layout();const L=LAY;oc.font=`500 ${L.sz}px Poppins`;oc.textBaseline='alphabetic';
