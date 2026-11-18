@@ -50,17 +50,17 @@ hit('power_down', 0.78, 0.22, 0.063, 1.15)
 for i, c in enumerate([2.45, 10.9, 13.3, 22.5, 25.9, 31.0, 35.4, 38.3]): whoosh(c, 0.32 if c == 13.3 else 0.42, i)
 # the spotlight on the lectern switches on at "Kanzler Merz"
 hit('switch', 3.78, 0.42, 0.009)
-# three LED columns rise; later the November column
-add(cut(sz('shimmer'), 0.0, 2.4, 0.01, 1.2), 11.7, 0.16)
-add(cut(sz('shimmer'), 0.0, 1.4, 0.01, 0.8), 36.75, 0.12)
+# LED columns (v5, feedback 18.11.2026: new sound instead of the bright shimmer): each column rises with a soft rising chord;
+# the chord is pitched by the value (May 16 %, Sep. 13 %, Oct. 10 %, Nov. 12 %), so the falling numbers also sound lower
+for t0, v in [(11.75, 16), (12.15, 13), (12.55, 10), (36.75, 12)]:
+    hit('column_chord', t0 + 0.04, 0.16, 0.169, 2 ** ((v - 16) * 0.7 / 12))
 # Schuldenbremse: the barrier arm lifts at "lockerte", then coins fly in one by one and stack up on five piles, the last pile settles
 # (v4, feedback 17.11.2026 "13-22 s viel zu penetrant": the bright coin rain (all energy above 3 kHz) and the loud truck-arm motor are gone;
 #  now only a soft, darkened barrier movement and a few warm coin accents at key moments, the music carries the rest)
 add(lp(cut(sz('arm_raise'), 2.75, 1.0, 0.12, 0.35), 2200, 2), 17.65, 0.2)
-def soft(name, a, d, f, fi=0.004, fo=0.15): return lp(cut(sz(name), a, d, fi, fo), f, 2)
-add(soft('coin_single', 0.0, 0.5, 3800), 18.55, 0.16)   # the first coin lands on the first pile
-add(soft('coin_single', 0.0, 0.5, 3200), 20.0, 0.11)    # the first pile is complete and lights up ("100 Mrd.")
-add(soft('coins_drop', 0.0, 1.2, 3000, 0.01, 0.5), 22.15, 0.12)  # the last pile settles
+# (v5, feedback 18.11.2026 "die Münzen sollten ein Geräusch haben, aber ganz leise"): one slow coin-stacking take under the whole stacking
+#  (18.55-22.2 s, it gets denser like the piles), very quiet and with the top end softened
+add(lp(cut(sz('coins_stack_slow'), 0.0, 3.75, 0.01, 0.4), 7500, 2), 18.53, 0.09)
 # 64 lights switch on (one soft switch), the LED chart on the factory draws its line (a little electric hum)
 hit('switch', 22.95, 0.25, 0.009)
 add(cut(sz('neon_flicker'), 12.0, 1.6, 0.3, 0.5), 27.6, 0.16)

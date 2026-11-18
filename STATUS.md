@@ -105,5 +105,7 @@ Der Nutzer hat das Bundestag-Paket abgebrochen und stattdessen dieses Thema best
 
 - **Ton v4 (Rückmeldung des Nutzers, 18.11.2026: Soundeffekte von Sekunde 13 bis 22 „viel zu penetrant“):** Der helle Münzregen (coins_falling, fast nur Energie über 3 kHz) und das Stapelgeräusch sind gestrichen. Die Schranke klingt kürzer, leiser und abgedunkelt, und die Münzen bekommen nur noch drei weiche Akzente an Schlüsselstellen, dazwischen trägt die Musik. Klick und Whoosh am Anfang des Abschnitts sind etwas leiser. Das Bild ist unverändert, die neue Tonspur wurde auf das v3-Video gelegt: `merz/Merz_unbeliebtester_Kanzler_v4_*.mp4`.
 
+- **Ton v5 (Rückmeldung des Nutzers, 18.11.2026: neuer Sound für die LED-Säulen, Münzen ganz leise hörbar):** Statt des hellen Schimmers bekommt jede LED-Säule einen weichen aufsteigenden Akkord, der nach dem Wert gestimmt ist (Mai 16 % am höchsten, Oktober 10 % am tiefsten, November 12 % dazwischen). Unter dem Stapeln der Münzen liegt jetzt ein langsames Münzstapel-Geräusch, sehr leise und oben abgedunkelt. Bild unverändert: `merz/Merz_unbeliebtester_Kanzler_v5_*.mp4`.
+
 ## Nächster Schritt
-Rückmeldung des Nutzers zur Fassung v4 abwarten. Danach kommen auf Wunsch Cover-Varianten und die Beschreibungen. Metricool-Entwürfe gibt es erst, wenn der Nutzer sie wieder möchte. Das Bundestag-Paket hat der Nutzer abgebrochen, und Rundfunk A3 ist geliefert.
+Rückmeldung des Nutzers zur Fassung v5 abwarten. Danach kommen auf Wunsch Cover-Varianten und die Beschreibungen. Metricool-Entwürfe gibt es erst, wenn der Nutzer sie wieder möchte. Das Bundestag-Paket hat der Nutzer abgebrochen, und Rundfunk A3 ist geliefert.
