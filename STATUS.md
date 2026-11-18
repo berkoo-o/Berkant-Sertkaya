@@ -103,5 +103,7 @@ Der Nutzer hat das Bundestag-Paket abgebrochen und stattdessen dieses Thema best
   - Ton: Musik 19 statt 15 dB unter der Stimme, Effekte etwa 3 dB leiser.
   - Ergebnis: `merz/Merz_unbeliebtester_Kanzler_v3_*.mp4` in 1080 × 1920
 
+- **Ton v4 (Rückmeldung des Nutzers, 18.11.2026: Soundeffekte von Sekunde 13 bis 22 „viel zu penetrant“):** Der helle Münzregen (coins_falling, fast nur Energie über 3 kHz) und das Stapelgeräusch sind gestrichen. Die Schranke klingt kürzer, leiser und abgedunkelt, und die Münzen bekommen nur noch drei weiche Akzente an Schlüsselstellen, dazwischen trägt die Musik. Klick und Whoosh am Anfang des Abschnitts sind etwas leiser. Das Bild ist unverändert, die neue Tonspur wurde auf das v3-Video gelegt: `merz/Merz_unbeliebtester_Kanzler_v4_*.mp4`.
+
 ## Nächster Schritt
-Rückmeldung des Nutzers zur Fassung v3 abwarten. Danach kommen auf Wunsch Cover-Varianten und die Beschreibungen. Metricool-Entwürfe gibt es erst, wenn der Nutzer sie wieder möchte. Das Bundestag-Paket hat der Nutzer abgebrochen, und Rundfunk A3 ist geliefert.
+Rückmeldung des Nutzers zur Fassung v4 abwarten. Danach kommen auf Wunsch Cover-Varianten und die Beschreibungen. Metricool-Entwürfe gibt es erst, wenn der Nutzer sie wieder möchte. Das Bundestag-Paket hat der Nutzer abgebrochen, und Rundfunk A3 ist geliefert.

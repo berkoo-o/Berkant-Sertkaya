@@ -43,20 +43,24 @@ CK = [epi('clicks.wav', 0.0, 0.3)*0.22, epi('clicks.wav', 0.55, 0.9)*0.22, epi('
 def whoosh(c, g, i=0): add(WH[i % 2][0], c - WH[i % 2][1], g)
 
 # numbers and the key titles click in (not every title)
-for c in [0.14, 5.52, 11.02, 13.42, 19.47, 22.82, 27.47, 33.72, 36.72, 38.37]: add(CK[[0, 1, 2][int(c * 10) % 3]], c, 0.55)
+for c in [0.14, 5.52, 11.02, 13.42, 19.47, 22.82, 27.47, 33.72, 36.72, 38.37]: add(CK[[0, 1, 2][int(c * 10) % 3]], c, 0.42 if 13 <= c <= 22 else 0.55)
 # hook: 90 of the 100 lights on the lawn go out (one soft power-down, no tick per light)
 hit('power_down', 0.78, 0.22, 0.063, 1.15)
 # camera moves (the user's soft swooshes)
-for i, c in enumerate([2.45, 10.9, 13.3, 22.5, 25.9, 31.0, 35.4, 38.3]): whoosh(c, 0.42, i)
+for i, c in enumerate([2.45, 10.9, 13.3, 22.5, 25.9, 31.0, 35.4, 38.3]): whoosh(c, 0.32 if c == 13.3 else 0.42, i)
 # the spotlight on the lectern switches on at "Kanzler Merz"
 hit('switch', 3.78, 0.42, 0.009)
 # three LED columns rise; later the November column
 add(cut(sz('shimmer'), 0.0, 2.4, 0.01, 1.2), 11.7, 0.16)
 add(cut(sz('shimmer'), 0.0, 1.4, 0.01, 0.8), 36.75, 0.12)
 # Schuldenbremse: the barrier arm lifts at "lockerte", then coins fly in one by one and stack up on five piles, the last pile settles
-add(cut(sz('arm_raise'), 2.75, 1.2, 0.08, 0.15), 17.65, 0.5)
-add(cut(sz('coins_falling'), 0.0, 3.9, 0.08, 0.6), 18.5, 0.45)
-hit('coins_stack', 22.2, 0.3, 0.122)
+# (v4, feedback 17.11.2026 "13-22 s viel zu penetrant": the bright coin rain (all energy above 3 kHz) and the loud truck-arm motor are gone;
+#  now only a soft, darkened barrier movement and a few warm coin accents at key moments, the music carries the rest)
+add(lp(cut(sz('arm_raise'), 2.75, 1.0, 0.12, 0.35), 2200, 2), 17.65, 0.2)
+def soft(name, a, d, f, fi=0.004, fo=0.15): return lp(cut(sz(name), a, d, fi, fo), f, 2)
+add(soft('coin_single', 0.0, 0.5, 3800), 18.55, 0.16)   # the first coin lands on the first pile
+add(soft('coin_single', 0.0, 0.5, 3200), 20.0, 0.11)    # the first pile is complete and lights up ("100 Mrd.")
+add(soft('coins_drop', 0.0, 1.2, 3000, 0.01, 0.5), 22.15, 0.12)  # the last pile settles
 # 64 lights switch on (one soft switch), the LED chart on the factory draws its line (a little electric hum)
 hit('switch', 22.95, 0.25, 0.009)
 add(cut(sz('neon_flicker'), 12.0, 1.6, 0.3, 0.5), 27.6, 0.16)
