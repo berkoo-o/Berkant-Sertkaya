@@ -4,7 +4,7 @@ Alle Geräusche und die Musik stammen aus dem Epidemic-Sound-Connector. Die Date
 
 | Sound | Einsatz |
 |---|---|
-| Musik „Radar Focus“ (Blue Saga) | durchgehend, seit v3 etwa 19 dB unter der Stimme (vorher 15 dB) |
+| Musik „Radar Focus“ (Blue Saga) | durchgehend; seit v6 mit abgesenktem Sub-Bass und so eingestellt, dass der auf dem Handy hörbare Anteil über 250 Hz 22 dB unter der Stimme liegt (v3 bis v5 waren auf dem Handy praktisch unhörbar) |
 | power_down | einmal, wenn 90 der 100 Lichter ausgehen, und zu Beginn der Outro |
 | switch | wenn das Spotlicht auf Merz angeht, in der Outro zweimal |
 | shimmer | bis v4 leise, wenn die LED-Säulen wachsen; seit v5 ersetzt (Wunsch des Nutzers, 18.11.2026) |

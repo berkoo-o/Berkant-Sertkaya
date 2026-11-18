@@ -77,10 +77,17 @@ subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', 'voice/take1.mp3', '
 v = np.fromfile('/tmp/merz_voice.raw', dtype=np.float32).astype(np.float64)
 voice = np.zeros(N); i0 = int(VOFF*SR); voice[i0:i0 + len(v)] = v[:N - i0]
 ve = lp(np.abs(voice), 4); ve = ve / (ve.max() + 1e-9)
-duck = lp(1 - 0.65 * np.clip(ve * 6, 0, 1), 3)
+duck = lp(1 - 0.42 * np.clip(ve * 6, 0, 1), 3)  # v6: gentler ducking (about -5 dB under speech instead of -9 dB)
 def norm(x, peak): return x / (np.max(np.abs(x)) + 1e-9) * peak
 vo = norm(voice, 0.9)
-mus = music / (np.sqrt(np.mean(music[int(SR):int(O*SR)]**2)) + 1e-9) * np.sqrt(np.mean(vo[voice != 0]**2)) * 10**(-19/20) * duck
+# v6 (feedback 18.11.2026 "Wo ist die Hintergrundmusik?"): at -19 dB plus -9 dB ducking the music was inaudible on phones, because almost 90 % of
+# "Radar Focus" lies below 100 Hz. The sub-bass is now lowered (about -8 dB below 120 Hz) and the level is set by the part a phone speaker plays
+# (above 250 Hz): there the music sits MUSIC_DB under the voice while Tom speaks.
+MUSIC_DB = -22
+music_sh = music - 0.6 * lp(music, 120, 2)
+_hp = butter(4, 250, 'high', fs=SR, output='sos'); _ref = slice(int(SR), int(O*SR))
+_m_hi = np.sqrt(np.mean(sosfilt(_hp, music_sh)[_ref]**2)) * np.mean(duck[voice != 0]); _v_hi = np.sqrt(np.mean(sosfilt(_hp, vo)[voice != 0]**2))
+mus = music_sh * (_v_hi / (_m_hi + 1e-12)) * 10**(MUSIC_DB/20) * duck
 fxn = fx * 0.9 * 10**(-3/20)  # background turned down after feedback (17.11.2026): music 19 dB under the voice, effects -3 dB
 for name, mix in [('music', vo + mus + fxn), ('fx', vo + fxn)]:
     mix = mix / max(1.0, np.max(np.abs(mix)) / 0.97)

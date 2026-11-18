@@ -107,5 +107,7 @@ Der Nutzer hat das Bundestag-Paket abgebrochen und stattdessen dieses Thema best
 
 - **Ton v5 (Rückmeldung des Nutzers, 18.11.2026: neuer Sound für die LED-Säulen, Münzen ganz leise hörbar):** Statt des hellen Schimmers bekommt jede LED-Säule einen weichen aufsteigenden Akkord, der nach dem Wert gestimmt ist (Mai 16 % am höchsten, Oktober 10 % am tiefsten, November 12 % dazwischen). Unter dem Stapeln der Münzen liegt jetzt ein langsames Münzstapel-Geräusch, sehr leise und oben abgedunkelt. Bild unverändert: `merz/Merz_unbeliebtester_Kanzler_v5_*.mp4`.
 
+- **Ton v6 (Rückfrage des Nutzers, 18.11.2026: „Wo ist die Hintergrundmusik?“):** Die Musik war seit v3 mit 19 dB unter der Stimme plus 9 dB Ducking auf dem Handy unhörbar, weil fast 90 % ihrer Energie unter 100 Hz liegen. Jetzt ist der Sub-Bass abgesenkt, der hörbare Anteil über 250 Hz liegt 22 dB unter der Stimme, und das Ducking ist sanfter (etwa −5 dB). Effekte, Stimme und Bild unverändert: `merz/Merz_unbeliebtester_Kanzler_v6_*.mp4`.
+
 ## Nächster Schritt
-Rückmeldung des Nutzers zur Fassung v5 abwarten. Danach kommen auf Wunsch Cover-Varianten und die Beschreibungen. Metricool-Entwürfe gibt es erst, wenn der Nutzer sie wieder möchte. Das Bundestag-Paket hat der Nutzer abgebrochen, und Rundfunk A3 ist geliefert.
+Rückmeldung des Nutzers zur Fassung v6 abwarten. Danach kommen auf Wunsch Cover-Varianten und die Beschreibungen. Metricool-Entwürfe gibt es erst, wenn der Nutzer sie wieder möchte. Das Bundestag-Paket hat der Nutzer abgebrochen, und Rundfunk A3 ist geliefert.
