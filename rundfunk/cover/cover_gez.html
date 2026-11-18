@@ -1,0 +1,138 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:'Inter Tight';font-weight:800;src:url('./node_modules/@fontsource/inter-tight/files/inter-tight-latin-800-normal.woff2') format('woff2')}
+@font-face{font-family:'Inter Tight';font-weight:700;src:url('./node_modules/@fontsource/inter-tight/files/inter-tight-latin-700-normal.woff2') format('woff2')}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#07070B}
+canvas{position:absolute;left:0;top:0}
+</style></head><body>
+<canvas id="bg" width="1080" height="1920"></canvas>
+<canvas id="fg" width="1080" height="1920"></canvas>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+// function. – zweites Cover für „Wohin geht dein Rundfunkbeitrag?“ (Wunsch des Nutzers, 18.11.2026): ein Röhrenfernseher ohne Empfang
+// (nur Rauschen und „KEIN EMPFANG“) mit den Logos von ARD (Das Erste) und ZDF.
+// Varianten: ?v=1 Logos im Rauschen auf dem Bildschirm, ?v=2 dazu groß „18,36 €“, ?v=3 Logos schweben als Schilder über dem Fernseher.
+// Logos: Pfade aus dem npm-Paket simple-icons (Das Erste, ZDF), Farben #001A4B und #FA7D19.
+import * as THREE from 'three';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
+const W=1080,H=1920;const Q=new URLSearchParams(location.search);const V=+(Q.get('v')||1);
+await document.fonts.load("800 100px 'Inter Tight'");await document.fonts.load("700 100px 'Inter Tight'");
+const bg=document.getElementById('bg').getContext('2d'),fg=document.getElementById('fg').getContext('2d');
+const rnd=(s=>()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;})(1836);
+
+// ---------- logos (white backing so the cut-out "1" and the letters inside the ZDF circle stay white, as in the originals) ----------
+const ARD_P='M11.646.005C5.158.2-.001 5.57 0 12.127.135 18.724 5.468 24 12 24s11.865-5.276 12-11.873C24.001 5.291 18.41-.195 11.645.005zm5.138 4.93V16.96L8.78 19.92v-9.08l-3.9 1.386V9.263l11.903-4.328z';
+const ZDF_P='M7.014 4.987A7.02 7.02 0 000 12.005a7.017 7.017 0 0013.271 3.174h2.915c.696 0 1.324-.044 1.962-.553.461-.365.749-.884.883-1.56v2.103h1.336v-2.473h3.153v-1.1h-3.16l.02-.445c.005-.724.226-1.162 1.277-1.162H24V8.876h-2.818c-1.517 0-2.141.85-2.141 2.18v.129c-.254-1.565-1.185-2.31-2.889-2.31h-2.855a7.018 7.018 0 00-6.283-3.888zM8.02 8.876h3.436c1.742 0 1.992 1.219 1.992 1.9 0 .725-.298 1.873-1.992 1.873h-.844c-1.056 0-1.281.38-1.281 1.104v.336h3.945v1.074H7.982v-1.558c0-1.335.625-2.123 2.137-2.123h.873c.691 0 1.1-.14 1.1-.725 0-.605-.409-.772-1.12-.772h-2.95v-1.11zm6.63 1.113h1.472c1.157 0 1.574.496 1.574 2.04 0 1.542-.412 2.036-1.574 2.036H14.65z';
+const svgImg=s=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(s);});
+const ARD=await svgImg(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1024" height="1024"><circle cx="12" cy="12" r="11.8" fill="#fff"/><path fill="#001A4B" d="${ARD_P}"/></svg>`);
+const ZDF=await svgImg(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 4.95 24 14.1" width="1024" height="602"><circle cx="7.014" cy="12.005" r="6.9" fill="#fff"/><path fill="#FA7D19" d="${ZDF_P}"/></svg>`);
+
+// ---------- screen: static noise, ghosted logos, OSD ----------
+const SC=document.createElement('canvas');SC.width=1024;SC.height=780;const sx=SC.getContext('2d');
+// snow in coarse grains (so it survives the downscaling on the 3D screen), bright and slightly bluish, with a rolling bright band
+function noise(alpha,lo=70){const gw=342,gh=260,id=sx.createImageData(gw,gh),d=id.data;for(let y=0;y<gh;y++){const yy=y*3;const band=0.85+0.3*Math.exp(-(((yy-230)/70)**2))-0.2*Math.exp(-(((yy-600)/45)**2));
+  for(let x=0;x<gw;x++){const k=(y*gw+x)*4;const v=Math.min(255,(lo+(255-lo)*Math.pow(rnd(),0.9))*band);d[k]=v*0.93;d[k+1]=v*0.97;d[k+2]=v;d[k+3]=alpha*255;}}
+  const t=document.createElement('canvas');t.width=gw;t.height=gh;t.getContext('2d').putImageData(id,0,0);sx.save();sx.imageSmoothingEnabled=false;sx.drawImage(t,0,0,1026,780);sx.restore();
+  sx.save();sx.globalAlpha=0.22*alpha;sx.fillStyle='#000';for(let y=0;y<780;y+=4)sx.fillRect(0,y,1024,1.5);sx.restore();}
+sx.fillStyle='#000';sx.fillRect(0,0,1024,780);noise(1);
+if(V!==3){
+  // the two logos, big and clear, with a weak-signal look: dark plate behind them, horizontal tearing, colour ghosts, a little snow on top
+  sx.save();sx.fillStyle='rgba(10,12,30,0.55)';sx.fillRect(0,120,1024,430);sx.restore();
+  const L=document.createElement('canvas');L.width=1024;L.height=780;const lx=L.getContext('2d');
+  lx.drawImage(ARD,82,172,320,320);lx.drawImage(ZDF,494,214,450,265);
+  const T=document.createElement('canvas');T.width=1024;T.height=780;const tx=T.getContext('2d');
+  for(let y=0;y<780;y+=5){const off=(rnd()<0.12?(rnd()-0.5)*34:0)+4*Math.sin(y*0.05);tx.drawImage(L,0,y,1024,5,off,y,1024,5);}
+  const tint=(c,col)=>{const k=document.createElement('canvas');k.width=1024;k.height=780;const kx=k.getContext('2d');kx.drawImage(c,0,0);kx.globalCompositeOperation='source-in';kx.fillStyle=col;kx.fillRect(0,0,1024,780);return k;};
+  sx.save();sx.globalCompositeOperation='screen';sx.globalAlpha=0.5;sx.drawImage(tint(T,'#ff3040'),10,0);sx.drawImage(tint(T,'#30d0ff'),-10,0);sx.restore();
+  sx.drawImage(T,0,0);
+  noise(0.16,0);
+}
+// OSD
+{sx.save();const txt='KEIN EMPFANG';sx.font="800 64px 'Inter Tight'";const tw=sx.measureText(txt).width+txt.length*7;const bw=tw+90,bh=112,bx=(1024-bw)/2,by=V===3?334:578;
+ sx.fillStyle='rgba(8,10,40,0.82)';sx.beginPath();sx.roundRect(bx,by,bw,bh,14);sx.fill();sx.strokeStyle='rgba(255,255,255,0.55)';sx.lineWidth=3;sx.stroke();
+ sx.fillStyle='#fff';sx.textBaseline='middle';sx.letterSpacing='7px';sx.fillText(txt,bx+45,by+bh/2+3);
+ // signal bars: all empty, the first one red
+ const gx=bx+bw-0,gy=by;sx.restore();}
+// CRT vignette and rounded corners
+{const g=sx.createRadialGradient(512,390,260,512,390,660);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,0.5)');sx.fillStyle=g;sx.fillRect(0,0,1024,780);
+ sx.save();sx.globalCompositeOperation='destination-in';sx.fillStyle='#fff';sx.beginPath();sx.roundRect(6,6,1012,768,90);sx.fill();sx.restore();
+ sx.save();sx.globalCompositeOperation='destination-over';sx.fillStyle='#050507';sx.fillRect(0,0,1024,780);sx.restore();}
+
+// ---------- background ----------
+const TVX=540,TVY=V===1?1080:V===2?1230:1270;
+{bg.fillStyle='#07070B';bg.fillRect(0,0,W,H);
+ const blob=(x,y,r,c)=>{const g=bg.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,c);g.addColorStop(1,'rgba(0,0,0,0)');bg.fillStyle=g;bg.fillRect(0,0,W,H);};
+ blob(120,TVY-250,760,'rgba(40,80,255,0.30)');blob(1000,TVY-120,700,'rgba(250,125,25,0.24)');blob(540,TVY+80,520,'rgba(150,170,255,0.12)');
+ bg.save();bg.strokeStyle='rgba(170,170,255,0.09)';bg.lineWidth=1.5;const hz=TVY+300;
+ for(let i=-14;i<=14;i++){bg.beginPath();bg.moveTo(540+i*26,hz);bg.lineTo(540+i*190,H);bg.stroke();}
+ for(let k=0;k<9;k++){const y=hz+Math.pow(k/8,2.1)*(H-hz);bg.beginPath();bg.moveTo(0,y);bg.lineTo(W,y);bg.stroke();}
+ const f=bg.createLinearGradient(0,hz-10,0,hz+170);f.addColorStop(0,'#07070B');f.addColorStop(1,'rgba(7,7,11,0)');bg.fillStyle=f;bg.fillRect(0,hz-12,W,190);bg.restore();
+ bg.save();bg.translate(TVX,TVY+400);bg.scale(1,0.22);const g=bg.createRadialGradient(0,0,0,0,0,560);g.addColorStop(0,'rgba(170,190,255,0.40)');g.addColorStop(.6,'rgba(120,140,255,0.10)');g.addColorStop(1,'rgba(0,0,0,0)');bg.fillStyle=g;bg.fillRect(-600,-600,1200,1200);bg.restore();
+ const v=bg.createLinearGradient(0,0,0,700);v.addColorStop(0,'rgba(7,7,11,.5)');v.addColorStop(1,'rgba(7,7,11,0)');bg.fillStyle=v;bg.fillRect(0,0,W,700);}
+
+// ---------- 3D ----------
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});
+renderer.setSize(W,H);renderer.setPixelRatio(1);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.setClearColor(0x000000,0);
+renderer.domElement.style.position='absolute';document.body.insertBefore(renderer.domElement,document.getElementById('fg'));
+const scene=new THREE.Scene();const pm=new THREE.PMREMGenerator(renderer);scene.environment=pm.fromScene(new RoomEnvironment(),0.04).texture;scene.environmentIntensity=0.35;
+scene.add(new THREE.HemisphereLight(0xcfd4ff,0x14080c,0.45));
+const key=new THREE.DirectionalLight(0xffffff,1.5);key.position.set(-3,7,6);key.castShadow=true;key.shadow.mapSize.set(2048,2048);Object.assign(key.shadow.camera,{left:-5,right:5,top:5,bottom:-5});key.shadow.radius=6;scene.add(key);
+const rimB=new THREE.PointLight(0x3f6cff,60,0,2);rimB.position.set(-5,2.5,-1.5);scene.add(rimB);
+const rimO=new THREE.PointLight(0xff8a2a,55,0,2);rimO.position.set(5,2,-1.2);scene.add(rimO);
+const glow=new THREE.PointLight(0xc8d4ff,9,0,2);glow.position.set(-0.4,0,2.4);scene.add(glow);
+const M=(c,r=.5,m=0,o={})=>new THREE.MeshPhysicalMaterial(Object.assign({color:c,roughness:r,metalness:m},o));
+const add=(g,m,x=0,y=0,z=0,p=scene)=>{const o=new THREE.Mesh(g,m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;p.add(o);return o;};
+const TV=new THREE.Group();scene.add(TV);
+const BW=3.4,BH=2.5,BD=2.1;
+add(new RoundedBoxGeometry(BW,BH,BD,6,0.3),M(0xe9e2d4,.42,0,{clearcoat:.5,clearcoatRoughness:.3}),0,0,0,TV);
+// front: dark bezel, bulging screen with glass, control panel with knobs and speaker slots
+const SX=-0.42,SW=2.36,SH=1.8;
+add(new RoundedBoxGeometry(SW+0.26,SH+0.26,0.12,4,0.12),M(0x16171c,.55),SX,0.02,BD/2-0.02,TV);
+{const g=new THREE.PlaneGeometry(SW,SH,48,36);const p=g.attributes.position;for(let i=0;i<p.count;i++){const u=2*p.getX(i)/SW,v=2*p.getY(i)/SH;p.setZ(i,0.07*(1-0.5*(u*u+v*v)));}g.computeVertexNormals();
+ const tex=new THREE.CanvasTexture(SC);tex.colorSpace=THREE.SRGBColorSpace;tex.anisotropy=8;
+ const s=new THREE.Mesh(g,new THREE.MeshBasicMaterial({map:tex,toneMapped:false}));s.position.set(SX,0.02,BD/2+0.045);TV.add(s);
+ const gl=new THREE.Mesh(g,M(0xffffff,.06,0,{transparent:true,opacity:.12,clearcoat:1,envMapIntensity:1.6}));gl.position.set(SX,0.02,BD/2+0.05);TV.add(gl);}
+const PX=1.27;
+add(new RoundedBoxGeometry(0.62,SH+0.26,0.06,4,0.05),M(0xd9d1c2,.5),PX,0.02,BD/2-0.005,TV);
+for(const [y,c] of [[0.6,0x2a2b31],[0.12,0x2a2b31]]){const k=add(new THREE.CylinderGeometry(0.17,0.19,0.14,32),M(c,.35,.3),PX,y,BD/2+0.07,TV);k.rotation.x=Math.PI/2;
+  const m=add(new THREE.BoxGeometry(0.03,0.13,0.02),M(0xf2f2f2,.4),PX,y+0.06,BD/2+0.145,TV);m.rotation.z=y>0.3?-0.6:0.9;}
+for(let i=0;i<6;i++)add(new RoundedBoxGeometry(0.42,0.035,0.03,2,0.012),M(0x23242a,.6),PX,-0.4-i*0.085,BD/2+0.02,TV);
+// small red standby light (the only strong red)
+{const l=add(new THREE.SphereGeometry(0.035,16,12),new THREE.MeshBasicMaterial({color:new THREE.Color(1.0,0.12,0.15).multiplyScalar(3),toneMapped:false}),PX,-0.98,BD/2+0.03,TV);l.castShadow=false;}
+// legs
+for(const [x,z] of [[-1.35,0.7],[1.35,0.7],[-1.35,-0.7],[1.35,-0.7]]){const l=add(new THREE.CylinderGeometry(0.05,0.035,0.5,12),M(0x2a2b31,.4,.4),x,-BH/2-0.22,z,TV);l.rotation.z=x>0?-0.12:0.12;l.rotation.x=z>0?0.1:-0.1;}
+// rabbit-ear antenna
+{add(new THREE.SphereGeometry(0.24,24,12,0,Math.PI*2,0,Math.PI/2),M(0x2a2b31,.35,.4),0.25,BH/2-0.02,-0.15,TV);
+ const rod=M(0xd8dbe2,.22,1);const base=new THREE.Vector3(0.25,BH/2+0.16,-0.15);
+ const ears=V===3?[[-1.2,3.55,0.2,0.775],[0.47,3.05,0.35,0.66]].map(([x,y,z,r])=>{const d=new THREE.Vector3(x,y,z).sub(base);const L=d.length()-r*0.92;return [d.normalize(),L];}):[-1,1].map(s=>[new THREE.Vector3(Math.sin(s*0.5),Math.cos(s*0.5),0).applyAxisAngle(new THREE.Vector3(1,0,0),-0.18),1.7]);
+ for(const [dir,L] of ears){const r=new THREE.Group();r.position.copy(base);r.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir);TV.add(r);
+  add(new THREE.CylinderGeometry(0.016,0.022,L,10),rod,0,L/2,0,r);add(new THREE.SphereGeometry(0.05,14,10),rod,0,L,0,r);}}
+// floor shadow
+{const f=new THREE.Mesh(new THREE.PlaneGeometry(30,30),new THREE.ShadowMaterial({opacity:.55}));f.rotation.x=-Math.PI/2;f.position.y=-BH/2-0.46;f.receiveShadow=true;scene.add(f);}
+
+// variant 3: the two logos float as glowing signs above the TV, the antenna ears reach for them
+if(V===3){const lt=(img,w,h)=>{const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t;};
+ const sign=(tex,w,h,x,y,z,rx,ry,disc)=>{const G=new THREE.Group();G.position.set(x,y,z);G.rotation.set(rx,ry,0);scene.add(G);
+   if(disc){const d=add(new THREE.CylinderGeometry(disc.r,disc.r,0.12,64),M(disc.c,.35,.1,{clearcoat:.6}),disc.x,0,-0.07,G);d.rotation.x=Math.PI/2;}
+   const p=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:tex,transparent:true,toneMapped:false,color:new THREE.Color(1.08,1.08,1.08)}));p.position.z=0.002;G.add(p);return G;};
+ sign(lt(ARD,1024,1024),1.55,1.55,-1.2,3.55,0.2,0.08,0.22,{r:0.775,c:0x001A4B,x:0});
+ const zw=2.3,zh=zw*14.1/24;sign(lt(ZDF,1024,602),zw,zh,0.95,3.05,0.35,0.06,-0.2,{r:zw*6.9/24,c:0xFA7D19,x:-zw/2+zw*7.014/24});}
+
+// camera
+const yaw=(+(Q.get('yaw')||-16))*Math.PI/180,el=(+(Q.get('el')||9))*Math.PI/180;
+const CF={1:{d:14.3,ty:0.5,tx:0.1},2:{d:16.4,ty:1.42,tx:0.05},3:{d:17.2,ty:1.6,tx:0.0}}[V];
+const cam=new THREE.PerspectiveCamera(30,W/H,0.1,100);const tg=new THREE.Vector3(CF.tx,CF.ty,0);
+cam.position.set(tg.x+CF.d*Math.sin(yaw)*Math.cos(el),tg.y+CF.d*Math.sin(el),tg.z+CF.d*Math.cos(yaw)*Math.cos(el));cam.lookAt(tg);
+renderer.render(scene,cam);
+// soft bloom
+fg.save();fg.globalCompositeOperation='lighter';fg.filter='blur(24px) brightness(1.1)';fg.globalAlpha=.24;fg.drawImage(renderer.domElement,0,0);fg.restore();
+// variant 2: big price
+if(V===2){fg.save();fg.textBaseline='alphabetic';fg.fillStyle='#fff';fg.font="800 236px 'Inter Tight'";fg.letterSpacing='-6px';const t='18,36 €';const w=fg.measureText(t).width;
+ fg.shadowColor='rgba(0,0,0,.5)';fg.shadowBlur=30;fg.fillText(t,(W-w)/2,448);fg.shadowBlur=0;
+ fg.font="700 64px 'Inter Tight'";fg.letterSpacing='-1px';const a='pro Monat.',b=' Auch ohne Empfang.';const wa=fg.measureText(a).width,wb=fg.measureText(b).width;const x0=(W-wa-wb)/2;
+ fg.fillStyle='#fff';fg.fillText(a,x0,540);fg.fillStyle='#ff3b45';fg.fillText(b,x0+wa,540);fg.restore();}
+window.SC=SC;window.ready=true;
+</script></body></html>
