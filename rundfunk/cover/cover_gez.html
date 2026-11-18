@@ -107,7 +107,7 @@ for(const [x,z] of [[-1.35,0.7],[1.35,0.7],[-1.35,-0.7],[1.35,-0.7]]){const l=ad
 // rabbit-ear antenna
 {add(new THREE.SphereGeometry(0.24,24,12,0,Math.PI*2,0,Math.PI/2),M(0x2a2b31,.35,.4),0.25,BH/2-0.02,-0.15,TV);
  const rod=M(0xd8dbe2,.22,1);const base=new THREE.Vector3(0.25,BH/2+0.16,-0.15);
- const ears=V===3?[[-1.2,3.55,0.2,0.775],[0.47,3.05,0.35,0.66]].map(([x,y,z,r])=>{const d=new THREE.Vector3(x,y,z).sub(base);const L=d.length()-r*0.92;return [d.normalize(),L];}):[-1,1].map(s=>[new THREE.Vector3(Math.sin(s*0.5),Math.cos(s*0.5),0).applyAxisAngle(new THREE.Vector3(1,0,0),-0.18),1.7]);
+ const ears=V===3?[[-1.2,3.55,0.2,0.775],[0.47,3.05,0.35,0.66]].map(([x,y,z,r])=>{const d=new THREE.Vector3(x,y,z).sub(base);const L=d.length()-r*0.92;return [d.normalize(),L];}):[-1,1].map(s=>[new THREE.Vector3(Math.sin(s*0.5),Math.cos(s*0.5),0).applyAxisAngle(new THREE.Vector3(1,0,0),-0.18),V===2?1.4:1.7]);
  for(const [dir,L] of ears){const r=new THREE.Group();r.position.copy(base);r.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir);TV.add(r);
   add(new THREE.CylinderGeometry(0.016,0.022,L,10),rod,0,L/2,0,r);add(new THREE.SphereGeometry(0.05,14,10),rod,0,L,0,r);}}
 // floor shadow
@@ -123,16 +123,17 @@ if(V===3){const lt=(img,w,h)=>{const c=document.createElement('canvas');c.width=
 
 // camera
 const yaw=(+(Q.get('yaw')||-16))*Math.PI/180,el=(+(Q.get('el')||9))*Math.PI/180;
-const CF={1:{d:14.3,ty:0.5,tx:0.1},2:{d:16.4,ty:1.42,tx:0.05},3:{d:17.2,ty:1.6,tx:0.0}}[V];
+const CF={1:{d:14.3,ty:0.5,tx:0.1},2:{d:+(Q.get('d')||19.5),ty:+(Q.get('ty')||1.6),tx:0.05},3:{d:17.2,ty:1.6,tx:0.0}}[V];
 const cam=new THREE.PerspectiveCamera(30,W/H,0.1,100);const tg=new THREE.Vector3(CF.tx,CF.ty,0);
 cam.position.set(tg.x+CF.d*Math.sin(yaw)*Math.cos(el),tg.y+CF.d*Math.sin(el),tg.z+CF.d*Math.cos(yaw)*Math.cos(el));cam.lookAt(tg);
 renderer.render(scene,cam);
 // soft bloom
 fg.save();fg.globalCompositeOperation='lighter';fg.filter='blur(24px) brightness(1.1)';fg.globalAlpha=.24;fg.drawImage(renderer.domElement,0,0);fg.restore();
 // variant 2: big price
-if(V===2){fg.save();fg.textBaseline='alphabetic';fg.fillStyle='#fff';fg.font="800 236px 'Inter Tight'";fg.letterSpacing='-6px';const t='18,36 €';const w=fg.measureText(t).width;
- fg.shadowColor='rgba(0,0,0,.5)';fg.shadowBlur=30;fg.fillText(t,(W-w)/2,448);fg.shadowBlur=0;
- fg.font="700 64px 'Inter Tight'";fg.letterSpacing='-1px';const a='pro Monat.',b=' Auch ohne Empfang.';const wa=fg.measureText(a).width,wb=fg.measureText(b).width;const x0=(W-wa-wb)/2;
- fg.fillStyle='#fff';fg.fillText(a,x0,540);fg.fillStyle='#ff3b45';fg.fillText(b,x0+wa,540);fg.restore();}
+if(V===2){fg.save();fg.textBaseline='alphabetic';fg.fillStyle='#fff';const FS=+(Q.get('fs')||180),Y1=+(Q.get('y1')||560),Y2=Y1+FS*0.42;
+ fg.font=`800 ${FS}px 'Inter Tight'`;fg.letterSpacing=(-FS/40)+'px';const t='18,36 €';const w=fg.measureText(t).width;
+ fg.shadowColor='rgba(0,0,0,.5)';fg.shadowBlur=30;fg.fillText(t,(W-w)/2,Y1);fg.shadowBlur=0;
+ fg.font=`700 ${Math.round(FS*0.28)}px 'Inter Tight'`;fg.letterSpacing='-1px';const a='pro Monat.',b=' Auch ohne Empfang.';const wa=fg.measureText(a).width,wb=fg.measureText(b).width;const x0=(W-wa-wb)/2;
+ fg.fillStyle='#fff';fg.fillText(a,x0,Y2);fg.fillStyle='#ff3b45';fg.fillText(b,x0+wa,Y2);fg.restore();}
 window.SC=SC;window.ready=true;
 </script></body></html>
