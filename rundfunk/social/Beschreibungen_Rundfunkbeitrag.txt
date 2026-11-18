@@ -1,6 +1,6 @@
 function. – „Wohin geht dein Rundfunkbeitrag?“ – Beschreibungen
 Stand: 17.11.2026
-Video: rundfunk/Rundfunk_Diorama_A3_36s_mit_Musik.mp4 · Cover (vom Nutzer gewählt am 18.11.2026): rundfunk/social/Thumbnail_GEZ_9x16.png (Profilraster: Thumbnail_GEZ_Raster_3x4.png); das frühere cleane Cover Thumbnail_Rundfunkbeitrag_9x16.png ist abgelöst
+Video: rundfunk/Rundfunk_Diorama_A3_36s_mit_Musik.mp4 · Cover (vom Nutzer gewählt am 18.11.2026, Fernseher ohne Empfang mit ARD- und ZDF-Logo, ohne Preis-Text): rundfunk/social/Thumbnail_GEZ_9x16.png (Profilraster: Thumbnail_GEZ_Raster_3x4.png); das frühere cleane Cover Thumbnail_Rundfunkbeitrag_9x16.png ist abgelöst
 Zum Hochladen: rundfunk/social/Rundfunkbeitrag_Upload_mit_Cover.mp4 (das neue Cover steht als Standbild in den ersten 0,2 Sekunden und lässt sich in TikTok, Instagram und YouTube als Titelbild auswählen; bei Metricool videoCoverMilliseconds = 100)
 
 =====================================================================
