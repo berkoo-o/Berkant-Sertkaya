@@ -112,5 +112,10 @@ Der Nutzer hat das Bundestag-Paket abgebrochen und stattdessen dieses Thema best
 ## Nächster Schritt
 Rückmeldung des Nutzers zur Fassung v6 abwarten. Danach kommen auf Wunsch Cover-Varianten und die Beschreibungen. Metricool-Entwürfe gibt es erst, wenn der Nutzer sie wieder möchte. Das Bundestag-Paket hat der Nutzer abgebrochen, und Rundfunk A3 ist geliefert.
 
-## „Was ändert sich 2027 für dich?“ (Skript, Stand 19.11.2026)
-Der Nutzer wollte neue Ideen ohne Diorama-Look und hat dieses Thema gewählt. Zuerst nur das Skript: `jahr2027/Drehbuch_2027.md` (Hooks, Drehbuch, Sprechertext für Tom, Faktencheck mit Status beschlossen/geplant/Prognose). Look-Vorschlag: Abreißkalender vor dunklem Cover-Hintergrund, roter Filzstift-Kringel als roter Faden, geplante Änderungen mit grauem Bleistift und Stempel „geplant“. Noch offen: Freigabe des Skripts, dann Stimme, Stiltest und Bau.
+## „Was ändert sich 2027 für dich?“ (Stand 19.11.2026)
+Der Nutzer wollte neue Ideen ohne Diorama-Look und hat dieses Thema gewählt, danach „starte mit maximaler Nutzung“. Alles liegt in `jahr2027/`:
+- Drehbuch mit A bis I und Faktencheck: `Drehbuch_2027.md`. Die Frühstart-Rente steht im Block „geplant“, weil der Bundesrat noch fehlt; Kindergeld (Einkommensteuerreform) und Pflege-Zuschlag sind noch in Beratung.
+- Stimme: Tom Magic, eleven_v4, `voice/voice.mp3` (= Take 1, 73,2 s), Take 2 als Alternative; Wortzeiten aus der ElevenLabs-Transkription in `voice/words_take1.json`.
+- Szene: `kalender.html` + `src/` (util, calendar, props, main), lokaler Server `npx http-server . -p 8777`, Standbilder `node stills.mjs stills <Stimm-Zeiten>`, Rendern `seq 0 120 2309 | xargs -P 4 -I{} ./chunk.sh {}` (2310 Bilder, etwa zwei Stunden), Ton `python3 audio.py`, Videos `./build.sh`.
+- Cover: `cover.html` mit `src/main_cover.js`, `node cover.mjs social/Thumbnail_2027_9x16.png`; Beschreibungen in `social/Beschreibungen_2027.txt`; Sounds in `SOUNDS.md`.
+- Higgsfield-Guthaben war 0, deshalb ist alles selbst in 3D gebaut; Prompts für eine spätere Variante stehen im Drehbuch unter F.
