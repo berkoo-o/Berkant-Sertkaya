@@ -10,15 +10,15 @@ canvas{position:absolute;left:0;top:0}
 <script type="module">
 // function. – Cover „Ist Friedrich Merz Deutschlands unbeliebtester Bundeskanzler?“, clean (nur Motiv), Licht und Hintergrund wie rundfunk/cover/cover_turm.html.
 // ?v=1  der aufgeschnittene Reichstag: Glaskuppel mit Rampen und Spiegelkegel, Plenarsaal mit blauen Sitzreihen, Adler, Rednerpult mit roter Redezeit-Lampe
-// ?v=2  das leere Rednerpult auf einer Platte mit 100 Lichtern, nur 10 leuchten (10 % zufrieden), die rote Redezeit-Lampe als roter Faden
+// ?v=2  das Rednerpult mit Merz dahinter auf einer Platte mit 100 Lichtern, nur 10 leuchten (10 % zufrieden), die rote Redezeit-Lampe als roter Faden
 // ?v=3  die gläserne Kuppel allein, darunter der Plenarsaal im Kreis, in der Mitte das Pult mit der roten Lampe
 import * as THREE from 'three';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
 const W=1080,H=1920;const Q=new URLSearchParams(location.search);const V=+(Q.get('v')||1);
 const bg=document.getElementById('bg').getContext('2d'),fg=document.getElementById('fg').getContext('2d');
-const DEF={1:{cy:1250,el:26,ry:-0.55,s:0.82},2:{cy:1360,el:20,ry:-0.38,s:1.02},3:{cy:1300,el:20,ry:-0.3,s:1.08}}[V];
-const CX=+(Q.get('cx')||(V===1?585:540)),CY=+(Q.get('cy')||DEF.cy);
+const DEF={1:{cy:1250,el:26,ry:-0.55,s:0.82},2:{cy:1460,el:17,ry:-0.38,s:1.04},3:{cy:1300,el:20,ry:-0.3,s:1.08}}[V];
+const CX=+(Q.get('cx')||(V===1?585:V===2?575:540)),CY=+(Q.get('cy')||DEF.cy);
 // ---------- background (same recipe as the other clean covers) ----------
 {bg.fillStyle='#07070B';bg.fillRect(0,0,W,H);
  const blob=(x,y,r,c)=>{const g=bg.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,c);g.addColorStop(1,'rgba(0,0,0,0)');bg.fillStyle=g;bg.fillRect(0,0,W,H);};
@@ -65,15 +65,27 @@ const eagleTex=canvasTex(512,512,(g,w,h)=>{g.clearRect(0,0,w,h);const cx=256,ler
   g.beginPath();g.moveTo(cx-46,330);g.lineTo(cx+46,330);g.lineTo(cx+74,410);for(let i=0;i<5;i++){const x0=cx+74-i*29.6;g.quadraticCurveTo(x0-15,428,x0-29.6,410);}g.closePath();g.fill();});
 const eagle=(par,sz,x,y,z,ry=0,c=0xffffff)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(sz,sz),new THREE.MeshStandardMaterial({map:eagleTex,color:c,transparent:true,roughness:.6,emissive:0x9a9cc0,emissiveIntensity:.25}));m.position.set(x,y,z);m.rotation.y=ry;par.add(m);return m;};
 // small stylised chancellor figure (dark blue suit, grey hair, glasses), as in the video
-function figure(par,x,y,z,sc,ry=0){const G=new THREE.Group();G.position.set(x,y,z);G.scale.setScalar(sc);G.rotation.y=ry;par.add(G);
-  const suit=M(0x27355a,{roughness:.7}),skin=M(0xe8c6aa,{roughness:.65}),hair=M(0xbdbdb8,{roughness:.85}),shirt=M(0xf4f4f2);
+function figure(par,x,y,z,sc,ry=0,hands=0){const G=new THREE.Group();G.position.set(x,y,z);G.scale.setScalar(sc);G.rotation.y=ry;par.add(G);
+  const suit=M(0x27355a,{roughness:.7}),skin=M(0xd9a88c,{roughness:.6}),hair=M(0x9e9d99,{roughness:.85}),shirt=M(0xf4f4f2),tie=M(0x2e4c9a,{roughness:.5}),dk=M(0x1a1b22,{roughness:.4});
   for(const s of [-1,1])add(G,new THREE.CylinderGeometry(0.03,0.026,0.28,10),suit,s*0.034,0.14,0);
-  {const g=new THREE.CylinderGeometry(0.075,0.06,0.2,20);g.scale(1,1,0.62);add(G,g,suit,0,0.37,0);}
-  add(G,new THREE.CapsuleGeometry(0.032,0.09,6,12).rotateZ(Math.PI/2),suit,0,0.465,0);
-  add(G,new THREE.BoxGeometry(0.03,0.07,0.01),shirt,0,0.44,0.045);
-  for(const s of [-1,1]){const a=add(G,new THREE.CylinderGeometry(0.022,0.018,0.2,8),suit,s*0.085,0.38,0.03);a.rotation.x=-0.5;}
-  add(G,new THREE.SphereGeometry(0.052,20,16),skin,0,0.56,0);const hr=add(G,new THREE.SphereGeometry(0.054,20,12,0,Math.PI*2,0,Math.PI*0.45),hair,0,0.565,-0.006);
-  for(const s of [-1,1])add(G,new THREE.TorusGeometry(0.012,0.002,6,16),M(0x8a8a90,{metalness:.6}),s*0.02,0.565,0.05);return G;}
+  {const g=new THREE.CylinderGeometry(0.078,0.062,0.2,20);g.scale(1,1,0.62);add(G,g,suit,0,0.37,0);}
+  add(G,new THREE.CapsuleGeometry(0.034,0.1,6,12).rotateZ(Math.PI/2),suit,0,0.468,0);
+  {const v=new THREE.Shape();v.moveTo(-0.017,0);v.lineTo(0.017,0);v.lineTo(0,-0.07);v.closePath();add(G,new THREE.ShapeGeometry(v),shirt,0,0.48,0.049);}{const t=new THREE.Shape();t.moveTo(-0.006,0);t.lineTo(0.006,0);t.lineTo(0.009,-0.05);t.lineTo(0,-0.062);t.lineTo(-0.009,-0.05);t.closePath();add(G,new THREE.ShapeGeometry(t),M(0x24418f,{roughness:.5}),0,0.476,0.0505);}
+  add(G,new THREE.CylinderGeometry(0.02,0.022,0.04,12),skin,0,0.505,0);
+  // arms reach forward to the lectern top
+  for(const s of [-1,1]){const A=new THREE.Group();A.position.set(s*0.088,0.46,0.0);G.add(A);const up=add(A,new THREE.CylinderGeometry(0.021,0.018,0.13,8),suit,0,-0.06,0);
+    A.rotation.set(hands?-0.75:0,0,s*0.12);const F=new THREE.Group();F.position.set(0,-0.125,0);A.add(F);F.rotation.x=hands?-0.9:0;add(F,new THREE.CylinderGeometry(0.018,0.016,0.12,8),suit,0,-0.06,0);add(F,new THREE.SphereGeometry(0.017,10,8),skin,0,-0.125,0);}
+  // head: face, ears, glasses, nose, grey hair with a side part and high forehead
+  const Hd=new THREE.Group();Hd.position.set(0,0.565,0);G.add(Hd);
+  {const g=new THREE.SphereGeometry(0.05,24,18);g.scale(0.92,1.12,0.95);add(Hd,g,skin);}
+  for(const s of [-1,1]){add(Hd,new THREE.SphereGeometry(0.012,10,8),skin,s*0.046,0,0).scale.set(0.5,1,0.8);
+    add(Hd,new THREE.SphereGeometry(0.0055,8,6),dk,s*0.017,0.008,0.044);add(Hd,new THREE.TorusGeometry(0.012,0.0009,6,18),M(0xb8b8c0,{metalness:.7,roughness:.25,transparent:true,opacity:.7}),s*0.017,0.008,0.047);}
+  add(Hd,new THREE.BoxGeometry(0.012,0.002,0.002),M(0x9a9aa2,{metalness:.6}),0,0.009,0.048);
+  {const n=add(Hd,new THREE.ConeGeometry(0.008,0.02,8),skin,0,-0.006,0.05);n.rotation.x=Math.PI/2;}
+  add(Hd,new THREE.BoxGeometry(0.022,0.003,0.004),M(0xa8706a),0,-0.03,0.044);
+  {const g=new THREE.SphereGeometry(0.053,24,14,0,Math.PI*2,0,Math.PI*0.42);g.scale(0.95,1.0,1.0);const h=add(Hd,g,hair,0,0.012,-0.008);h.rotation.x=-0.25;}
+  for(const s of [-1,1]){const g=new THREE.SphereGeometry(0.022,14,10);g.scale(0.45,0.8,1.2);add(Hd,g,hair,s*0.043,0.012,-0.016);}
+  return G;}
 // the red thread: the red speaking-time lamp on the lectern
 function lectern(par,x,z,sc){const L=new THREE.Group();L.position.set(x,0,z);L.scale.setScalar(sc);par.add(L);
   RB(L,0.36,0.5,0.24,WOOD,0,0.25,0,0.02);RB(L,0.4,0.035,0.3,PAN,0,0.51,-0.01,0.01).rotation.x=0.18;
@@ -137,6 +149,8 @@ if(V===2){
     add(O,new THREE.SphereGeometry(0.038,16,10,0,Math.PI*2,0,Math.PI/2),isOn?LED_ON:LED_OFF,x,0.15,z);
     if(isOn){const p=new THREE.PointLight(0xffc878,0.35,0.6,2);p.position.set(x,0.3,z);O.add(p);}}
   const L=lectern(O,0,0.1,2.3);L.position.y=0.12;
+  // the chancellor stands behind the lectern, a little to the left of the red lamp, hands on the slanted top
+  figure(O,-0.07,0.12,-0.56,3.1,0.1,1);
   glass(O,new THREE.BoxGeometry(2.2,0.02,2.2),0,0.125,0,.05);
 }
 if(V===3){

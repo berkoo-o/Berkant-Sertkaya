@@ -1,7 +1,7 @@
 function. – „Ist Friedrich Merz Deutschlands unbeliebtester Bundeskanzler?“ – Beschreibungen
 Stand: 19.11.2026
 Video: merz/Merz_unbeliebtester_Kanzler_v6_mit_Musik.mp4 (aktuelle Fassung mit hörbarer Musik)
-Cover (clean, nur Motiv): merz/social/Thumbnail_Merz_9x16.png, Profilraster-Ausschnitt: Thumbnail_Merz_Raster_3x4.png, Vergleich der drei Motive: merz/cover/Cover_Merz_Varianten.jpg
+Cover (clean, nur Motiv, vom Nutzer gewählt: Variante 2, Merz hinter dem Rednerpult mit der roten Redezeit-Lampe auf einer Platte mit 100 Lichtern, von denen nur 10 leuchten): merz/social/Thumbnail_Merz_9x16.png, Profilraster-Ausschnitt: Thumbnail_Merz_Raster_3x4.png, Vergleich der drei Motive: merz/cover/Cover_Merz_Varianten.jpg
 Zum Hochladen: merz/social/Merz_Upload_mit_Cover.mp4 (das Cover steht als Standbild in den ersten 0,2 Sekunden und lässt sich in TikTok, Instagram und YouTube als Titelbild auswählen; bei Metricool videoCoverMilliseconds = 100)
 
 =====================================================================
