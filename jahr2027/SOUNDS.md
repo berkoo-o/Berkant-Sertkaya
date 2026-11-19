@@ -10,7 +10,7 @@ Gemischt wird mit `python3 audio.py` im Ordner `jahr2027/` (`python3 audio.py -v
 |---|---|---|---|
 | marker_scratch | cmtlveiqydbpscqyzhj7wkg5x | Crisp Pencil Scratch (wet paper) | alle Striche und Kreise des roten Filzstifts, auch das Logo |
 | pencil_scratch2 | cmv0gp82z008a06i9kdv5qeze | Pencil Scratch 2 | Bleistift: „geplant“, Unterstrich, 259 € gestrichen, 267 €, gestrichelter Kreis, Haken bei „freiwillig“ |
-| cover_tear1 | cmv5mzdr700ul06l4ctov5cv0 | Cover Paper Tear 1 | Deckblatt reißt ab (7 s), letzte Seite vor der Outro |
+| cover_tear1 | cmv5mzdr700ul06l4ctov5cv0 | Cover Paper Tear 1 | Deckblatt reißt ab (7 s), letzte Seite vor der Outro (schneller) |
 | tear4 | cmv5swsdk00yq06l6krildtr3 | Paper Tear 4 | Seite 1. Januar mit dem Zettel reißt ab (42 s) |
 | tear8 | cmv5swsdk00ys06l6m9h7w4k2 | Paper Tear 8 | Seite 1. Juli reißt ab (63,4 s) |
 | rustle_slide | cmukby4jej1z2td8905bzxb8b | Paper Rustle Slide | Lohnabrechnung kommt heraus; Geldbündel rutscht bei der privaten Übergabe |
@@ -26,6 +26,7 @@ Gemischt wird mit `python3 audio.py` im Ordner `jahr2027/` (`python3 audio.py -v
 | page_flips | cmv0gp82z008806i9v08lw7cm | Sketchbook Page Flips 2 | Februar bis Juni fliegen vorbei |
 | quarter_desk | cmukebqgd4asz39ggzzvyc8n7 | Quarter Dropping on Desk | zusätzliche Münze landet auf dem Rentenstapel |
 | envelope | cmukbvw5bktolkm5jm3d6jgcb | Envelope Unfolding | Umschlag öffnet sich hinten, der Brief gleitet nach vorne heraus |
+| stamp | cmtlvdihdl2bo3k6yyyhqcppr | Paper Stamp Hit (wet paper) | Outro: der Stempel drückt das rote Logo auf die letzte Seite |
 
 Heruntergeladen, aber nicht verwendet: card_slide2 (cmv5t3dbz001j06jucnmb2n5c, Card Slide 2).
 

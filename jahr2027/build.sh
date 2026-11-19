@@ -1,7 +1,7 @@
 #!/bin/sh
 # frames + both mixes -> final videos, contact sheet and the upload version with the cover: ./build.sh  (after rendering fr/ and python3 audio.py)
 set -e
-nf=2310; name=Was_aendert_sich_2027
+nf=2240; name=Was_aendert_sich_2027
 n=$(ls fr | wc -l); [ "$n" -eq $nf ] || { echo "frames missing: $n/$nf"; exit 1; }
 ffmpeg -loglevel error -y -framerate 30 -start_number 0 -i fr/f%05d.jpg -c:v libx264 -preset slow -crf 17 -pix_fmt yuv420p -movflags +faststart video.mp4
 for m in music:mit_Musik fx:nur_Effekte; do

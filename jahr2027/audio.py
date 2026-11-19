@@ -4,7 +4,7 @@
 import numpy as np, subprocess
 from scipy.io import wavfile
 from scipy.signal import butter, sosfilt
-SR = 48000; VO = 0.15; OUT = 73.45; END = 76.85 + VO; N = int(SR * END)
+SR = 48000; VO = 0.15; OUT = 73.45; END = 74.5 + VO; N = int(SR * END)
 t = np.arange(N) / SR
 def lp(x, f, o=2): return sosfilt(butter(o, f, 'low', fs=SR, output='sos'), x)
 def hp(x, f, o=2): return sosfilt(butter(o, f, 'high', fs=SR, output='sos'), x)
@@ -130,12 +130,11 @@ knock(69.17, 0.14, 0, 1.1); knock(69.82, 0.22, 1, 1.05)
 # ---------------------------------------------------------------- overview and end card
 whoosh(70.25, 0.4, 1)
 add(cut(sz('shimmer'), 0.0, 1.4, 0.003, 0.5), 70.6, 0.1)
-add(rate(cut(sz('cover_tear1'), 0.0, 1.0, 0.002, 0.2), 0.85), 73.8 - 0.035, 0.5)  # last page tears off
-marker(73.98, 0.8, 0.42); marker(74.78, 0.8, 0.4, 0.94)                       # the marker writes "function"
-marker(75.6, 0.35, 0.4, 1.1)                                                  # small ring for the dot
-add(CK[1], 75.93, 1.1)                                                        # dot pops in
-add(cut(sz('glock'), 0.0, 2.0, 0.002, 0.8), 75.95, 0.18)                       # soft chime on the finished logo
-fx *= np.clip((END - t) / 0.35, 0, 1)
+# outro v3 (1 s): last page tears off, the rubber stamp comes down and stamps the red logo
+add(rate(cut(sz('cover_tear1'), 0.0, 0.7, 0.002, 0.15), 1.1), 73.45 - 0.03, 0.45)   # last page tears off
+whoosh(73.74, 0.14, 1)                                                        # the stamp swings in
+hit('stamp', 73.84, 0.55, 0.071)                                              # stamp hits the page
+fx *= np.clip((END - t) / 0.2, 0, 1)
 
 # ---------------------------------------------------------------- voice (take 1, natural tempo) + gentle ducking
 subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', 'voice/voice.mp3', '-ac', '1', '-ar', str(SR), '-f', 'f32le', '/tmp/j27_voice.raw'], check=True)

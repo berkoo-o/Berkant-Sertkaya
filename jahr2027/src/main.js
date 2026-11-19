@@ -5,7 +5,8 @@ import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
 import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
-import {clamp,lerp,ease,eo,ei,eio,ebk,win,track,applyPose,ctex,grain,rng,RED,REDS,hdr} from './util.js';
+import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
+import {clamp,lerp,ease,eo,ei,eio,ebk,win,track,applyPose,ctex,grain,rng,RED,REDS,hdr,roundRect} from './util.js';
 import {buildCalendar,PW,PH,TW,TH,PY,PZ} from './calendar.js';
 import * as P from './props.js';
 
@@ -43,7 +44,7 @@ const focus=new THREE.SpotLight(0xfff1e2,0,0,0.42,0.9,2);scene.add(focus);scene.
 // ------------------------------------------------------------------ calendar and its pages (voice time)
 const cal=buildCalendar(scene);
 const TEAR={cover:6.72,jan1:41.7,flip:[48.22,48.38,48.53,48.67,48.8,48.92],jul1:63.22,jul10:73.45};
-cal.setTear(0,TEAR.cover,0.85);cal.setTear(1,TEAR.jan1,0.85);TEAR.flip.forEach((t,i)=>cal.setTear(2+i,t,0.62));cal.setTear(8,TEAR.jul1,0.8);cal.setTear(9,TEAR.jul10,0.8);
+cal.setTear(0,TEAR.cover,0.85);cal.setTear(1,TEAR.jan1,0.85);TEAR.flip.forEach((t,i)=>cal.setTear(2+i,t,0.62));cal.setTear(8,TEAR.jul1,0.8);cal.setTear(9,TEAR.jul10,0.48);
 const RING={jan1:[7.95,8.75],jan19:[46.3,47.1],jul1:[49.55,50.2],jul10:[63.7,64.45]};
 const R1=cal.addRing(1,...RING.jan1,5),R2=cal.addRing(2,...RING.jan19,8),R3=cal.addRing(8,...RING.jul1,12),R4=cal.addRing(9,...RING.jul10,4);
 // sticky note "geplant" on the 1st of January page, slapped on at "Geplant"
@@ -144,7 +145,8 @@ const strokeTip=(S)=>objTip(cash.G,u=>S.tip(u),[0,1,0]);
 const MARK=[[0.85,STROKES.s0[0],STROKES.s0[1],2.85,strokeTip(S0)],[7.45,...RING.jan1,9.25,ringTip(R1)],[45.85,...RING.jan19,47.65,ringTip(R2)],[49.12,...RING.jul1,50.75,ringTip(R3)],
   [63.3,...RING.jul10,65.1,ringTip(R4)],[65.1,STROKES.x1[0],STROKES.x2[1],67.15,u=>u<0.5?strokeTip(SX1)(u*2):strokeTip(SX2)((u-0.5)*2)]];
 // outro: the marker writes the logo; the tip path is set up further down
-const OUT={t0:73.45,w0:73.98,w1:75.55,d0:75.6,d1:75.92,end:76.85};
+// outro v3 (Wunsch des Nutzers 19.11.2026: roter Stempel, nur eine Sekunde): the last page tears off, a rubber stamp comes down and stamps the logo
+const OUT={t0:73.45,s0:73.64,hit:73.84,up:73.89,s1:74.08,end:74.5};
 function noteTip(u){const x=-NOTE.s/2+NOTE.s*(0.1+0.82*u)-NOTE.s/2*0.0,y=6-26+16*Math.sin(u*Math.PI*14);const q=notePt(x+NOTE.s*0.0,y);return {p:pagePt(q[0],q[1]),n:PAGE_N};}
 const kgTip=(px,py)=>objTip(kg.G,()=>[(px/kg.tw-0.5)*0.15,(0.5-py/kg.th)*0.19,0.004],[0,0,1]);
 const PENC=[[26.72,NOTE.w0,NOTE.u1,28.9,u=>{if(u<0.74)return noteTip(u/0.74);const v=(u-0.74)/0.26;const q=notePt(-120+240*v,40-6*v);return {p:pagePt(q[0],q[1]),n:PAGE_N};}],
@@ -200,7 +202,7 @@ const KEYS=[
  [48.4,C(0,0.192,0.1,2.732,2,11)],[49.8,C(0,0.182,0.12,2.571,0,11)],[50.9,C(0,0.142,0.26,2.392,5,14)],[52.4,C(0,0.142,0.26,2.313,6,14)],
  [53.6,C(0,0.152,0.26,2.392,-3,13)],[56.6,C(0,0.162,0.28,2.169,-2,12)],[60.6,C(0,0.162,0.28,2.114,-1,12)],
  [62.2,C(0,0.152,0.24,2.559,0,13)],[63.9,C(0,0.182,0.12,2.571,0,11)],[65.3,C(0,0.132,0.3,2.392,4,16)],[67.6,C(0,0.132,0.3,2.313,3,16)],[68.8,C(0,0.1,0.33,2.6,0,13)],
- [70.6,C(0,0.1,0.36,3.32,0,30)],[73.1,C(0,0.1,0.36,3.2,2,29)],[74.25,C(0,0.205,0.03,1.55,0,6)],[76.9,C(0,0.205,0.03,1.47,0,6)]];
+ [70.6,C(0,0.1,0.36,3.32,0,30)],[73.1,C(0,0.1,0.36,3.2,2,29)],[73.78,C(0,0.2,0.03,1.62,0,7)],[74.6,C(0,0.2,0.03,1.58,0,7)]];
 const KT=KEYS.map(k=>k[0]),KV=KEYS.map(k=>k[1]);
 const KM=[0,1,2,3,4,5].map(j=>{const n=KT.length,d=[],tg=new Array(n).fill(0);for(let i=0;i<n-1;i++)d.push((KV[i+1][j]-KV[i][j])/(KT[i+1]-KT[i]));
   for(let i=1;i<n-1;i++){if(d[i-1]*d[i]<=0)continue;const h0=KT[i]-KT[i-1],h1=KT[i+1]-KT[i],w1=2*h1+h0,w2=h1+2*h0;tg[i]=(w1+w2)/(w1/d[i-1]+w2/d[i]);}return tg;});
@@ -247,20 +249,35 @@ function overlay(t){const O2=OUT.t0;
   // number tags over the parked objects in the overview
   const tk=Math.min(win(t,70.55,73.4,0.3));const objs=TAGOBJ();tags.forEach((e,i)=>{const op=tk*clamp((t-70.55-i*0.07)/0.2,0,1);if(op<=0.01){e.style.opacity=0;return;}const o=objs[i];o.updateMatrixWorld();const b=new THREE.Box3().setFromObject(o);const q=proj([(b.min.x+b.max.x)/2,b.max.y+0.03,(b.min.z+b.max.z)/2]);e.style.left=q[0]+'px';e.style.top=q[1]+'px';e.style.opacity=op;e.style.transform=`translate(-50%,-50%) scale(${lerp(0.6,1,eo((t-70.55-i*0.07)/0.3))})`;});}
 
-// ------------------------------------------------------------------ outro: the marker writes "function." on the last (blank) page
-const LOGO={sz:182,base:700,xs:[],w:0};
-{const g=document.createElement('canvas').getContext('2d');g.font=`500 ${LOGO.sz}px Poppins`;const all='function.';const tr=-0.04*LOGO.sz;const ws=[...all].map(c=>g.measureText(c).width);const tot=ws.reduce((a,b)=>a+b,0)+tr*8;let x=TW/2-tot/2;
- [...all].forEach((c,i)=>{LOGO.xs.push(x);x+=ws[i]+tr;});LOGO.ws=ws;LOGO.x0=LOGO.xs[0];LOGO.x1=LOGO.xs[7]+ws[7];const m=g.measureText('.');LOGO.dcx=LOGO.xs[8]+(m.actualBoundingBoxRight-m.actualBoundingBoxLeft)/2;LOGO.dcy=LOGO.base-(m.actualBoundingBoxAscent-m.actualBoundingBoxDescent)/2;LOGO.dr=(m.actualBoundingBoxRight+m.actualBoundingBoxLeft)/2;}
-cal.pages[10].draws.push({key:t=>t<OUT.w0?null:[clamp((t-OUT.w0)/(OUT.w1-OUT.w0),0,1),clamp((t-OUT.d0)/(OUT.d1-OUT.d0),0,1),clamp((t-OUT.d1)/0.3,0,1)].map(v=>v.toFixed(3)).join(),
-  draw:(g,t)=>{const u=clamp((t-OUT.w0)/(OUT.w1-OUT.w0),0,1);g.save();g.font=`500 ${LOGO.sz}px Poppins`;g.fillStyle=REDS;g.textBaseline='alphabetic';
-    const rx=lerp(LOGO.x0-4,LOGO.x1+6,u);g.save();g.beginPath();g.rect(0,0,rx,TH);g.clip();[...'function'].forEach((c,i)=>g.fillText(c,LOGO.xs[i],LOGO.base));g.restore();
-    const d=clamp((t-OUT.d0)/(OUT.d1-OUT.d0),0,1);if(d>0){const P2=[];for(let i=0;i<=40;i++){const a=-1.6+i/40*(Math.PI*2+0.4);P2.push([LOGO.dcx+Math.cos(a)*LOGO.dr*1.9*(1-0.1*i/40),LOGO.dcy+Math.sin(a)*LOGO.dr*1.9*(1-0.1*i/40)]);}
-      const f=clamp((t-OUT.d1)/0.3,0,1);if(f<1){g.globalAlpha=1-ease(f*1.3);g.lineWidth=12;g.strokeStyle=REDS;g.lineCap='round';g.beginPath();P2.slice(0,1+Math.floor(40*d)).forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.stroke();g.globalAlpha=1;}
-      if(f>0){const r=LOGO.dr*(f<0.6?lerp(1.9,0.85,eo(f/0.6)):lerp(0.85,1,ease((f-0.6)/0.4)));g.beginPath();g.arc(LOGO.dcx,LOGO.dcy,r,0,7);g.fill();}}
-    g.restore();}});
-function outroTip(u){if(u<0.93){const v=u/0.93;const x=lerp(LOGO.x0,LOGO.x1,v);const y=LOGO.base-56+44*Math.sin(v*Math.PI*16)+18*Math.sin(v*Math.PI*5.3);return {p:pagePt(x,y),n:PAGE_N};}
-  const v=(u-0.93)/0.07;const a=-1.6+v*(Math.PI*2+0.4);return {p:pagePt(LOGO.dcx+Math.cos(a)*LOGO.dr*1.9,LOGO.dcy+Math.sin(a)*LOGO.dr*1.9),n:PAGE_N};}
-MARK.push([73.55,OUT.w0,OUT.d1,76.35,outroTip]);
+// ------------------------------------------------------------------ outro: a rubber stamp stamps the red logo onto the last (blank) page
+const LOGO={sz:150,base:690};
+{const g=document.createElement('canvas').getContext('2d');g.font=`500 ${LOGO.sz}px Poppins`;const tr=-0.04*LOGO.sz;const ws=[...'function.'].map(c=>g.measureText(c).width);LOGO.w=ws.reduce((a,b)=>a+b,0)+tr*8;LOGO.tr=tr;LOGO.ws=ws;
+ LOGO.x0=TW/2-LOGO.w/2;LOGO.cy=LOGO.base-LOGO.sz*0.36;LOGO.bw=LOGO.w+110;LOGO.bh=LOGO.sz*1.32;}
+// ink texture: the imprint is a little uneven like a real stamp
+const INK=(()=>{const c=document.createElement('canvas');c.width=TW;c.height=TH;const g=c.getContext('2d');const r=rng(77);
+  g.save();g.translate(TW/2,LOGO.cy);g.rotate(-0.035);g.translate(-TW/2,-LOGO.cy);g.fillStyle=REDS;g.strokeStyle=REDS;
+  g.lineWidth=11;roundRect(g,TW/2-LOGO.bw/2,LOGO.cy-LOGO.bh/2,LOGO.bw,LOGO.bh,26);g.stroke();
+  g.font=`500 ${LOGO.sz}px Poppins`;g.textBaseline='alphabetic';let x=LOGO.x0;[...'function.'].forEach((ch,i)=>{g.fillText(ch,x,LOGO.base);x+=LOGO.ws[i]+LOGO.tr;});g.restore();
+  g.globalCompositeOperation='destination-out';for(let i=0;i<2600;i++){const x=TW/2+(r()-0.5)*LOGO.bw*1.05,y=LOGO.cy+(r()-0.5)*LOGO.bh*1.1;g.globalAlpha=0.25+0.6*r();g.beginPath();g.arc(x,y,0.6+r()*2.4,0,7);g.fill();}
+  g.globalAlpha=0.18;for(let i=0;i<14;i++){const y=LOGO.cy-LOGO.bh/2+r()*LOGO.bh;g.fillRect(TW/2-LOGO.bw/2,y,LOGO.bw,1+r()*2);}return c;})();
+cal.pages[10].draws.push({key:t=>t<OUT.hit?null:'ink',draw:(g,t)=>{g.save();g.globalAlpha=0.94;g.drawImage(INK,0,0);g.restore();}});
+// the stamp: dark wooden handle with a round knob, a block with a red rubber face, it comes down along the page normal
+const stamp=(()=>{const G=new THREE.Group();scene.add(G);const B=new THREE.Group();G.add(B);
+  const fw=(LOGO.bw+40)/TW*PW,fh=(LOGO.bh+40)/TH*PH;const wood=new THREE.MeshStandardMaterial({color:0x2a2630,roughness:0.55}),wood2=new THREE.MeshStandardMaterial({color:0x3a3442,roughness:0.5});
+  const add=(geo,m,y)=>{const o=new THREE.Mesh(geo,m);o.position.y=y;o.castShadow=true;B.add(o);return o;};
+  add(new RoundedBoxGeometry(fw,0.006,fh,2,0.002),new THREE.MeshStandardMaterial({color:0xb3141f,roughness:0.6,emissive:0x400307,emissiveIntensity:0.4}),0.003);
+  add(new RoundedBoxGeometry(fw+0.006,0.018,fh+0.006,3,0.004),wood,0.015);
+  add(new RoundedBoxGeometry(fw*0.5,0.012,fh*0.62,3,0.004),wood2,0.03);
+  add(new THREE.CylinderGeometry(0.009,0.013,0.06,20),wood,0.066);
+  add(new THREE.SphereGeometry(0.02,24,16),wood2,0.108);
+  const q=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),PAGE_N);G.quaternion.copy(q);G.visible=false;return {G,B};})();
+// it swings in from the upper left (the torn page flies off to the right) and leaves the same way
+const STAMP_DIR=new THREE.Vector3(-0.45,Math.cos(0.16),-Math.sin(0.16)).normalize();
+function stampAnim(t){const G=stamp.G,B=stamp.B;if(t<OUT.s0||t>OUT.s1+0.02){G.visible=false;return;}G.visible=true;
+  let h,tilt=0,sq=1;if(t<OUT.hit){const u=(t-OUT.s0)/(OUT.hit-OUT.s0);h=0.42*(1-u*u);tilt=0.22*(1-u)*(1-u);}
+  else if(t<OUT.up){const u=(t-OUT.hit)/(OUT.up-OUT.hit);h=0;sq=1-0.06*Math.sin(Math.PI*u);}
+  else{const u=(t-OUT.up)/(OUT.s1-OUT.up);h=0.5*u*u;tilt=-0.12*u;}
+  const c=pagePt(TW/2,LOGO.cy);G.position.copy(c).addScaledVector(PAGE_N,h+0.0005).addScaledVector(STAMP_DIR,h*1.3);B.rotation.set(tilt,0,-tilt*0.4);B.scale.set(1,sq,1);}
 
 // ------------------------------------------------------------------ per-frame state
 const _b=new THREE.Box3();
@@ -291,13 +308,14 @@ function setTime(t){setCam(t);
   applyPose(env.G,TR.env(t));if(t>52.8&&t<61.3)bob(env.G,8);env.flapG.rotation.x=2.75*eio((t-55.9)/0.45)+(Math.PI+0.03-2.75)*eio((t-61.35)/0.55);env.letter.position.y=0.072*eio((t-56.25)/0.7);env.tick.opacity=clamp((t-60.45)/0.15,0,1);
   applyPose(shop.G,SHOP(t));shop.G.visible=t>64.45&&t<67.85;
   meepleAnim(t);
+  stampAnim(t);
   // tools
   const mOn=toolPose(marker,MARK,t,REST.marker,1);const pOn=toolPose(pencil,PENC,t,REST.pencil,-1);
   {const o=clamp((t-OUT.t0-0.3)/0.6,0,1);shadeEl.style.opacity=(1-0.55*o).toFixed(3);}
   overlay(t);}
 
 const VO=0.15,END_V=OUT.end;window.TOTAL=Math.round((END_V+VO)*30);
-window.renderAt=async f=>{const tv=f/30-VO;setTime(tv);composer.render();const fd=Math.min(clamp((f/30)/0.25,0,1),clamp((END_V-tv)/0.3,0,1));document.body.style.filter=fd<1?`brightness(${fd.toFixed(3)})`:'none';return true;};
+window.renderAt=async f=>{const tv=f/30-VO;setTime(tv);composer.render();const fd=Math.min(clamp((f/30)/0.25,0,1),clamp((END_V-tv)/0.18,0,1));document.body.style.filter=fd<1?`brightness(${fd.toFixed(3)})`:'none';return true;};
 window.setTimeV=tv=>{setTime(tv);composer.render();};
 window.THREE_DBG=THREE;window.DBGOBJ={cash,slip,ticket,binder,depot,piggy,kg,bars,lic,stack,env,shop,ma,mb,marker,pencil};window.setT=tv=>setTime(tv);
 await window.renderAt(0);window.ready=true;
