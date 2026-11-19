@@ -111,3 +111,6 @@ Der Nutzer hat das Bundestag-Paket abgebrochen und stattdessen dieses Thema best
 
 ## Nächster Schritt
 Rückmeldung des Nutzers zur Fassung v6 abwarten. Danach kommen auf Wunsch Cover-Varianten und die Beschreibungen. Metricool-Entwürfe gibt es erst, wenn der Nutzer sie wieder möchte. Das Bundestag-Paket hat der Nutzer abgebrochen, und Rundfunk A3 ist geliefert.
+
+## „Was ändert sich 2027 für dich?“ (Skript, Stand 19.11.2026)
+Der Nutzer wollte neue Ideen ohne Diorama-Look und hat dieses Thema gewählt. Zuerst nur das Skript: `jahr2027/Drehbuch_2027.md` (Hooks, Drehbuch, Sprechertext für Tom, Faktencheck mit Status beschlossen/geplant/Prognose). Look-Vorschlag: Abreißkalender vor dunklem Cover-Hintergrund, roter Filzstift-Kringel als roter Faden, geplante Änderungen mit grauem Bleistift und Stempel „geplant“. Noch offen: Freigabe des Skripts, dann Stimme, Stiltest und Bau.
