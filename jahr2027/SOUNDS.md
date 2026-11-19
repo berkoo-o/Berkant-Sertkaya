@@ -12,7 +12,7 @@ Alle Geräusche und die Musik stammen aus dem Epidemic-Sound-Connector. Die Date
 | marker_circle | a836c16e-6b5d-4d44-8eda-12f135d8dfe8 | Objects, Writing, Marker Writing, Circle | roter Kreis um den 1. Januar und den 10. Juli, Kreis für den Punkt im Logo |
 | marker_circle2 | b640d342-e24b-4ecc-9611-e02e7dd9c4c9 | Objects, Writing, Color Marker On Paper, Circle | Kreis um den 19. Januar, der Stift schreibt „function“ |
 | receipt_print | 54644c85-f1a0-4cbc-adb0-4376fe506ade | Machines, Antique, Cash Register, Printing, Receipt, Light | die Lohnabrechnung erscheint (leise, gedämpft) |
-| card_slide | 604c921e-5e19-429e-88a7-6319719f8423 | Objects, Misc, Credit Card, Slide On Table | Deutschlandticket und Führerschein |
+| card_slide | 604c921e-5e19-429e-88a7-6319719f8423 | Objects, Misc, Credit Card, Slide On Table | Deutschlandticket (beim Führerschein seit der Überarbeitung ein weicher Swoosh) |
 | binder_drop | 42c2a242-c964-43b2-b677-a7a4210a53c2 | Objects, Book, Books, Pile Of School Homework, Drop Down On Table | der Riester-Ordner kippt um |
 | paper_drop | cda39aae-673d-4bae-a99c-d47d84d646fe | Paper, Impact, Letter, Drop On Table 02 | der Zettel „geplant“ landet auf der Seite |
 | pencil_write | d283b949-59d2-4b9b-9eaa-b813f517dd90 | Objects, Writing, Pencil On Paper, Letter | der Bleistift schreibt „geplant“ und „267 €“ |
@@ -20,7 +20,12 @@ Alle Geräusche und die Musik stammen aus dem Epidemic-Sound-Connector. Die Date
 | crayon_circle | 65e5776d-953e-43cb-a4fc-922384a5f82d | Objects, Writing, Crayon, Draw Circle On Paper | gestrichelter Bleistiftkreis um 267 € |
 | pages_flick | 5c96103c-85ee-4d3b-96fc-0413e623bc03 | Document, Thick, Many Pages, Flick Through Fast 03 | Februar bis Juni fliegen vorbei |
 | notes_count | 45986e3f-12c8-4914-b106-956defaf3460 | Money, Notes, Count Into Hand | private Übergabe des Bündels |
-| coin_single | 11214eb1-567c-4cff-953d-8408c4c26832 | Coin, Money, Pound, Coin, Down On Table | drei leise Münzen ins Sparschwein, die zusätzliche Münze auf dem Rentenstapel |
+| coin_single | 11214eb1-567c-4cff-953d-8408c4c26832 | Coin, Money, Pound, Coin, Down On Table | die zusätzliche Münze auf dem Rentenstapel (beim Sparschwein seit der Überarbeitung ersetzt) |
+| piggy_coin4 | 43d1bb7a-0f10-422d-9bad-4b809a9321f6 | Money, Piggy Bank, Coin Insert 04 | erste Münze ins Sparschwein (überarbeitete Szene) |
+| piggy_ceramic | e902a062-9c82-4088-bcb7-549458513770 | Objects, Coin, Coin Dropping, Ceramic Piggy Bank | zweite Münze (Ausschnitt ab 2,03 s) |
+| piggy_coin2 | 3d69cb14-3fb7-4075-9ee0-d96af8a53f3f | Money, Piggy Bank, Coin Insert 02 | dritte Münze |
+| tiny_steps | 3bb8c761-a875-4b10-9715-e2d338dcc163 | Footsteps, Animal, Designed Tiny Animal Footsteps, Skittering, Wooden Surface 04 | einzelne, sehr leise Hufschritte, genau auf die Trabschritte des Sparschweins gelegt |
+| card_flip | 620f7fcc-556b-4ff4-a77c-149152b3648c | Games, Misc, Playing Cards, Card, Flip | der alte Führerschein dreht sich bei „umtauschen“ in den neuen |
 | coins_drop | 8e7e3f28-f5cc-4f6c-9342-7e762b5b98a6 | Coins, Drop 01 | Münzen fallen ins Altersvorsorgedepot |
 | envelope_flap | 3c4bcbd5-7781-4843-9cbc-086fb37aa0c1 | Paper, Handle, Envelope, Flap, Open | der Musterungsbrief kommt |
 | envelope_open | d09076fc-ff2c-49da-8af1-5f0ecb6e1de8 | Paper, Handle, Opening Envelope | der Brief geht auf |

@@ -88,7 +88,11 @@ const TR={
   piggy:hero(30.72,36.0,36.7,PARK.piggy,[0.08,-0.75,0],{hp:HP(0,0.006,0),s:1.25,spin:0.35,form:FORM.piggy,k:3}),
   kg:hero(36.05,38.62,39.3,PARK.kg,[-0.28,0.18,-0.02],{hp:HP(0,0.097,0.02),s:1.05,form:FORM.kg,k:4}),
   bars:hero(38.66,41.62,42.3,PARK.bars,[0.16,-0.3,0],{hp:HP(0,0.006,0.01),s:1.75,spin:0.2,form:FORM.bars,k:5}),
-  lic:hero(42.05,48.2,48.9,PARK.lic,[-0.28,0.24,-0.04],{hp:HP(0,0.075,0),s:1.35,form:FORM.lic,k:6}),
+  lic:(()=>{const LP={p:PARK.lic.p,r:[PARK.lic.r[0],PARK.lic.r[1]+Math.PI,PARK.lic.r[2]],s:1},LF={p:FORM.lic.p,r:[FORM.lic.r[0],FORM.lic.r[1]+Math.PI,FORM.lic.r[2]],s:FORM.lic.s};
+    return track([[41.99,{p:[0.5,0.27,0.66],r:[-0.7,-1.5,0.7],s:0}],[42.0,{p:[0.5,0.27,0.66],r:[-0.7,-1.5,0.7],s:1.35}],[42.9,{p:[-0.045,0.062,0.56],r:[-0.24,0.34,-0.04],s:1.35,e:'out'}],
+      [45.35,{p:[-0.042,0.065,0.56],r:[-0.23,0.4,-0.03],s:1.35}],[46.15,{p:[-0.05,0.062,0.46],r:[-0.27,0.3,-0.05],s:1.3}],[47.15,{p:[-0.046,0.063,0.46],r:[-0.27,0.32,-0.05],s:1.3}],
+      [47.95,{p:[0.02,0.062,0.52],r:[-0.25,Math.PI+0.04,0.03],s:1.38,e:'io'}],[48.5,{p:[0.025,0.064,0.52],r:[-0.25,Math.PI+0.08,0.03],s:1.38}],[49.3,{p:LP.p,r:LP.r,s:1,e:'io'}],
+      [70.25,{p:LP.p,r:LP.r,s:1}],[71.05,{p:LF.p,r:LF.r,s:LF.s,e:'io'}],[73.35,{p:LF.p,r:LF.r,s:LF.s}],[74.15,{p:LP.p,r:LP.r,s:1,e:'io'}]]);})(),
   stack:hero(49.3,52.78,53.4,PARK.stack,[0.1,0,0],{hp:HP(0,0.006,0.01),s:1.75,spin:0.4,form:FORM.stack,k:7}),
   env:hero(52.85,61.3,62.0,PARK.env,[-0.2,-0.16,0.02],{hp:HP(0,0.09,0),s:1.25,drift:0.003,spin:0.05,form:FORM.env,k:8}),
 };
@@ -133,6 +137,37 @@ function toolPose(tool,acts,t,rest,side){let best=null;for(const a of acts){if(t
   if(t<=d1){const u=(t-d0)/(d1-d0);const s=fn(u);tool.G.position.copy(s.p).addScaledVector(s.n,0.0004);tool.G.quaternion.copy(toolQ(s.n,side));return true;}
   const u=eio((t-d1)/(to-d1));const s=fn(1);const p=s.p.clone().addScaledVector(s.n,0.01*u).lerp(rest.p,u);p.y+=0.06*Math.sin(u*Math.PI);tool.G.position.copy(p);tool.G.quaternion.copy(toolQ(s.n,side)).slerp(rest.q,u);return true;}
 
+// ------------------------------------------------------------------ piggy bank: walks in from the left, three coins drop into its slot, it turns and trots off again
+const PIG={in0:30.72,in1:32.3,tu0:32.2,tu1:32.8,out0:35.45,wo0:35.7,out1:36.7,x0:-0.37,z:0.33,yaw:-0.72,S:1.25,STR:0.11,coin:[33.98,34.32,34.66],fall:0.55,V:0.48,A:0.12};
+function pigX(t){if(t<PIG.in1){const u=clamp((t-PIG.in0)/(PIG.in1-PIG.in0),0,1);return PIG.x0*(1-u)*(1-u);}if(t<PIG.wo0)return 0;const tau=t-PIG.wo0;return -PIG.V*(tau-PIG.A*(1-Math.exp(-tau/PIG.A)));}
+function pigPhase(t){const s=t<PIG.wo0?pigX(t)-PIG.x0:-PIG.x0-pigX(t);return 2*Math.PI*s/PIG.STR+Math.PI*clamp((t-PIG.tu0)/(PIG.tu1-PIG.tu0),0,1)+Math.PI*clamp((t-PIG.out0)/(PIG.wo0+0.08-PIG.out0),0,1);}
+function pigAmp(t){const dt=0.02,v=Math.abs(pigX(t+dt)-pigX(t-dt))/(2*dt);return Math.max(0.55*clamp(v/0.3,0,1),0.3*Math.max(win(t,PIG.tu0,PIG.tu1,0.12),win(t,PIG.out0,PIG.wo0+0.08,0.1)));}
+function pigYaw(t){if(t<PIG.tu0)return 0;if(t<PIG.out0)return lerp(0,PIG.yaw,eio((t-PIG.tu0)/(PIG.tu1-PIG.tu0)))+0.04*Math.sin(t*1.7)*clamp((t-PIG.tu1)/0.4,0,1);return lerp(PIG.yaw,-Math.PI,eio((t-PIG.out0)/(PIG.wo0+0.1-PIG.out0)));}
+function piggyAnim(t){const B=piggy.B;
+  if(t<PIG.in0||t>PIG.out1){applyPose(piggy.G,TR.piggy(t));B.position.set(0,0,0);B.rotation.set(0,0,0);B.scale.set(1,1,1);piggy.legs.forEach(L=>L.rotation.z=0);piggy.Hd.rotation.set(0,0,0);piggy.tail.rotation.set(0,0,0);piggy.ears.forEach(E=>E.rotation.set(0,0,0));piggy.coins.forEach(c=>c.visible=false);return;}
+  const G=piggy.G;G.visible=true;G.scale.setScalar(PIG.S);G.rotation.set(0,pigYaw(t),0);
+  let hop=0;{const u=(t-34.95)/0.34;if(u>0&&u<1)hop=0.013*Math.sin(Math.PI*u);}G.position.set(pigX(t),hop,PIG.z);
+  const ph=pigPhase(t),amp=pigAmp(t),k=amp/0.55;
+  piggy.legs.forEach((L,i)=>{L.rotation.z=amp*Math.sin(ph+(i===0||i===3?0:Math.PI));});
+  let dip=0,ear=0;PIG.coin.forEach(tc=>{const d=t-tc;if(d>0&&d<0.8){dip+=-0.0036*Math.exp(-d*7)*Math.cos(d*24);ear+=0.45*Math.exp(-d*9)*Math.sin(d*30);}});
+  const still=1-clamp(k*2,0,1);B.position.set(0,0.0026*k*Math.abs(Math.sin(ph))+dip,0);B.rotation.set(0.035*k*Math.sin(ph),0,0.012*k*Math.sin(2*ph));B.scale.set(1,1+0.011*still*Math.sin(t*5.2),1);
+  piggy.Hd.rotation.set(0,0,0.24*win(t,33.3,34.9,0.35)+0.035*k*Math.sin(2*ph+0.6));piggy.ears.forEach((E,i)=>E.rotation.set(ear*(i?1:-1)+0.06*Math.sin(t*3.1+i),0,0));
+  piggy.tail.rotation.set(0.55*Math.sin(t*15)*Math.max(win(t,34.0,35.5,0.3),0.35*k),0,0);
+  piggy.coins.forEach((c,i)=>{const tc=PIG.coin[i],t0=tc-PIG.fall,r=0.0112;if(t<t0||t>tc+0.06){c.visible=false;return;}c.visible=true;let y,tilt;
+    if(t<tc){const u=(t-t0)/PIG.fall;y=lerp(0.40,piggy.SLOT+r,u*u);tilt=0.35*(1-u)*(1-u)*Math.sin(u*9+i*1.7);}else{y=lerp(piggy.SLOT+r,piggy.SLOT-r*1.35,(t-tc)/0.06);tilt=0;}
+    c.position.set(0,y,0);c.rotation.set(Math.PI/2+tilt,0,0);});}
+// ------------------------------------------------------------------ licence: the old card flies in, its issue date lights up, at "umtauschen" it turns over into the new EU card
+function licAnim(t){applyPose(lic.G,TR.lic(t));if(t<41.99||t>49.35)return;
+  {const u=(t-42.0)/0.9;if(u>0&&u<1){lic.G.position.y+=0.07*Math.sin(Math.PI*u);lic.G.position.z+=0.03*Math.sin(Math.PI*u);}}
+  {const u=(t-47.15)/0.8;if(u>0&&u<1){lic.G.position.y+=0.018*Math.sin(Math.PI*u);lic.G.position.z+=0.045*Math.sin(Math.PI*u);lic.G.rotation.x+=0.12*Math.sin(Math.PI*u);}}
+  if(t>42.9&&t<48.5)lic.G.position.y+=0.0018*Math.sin(t*1.9+7);
+  lic.hl.material.opacity=win(t,43.25,45.5,0.25);{const u=(t-48.0)/0.55;lic.sweep.offset.x=lerp(-0.6,0.6,clamp(u,0,1));lic.sheen.material.opacity=0.24*win(t,47.98,48.6,0.12);}}
+// scene cameras for these two scenes, blended over the main camera so that everything outside them stays exactly as it was
+function pigCam(t){const up=ease((t-33.3)/0.5)*(1-ease((t-35.0)/0.6));return [lerp(-0.05,0,ease((t-30.9)/1.4)),lerp(0.095,0.122,up),0.335,Math.log(lerp(1.56,1.44,ease((t-30.8)/2.6))),lerp(13,9,ease((t-30.8)/4.5)),lerp(10,12.5,up)];}
+function licCamA(t){const u=ease((t-42.3)/3.0);return [lerp(-0.05,-0.04,u),0.13,0.36,Math.log(lerp(1.78,1.66,u)),lerp(-14,-9,u),lerp(8,9.5,u)];}
+function licCamB(t){const u=ease((t-47.0)/1.0);return [0.015,lerp(0.14,0.13,u),0.33,Math.log(lerp(2.0,1.86,u)),lerp(-3,-6,u),10.5];}
+const SCAM=[{a:30.55,ai:0.7,b:35.5,bo:0.8,f:pigCam},{a:42.3,ai:0.7,b:45.3,bo:0.8,f:licCamA},{a:47.0,ai:0.5,b:47.9,bo:0.45,f:licCamB}];
+function blendCam(v,t){for(const s of SCAM){const w=ease((t-s.a)/s.ai)*(1-ease((t-s.b)/s.bo));if(w>0){const c=s.f(t);v=v.map((x,j)=>lerp(x,c[j],w));}}return v;}
 // ------------------------------------------------------------------ camera: monotone cubic through keyframes (voice time)
 const C=(tx,ty,tz,d,az,el)=>[tx,ty,tz,Math.log(d),az,el];
 const KEYS=[
@@ -152,7 +187,7 @@ const KM=[0,1,2,3,4,5].map(j=>{const n=KT.length,d=[],tg=new Array(n).fill(0);fo
 function camAt(t){let i=0;while(i<KT.length-2&&t>KT[i+1])i++;const h=KT[i+1]-KT[i],u=clamp((t-KT[i])/h,0,1),u2=u*u,u3=u2*u;const a=2*u3-3*u2+1,b=u3-2*u2+u,c=-2*u3+3*u2,e=u3-u2;
   return [0,1,2,3,4,5].map(j=>a*KV[i][j]+b*h*KM[j][i]+c*KV[i+1][j]+e*h*KM[j][i+1]);}
 const CAMT=[0,0,0];
-function setCam(t){const v=camAt(t);const d=Math.exp(v[3]);const az=(v[4]+0.3*Math.sin(t*0.23)+0.18*Math.sin(t*0.51+1.3))*Math.PI/180,el=(v[5]+0.15*Math.sin(t*0.31+0.7))*Math.PI/180;
+function setCam(t){const v=blendCam(camAt(t),t);const d=Math.exp(v[3]);const az=(v[4]+0.3*Math.sin(t*0.23)+0.18*Math.sin(t*0.51+1.3))*Math.PI/180,el=(v[5]+0.15*Math.sin(t*0.31+0.7))*Math.PI/180;
   CAMT[0]=v[0];CAMT[1]=v[1];CAMT[2]=v[2];cam.position.set(v[0]+d*Math.sin(az)*Math.cos(el),v[1]+d*Math.sin(el),v[2]+d*Math.cos(az)*Math.cos(el));cam.lookAt(v[0],v[1],v[2]);
   if(window.DBG){const [x,y,z,dd,a2,e2]=window.DBG;const A=a2*Math.PI/180,E=e2*Math.PI/180;cam.position.set(x+dd*Math.sin(A)*Math.cos(E),y+dd*Math.sin(E),z+dd*Math.cos(A)*Math.cos(E));cam.lookAt(x,y,z);}
   cam.updateProjectionMatrix();cam.updateMatrixWorld();}
@@ -227,11 +262,10 @@ function setTime(t){setCam(t);
   applyPose(depot.G,TR.depot(t));if(t>21.8&&t<26.6)bob(depot.G,3);
   {const u=eo((t-22.25)/1.4);depot.tube.setDrawRange(0,Math.floor(depot.tube.index.count*u/6)*6);depot.line.visible=u>0.01;const hp=depot.curve.getPointAt(Math.max(0.001,u));depot.head.position.copy(hp);depot.head.visible=u>0.01;
    depot.coins.forEach((c,i)=>{const t0=24.32+i*0.13;const v=clamp((t-t0)/0.32,0,1);const yEnd=0.0095+i*0.003;c.visible=t>t0;c.position.set(0.025*Math.sin(i*2.1)*0.3+0.01,lerp(depot.S+0.06,yEnd,v*v),0.012);c.rotation.set(0.4*(1-v),i,0);});}
-  applyPose(piggy.G,TR.piggy(t));if(t>30.7&&t<36)bob(piggy.G,4);
-  piggy.coins.forEach((c,i)=>{const t0=33.62+i*0.34;const v=clamp((t-t0)/0.36,0,1);c.visible=v>0&&v<1;c.position.set(0.004,lerp(0.2,0.105,v*v),0);c.rotation.set(Math.PI/2,0,0);});
+  piggyAnim(t);
   applyPose(kg.G,TR.kg(t));if(t>36&&t<38.6)bob(kg.G,5);kg.set(clamp((t-37.0)/0.25,0,1),clamp((t-37.25)/0.52,0,1),clamp((t-37.82)/0.48,0,1));
   applyPose(bars.G,TR.bars(t));if(t>38.6&&t<41.6)bob(bars.G,6);bars.setNew(eio((t-39.9)/0.6));
-  applyPose(lic.G,TR.lic(t));if(t>42&&t<48.2)bob(lic.G,7);lic.hl.material.opacity=win(t,43.25,45.5,0.25);
+  licAnim(t);
   applyPose(stack.G,TR.stack(t));{const c=stack.coins[stack.n];const v=clamp((t-51.62)/0.42,0,1);c.visible=t>51.5;const yE=0.008+0.0017+stack.n*0.0034;c.position.y=lerp(yE+0.14,yE,v*v)+(v>=1?0.004*Math.max(0,Math.sin((t-52.04)*30))*Math.exp(-(t-52.04)*12):0);
    c.material[1].emissive=new THREE.Color(0xffd27a);c.material[1].emissiveIntensity=1.2*win(t,51.95,52.9,0.3);}
   applyPose(env.G,TR.env(t));if(t>52.8&&t<61.3)bob(env.G,8);env.flapG.rotation.x=-2.75*eio((t-55.9)/0.45);env.letter.position.y=0.072*eio((t-56.25)/0.7);env.tick.opacity=clamp((t-60.45)/0.15,0,1);

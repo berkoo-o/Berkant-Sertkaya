@@ -116,17 +116,21 @@ export function mkDepot(scene){const G=new THREE.Group();scene.add(G);const S=0.
   return {G,S,tube,line,head,curve,coins,glass,edges};}
 
 // ------------------------------------------------------------------ 4/5/6: planned things in sketch style
-export function mkPiggy(scene){const G=new THREE.Group();scene.add(G);const B=new THREE.Group();G.add(B);const f=sketchFill(0xf0e2e0);
-  const body=M(B,new THREE.SphereGeometry(0.05,40,28),f,0,0.062,0);body.scale.set(1.25,1,1);outline(body,0.0013);
-  const sn=M(B,new THREE.CylinderGeometry(0.019,0.021,0.022,32),f,0.064,0.06,0);sn.rotation.z=Math.PI/2;outline(sn,0.0012);
-  [[-1],[1]].forEach(([s])=>{const n=M(B,new THREE.SphereGeometry(0.0034,12,8),new THREE.MeshBasicMaterial({color:0x3b3f47}),0.0752,0.062,s*0.0075,false);});
-  [[-1],[1]].forEach(([s])=>{const e=M(B,new THREE.ConeGeometry(0.013,0.022,20),f,0.03,0.106,s*0.025);e.rotation.z=-0.35;e.rotation.x=s*0.3;outline(e,0.0011);});
-  [[0.035,0.028],[0.035,-0.028],[-0.035,0.028],[-0.035,-0.028]].forEach(([x,z])=>{const l=M(B,new THREE.CylinderGeometry(0.0105,0.0115,0.026,20),f,x,0.013,z);outline(l,0.0011);});
-  const tail=M(B,new THREE.TorusGeometry(0.008,0.0022,8,20,Math.PI*1.4),f,-0.066,0.07,0);tail.rotation.y=Math.PI/2;outline(tail,0.0008);
-  const slot=M(B,new THREE.BoxGeometry(0.026,0.004,0.0045),new THREE.MeshBasicMaterial({color:0x2c2f36}),0.004,0.1118,0,false);
-  const eye=[-1,1].map(s=>M(B,new THREE.SphereGeometry(0.0035,12,8),new THREE.MeshBasicMaterial({color:0x2c2f36}),0.05,0.083,s*0.02,false));
-  const coins=[0,1,2].map(()=>{const c=new THREE.Mesh(new THREE.CylinderGeometry(0.0115,0.0115,0.0028,32),sketchFill(0xf3e7c4));outline(c,0.0009);c.rotation.x=Math.PI/2;G.add(c);return c;});
-  return {G,B,coins};}
+export function mkPiggy(scene){const G=new THREE.Group();scene.add(G);const B=new THREE.Group();G.add(B);const f=sketchFill(0xf0e2e0),fh=sketchFill(0xd8c6c4),dk=new THREE.MeshBasicMaterial({color:0x2c2f36});
+  // proportions of a classic piggy bank: oval body high on four short legs, round snout, small ears, curly tail, coin slot on the back
+  const BY=0.064;const body=M(B,new THREE.SphereGeometry(0.05,48,32),f,0,BY,0);body.scale.set(1.24,0.95,0.9);outline(body,0.0013);
+  const Hd=new THREE.Group();Hd.position.set(0.052,BY+0.006,0);B.add(Hd);
+  const sn=M(Hd,new THREE.CylinderGeometry(0.0172,0.0192,0.02,32),f,0.016,-0.007,0);sn.rotation.z=Math.PI/2;outline(sn,0.0011);
+  [-1,1].forEach(s=>M(Hd,new THREE.SphereGeometry(0.0033,12,8),dk,0.0262,-0.007,s*0.0068,false));
+  [-1,1].forEach(s=>M(Hd,new THREE.SphereGeometry(0.0034,12,8),dk,0.004,0.018,s*0.018,false));
+  const ears=[-1,1].map(s=>{const E=new THREE.Group();E.position.set(-0.014,0.031,s*0.022);Hd.add(E);const e=M(E,new THREE.ConeGeometry(0.0115,0.02,20),f,0,0.008,0);e.rotation.z=-0.32;e.rotation.x=s*0.28;outline(e,0.001);return E;});
+  // legs hang from hip pivots so they can swing when the pig walks
+  const legGeo=new THREE.CylinderGeometry(0.0106,0.0094,0.036,20);legGeo.translate(0,-0.018,0);const hoofGeo=new THREE.CylinderGeometry(0.0096,0.01,0.006,20);hoofGeo.translate(0,-0.039,0);
+  const legs=[[0.034,0.022],[0.034,-0.022],[-0.033,0.022],[-0.033,-0.022]].map(([x,z])=>{const L=new THREE.Group();L.position.set(x,BY-0.022,z);B.add(L);const l=M(L,legGeo,f);outline(l,0.001);const h=M(L,hoofGeo,fh);outline(h,0.0009);return L;});
+  const tail=new THREE.Group();tail.position.set(-0.062,BY+0.008,0);B.add(tail);const tl=M(tail,new THREE.TorusGeometry(0.0075,0.0021,8,22,Math.PI*1.5),f,-0.006,0.002,0);tl.rotation.y=Math.PI/2;outline(tl,0.0008);
+  const SLOT=BY+0.05*0.95;M(B,new THREE.BoxGeometry(0.026,0.0035,0.0048),dk,0.0,SLOT+0.0002,0,false);
+  const coins=[0,1,2].map(()=>{const c=new THREE.Mesh(new THREE.CylinderGeometry(0.0112,0.0112,0.0028,32),sketchFill(0xf3e7c4));outline(c,0.0009);c.rotation.x=Math.PI/2;c.visible=false;B.add(c);return c;});
+  return {G,B,Hd,ears,legs,tail,coins,SLOT,BY};}
 export function mkLetterKG(scene){const P=paper(0.15,0.19,640,null,{bend:0.003});scene.add(P.G);const g=P.T.g,w=P.tw,h=P.th;
   function draw(strike,write,ring){g.setTransform(1,0,0,1,0,0);g.fillStyle='#f6f3ec';g.fillRect(0,0,w,h);grain(g,w,h,7,12);
     g.fillStyle='#3d4250';g.font='700 30px Poppins';g.fillText('Familienkasse',40,64);g.fillStyle='#8a8d96';g.font='500 22px Poppins';g.fillText('Kindergeld 2027',40,98);
@@ -150,23 +154,40 @@ export function mkBars(scene){const G=new THREE.Group();scene.add(G);const f=ske
   const tp=M(G,new THREE.PlaneGeometry(0.16,0.025),new THREE.MeshStandardMaterial({map:title.tex,transparent:true,roughness:0.6}),0,0.012,0.042,false);tp.rotation.x=-0.5;
   return {G,old,nw,vOld,vNew,setNew(u){const hh=lerp(0.054,0.081,u);nw.scale.y=hh;nw.position.y=0.008+hh/2;vNew.position.y=0.008+hh+0.02;}};}
 
-// ------------------------------------------------------------------ 7: card driving licence (generic sample card)
+// ------------------------------------------------------------------ 7: card driving licence: the old card (front) turns into the new EU card (back); generic sample cards
+function licBase(g,w,h,cols,seed){const L=g.createLinearGradient(0,0,w,h);L.addColorStop(0,cols[0]);L.addColorStop(0.55,cols[1]);L.addColorStop(1,cols[2]);g.fillStyle=L;g.fillRect(0,0,w,h);}
+function licEU(g,x,y){g.fillStyle='#21308a';roundRect(g,x,y,92,84,8);g.fill();g.fillStyle='#ffd23f';for(let k=0;k<12;k++){const a=k/12*Math.PI*2;g.beginPath();g.arc(x+46+Math.cos(a)*26,y+34+Math.sin(a)*26,3.4,0,7);g.fill();}
+  g.fillStyle='#fff';g.font='800 34px "Inter Tight"';g.textAlign='center';g.fillText('D',x+46,y+74);g.textAlign='left';}
+function licPhoto(g,x,y,c1,c2){g.fillStyle=c1;roundRect(g,x,y,190,240,12);g.fill();g.fillStyle=c2;g.beginPath();g.arc(x+95,y+90,46,0,7);g.fill();g.beginPath();g.ellipse(x+95,y+222,80,62,0,Math.PI,0);g.fill();}
+function licMuster(g,w,h,a){g.save();g.translate(w*0.62,h*0.62);g.rotate(-0.28);g.fillStyle=`rgba(80,40,80,${a})`;g.font='800 92px "Inter Tight"';g.textAlign='center';g.letterSpacing='12px';g.fillText('MUSTER',0,0);g.letterSpacing='0px';g.restore();}
 export function mkLicense(scene){const G=new THREE.Group();scene.add(G);const W=0.137,Hh=0.086;
-  const T=ctex(820,515,(g,w,h)=>{const L=g.createLinearGradient(0,0,w,h);L.addColorStop(0,'#f2c7d4');L.addColorStop(0.55,'#e9d3e6');L.addColorStop(1,'#cfd6f0');g.fillStyle=L;g.fillRect(0,0,w,h);
-    g.globalAlpha=0.18;g.strokeStyle='#8a5a7a';g.lineWidth=1.5;for(let i=0;i<40;i++){g.beginPath();g.ellipse(w*0.7,h*0.5,60+i*12,30+i*7,0.2,0,7);g.stroke();}g.globalAlpha=1;
-    g.fillStyle='#21308a';roundRect(g,34,30,92,84,8);g.fill();g.fillStyle='#ffd23f';for(let k=0;k<12;k++){const a=k/12*Math.PI*2;g.beginPath();g.arc(80+Math.cos(a)*26,64+Math.sin(a)*26,3.4,0,7);g.fill();}
-    g.fillStyle='#fff';g.font='800 34px "Inter Tight"';g.textAlign='center';g.fillText('D',80,104);g.textAlign='left';
-    g.fillStyle='#4b2d4a';g.font='800 50px "Inter Tight"';g.letterSpacing='3px';g.fillText('FÜHRERSCHEIN',150,78);g.letterSpacing='0px';g.font='500 24px Poppins';g.fillText('BUNDESREPUBLIK DEUTSCHLAND',152,112);
-    g.fillStyle='#b9aab8';roundRect(g,40,150,190,240,12);g.fill();g.fillStyle='#93839a';g.beginPath();g.arc(135,240,46,0,7);g.fill();g.beginPath();g.ellipse(135,372,80,62,0,Math.PI,0);g.fill();
-    g.fillStyle='#3d2a40';g.font='500 30px Poppins';const rows=[['1.','MUSTERMANN'],['2.','ERIKA'],['3.','12.08.1984'],['4a.','14.05.2003'],['4c.','Stadt Musterstadt']];
-    rows.forEach(([a,b],i)=>{g.fillStyle='#8a6a8a';g.fillText(a,262,182+i*50);g.fillStyle='#3d2a40';g.font=(i===3?'700 ':'500 ')+'30px Poppins';g.fillText(b,320,182+i*50);g.font='500 30px Poppins';});
-    g.fillStyle='rgba(61,42,64,0.75)';g.font='600 26px Poppins';g.fillText('9.  AM  B  L',262,456);grain(g,w,h,6,13);});
-  const face=std(0xffffff,0.32,0,{map:T.tex});const am=ctex(256,160,(g2,w2,h2)=>{g2.fillStyle='#000';g2.fillRect(0,0,w2,h2);g2.fillStyle='#fff';roundRect(g2,0,0,w2,h2,14);g2.fill();});face.alphaMap=am.tex;face.transparent=true;
-  M(G,new RoundedBoxGeometry(W,Hh,0.0022,2,0.0012),std(0xe8c9d8,0.4));M(G,new THREE.PlaneGeometry(W-0.0006,Hh-0.0006),face,0,0,0.00112,false);
-  // highlight frame around the issue date (white, not red: red is the marker's colour)
+  // old card (issued 2003): faded colours, a yellowish cast, scratches and worn edges
+  const OT=ctex(820,515,(g,w,h)=>{licBase(g,w,h,['#e6bfcb','#dccbd9','#c9cde0']);g.globalAlpha=0.16;g.strokeStyle='#7a5a6e';g.lineWidth=1.5;for(let i=0;i<34;i++){g.beginPath();g.ellipse(w*0.7,h*0.5,60+i*13,30+i*8,0.2,0,7);g.stroke();}g.globalAlpha=1;
+    licEU(g,34,30);g.fillStyle='#4f3550';g.font='800 50px "Inter Tight"';g.letterSpacing='3px';g.fillText('FÜHRERSCHEIN',150,78);g.letterSpacing='0px';g.font='500 24px Poppins';g.fillText('BUNDESREPUBLIK DEUTSCHLAND',152,112);
+    licPhoto(g,40,150,'#b8acb4','#958a96');g.font='500 30px Poppins';const rows=[['1.','MUSTERMANN'],['2.','ERIKA'],['3.','12.08.1984'],['4a.','14.05.2003'],['4c.','Stadt Musterstadt']];
+    rows.forEach(([a,b],i)=>{g.fillStyle='#8a6a86';g.fillText(a,262,182+i*50);g.fillStyle='#43303f';g.font=(i===3?'700 ':'500 ')+'30px Poppins';g.fillText(b,320,182+i*50);g.font='500 30px Poppins';});
+    g.fillStyle='rgba(67,48,63,0.75)';g.font='600 26px Poppins';g.fillText('9.  B',262,456);licMuster(g,w,h,0.07);
+    g.fillStyle='rgba(205,170,95,0.17)';g.fillRect(0,0,w,h);const r=rng(41);g.strokeStyle='rgba(255,255,255,0.35)';g.lineWidth=1.2;for(let i=0;i<26;i++){const x=r()*w,y=r()*h,a=r()*Math.PI,l=20+r()*90;g.beginPath();g.moveTo(x,y);g.lineTo(x+Math.cos(a)*l,y+Math.sin(a)*l);g.stroke();}
+    const E=g.createRadialGradient(w/2,h/2,h*0.35,w/2,h/2,w*0.62);E.addColorStop(0,'rgba(90,60,40,0)');E.addColorStop(1,'rgba(90,60,40,0.22)');g.fillStyle=E;g.fillRect(0,0,w,h);grain(g,w,h,11,13);});
+  // new EU card (since 2013 design): cleaner colours, fine guilloche, hologram patch, valid for 15 years
+  const NT=ctex(820,515,(g,w,h)=>{licBase(g,w,h,['#f6cfdc','#efdcef','#d6def6']);g.strokeStyle='rgba(120,80,140,0.13)';g.lineWidth=1.2;for(let i=0;i<70;i++){g.beginPath();for(let x=0;x<=w;x+=8){const y=40+i*7+10*Math.sin(x*0.02+i*0.35);x?g.lineTo(x,y):g.moveTo(x,y);}g.stroke();}
+    licEU(g,34,30);g.fillStyle='#3a2050';g.font='800 50px "Inter Tight"';g.letterSpacing='3px';g.fillText('FÜHRERSCHEIN',150,78);g.letterSpacing='0px';g.font='500 24px Poppins';g.fillText('BUNDESREPUBLIK DEUTSCHLAND',152,112);
+    licPhoto(g,40,150,'#c3b6d2','#9d90b4');const H=g.createRadialGradient(205,370,4,205,370,46);['#ff9ad5','#9ee6ff','#c9ff9e','#ffe48a','#ff9ad5'].forEach((c,i)=>H.addColorStop(i/4,c));g.globalAlpha=0.75;g.fillStyle=H;g.beginPath();g.arc(205,370,42,0,7);g.fill();g.globalAlpha=1;
+    g.font='500 29px Poppins';const rows=[['1.','MUSTERMANN'],['2.','ERIKA'],['3.','12.08.1984'],['4a.','12.01.2027'],['4b.','11.01.2042'],['4c.','Stadt Musterstadt']];
+    rows.forEach(([a,b],i)=>{g.fillStyle='#7a5a96';g.fillText(a,262,176+i*46);g.fillStyle='#2e1f40';g.font=(i===3||i===4?'700 ':'500 ')+'29px Poppins';g.fillText(b,330,176+i*46);g.font='500 29px Poppins';});
+    g.fillStyle='rgba(46,31,64,0.75)';g.font='600 26px Poppins';g.fillText('9.  AM  B  L',262,470);licMuster(g,w,h,0.06);grain(g,w,h,5,17);});
+  const am=ctex(256,160,(g2,w2,h2)=>{g2.fillStyle='#000';g2.fillRect(0,0,w2,h2);g2.fillStyle='#fff';roundRect(g2,0,0,w2,h2,14);g2.fill();});
+  const front=std(0xffffff,0.36,0,{map:OT.tex,alphaMap:am.tex,transparent:true}),back=std(0xeae6ee,0.3,0,{map:NT.tex,alphaMap:am.tex,transparent:true});
+  M(G,new RoundedBoxGeometry(W,Hh,0.0022,2,0.0012),std(0xe2c8d6,0.4));M(G,new THREE.PlaneGeometry(W-0.0006,Hh-0.0006),front,0,0,0.00112,false);
+  const bp=M(G,new THREE.PlaneGeometry(W-0.0006,Hh-0.0006),back,0,0,-0.00112,false);bp.rotation.y=Math.PI;
+  // highlight frame around the issue date on the old card (white, not red: red is the marker's colour)
   const hlT=ctex(512,128,(g,w,h)=>{g.strokeStyle='#ffffff';g.lineWidth=7;roundRect(g,6,6,w-12,h-12,22);g.stroke();});
   const hl=new THREE.Mesh(new THREE.PlaneGeometry(0.05,0.0125),new THREE.MeshBasicMaterial({map:hlT.tex,color:new THREE.Color(0xffffff).multiplyScalar(1.6),transparent:true,opacity:0,depthWrite:false}));hl.position.set(-0.0035,-0.0105,0.0013);G.add(hl);
-  return {G,hl};}
+  // a soft light sweep over the new card right after it has turned
+  const sw=ctex(512,64,(g,w,h)=>{const L=g.createLinearGradient(0,0,w,0);L.addColorStop(0,'rgba(255,255,255,0)');L.addColorStop(0.45,'rgba(255,255,255,0)');L.addColorStop(0.5,'rgba(255,255,255,1)');L.addColorStop(0.55,'rgba(255,255,255,0)');L.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=L;g.fillRect(0,0,w,h);});
+  sw.tex.wrapS=THREE.ClampToEdgeWrapping;sw.tex.repeat.set(0.5,1);
+  const sheen=new THREE.Mesh(new THREE.PlaneGeometry(W-0.002,Hh-0.002),new THREE.MeshBasicMaterial({map:sw.tex,alphaMap:am.tex,transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending}));sheen.position.z=-0.0014;sheen.rotation.y=Math.PI;G.add(sheen);sw.tex.center.set(0.5,0.5);sw.tex.rotation=0.45;
+  return {G,hl,sheen,sweep:sw.tex};}
 
 // ------------------------------------------------------------------ 8: pension coin stack
 export function mkCoinStack(scene,n=24){const G=new THREE.Group();scene.add(G);M(G,new THREE.CylinderGeometry(0.03,0.032,0.008,48),std(0x1b1c22,0.5,0.2),0,0.004,0);

@@ -66,14 +66,42 @@ add(lp(cut(sz(RS + 'coins_drop'), 0.0, 1.2, 0.003, 0.3), 7000), 24.4, 0.26)   # 
 hit('paper_drop', 27.03, 0.5, 0.165)
 add(cut(sz('pencil_write'), 0.25, 0.95, 0.02, 0.15), 27.15, 0.38)              # "geplant"
 add(cut(sz('pencil_v'), 0.3, 0.35, 0.01, 0.1), 28.05, 0.4)                     # underline
-for i in range(3): hit(RS + 'coin_single', 33.62 + i*0.34 + 0.36, 0.16, 0.029, 1.0 + 0.06*i)   # three coins into the piggy bank (quiet)
+# piggy bank (v2, Wunsch des Nutzers 19.11.2026): it trots in and out on small hooves, three coins drop through its slot
+PIG = dict(in0=30.72, in1=32.3, tu0=32.2, tu1=32.8, out0=35.45, wo0=35.7, out1=36.7, x0=-0.37, STR=0.11, V=0.48, A=0.12)
+def _cl(x): return min(max(x, 0.0), 1.0)
+def _win(t, a, b, f): return min(_cl((t - a) / f), _cl((b - t) / f))
+def pig_x(t):
+    P = PIG
+    if t < P['in1']: u = _cl((t - P['in0']) / (P['in1'] - P['in0'])); return P['x0'] * (1 - u) ** 2
+    if t < P['wo0']: return 0.0
+    tau = t - P['wo0']; return -P['V'] * (tau - P['A'] * (1 - np.exp(-tau / P['A'])))
+def pig_phase(t):
+    P = PIG; s = pig_x(t) - P['x0'] if t < P['wo0'] else -P['x0'] - pig_x(t)
+    return 2 * np.pi * s / P['STR'] + np.pi * _cl((t - P['tu0']) / (P['tu1'] - P['tu0'])) + np.pi * _cl((t - P['out0']) / (P['wo0'] + 0.08 - P['out0']))
+def pig_amp(t):
+    P = PIG; v = abs(pig_x(t + 0.02) - pig_x(t - 0.02)) / 0.04
+    return max(0.55 * min(v / 0.3, 1), 0.3 * max(_win(t, P['tu0'], P['tu1'], 0.12), _win(t, P['out0'], P['wo0'] + 0.08, 0.1)))
+TAPS = [cut(sz('tiny_steps'), a, 0.09, 0.002, 0.05) for a in (0.02, 0.398, 0.75, 1.362, 2.038, 2.218, 2.913)]
+_last = None; _k = 0; _r = np.random.default_rng(3)
+for tt in np.arange(PIG['in0'], PIG['out1'], 0.002):
+    ph = pig_phase(tt); n = int(np.floor((ph - np.pi / 2) / np.pi))
+    if _last is not None and n > _last:
+        a = pig_amp(tt)
+        if a > 0.08: add(rate(TAPS[_k % len(TAPS)], 1.0 + 0.06 * (_r.random() - 0.5)), tt - 0.005, 0.2 * (a / 0.55) ** 0.5); _k += 1
+    _last = n
+hit('piggy_coin4', 33.98, 0.5, 0.004)
+add(cut(sz('piggy_ceramic'), 2.03, 0.42, 0.002, 0.12), 34.32 - 0.016, 0.42)
+hit('piggy_coin2', 34.66, 0.48, 0.075)
 add(cut(sz('pencil_v'), 0.45, 0.3, 0.01, 0.08), 37.0, 0.42)                    # 259 struck out
 add(cut(sz('pencil_write'), 1.0, 0.55, 0.02, 0.12), 37.25, 0.5)               # 267 written
 add(cut(sz('crayon_circle'), 0.0, 0.5, 0.005, 0.15), 37.82, 0.38)             # dashed ring
 hit(RS + 'column_chord', 39.9, 0.13, 0.174, 2 ** (-2/12))                     # the 2027 bar grows
 # ---------------------------------------------------------------- 7 driving licence
 add(cut(sz('tear_03'), 0.0, 0.64, 0.002, 0.12), 42.08 - 0.461, 0.6)
-hit('card_slide', 42.45, 0.45, 0.314)
+# licence (v2): the old card flies in, at "umtauschen" it turns over into the new EU card, a soft light sweep follows
+whoosh(42.4, 0.26, 1)
+add(cut(sz('card_flip'), 0.38, 0.42, 0.003, 0.12), 47.32 - 0.036, 0.5)
+hit(RS + 'shimmer', 48.0, 0.05, 0.0)
 add(cut(sz('marker_circle2'), 2.2, 0.85, 0.02, 0.2), 46.3, 0.42)              # ring around the 19th
 add(CK[0], 46.27, 0.38)
 # ---------------------------------------------------------------- 8 pensions
