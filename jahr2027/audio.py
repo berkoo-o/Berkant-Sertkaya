@@ -47,11 +47,11 @@ CK = [epi('clicks.wav', 0.0, 0.3)*0.22, epi('clicks.wav', 0.55, 0.9)*0.22, epi('
 def whoosh(c, g, i=0): add(WH[i % 2][0], c - WH[i % 2][1], g)
 
 # ---------------------------------------------------------------- hook
-add(cut(sz('marker_line'), 0.0, 0.9, 0.003, 0.15), 1.55 - 0.075, 0.55)        # the red marker strikes through the 10.000-euro bundle
+add(cut(sz('marker_line'), 0.0, 0.9, 0.003, 0.15), 1.55 - 0.075, 0.42)        # the red marker strikes through the 10.000-euro bundle
 whoosh(2.95, 0.38, 0)                                                         # the bundle slides away
 add(cut(sz('tear_04'), 0.0, 0.73, 0.002, 0.12), 7.05 - 0.147, 0.62)            # the cover page tears off
 # ---------------------------------------------------------------- 1 minimum wage
-add(cut(sz('marker_circle'), 0.65, 0.95, 0.02, 0.2), 7.95, 0.5)               # red ring around the 1st of January
+add(cut(sz('marker_circle'), 0.65, 0.95, 0.02, 0.2), 7.95, 0.4)               # red ring around the 1st of January
 add(lp(cut(sz('receipt_print'), 1.3, 1.0, 0.03, 0.25), 6000), 8.55, 0.22)     # the pay slip comes out
 add(CK[0], 9.72, 0.5); add(CK[2], 12.64, 0.42)
 # ---------------------------------------------------------------- 2 Deutschlandticket
@@ -64,7 +64,7 @@ hit('../rundfunk/sfx/epidemic/shimmer', 22.25, 0.13, 0.0)                     # 
 add(lp(cut(sz(RS + 'coins_drop'), 0.0, 1.2, 0.003, 0.3), 7000), 24.4, 0.26)   # coins fall into the depot
 # ---------------------------------------------------------------- planned: sticky note and pencil
 hit('paper_drop', 27.03, 0.5, 0.165)
-add(cut(sz('pencil_write'), 0.25, 0.95, 0.02, 0.15), 27.15, 0.55)              # "geplant"
+add(cut(sz('pencil_write'), 0.25, 0.95, 0.02, 0.15), 27.15, 0.38)              # "geplant"
 add(cut(sz('pencil_v'), 0.3, 0.35, 0.01, 0.1), 28.05, 0.4)                     # underline
 for i in range(3): hit(RS + 'coin_single', 33.62 + i*0.34 + 0.36, 0.16, 0.029, 1.0 + 0.06*i)   # three coins into the piggy bank (quiet)
 add(cut(sz('pencil_v'), 0.45, 0.3, 0.01, 0.08), 37.0, 0.42)                    # 259 struck out
@@ -90,14 +90,14 @@ whoosh(61.75, 0.4, 0)
 add(rate(cut(sz('tear_04'), 0.0, 0.73, 0.002, 0.12), 0.93), 63.45 - 0.13, 0.55)
 add(cut(sz('marker_circle'), 0.2, 0.8, 0.02, 0.2), 63.7, 0.42)
 whoosh(64.75, 0.3, 1)
-add(cut(sz('marker_line'), 0.05, 0.3, 0.003, 0.06), 65.85, 0.5); add(rate(cut(sz('marker_line'), 0.05, 0.3, 0.003, 0.06), 1.08), 66.24, 0.48)
+add(cut(sz('marker_line'), 0.05, 0.3, 0.003, 0.06), 65.85, 0.38); add(rate(cut(sz('marker_line'), 0.05, 0.3, 0.003, 0.06), 1.08), 66.24, 0.36)
 add(CK[1], 65.86, 0.35)
 add(cut(sz('notes_count'), 0.0, 1.3, 0.01, 0.3), 68.4, 0.4)                   # private hand-over
 # ---------------------------------------------------------------- overview and end card
 whoosh(70.25, 0.4, 1)
 hit(RS + 'shimmer', 70.6, 0.1, 0.0)
 add(cut(sz('tear_notepad'), 0.0, 1.0, 0.002, 0.2), 73.8 - 0.527, 0.5)  # last page tears off
-add(cut(sz('marker_circle2'), 0.4, 1.6, 0.05, 0.3), 73.98, 0.5)               # the marker writes "function"
+add(cut(sz('marker_circle2'), 0.4, 1.6, 0.05, 0.3), 73.98, 0.42)               # the marker writes "function"
 add(cut(sz('marker_circle'), 1.3, 0.35, 0.01, 0.1), 75.6, 0.4)                # small ring for the dot
 add(CK[1], 75.93, 1.1)                                                        # dot pops in
 hit(RS + 'column_chord', 75.95, 0.22, 0.174)                                  # soft chord on the finished logo
@@ -119,7 +119,7 @@ _m_hi = np.sqrt(np.mean(sosfilt(_hp, music_sh)[_ref]**2)) * np.mean(duck[voice !
 mus = music_sh * (_v_hi / (_m_hi + 1e-12)) * 10**(MUSIC_DB/20) * duck
 # after the voice the music lifts a little for the end card
 mus *= 1 + 0.6 * np.clip((t - (OUT + VO + 0.1)) / 0.6, 0, 1)
-fxn = fx * 0.9 * 10**(-3/20)
+fxn = fx * 0.9 * 10**(-9/20)  # effects sit about 7 dB under the speech level (the user found loud effects penetrant before)
 for name, mix in [('music', vo + mus + fxn), ('fx', vo + fxn)]:
     mix = mix / max(1.0, np.max(np.abs(mix)) / 0.97)
     wavfile.write('mix_' + name + '.wav', SR, mix.astype(np.float32))
