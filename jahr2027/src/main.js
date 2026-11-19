@@ -59,46 +59,66 @@ function notePt(tx,ty){const c=Math.cos(NOTE.rot),s=Math.sin(NOTE.rot);return [N
 
 // ------------------------------------------------------------------ objects
 const cash=P.mkCash(scene),slip=P.mkSlip(scene),ticket=P.mkTicket(scene),binder=P.mkBinder(scene),depot=P.mkDepot(scene),piggy=P.mkPiggy(scene),kg=P.mkLetterKG(scene),bars=P.mkBars(scene);
-const lic=P.mkLicense(scene),stack=P.mkCoinStack(scene),env=P.mkEnvelope(scene),shop=P.mkShop(scene),pa=P.mkPerson(scene,0x5a6b85),pb=P.mkPerson(scene,0x9b8667),marker=P.mkMarker(scene),pencil=P.mkPencil(scene);
+const lic=P.mkLicense(scene),stack=P.mkCoinStack(scene),env=P.mkEnvelope(scene),shop=P.mkShop(scene),ma=P.mkMeeple(scene,'#d8bb8c','#8f6b40',11),mb=P.mkMeeple(scene,'#9e6c47','#50331f',12),marker=P.mkMarker(scene),pencil=P.mkPencil(scene);
 const EM=[0,0.2,0.07],HERO=[0,0.0,0.33];
+// cash above the counter: tilted to the camera, lowest corner 4 mm above the counter top (0.081 * 1.3)
+const CASH_YC=0.081*1.3+0.0478*Math.sin(0.6)*1.3+0.004;
+// private hand-over: figures A/B (scale ms), the bundle (scale cs) lands next to A's right foot and slides to just before B's left foot
+const HAND=(()=>{const ms=1.2,cs=0.85,xa=-0.19,xbm=0.19,fe=0.047*ms;const h={ms,cs,xa,xbm,z:0.33,da:67.92,db:68.08,fall:0.3,ytop:0.85,hop:69.58,la:69.95,lb:70.02,lift:0.45,
+  xb0:xa+fe*Math.cos(0.18)+0.017*ms*Math.sin(0.18)+0.002+0.075*cs,xb1:xbm-fe-0.012-0.075*cs,s0:69.0,s1:69.55};
+  const T=track([[68.86,{p:[0,0,0]}],[69.0,{p:[0.26,0,0]}],[69.17,{p:[0,0,0],e:'in'}],[69.27,{p:[-0.045,0,0],e:'out'}],[69.37,{p:[0,0,0],e:'in'}],[69.44,{p:[0.014,0,0],e:'out'}],[69.5,{p:[0,0,0],e:'in'}]]);
+  h.tip=t=>t<68.86||t>69.5?0:T(t).p[0];return h;})();
 const HP=(dx=0,dy=0,dz=0)=>[HERO[0]+dx,HERO[1]+dy,HERO[2]+dz];
 // park spots on the desk for the final overview (two columns left and right of the calendar, three rows)
 // parking spots just outside the frame (left column 1-5, right column 6-10); for the overview they glide into a closer formation
 const PX=0.48,FX=0.3,FZ=[0.0,0.15,0.3,0.45,0.6];const lay=(o,x,z,y=0)=>({p:[x,y+(o.p?o.p[1]:0),z],r:o.r,s:o.s});
 const LIE=[-Math.PI/2,0,0];const BASE={slip:{p:[0,0.0025],r:[-Math.PI/2,0,0.12],s:0.9},ticket:{p:[0,0.0012],r:[-Math.PI/2,0,-0.1],s:1},depot:{p:[0,0],r:[0,0.35,0],s:0.95},piggy:{p:[0,0],r:[0,0.6,0],s:0.95},
-  kg:{p:[0,0.002],r:[-Math.PI/2,0,0.1],s:0.9},bars:{p:[0,0],r:[0,-0.25,0],s:0.95},lic:{p:[0,0.0012],r:[-Math.PI/2,0,-0.08],s:1},stack:{p:[0,0],r:[0,0,0],s:1},env:{p:[0,0.0017],r:[-Math.PI/2,0,0.06],s:0.95},cash:{p:[0,0],r:[0,-0.3,0],s:1}};
+  kg:{p:[0,0.002],r:[-Math.PI/2,0,0.1],s:0.9},bars:{p:[0,0],r:[0,-0.25,0],s:0.95},lic:{p:[0,0.0012],r:[-Math.PI/2,0,-0.08],s:1},stack:{p:[0,0],r:[0,0,0],s:1},env:{p:[0,0.0025],r:[-Math.PI/2,0,0.06],s:0.95},cash:{p:[0,0],r:[0,-0.3,0],s:1}};
 const COL={slip:[-1,0],ticket:[-1,1],depot:[-1,2],piggy:[-1,3],kg:[-1,4],bars:[1,0],lic:[1,1],stack:[1,2],env:[1,3],cash:[1,4]};
 const mkSpot=(k,x)=>{const b=BASE[k],c=COL[k];return {p:[c[0]*x,b.p[1],FZ[c[1]]],r:b.r,s:b.s};};
 const PARK={},FORM={};for(const k in BASE)PARK[k]=mkSpot(k,PX);PARK.binder={p:[-0.62,0,-0.25],r:[0,0.3,0],s:0.75};
-const LEAN=1.0,CL=Math.cos(LEAN),lean=(h,sc,x,z,ry)=>({p:[x,h*sc/2*CL,z],r:[-LEAN,ry,0],s:sc});
+const LEAN=1.0,CL=Math.cos(LEAN);
+// tilt back first, then turn around the vertical (flip: show the back side), as XYZ angles close to the naive ones so the tracks interpolate smoothly
+function leanR(ry,flip=0){const Q=(x,y,z)=>new THREE.Quaternion().setFromEuler(new THREE.Euler(x,y,z));const q=Q(0,ry,0).multiply(Q(-LEAN,0,0));if(flip)q.multiply(Q(0,Math.PI,0));
+  const e=new THREE.Euler().setFromQuaternion(q,'XYZ'),ref=[-LEAN,ry+(flip?Math.PI:0),0],W=(a,r)=>a+2*Math.PI*Math.round((r-a)/(2*Math.PI));
+  const c=[[e.x,e.y,e.z],[e.x+Math.PI,Math.PI-e.y,e.z+Math.PI]].map(v=>v.map((a,i)=>W(a,ref[i])));const d=v=>v.reduce((s,a,i)=>s+(a-ref[i])**2,0);return d(c[0])<=d(c[1])?c[0]:c[1];}
+const lean=(h,sc,x,z,ry)=>({p:[x,h*sc/2*CL,z],r:leanR(ry),s:sc});
 Object.assign(FORM,{slip:lean(0.215,0.85,-0.33,0.3,0.25),ticket:lean(0.086,1.1,-0.165,0.3,0.12),depot:{p:[0,0,0.3],r:[0,0.3,0],s:0.95},piggy:{p:[0.165,0,0.3],r:[0,-0.5,0],s:0.95},kg:lean(0.19,0.85,0.33,0.3,-0.25),
   bars:{p:[-0.295,0,0.58],r:[0,0.3,0],s:1.0},lic:lean(0.086,1.1,-0.148,0.58,0.12),stack:{p:[0,0,0.58],r:[0,0,0],s:1.15},env:lean(0.115,0.9,0.148,0.58,-0.12),cash:{p:[0.295,0,0.58],r:[0,-0.35,0],s:0.9}});
 const pk=(o,t,e='io')=>[t,{p:o.p,r:o.r,s:o.s,e}];
 // one track per object: emerge from the page, present in front of the calendar, then park
-function hero(tIn,tOut,tPark,park,rot,opt={}){const hp=opt.hp||HP(),s=opt.s||1.45;return track([[tIn-0.01,{p:EM,r:[0,0,0],s:0}],[tIn,{p:EM,r:[0.6,0,0],s:0.12}],[tIn+0.62,{p:hp,r:rot,s,e:'back',k:1.2}],
-  [tOut,{p:[hp[0]+(opt.drift||0.006),hp[1]+0.004,hp[2]],r:[rot[0],rot[1]+(opt.spin||0.12),rot[2]],s}],pk(park,tPark),pk(park,69.95+(opt.k||0)*0.05),pk(opt.form,70.75+(opt.k||0)*0.05),pk(opt.form,73.35),pk(park,74.15)]);}
+function hero(tIn,tOut,tPark,park,rot,opt={}){const hp=opt.hp||HP(),s=opt.s||1.45;const parkKey=opt.lay?[tPark,{p:park.p,r:park.r,s:park.s,e:'out',ep:'io'}]:pk(park,tPark);
+  return track([[tIn-0.01,{p:EM,r:[0,0,0],s:0}],[tIn,{p:EM,r:[0.6,0,0],s:0.12}],[tIn+0.62,{p:hp,r:rot,s,e:'back',k:1.2,ep:opt.ep}],
+  [tOut,{p:[hp[0]+(opt.drift||0.006),hp[1]+0.004,hp[2]],r:[rot[0],rot[1]+(opt.spin||0.12),rot[2]],s}],parkKey,pk(park,69.95+(opt.k||0)*0.05),[70.75+(opt.k||0)*0.05,{p:opt.form.p,r:opt.form.r,s:opt.form.s,e:'io',ep:'out'}],pk(opt.form,73.35),[74.15,{p:park.p,r:park.r,s:park.s,e:'out',ep:'io'}]]);}
 const TR={
-  cash:track([[0,{p:HP(0,0.05,0),r:[0.95,-0.32,0.05],s:1.3}],[2.6,{p:HP(0.004,0.054,0),r:[0.92,-0.2,0.04],s:1.3}],[3.6,{p:[0.6,0.0,0.15],r:[0,-0.3,0],s:1}],[61.35,{p:[0.6,0.0,0.15],r:[0,-0.3,0],s:1}],
-    [62.1,{p:HP(0,0.05,0),r:[0.9,-0.28,0.04],s:1.3,e:'out'}],[64.62,{p:HP(0,0.052,0),r:[0.9,-0.18,0.04],s:1.3}],[65.0,{p:HP(0,0.1053+0.0156,0.01),r:[0.75,-0.1,0],s:1.3,e:'out'}],[67.95,{p:HP(0,0.1053+0.0156,0.01),r:[0.75,-0.05,0],s:1.3}],
-    [68.35,{p:HP(-0.058,0.108,0.02),r:[0.2,0,0],s:0.85}],[69.25,{p:HP(0.058,0.108,0.02),r:[0.2,0.2,0],s:0.85}],[69.95,{p:HP(0.058,0.108,0.02),r:[0.2,0.2,0],s:0.85}],pk(FORM.cash,70.95),pk(FORM.cash,73.35),pk(PARK.cash,74.15)]),
-  slip:hero(8.5,14.85,15.6,PARK.slip,[-0.3,0.2,-0.03],{hp:HP(0,0.1,0.02),s:1.0,form:FORM.slip,k:0}),
+  cash:track([[0,{p:HP(0,0.066,0),r:[0.95,-0.32,0.05],s:1.3}],[2.6,{p:HP(0.004,0.07,0),r:[0.92,-0.2,0.04],s:1.3}],[3.6,{p:[0.6,0.0,0.15],r:[0,-0.3,0],s:1,e:'out',ep:'io'}],[61.35,{p:[0.6,0.0,0.15],r:[0,-0.3,0],s:1}],
+    [62.1,{p:HP(0,0.066,0),r:[0.9,-0.28,0.04],s:1.3,e:'io',ep:'out'}],[64.2,{p:HP(0,0.068,0),r:[0.9,-0.2,0.04],s:1.3}],[64.6,{p:HP(0,CASH_YC,0.01),r:[0.6,-0.1,0],s:1.3}],[67.45,{p:HP(0,CASH_YC,0.01),r:[0.6,-0.05,0],s:1.3}],
+    [68.0,{p:[HAND.xb0,0,HAND.z],r:[0,0.06,0],s:HAND.cs}],[HAND.s0,{p:[HAND.xb0,0,HAND.z],r:[0,0.06,0],s:HAND.cs}],[HAND.s1,{p:[HAND.xb1,0,HAND.z],r:[0,-0.03,0],s:HAND.cs,e:'o2'}],
+    [69.95,{p:[HAND.xb1,0,HAND.z],r:[0,-0.03,0],s:HAND.cs}],pk(FORM.cash,70.95),pk(FORM.cash,73.35),pk(PARK.cash,74.15)]),
+  slip:hero(8.5,14.85,15.6,PARK.slip,[-0.3,0.2,-0.03],{hp:HP(0,0.118,0.02),s:1.0,form:FORM.slip,k:0,ep:'out',lay:1}),
   ticket:hero(14.95,19.3,20.0,PARK.ticket,[-0.3,-0.22,0.04],{hp:HP(0,0.075,0),s:1.35,form:FORM.ticket,k:1}),
-  binder:track([[19.33,{p:EM,r:[0,0,0],s:0}],[19.34,{p:EM,r:[0,0,0],s:0.12}],[19.95,{p:HP(-0.04,0,-0.05),r:[0,0.5,0],s:0.8,e:'back',k:1.1}],[21.4,{p:HP(-0.04,0,-0.05),r:[0,0.56,0],s:0.8}],pk(PARK.binder,22.6)]),
-  depot:hero(21.8,26.65,27.4,PARK.depot,[0.1,-0.45,0],{hp:HP(0.02,0.006,0),s:1.4,spin:0.3,form:FORM.depot,k:2}),
+  binder:track([[19.33,{p:EM,r:[0,0,0],s:0}],[19.34,{p:EM,r:[0,0,0],s:0.12}],[19.95,{p:HP(-0.04,0,-0.05),r:[0,0.5,0],s:0.8,e:'back',k:1.1,ep:'out'}],[21.4,{p:HP(-0.04,0,-0.05),r:[0,0.56,0],s:0.8}],pk(PARK.binder,22.6)]),
+  depot:hero(21.8,26.65,27.4,PARK.depot,[0.1,-0.45,0],{hp:HP(0.02,0.0155,0),s:1.4,spin:0.3,form:FORM.depot,k:2,ep:'out'}),
   piggy:hero(30.72,36.0,36.7,PARK.piggy,[0.08,-0.75,0],{hp:HP(0,0.006,0),s:1.25,spin:0.35,form:FORM.piggy,k:3}),
-  kg:hero(36.05,38.62,39.3,PARK.kg,[-0.28,0.18,-0.02],{hp:HP(0,0.097,0.02),s:1.05,form:FORM.kg,k:4}),
-  bars:hero(38.66,41.62,42.3,PARK.bars,[0.16,-0.3,0],{hp:HP(0,0.006,0.01),s:1.75,spin:0.2,form:FORM.bars,k:5}),
-  lic:(()=>{const LP={p:PARK.lic.p,r:[PARK.lic.r[0],PARK.lic.r[1]+Math.PI,PARK.lic.r[2]],s:1},LF={p:FORM.lic.p,r:[FORM.lic.r[0],FORM.lic.r[1]+Math.PI,FORM.lic.r[2]],s:FORM.lic.s};
-    return track([[41.99,{p:[0.5,0.27,0.66],r:[-0.7,-1.5,0.7],s:0}],[42.0,{p:[0.5,0.27,0.66],r:[-0.7,-1.5,0.7],s:1.35}],[42.9,{p:[-0.045,0.062,0.56],r:[-0.24,0.34,-0.04],s:1.35,e:'out'}],
-      [45.35,{p:[-0.042,0.065,0.56],r:[-0.23,0.4,-0.03],s:1.35}],[46.15,{p:[-0.05,0.062,0.46],r:[-0.27,0.3,-0.05],s:1.3}],[47.15,{p:[-0.046,0.063,0.46],r:[-0.27,0.32,-0.05],s:1.3}],
-      [47.95,{p:[0.02,0.062,0.52],r:[-0.25,Math.PI+0.04,0.03],s:1.38,e:'io'}],[48.5,{p:[0.025,0.064,0.52],r:[-0.25,Math.PI+0.08,0.03],s:1.38}],[49.3,{p:LP.p,r:LP.r,s:1,e:'io'}],
-      [70.25,{p:LP.p,r:LP.r,s:1}],[71.05,{p:LF.p,r:LF.r,s:LF.s,e:'io'}],[73.35,{p:LF.p,r:LF.r,s:LF.s}],[74.15,{p:LP.p,r:LP.r,s:1,e:'io'}]]);})(),
-  stack:hero(49.3,52.78,53.4,PARK.stack,[0.1,0,0],{hp:HP(0,0.006,0.01),s:1.75,spin:0.4,form:FORM.stack,k:7}),
+  kg:hero(36.05,38.62,39.3,PARK.kg,[-0.28,0.18,-0.02],{hp:HP(0,0.114,0.02),s:1.05,form:FORM.kg,k:4,ep:'out',lay:1}),
+  bars:hero(38.66,41.62,42.3,PARK.bars,[0,-0.3,0],{hp:HP(0,0.0005,0.01),s:1.75,spin:0.2,form:FORM.bars,k:5,ep:'out'}),
+  lic:(()=>{const LP={p:PARK.lic.p,r:[PARK.lic.r[0],PARK.lic.r[1]+Math.PI,PARK.lic.r[2]],s:1},LF={p:FORM.lic.p,r:leanR(0.12,1),s:FORM.lic.s};
+    return track([[41.99,{p:[0.5,0.27,0.66],r:[-0.7,-1.5,0.7],s:0}],[42.0,{p:[0.5,0.27,0.66],r:[-0.7,-1.5,0.7],s:1.35}],[42.9,{p:[-0.045,0.0675,0.56],r:[-0.24,0.34,-0.04],s:1.35,e:'out'}],
+      [45.35,{p:[-0.042,0.0705,0.56],r:[-0.23,0.4,-0.03],s:1.35}],[46.15,{p:[-0.05,0.0675,0.46],r:[-0.27,0.3,-0.05],s:1.3}],[47.15,{p:[-0.046,0.0685,0.46],r:[-0.27,0.32,-0.05],s:1.3}],
+      [47.95,{p:[0.02,0.062,0.52],r:[-0.25,Math.PI+0.04,0.03],s:1.38,e:'io'}],[48.5,{p:[0.025,0.064,0.52],r:[-0.25,Math.PI+0.08,0.03],s:1.38}],[49.3,{p:LP.p,r:LP.r,s:1,e:'out',ep:'io'}],
+      [70.25,{p:LP.p,r:LP.r,s:1}],[71.05,{p:LF.p,r:LF.r,s:LF.s,e:'io',ep:'out'}],[73.35,{p:LF.p,r:LF.r,s:LF.s}],[74.15,{p:LP.p,r:LP.r,s:1,e:'out',ep:'io'}]]);})(),
+  stack:hero(49.3,52.78,53.4,PARK.stack,[0.1,0,0],{hp:HP(0,0.006,0.01),s:1.75,spin:0.4,form:FORM.stack,k:7,ep:'out'}),
   env:hero(52.85,61.3,62.0,PARK.env,[-0.2,-0.16,0.02],{hp:HP(0,0.09,0),s:1.25,drift:0.003,spin:0.05,form:FORM.env,k:8}),
 };
-const SHOP=track([[64.45,{p:[-0.7,0,0.34],r:[0,0.3,0],s:1.3}],[65.0,{p:[0,0,0.34],r:[0,0,0],s:1.3,e:'out'}],[67.95,{p:[0,0,0.34],r:[0,0,0],s:1.3}],[68.5,{p:[0.72,0,0.3],r:[0,-0.3,0],s:1.3,e:'in'}]]);
-const PA=track([[67.9,{p:[-0.12,0,0.35],r:[0,1.2,0],s:0}],[68.3,{p:[-0.12,0,0.35],r:[0,1.2,0],s:1.45,e:'back'}],[70.0,{p:[-0.12,0,0.35],r:[0,1.3,0],s:1.45}],[70.4,{p:[-0.12,0,0.35],r:[0,1.3,0],s:0,e:'in'}]]);
-const PB=track([[68.0,{p:[0.12,0,0.35],r:[0,-1.2,0],s:0}],[68.4,{p:[0.12,0,0.35],r:[0,-1.2,0],s:1.45,e:'back'}],[70.0,{p:[0.12,0,0.35],r:[0,-1.3,0],s:1.45}],[70.4,{p:[0.12,0,0.35],r:[0,-1.3,0],s:0,e:'in'}]]);
+const SHOP=track([[64.45,{p:[-0.7,0,0.34],r:[0,0.3,0],s:1.3}],[65.0,{p:[0,0,0.34],r:[0,0,0],s:1.3,e:'out'}],[67.25,{p:[0,0,0.34],r:[0,0,0],s:1.3}],[67.75,{p:[0.72,0,0.3],r:[0,-0.3,0],s:1.3,e:'in'}]]);
+// private hand-over (v3): two wooden board-game figures are put down on the desk, A tips over to B and flicks the bundle across, friction stops it, B hops; then both are lifted away
+function meepleAnim(t){[[ma,HAND.xa,HAND.da,HAND.la],[mb,HAND.xbm,HAND.db,HAND.lb]].forEach(([m,x,t0,tl],i)=>{const G=m.G,B=m.B;
+    if(t<t0||t>tl+HAND.lift){G.visible=false;return;}G.visible=true;G.scale.setScalar(HAND.ms);G.rotation.set(0,i?-0.18:0.18,0);
+    let y=0,rx=0,rz=0;const u=(t-t0)/HAND.fall;if(u<1)y=HAND.ytop*(1-u*u);else{const d=t-t0-HAND.fall;y=0.005*Math.abs(Math.sin(d*17))*Math.exp(-d*13);rx=0.09*Math.exp(-d*7)*Math.sin(d*21);}
+    if(i===0)rz=-HAND.tip(t);else{const v=(t-HAND.hop)/0.24;if(v>0&&v<1)y+=0.024*Math.sin(Math.PI*v);const d=t-HAND.hop-0.24;if(d>0)rx+=0.045*Math.exp(-d*8)*Math.sin(d*22);}
+    const w=(t-tl)/HAND.lift;if(w>0)y+=1.25*w*w;
+    // rock on the foot edges: front/back edge for rx, right/left foot for rz, so the figure never sinks into the desk
+    const pz=rx>0?m.hz:-m.hz,px=rz<0?m.hx:-m.hx;B.rotation.set(rx,0,rz);B.position.set(px-px*Math.cos(rz),-px*Math.sin(rz)+pz*Math.sin(rx),pz-pz*Math.cos(rx));G.position.set(x,y,HAND.z);});}
 // red marker strokes on the cash bundle (local coordinates on its top face)
 function mkStroke(parent,pts,width,y){const N=pts.length-1;const pos=[];for(let i=0;i<=N;i++){const a=pts[Math.max(0,i-1)],b=pts[Math.min(N,i+1)];const dx=b[0]-a[0],dz=b[1]-a[1],l=Math.hypot(dx,dz)||1;const nx=-dz/l,nz=dx/l;const w=width*(0.85+0.3*Math.sin(i*1.7));
   pos.push(pts[i][0]+nx*w/2,y,pts[i][1]+nz*w/2,pts[i][0]-nx*w/2,y,pts[i][1]-nz*w/2);}const idx=[];for(let i=0;i<N;i++){const a=2*i;idx.push(a,a+1,a+2,a+1,a+3,a+2);}
@@ -150,7 +170,7 @@ function piggyAnim(t){const B=piggy.B;
   const ph=pigPhase(t),amp=pigAmp(t),k=amp/0.55;
   piggy.legs.forEach((L,i)=>{L.rotation.z=amp*Math.sin(ph+(i===0||i===3?0:Math.PI));});
   let dip=0,ear=0;PIG.coin.forEach(tc=>{const d=t-tc;if(d>0&&d<0.8){dip+=-0.0036*Math.exp(-d*7)*Math.cos(d*24);ear+=0.45*Math.exp(-d*9)*Math.sin(d*30);}});
-  const still=1-clamp(k*2,0,1);B.position.set(0,0.0026*k*Math.abs(Math.sin(ph))+dip,0);B.rotation.set(0.035*k*Math.sin(ph),0,0.012*k*Math.sin(2*ph));B.scale.set(1,1+0.011*still*Math.sin(t*5.2),1);
+  const still=1-clamp(k*2,0,1);B.position.set(0,0.0026*k*Math.abs(Math.sin(ph)),0);B.rotation.set(0.035*k*Math.sin(ph),0,0.012*k*Math.sin(2*ph));B.scale.set(1-dip*3,1+0.011*still*Math.sin(t*5.2)+dip*9,1-dip*3);
   piggy.Hd.rotation.set(0,0,0.24*win(t,33.3,34.9,0.35)+0.035*k*Math.sin(2*ph+0.6));piggy.ears.forEach((E,i)=>E.rotation.set(ear*(i?1:-1)+0.06*Math.sin(t*3.1+i),0,0));
   piggy.tail.rotation.set(0.55*Math.sin(t*15)*Math.max(win(t,34.0,35.5,0.3),0.35*k),0,0);
   piggy.coins.forEach((c,i)=>{const tc=PIG.coin[i],t0=tc-PIG.fall,r=0.0112;if(t<t0||t>tc+0.06){c.visible=false;return;}c.visible=true;let y,tilt;
@@ -179,7 +199,7 @@ const KEYS=[
  [42.2,C(0,0.182,0.12,2.571,0,11)],[43.2,C(0,0.152,0.24,2.447,-4,13)],[45.7,C(0,0.172,0.2,2.447,-2,12)],[46.6,C(0,0.182,0.12,2.464,0,11)],
  [48.4,C(0,0.192,0.1,2.732,2,11)],[49.8,C(0,0.182,0.12,2.571,0,11)],[50.9,C(0,0.142,0.26,2.392,5,14)],[52.4,C(0,0.142,0.26,2.313,6,14)],
  [53.6,C(0,0.152,0.26,2.392,-3,13)],[56.6,C(0,0.162,0.28,2.169,-2,12)],[60.6,C(0,0.162,0.28,2.114,-1,12)],
- [62.2,C(0,0.152,0.24,2.559,0,13)],[63.9,C(0,0.182,0.12,2.571,0,11)],[65.3,C(0,0.132,0.3,2.392,4,16)],[67.6,C(0,0.132,0.3,2.313,3,16)],[68.8,C(0,0.122,0.32,2.336,0,14)],
+ [62.2,C(0,0.152,0.24,2.559,0,13)],[63.9,C(0,0.182,0.12,2.571,0,11)],[65.3,C(0,0.132,0.3,2.392,4,16)],[67.6,C(0,0.132,0.3,2.313,3,16)],[68.8,C(0,0.1,0.33,2.6,0,13)],
  [70.6,C(0,0.1,0.36,3.32,0,30)],[73.1,C(0,0.1,0.36,3.2,2,29)],[74.25,C(0,0.205,0.03,1.55,0,6)],[76.9,C(0,0.205,0.03,1.47,0,6)]];
 const KT=KEYS.map(k=>k[0]),KV=KEYS.map(k=>k[1]);
 const KM=[0,1,2,3,4,5].map(j=>{const n=KT.length,d=[],tg=new Array(n).fill(0);for(let i=0;i<n-1;i++)d.push((KV[i+1][j]-KV[i][j])/(KT[i+1]-KT[i]));
@@ -257,20 +277,20 @@ function setTime(t){setCam(t);
   applyPose(slip.G,TR.slip(t));if(t>8.5&&t<14.9)bob(slip.G,1);
   slip.set(lerp(13.9,14.6,eio((t-9.7)/0.9)),lerp(603,633,eio((t-12.66)/0.9)),win(t,9.6,12.5,0.3),win(t,12.6,14.9,0.3));
   applyPose(ticket.G,TR.ticket(t));if(t>15&&t<19.3)bob(ticket.G,2);{const f=clamp((t-17.32)/0.38,0,1);ticket.set(f<0.5?'63,00 €':'66,80 €',f>0&&f<1?f:0);}
-  applyPose(binder.G,TR.binder(t));{const D=0.215,u=clamp((t-21.02)/0.42,0,1);const th=-Math.PI/2*u*u+(u>=1?0.06*Math.sin((t-21.44)*26)*Math.exp(-(t-21.44)*9):0);
+  applyPose(binder.G,TR.binder(t));{const D=0.215,u=clamp((t-21.02)/0.42,0,1);const th=-Math.PI/2*u*u+(u>=1?0.06*Math.abs(Math.sin((t-21.44)*26))*Math.exp(-(t-21.44)*9):0);
     binder.P.rotation.x=th;binder.P.position.set(0,-(D/2)*Math.sin(th),-(D/2)+(D/2)*Math.cos(th));const g2=clamp((t-21.0)/0.6,0,1);binder.mat[0].color.setRGB(lerp(0.31,0.16,g2),lerp(0.38,0.16,g2),lerp(0.48,0.17,g2));binder.mat[1].color.setScalar(lerp(1,0.45,g2));}
   applyPose(depot.G,TR.depot(t));if(t>21.8&&t<26.6)bob(depot.G,3);
   {const u=eo((t-22.25)/1.4);depot.tube.setDrawRange(0,Math.floor(depot.tube.index.count*u/6)*6);depot.line.visible=u>0.01;const hp=depot.curve.getPointAt(Math.max(0.001,u));depot.head.position.copy(hp);depot.head.visible=u>0.01;
    depot.coins.forEach((c,i)=>{const t0=24.32+i*0.13;const v=clamp((t-t0)/0.32,0,1);const yEnd=0.0095+i*0.003;c.visible=t>t0;c.position.set(0.025*Math.sin(i*2.1)*0.3+0.01,lerp(depot.S+0.06,yEnd,v*v),0.012);c.rotation.set(0.4*(1-v),i,0);});}
   piggyAnim(t);
   applyPose(kg.G,TR.kg(t));if(t>36&&t<38.6)bob(kg.G,5);kg.set(clamp((t-37.0)/0.25,0,1),clamp((t-37.25)/0.52,0,1),clamp((t-37.82)/0.48,0,1));
-  applyPose(bars.G,TR.bars(t));if(t>38.6&&t<41.6)bob(bars.G,6);bars.setNew(eio((t-39.9)/0.6));
+  applyPose(bars.G,TR.bars(t));bars.setNew(eio((t-39.9)/0.6));
   licAnim(t);
   applyPose(stack.G,TR.stack(t));{const c=stack.coins[stack.n];const v=clamp((t-51.62)/0.42,0,1);c.visible=t>51.5;const yE=0.008+0.0017+stack.n*0.0034;c.position.y=lerp(yE+0.14,yE,v*v)+(v>=1?0.004*Math.max(0,Math.sin((t-52.04)*30))*Math.exp(-(t-52.04)*12):0);
    c.material[1].emissive=new THREE.Color(0xffd27a);c.material[1].emissiveIntensity=1.2*win(t,51.95,52.9,0.3);}
-  applyPose(env.G,TR.env(t));if(t>52.8&&t<61.3)bob(env.G,8);env.flapG.rotation.x=-2.75*eio((t-55.9)/0.45);env.letter.position.y=0.072*eio((t-56.25)/0.7);env.tick.opacity=clamp((t-60.45)/0.15,0,1);
-  applyPose(shop.G,SHOP(t));shop.G.visible=t>64.45&&t<68.6;
-  applyPose(pa.G,PA(t));applyPose(pb.G,PB(t));{const ra=-1.1*win(t,68.2,69.0,0.25),rb=-1.1*win(t,68.9,69.9,0.25);pa.arms[1].rotation.x=ra;pa.arms[0].rotation.x=ra;pb.arms[0].rotation.x=rb;pb.arms[1].rotation.x=rb;}
+  applyPose(env.G,TR.env(t));if(t>52.8&&t<61.3)bob(env.G,8);env.flapG.rotation.x=2.75*eio((t-55.9)/0.45)+(Math.PI+0.03-2.75)*eio((t-61.35)/0.55);env.letter.position.y=0.072*eio((t-56.25)/0.7);env.tick.opacity=clamp((t-60.45)/0.15,0,1);
+  applyPose(shop.G,SHOP(t));shop.G.visible=t>64.45&&t<67.85;
+  meepleAnim(t);
   // tools
   const mOn=toolPose(marker,MARK,t,REST.marker,1);const pOn=toolPose(pencil,PENC,t,REST.pencil,-1);
   {const o=clamp((t-OUT.t0-0.3)/0.6,0,1);shadeEl.style.opacity=(1-0.55*o).toFixed(3);}
@@ -279,4 +299,5 @@ function setTime(t){setCam(t);
 const VO=0.15,END_V=OUT.end;window.TOTAL=Math.round((END_V+VO)*30);
 window.renderAt=async f=>{const tv=f/30-VO;setTime(tv);composer.render();const fd=Math.min(clamp((f/30)/0.25,0,1),clamp((END_V-tv)/0.3,0,1));document.body.style.filter=fd<1?`brightness(${fd.toFixed(3)})`:'none';return true;};
 window.setTimeV=tv=>{setTime(tv);composer.render();};
+window.THREE_DBG=THREE;window.DBGOBJ={cash,slip,ticket,binder,depot,piggy,kg,bars,lic,stack,env,shop,ma,mb,marker,pencil};window.setT=tv=>setTime(tv);
 await window.renderAt(0);window.ready=true;

@@ -19,8 +19,10 @@ export function grain(g,w,h,amt=10,seed=7){const r=rng(seed);const id=g.getImage
 export function roundRect(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
 // keyframe track for object poses: keys [t,{p:[x,y,z],r:[x,y,z],s,e:'io'|'out'|'back'|'lin'}]; easing of a segment is set by the key it ends on
 export function track(keys){return t=>{if(t<=keys[0][0])return keys[0][1];for(let i=0;i<keys.length-1;i++){const [t0,a]=keys[i],[t1,b]=keys[i+1];if(t<t1){const u0=(t-t0)/(t1-t0);
-  const e=b.e||'io';const u=e==='out'?eo(u0):e==='back'?ebk(u0,b.k||1.3):e==='lin'?u0:e==='in'?ei(u0):eio(u0);const L3=(p,q)=>[lerp(p[0],q[0],u),lerp(p[1],q[1],u),lerp(p[2],q[2],u)];
-  return {p:L3(a.p,b.p),r:L3(a.r||[0,0,0],b.r||[0,0,0]),s:lerp(a.s??1,b.s??1,u),v:lerp(a.v??1,b.v??1,u)};}}return keys[keys.length-1][1];};}
+  const EZ=e=>e==='o2'?1-(1-u0)*(1-u0):e==='out'?eo(u0):e==='back'?ebk(u0,b.k||1.3):e==='lin'?u0:e==='in'?ei(u0):eio(u0);const u=EZ(b.e||'io'),up=b.ep?EZ(b.ep):u;
+  const L3=(p,q,w)=>[lerp(p[0],q[0],w),lerp(p[1],q[1],w),lerp(p[2],q[2],w)];
+  // ep: separate easing for the position (e.g. a scale pop with 'back' without the object dipping into the desk)
+  return {p:L3(a.p,b.p,up),r:L3(a.r||[0,0,0],b.r||[0,0,0],u),s:lerp(a.s??1,b.s??1,u),v:lerp(a.v??1,b.v??1,u)};}}return keys[keys.length-1][1];};}
 export function applyPose(o,q){o.position.set(q.p[0],q.p[1],q.p[2]);o.rotation.set(q.r[0],q.r[1],q.r[2]);o.scale.setScalar(Math.max(1e-4,q.s??1));o.visible=(q.v??1)>0.001&&(q.s??1)>0.002;}
 // a hand-drawn ring around (cx,cy) in canvas pixels: returns points with progress so a pen can follow it
 export function ringPath(cx,cy,rx,ry,seed=3,sweep=Math.PI*2+0.55,a0=-2.2){const r=rng(seed);const ph=[r()*6,r()*6,r()*6];const P=[];const N=180;

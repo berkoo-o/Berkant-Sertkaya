@@ -67,7 +67,7 @@ export function mkSlip(scene){const P=paper(0.165,0.215,700,null,{bend:0.004});s
     const row=(y,a,b,hi,bold)=>{if(hi>0){g.fillStyle=`rgba(255,226,120,${0.55*hi})`;roundRect(g,26,y-46,w-52,64,10);g.fill();}g.fillStyle='#2a2a31';g.font=(bold?'600 ':'500 ')+'33px Poppins';g.fillText(a,40,y);g.textAlign='right';g.font='700 36px "Inter Tight"';g.fillText(b,w-40,y);g.textAlign='left';
       g.fillStyle='rgba(30,30,35,0.12)';g.fillRect(40,y+22,w-80,2);};
     const eur=v=>v.toFixed(2).replace('.',',')+' €';
-    row(236,'Stundenlohn',eur(wage),hiWage,true);row(318,'Stunden',(160).toString(),0);row(400,'Brutto',(wage*160).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.')+' €',0);
+    row(236,'Stundenlohn',eur(wage),hiWage,true);row(318,'Stunden',(160).toString(),0);row(400,'Brutto',(Math.round(wage*100)*160/100).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.')+' €',0);
     g.fillStyle='rgba(30,30,35,0.35)';g.fillRect(40,470,w-80,3);
     row(560,'Minijob-Grenze',Math.round(mini)+' €',hiMini,true);
     g.fillStyle='#8a8a92';g.font='500 24px Poppins';g.fillText('gesetzlicher Mindestlohn ab 01.01.2027',40,h-48);P.T.tex.needsUpdate=true;}
@@ -96,7 +96,7 @@ export function mkBinder(scene){const G=new THREE.Group();scene.add(G);const P=n
     g.fillStyle='#2a3240';g.beginPath();g.arc(w/2,600,40,0,7);g.fill();g.fillStyle='#8b96a6';g.beginPath();g.arc(w/2,600,30,0,7);g.fill();});
   const spm=std(0xffffff,0.75,0,{map:sp.tex});const Wd=0.062,Hh=0.27,D=0.215;
   M(P,new THREE.BoxGeometry(Wd,Hh,D),[cover,cover,cover,cover,spm,cover],0,Hh/2,0);
-  const pages=std(0xeee9de,0.95);M(P,new THREE.BoxGeometry(Wd-0.008,Hh-0.012,D-0.004),pages,0,Hh/2,-0.004);
+  const pages=std(0xeee9de,0.95);M(P,new THREE.BoxGeometry(Wd-0.008,Hh-0.012,D-0.004),pages,0,Hh/2,-0.002);
   return {G,P,mat:[cover,spm],H:Hh};}
 export function mkCoin(r=0.0118,h=0.0026){const T=ctex(128,128,(g,w,hh)=>{g.fillStyle='#d6b25a';g.fillRect(0,0,w,hh);g.strokeStyle='rgba(120,90,30,0.55)';g.lineWidth=5;g.beginPath();g.arc(64,64,52,0,7);g.stroke();g.fillStyle='rgba(120,90,30,0.6)';g.font='800 56px "Inter Tight"';g.textAlign='center';g.fillText('€',64,84);});
   const face=std(0xffffff,0.32,0.85,{map:T.tex});const side=std(0xc9a24a,0.3,0.9);return new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,40),[side,face,face]);}
@@ -143,16 +143,18 @@ export function mkLetterKG(scene){const P=paper(0.15,0.19,640,null,{bend:0.003})
     if(ring>0){g.save();g.setLineDash([16,12]);g.strokeStyle='rgba(70,74,84,0.85)';g.lineWidth=5;g.beginPath();const N=60;for(let i=0;i<=N*ring;i++){const a=-2.4+i/N*6.8;const rr=1+0.04*Math.sin(3*a);const x=460+Math.cos(a)*165*rr,y=352+Math.sin(a)*92*rr;i?g.lineTo(x,y):g.moveTo(x,y);}g.stroke();g.restore();}
     P.T.tex.needsUpdate=true;}
   draw(0,0,0);let k='';return {G:P.G,tw:w,th:h,set(a,b,c){const kk=[a,b,c].map(v=>v.toFixed(3)).join();if(kk!==k){k=kk;draw(a,b,c);}}};}
-export function mkBars(scene){const G=new THREE.Group();scene.add(G);const f=sketchFill(0xe9e6df);
-  M(G,new RoundedBoxGeometry(0.17,0.008,0.07,2,0.003),std(0x1b1c22,0.5,0.2),0,0.004,0);
-  const old=M(G,new THREE.BoxGeometry(0.044,1,0.044),std(0x9aa3b2,0.6),-0.035,0.5,0);old.scale.y=0.054;old.position.y=0.008+0.027;
-  const nw=M(G,new THREE.BoxGeometry(0.044,1,0.044),f,0.035,0.5,0);const nwo=outline(nw,0.0012);
-  const lab=(txt,sz,x,y,col='#e9e6df',bold=600)=>{const T=ctex(256,96,(g,w,h)=>{g.fillStyle=col;g.font=bold+' '+sz+'px Poppins';g.textAlign='center';g.fillText(txt,w/2,64);});const m=M(G,new THREE.PlaneGeometry(0.06,0.0225),new THREE.MeshBasicMaterial({map:T.tex,transparent:true,depthWrite:false}),x,y,0.024,false);return m;};
-  lab('2026',38,-0.035,0.018);lab('2027',38,0.035,0.018);
-  const vOld=lab('0,6 %',58,-0.035,0.08,'#f2efe8',700);const vNew=lab('0,9 %',58,0.035,0.11,'#f2efe8',700);
-  const title=ctex(512,80,(g,w,h)=>{g.fillStyle='#16161b';roundRect(g,0,0,w,h,14);g.fill();g.fillStyle='#f2efe8';g.font='600 32px Poppins';g.textAlign='center';g.fillText('Pflege-Zuschlag Kinderlose',w/2,52);});
-  const tp=M(G,new THREE.PlaneGeometry(0.16,0.025),new THREE.MeshStandardMaterial({map:title.tex,transparent:true,roughness:0.6}),0,0.012,0.042,false);tp.rotation.x=-0.5;
-  return {G,old,nw,vOld,vNew,setNew(u){const hh=lerp(0.054,0.081,u);nw.scale.y=hh;nw.position.y=0.008+hh/2;vNew.position.y=0.008+hh+0.02;}};}
+export function mkBars(scene){const G=new THREE.Group();scene.add(G);const f=sketchFill(0xe9e6df);const BH=0.03;
+  M(G,new RoundedBoxGeometry(0.17,BH,0.07,2,0.004),std(0x1b1c22,0.5,0.2),0,BH/2,0);
+  // front face of the base: years under the bars, the title below
+  const ft=ctex(1024,180,(g,w,h)=>{g.fillStyle='#1b1c22';g.fillRect(0,0,w,h);g.fillStyle='#f2efe8';g.font='800 84px "Inter Tight"';g.textAlign='center';g.fillText('2026',w*0.294,92);g.fillText('2027',w*0.706,92);
+    g.fillStyle='rgba(242,239,232,0.75)';g.font='600 40px Poppins';g.fillText('Pflege-Zuschlag Kinderlose',w/2,156);});
+  M(G,new THREE.PlaneGeometry(0.162,0.0285),new THREE.MeshStandardMaterial({map:ft.tex,roughness:0.6}),0,BH/2,0.0352,false);
+  const old=M(G,new THREE.BoxGeometry(0.044,1,0.044),std(0x9aa3b2,0.6),-0.035,0.5,0);old.scale.y=0.054;old.position.y=BH+0.027;
+  const nw=M(G,new THREE.BoxGeometry(0.044,1,0.044),f,0.035,0.5,0);outline(nw,0.0012);
+  // the values sit on the front of each bar (dark on the bar), so neither the sticky note nor the light page can swallow them
+  const lab=(txt,x,y)=>{const T=ctex(256,96,(g,w,h)=>{g.fillStyle='#1b1c22';g.font='800 66px "Inter Tight"';g.textAlign='center';g.fillText(txt,w/2,72);});return M(G,new THREE.PlaneGeometry(0.04,0.015),new THREE.MeshBasicMaterial({map:T.tex,transparent:true,depthWrite:false}),x,y,0.0226,false);};
+  const vOld=lab('0,6 %',-0.035,BH+0.054-0.011);const vNew=lab('0,9 %',0.035,BH+0.054-0.011);
+  return {G,old,nw,vOld,vNew,setNew(u){const hh=lerp(0.054,0.081,u);nw.scale.y=hh;nw.position.y=BH+hh/2;vNew.position.y=BH+hh-0.011;}};}
 
 // ------------------------------------------------------------------ 7: card driving licence: the old card (front) turns into the new EU card (back); generic sample cards
 function licBase(g,w,h,cols,seed){const L=g.createLinearGradient(0,0,w,h);L.addColorStop(0,cols[0]);L.addColorStop(0.55,cols[1]);L.addColorStop(1,cols[2]);g.fillStyle=L;g.fillRect(0,0,w,h);}
@@ -195,14 +197,14 @@ export function mkCoinStack(scene,n=24){const G=new THREE.Group();scene.add(G);M
 
 // ------------------------------------------------------------------ 9: envelope with the letter (flap on the front so the letter reads while it rises)
 export function mkEnvelope(scene){const G=new THREE.Group();scene.add(G);const W=0.2,Hh=0.115;
-  const env=ctex(900,518,(g,w,h)=>{g.fillStyle='#ece3cf';g.fillRect(0,0,w,h);grain(g,w,h,8,21);g.fillStyle='rgba(255,255,255,0.6)';roundRect(g,50,318,470,160,10);g.fill();g.strokeStyle='rgba(120,110,90,0.35)';g.lineWidth=3;roundRect(g,50,318,470,160,10);g.stroke();
-    g.fillStyle='#2c2e35';g.font='700 38px Poppins';g.fillText('Einladung zur Musterung',74,382);g.fillStyle='#5b5e66';g.font='500 30px Poppins';g.fillText('Jahrgang 2008',74,434);
+  const env=ctex(900,518,(g,w,h)=>{g.fillStyle='#ece3cf';g.fillRect(0,0,w,h);grain(g,w,h,8,21);g.fillStyle='rgba(255,255,255,0.6)';roundRect(g,46,318,600,160,10);g.fill();g.strokeStyle='rgba(120,110,90,0.35)';g.lineWidth=3;roundRect(g,46,318,600,160,10);g.stroke();
+    g.fillStyle='#2c2e35';g.font='700 36px Poppins';g.fillText('Einladung zur Musterung',72,382);g.fillStyle='#5b5e66';g.font='500 29px Poppins';g.fillText('Jahrgang 2008',72,432);
     g.strokeStyle='rgba(120,110,90,0.4)';g.lineWidth=2;roundRect(g,w-160,36,112,130,6);g.stroke();g.fillStyle='rgba(120,110,90,0.4)';g.font='600 21px Poppins';g.textAlign='center';g.fillText('Deutsche',w-104,96);g.fillText('Post',w-104,124);});
   const em=std(0xd4cec2,0.85,0,{map:env.tex});const eb=std(0xc9c0ad,0.9);
   M(G,new THREE.BoxGeometry(W,Hh,0.003),[eb,eb,eb,eb,em,eb]);
-  const flapG=new THREE.Group();flapG.position.set(0,Hh/2,0.0017);G.add(flapG);const fs=new THREE.Shape();fs.moveTo(-W/2,0);fs.lineTo(W/2,0);fs.lineTo(0.012,-Hh*0.52);fs.quadraticCurveTo(0,-Hh*0.545,-0.012,-Hh*0.52);fs.closePath();
+  const flapG=new THREE.Group();flapG.position.set(0,Hh/2,-0.0017);G.add(flapG);const fs=new THREE.Shape();fs.moveTo(-W/2,0);fs.lineTo(W/2,0);fs.lineTo(0.012,-Hh*0.52);fs.quadraticCurveTo(0,-Hh*0.545,-0.012,-Hh*0.52);fs.closePath();
   const ft=ctex(256,128,(g,w,h)=>{g.fillStyle='#e6dcc5';g.fillRect(0,0,w,h);grain(g,w,h,8,24);});
-  const flap=M(flapG,new THREE.ShapeGeometry(fs),new THREE.MeshStandardMaterial({color:0xcfc6b2,roughness:0.9,side:THREE.DoubleSide}));flap.position.z=0.0003;
+  const flap=M(flapG,new THREE.ShapeGeometry(fs),new THREE.MeshStandardMaterial({color:0xcfc6b2,roughness:0.9,side:THREE.DoubleSide}));flap.position.z=-0.0003;
   const L=paper(0.185,0.105,820,(g,w,h)=>{g.fillStyle='#fbfaf6';g.fillRect(0,0,w,h);grain(g,w,h,5,22);g.fillStyle='#2c2e35';g.font='700 46px Poppins';g.fillText('Musterung',50,90);
     g.fillStyle='#5b5e66';g.font='500 30px Poppins';g.fillText('Jahrgang 2008 · ab Juli 2027',50,142);g.fillStyle='rgba(30,30,35,0.15)';g.fillRect(50,170,w-100,2);
     g.fillStyle='#2c2e35';g.font='500 34px Poppins';g.fillText('Wehrdienst:',50,262);g.font='700 34px Poppins';g.fillText('freiwillig',260,262);g.strokeStyle='#2c2e35';g.lineWidth=4;g.strokeRect(w-170,222,52,52);
@@ -218,6 +220,20 @@ export function mkShop(scene){const G=new THREE.Group();scene.add(G);
   const sign=ctex(512,112,(g,w,h)=>{g.fillStyle='#16161b';roundRect(g,0,0,w,h,14);g.fill();g.fillStyle='#f2efe8';g.font='700 56px Poppins';g.textAlign='center';g.fillText('Händler',w/2,76);});
   const sp=M(G,new THREE.PlaneGeometry(0.1,0.022),new THREE.MeshStandardMaterial({map:sign.tex,transparent:true,roughness:0.6}),0,0.045,0.0381,false);
   return {G};}
+function woodTex(base,dark,seed){return ctex(256,512,(g,w,h)=>{g.fillStyle=base;g.fillRect(0,0,w,h);const r=rng(seed);
+  for(let i=0;i<46;i++){const x=r()*w,amp=4+r()*10,ph=r()*6;g.strokeStyle=dark;g.globalAlpha=0.08+r()*0.16;g.lineWidth=1+r()*2.2;g.beginPath();for(let y=0;y<=h;y+=8){const xx=x+amp*Math.sin(y*0.012+ph)+3*Math.sin(y*0.05+i);y?g.lineTo(xx,y):g.moveTo(xx,y);}g.stroke();}
+  g.globalAlpha=1;grain(g,w,h,10,seed);});}
+export function mkMeeple(scene,base,dark,seed){const G=new THREE.Group();scene.add(G);const B=new THREE.Group();G.add(B);
+  // classic meeple outline: round head, short arms, splayed legs, flat feet (units: metres, height 0.11)
+  const sh=new THREE.Shape();sh.moveTo(-0.044,0);sh.lineTo(-0.014,0);sh.quadraticCurveTo(0,0.026,0.014,0);sh.lineTo(0.044,0);sh.quadraticCurveTo(0.05,0.004,0.046,0.012);
+  sh.quadraticCurveTo(0.03,0.04,0.022,0.056);sh.quadraticCurveTo(0.05,0.058,0.054,0.064);sh.quadraticCurveTo(0.058,0.074,0.046,0.078);sh.quadraticCurveTo(0.03,0.08,0.016,0.08);
+  sh.absarc(0,0.093,0.0175,-0.2,Math.PI+0.2,false);sh.quadraticCurveTo(-0.03,0.08,-0.046,0.078);sh.quadraticCurveTo(-0.058,0.074,-0.054,0.064);sh.quadraticCurveTo(-0.05,0.058,-0.022,0.056);
+  sh.quadraticCurveTo(-0.03,0.04,-0.046,0.012);sh.quadraticCurveTo(-0.05,0.004,-0.044,0);
+  const geo=new THREE.ExtrudeGeometry(sh,{depth:0.026,bevelEnabled:true,bevelThickness:0.004,bevelSize:0.0035,bevelSegments:4,curveSegments:24});geo.translate(0,0.0035,-0.013);
+  const T=woodTex(base,dark,seed);T.tex.wrapS=T.tex.wrapT=THREE.RepeatWrapping;T.tex.repeat.set(8,8);
+  const m=M(B,geo,new THREE.MeshStandardMaterial({map:T.tex,roughness:0.62,metalness:0}));
+  // outline for collision checks (local x/y, half thickness hz, foot edge hx)
+  return {G,B,poly:sh.getPoints(24).map(v=>[v.x,v.y]),hz:0.017,hx:0.047};}
 export function mkPerson(scene,col){const G=new THREE.Group();scene.add(G);const skin=std(0xd9b89a,0.7),c=std(col,0.75),dk=std(0x2b2d33,0.8);
   [-1,1].forEach(s=>M(G,new THREE.CylinderGeometry(0.0062,0.0055,0.05,14),dk,s*0.0072,0.025,0));
   const t=M(G,new THREE.CapsuleGeometry(0.0125,0.03,6,16),c,0,0.072,0);t.scale.set(1,1,0.72);

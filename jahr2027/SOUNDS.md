@@ -1,39 +1,34 @@
 # Sounds im Video „Was ändert sich 2027 für dich?“
 
-Alle Geräusche und die Musik stammen aus dem Epidemic-Sound-Connector. Die Dateien liegen nur lokal in `jahr2027/sfx/epidemic/` und `rundfunk/sfx/epidemic/` und sind nicht im Repo, weil die Lizenz die Weitergabe einzelner Dateien verbietet. Gemischt wird mit `python3 audio.py` im Ordner `jahr2027/`. Die Zeiten sind Stimm-Zeiten, im Video beginnt die Stimme bei 0,15 Sekunden.
+Seit der dritten Fassung (Wunsch des Nutzers vom 19.11.2026: „verwende andere Sounds, benutze SFX oder Soundza“) kommen alle Geräuscheffekte aus der kostenlosen Soundza-Bibliothek. Es sind ausschließlich echte Aufnahmen, kein Sound ist KI-erzeugt (`ai_content` fehlt bei allen). Die Dateien liegen nur lokal in `jahr2027/sfx/soundza/` und sind nicht im Repo, weil die Soundza-Lizenz die Weitergabe einzelner Dateien verbietet. Die kommerzielle Nutzung im Video ist erlaubt, eine Nennung ist nicht nötig; Soundza freut sich über den Tag @soundza_audio.
 
-| Datei | Epidemic-ID | Titel | Einsatz |
+Unverändert bleiben die Musik „Radar Focus“ (Epidemic Sound, ID 6f90c76d-de15-4a4d-9d51-cbea2cbbe75f, `rundfunk/sfx/epidemic/`) und die beiden vom Nutzer gelieferten Übergangssounds `rundfunk/sfx/whoosh.wav` und `rundfunk/sfx/clicks.wav`.
+
+Gemischt wird mit `python3 audio.py` im Ordner `jahr2027/` (`python3 audio.py -v` zeigt zusätzlich, wo die Effekte im Verhältnis zur Stimme am lautesten sind). Die Zeiten sind Stimm-Zeiten; im Video beginnt die Stimme bei 0,15 Sekunden.
+
+| Datei | Soundza-ID | Titel | Einsatz |
 |---|---|---|---|
-| music_radar_focus | 6f90c76d-de15-4a4d-9d51-cbea2cbbe75f | Radar Focus (Blue Saga), 100 BPM | Musikbett ab Trackbeginn, Sub-Bass abgesenkt, über 250 Hz 22 dB unter der Stimme, sanftes Ducking |
-| marker_line | 9f76f0f2-0cc1-44f4-b1e4-a673573582fe | Objects, Writing, Marker Pen, Draw Line On Cardboard Sheet | Hook: der rote Stift streicht das Geldbündel durch; 65,9 s das rote Kreuz |
-| tear_04 | e86cd981-a794-4d9c-82d9-70228e95a487 | Paper, Rip, Telephone Directory, Yellow Pages, Page Tear Out 04 | Deckblatt reißt ab (7 s), Seite 1. Juli reißt ab (63,4 s) |
-| tear_03 | 4c3d5b9c-349a-4da9-bccb-eb9495d22561 | Paper, Rip, Telephone Directory, Yellow Pages, Page Tear Out 03 | Seite 1. Januar mit dem Zettel reißt ab (42 s) |
-| tear_notepad | 9da88452-eb77-480e-940c-65b27116d6ed | Paper, Rip, Notepad, Small, Binded Page, Tear Out, Several | letzte Seite vor der Outro |
-| marker_circle | a836c16e-6b5d-4d44-8eda-12f135d8dfe8 | Objects, Writing, Marker Writing, Circle | roter Kreis um den 1. Januar und den 10. Juli, Kreis für den Punkt im Logo |
-| marker_circle2 | b640d342-e24b-4ecc-9611-e02e7dd9c4c9 | Objects, Writing, Color Marker On Paper, Circle | Kreis um den 19. Januar, der Stift schreibt „function“ |
-| receipt_print | 54644c85-f1a0-4cbc-adb0-4376fe506ade | Machines, Antique, Cash Register, Printing, Receipt, Light | die Lohnabrechnung erscheint (leise, gedämpft) |
-| card_slide | 604c921e-5e19-429e-88a7-6319719f8423 | Objects, Misc, Credit Card, Slide On Table | Deutschlandticket (beim Führerschein seit der Überarbeitung ein weicher Swoosh) |
-| binder_drop | 42c2a242-c964-43b2-b677-a7a4210a53c2 | Objects, Book, Books, Pile Of School Homework, Drop Down On Table | der Riester-Ordner kippt um |
-| paper_drop | cda39aae-673d-4bae-a99c-d47d84d646fe | Paper, Impact, Letter, Drop On Table 02 | der Zettel „geplant“ landet auf der Seite |
-| pencil_write | d283b949-59d2-4b9b-9eaa-b813f517dd90 | Objects, Writing, Pencil On Paper, Letter | der Bleistift schreibt „geplant“ und „267 €“ |
-| pencil_v | 8973628b-5791-4098-8302-83bfd7133a26 | Objects, Writing, Pencil On Paper, Letter V | Unterstrich, 259 € durchgestrichen, Haken bei „freiwillig“ |
-| crayon_circle | 65e5776d-953e-43cb-a4fc-922384a5f82d | Objects, Writing, Crayon, Draw Circle On Paper | gestrichelter Bleistiftkreis um 267 € |
-| pages_flick | 5c96103c-85ee-4d3b-96fc-0413e623bc03 | Document, Thick, Many Pages, Flick Through Fast 03 | Februar bis Juni fliegen vorbei |
-| notes_count | 45986e3f-12c8-4914-b106-956defaf3460 | Money, Notes, Count Into Hand | private Übergabe des Bündels |
-| coin_single | 11214eb1-567c-4cff-953d-8408c4c26832 | Coin, Money, Pound, Coin, Down On Table | die zusätzliche Münze auf dem Rentenstapel (beim Sparschwein seit der Überarbeitung ersetzt) |
-| piggy_coin4 | 43d1bb7a-0f10-422d-9bad-4b809a9321f6 | Money, Piggy Bank, Coin Insert 04 | erste Münze ins Sparschwein (überarbeitete Szene) |
-| piggy_ceramic | e902a062-9c82-4088-bcb7-549458513770 | Objects, Coin, Coin Dropping, Ceramic Piggy Bank | zweite Münze (Ausschnitt ab 2,03 s) |
-| piggy_coin2 | 3d69cb14-3fb7-4075-9ee0-d96af8a53f3f | Money, Piggy Bank, Coin Insert 02 | dritte Münze |
-| tiny_steps | 3bb8c761-a875-4b10-9715-e2d338dcc163 | Footsteps, Animal, Designed Tiny Animal Footsteps, Skittering, Wooden Surface 04 | einzelne, sehr leise Hufschritte, genau auf die Trabschritte des Sparschweins gelegt |
-| card_flip | 620f7fcc-556b-4ff4-a77c-149152b3648c | Games, Misc, Playing Cards, Card, Flip | der alte Führerschein dreht sich bei „umtauschen“ in den neuen |
-| coins_drop | 8e7e3f28-f5cc-4f6c-9342-7e762b5b98a6 | Coins, Drop 01 | Münzen fallen ins Altersvorsorgedepot |
-| envelope_flap | 3c4bcbd5-7781-4843-9cbc-086fb37aa0c1 | Paper, Handle, Envelope, Flap, Open | der Musterungsbrief kommt |
-| envelope_open | d09076fc-ff2c-49da-8af1-5f0ecb6e1de8 | Paper, Handle, Opening Envelope | der Brief geht auf |
-| shimmer | 59869c0c-1388-480e-b06d-4592db0c3415 | Magic, Shimmer, Bright | ganz leise: Kurve im Depot, Glanz der Rentenmünze, Übersicht |
-| column_chord | 4b2516e0-8522-44f0-9337-c36c44420ab4 | User Interface, Beep, Button, Chord, Up, Soft | der Balken 2027 wächst; Akkord auf dem fertigen Logo |
+| marker_scratch | cmtlveiqydbpscqyzhj7wkg5x | Crisp Pencil Scratch (wet paper) | alle Striche und Kreise des roten Filzstifts, auch das Logo |
+| pencil_scratch2 | cmv0gp82z008a06i9kdv5qeze | Pencil Scratch 2 | Bleistift: „geplant“, Unterstrich, 259 € gestrichen, 267 €, gestrichelter Kreis, Haken bei „freiwillig“ |
+| cover_tear1 | cmv5mzdr700ul06l4ctov5cv0 | Cover Paper Tear 1 | Deckblatt reißt ab (7 s), letzte Seite vor der Outro |
+| tear4 | cmv5swsdk00yq06l6krildtr3 | Paper Tear 4 | Seite 1. Januar mit dem Zettel reißt ab (42 s) |
+| tear8 | cmv5swsdk00ys06l6m9h7w4k2 | Paper Tear 8 | Seite 1. Juli reißt ab (63,4 s) |
+| rustle_slide | cmukby4jej1z2td8905bzxb8b | Paper Rustle Slide | Lohnabrechnung kommt heraus; Geldbündel rutscht bei der privaten Übergabe |
+| card_slide | cmv0il4an009506l5p37quq3s | Card Slide 1 | Deutschlandticket |
+| book_drop | cmukbw8xe5u7cyfpd5ljbes18 | Book Drop | Riester-Ordner kippt um; gedämpft, wenn das Bündel auf dem Tisch landet |
+| shimmer | cmvjom5v0wesjkcnnq42gu3ql | Sparkle Shimmer | ganz leise: Kurve im Depot, Glanz des neuen Führerscheins, Rentenmünze, Übersicht |
+| coins2 | cmv5p0bmi00l506l5t616c4y5 | Coins 2 | Münzen fallen ins Altersvorsorgedepot |
+| paper3 | cmv0gjx4z001l06l8aylcu9uz | Paper 3 | Zettel „geplant“ landet; Musterungsbrief kommt |
+| knock | cmv8zxseeyz42m1kvc48ask6x | Wood Door Knock | einzelne Schläge, hochgefiltert: Hufe des Sparschweins (sehr leise), Holzfiguren landen, kippen und hüpfen |
+| coin_box | cmukeapx5pqtvs1kl3eywua9n | Coin Drop Metal Box | drei Münzen fallen ins Sparschwein (tiefpassgefiltert, leicht verschieden gestimmt) |
+| glock | cmvcmgxpuvpqbjdx0i99c21ia | Glockenspiel Success Chime | Balken 2027 wächst (tiefer gestimmt, leise); Glocke auf dem fertigen Logo |
+| card_flip | cmv5t3dbz001806ju9mdth3am | Card Playing 14 | alter Führerschein dreht sich in den neuen |
+| page_flips | cmv0gp82z008806i9v08lw7cm | Sketchbook Page Flips 2 | Februar bis Juni fliegen vorbei |
+| quarter_desk | cmukebqgd4asz39ggzzvyc8n7 | Quarter Dropping on Desk | zusätzliche Münze landet auf dem Rentenstapel |
+| envelope | cmukbvw5bktolkm5jm3d6jgcb | Envelope Unfolding | Umschlag öffnet sich hinten, der Brief gleitet nach vorne heraus |
 
-Dazu die Epidemic-Sounds, die der Nutzer früher geliefert hat: `rundfunk/sfx/whoosh.wav` für die Fahrten der Objekte und `rundfunk/sfx/clicks.wav`, wenn eine Zahl erscheint (nur an Schlüsselstellen, nicht bei jeder Zahl).
+Heruntergeladen, aber nicht verwendet: card_slide2 (cmv5t3dbz001j06jucnmb2n5c, Card Slide 2).
 
-Heruntergeladen, aber nicht verwendet: stamp (d530c5b9-3047-42fe-a06a-7c479d637b60, Office Supplies, Rubber Stamp, Document 01).
+Abgelöst (Fassung 1 und 2, Epidemic Sound): marker_line, tear_04, tear_03, tear_notepad, marker_circle, marker_circle2, receipt_print, card_slide, binder_drop, paper_drop, pencil_write, pencil_v, crayon_circle, pages_flick, notes_count, coin_single, piggy_coin4, piggy_ceramic, piggy_coin2, tiny_steps, card_flip, coins_drop, envelope_flap, envelope_open, shimmer, column_chord. Die IDs stehen in der Git-Geschichte dieser Datei.
 
 Die Stimme ist Tom Magic (ElevenLabs, eleven_v4), Take 1 in `voice/voice.mp3`, Take 2 als Alternative in `voice/take2.mp3`. Die Wortzeiten stammen aus der ElevenLabs-Transkription (`voice/words_take1.json`).
