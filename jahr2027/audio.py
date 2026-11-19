@@ -4,7 +4,7 @@
 import numpy as np, subprocess
 from scipy.io import wavfile
 from scipy.signal import butter, sosfilt
-SR = 48000; VO = 0.15; OUT = 73.45; END = 74.5 + VO; N = int(SR * END)
+SR = 48000; VO = 0.15; OUT = 73.45; END = 74.95 + VO; N = int(SR * END)
 t = np.arange(N) / SR
 def lp(x, f, o=2): return sosfilt(butter(o, f, 'low', fs=SR, output='sos'), x)
 def hp(x, f, o=2): return sosfilt(butter(o, f, 'high', fs=SR, output='sos'), x)
@@ -130,10 +130,20 @@ knock(69.17, 0.14, 0, 1.1); knock(69.82, 0.22, 1, 1.05)
 # ---------------------------------------------------------------- overview and end card
 whoosh(70.25, 0.4, 1)
 add(cut(sz('shimmer'), 0.0, 1.4, 0.003, 0.5), 70.6, 0.1)
-# outro v3 (1 s): last page tears off, the rubber stamp comes down and stamps the red logo
-add(rate(cut(sz('cover_tear1'), 0.0, 0.7, 0.002, 0.15), 1.1), 73.45 - 0.03, 0.45)   # last page tears off
-whoosh(73.74, 0.14, 1)                                                        # the stamp swings in
-hit('stamp', 73.84, 0.55, 0.071)                                              # stamp hits the page
+# outro v5 (1,5 s): the red marker rolls off its resting place towards the camera and stops with "function." facing it
+add(rate(cut(sz('cover_tear1'), 0.0, 0.7, 0.002, 0.15), 1.1), 73.45 - 0.03, 0.3)    # last page tears off (in the background)
+def roll_sound(t0, t1, length=0.7185, r=0.0096, seed=11):
+    # no library has a rolling pen: soft friction noise that pulses once per turn and slows down with the marker (constant friction)
+    n = int((t1 - t0 + 0.05) * SR); tt = np.arange(n) / SR; T = t1 - t0; u = np.clip(tt / T, 0, 1)
+    speed = 2 * length / T * (1 - u)                                   # m/s, linear decay
+    ph = np.cumsum(speed / (2 * np.pi * r)) / SR                       # turns
+    rng = np.random.default_rng(seed); nz = rng.standard_normal(n)
+    body = sosfilt(butter(2, [500, 2600], 'band', fs=SR, output='sos'), nz)
+    puls = 0.55 + 0.45 * np.abs(np.sin(np.pi * ph)) ** 6               # a slightly flatter spot touches the desk once per turn
+    env = np.clip(speed / speed.max(), 0, 1) ** 0.7 * np.clip(tt / 0.02, 0, 1)
+    y = body * puls * env; return y / (np.max(np.abs(y)) + 1e-9)
+add(roll_sound(73.6, 74.55), 73.6, 0.3)
+add(cut(sz('glock'), 0.0, 1.0, 0.002, 0.4), 74.5, 0.12)                       # soft chime as the logo comes to rest
 fx *= np.clip((END - t) / 0.2, 0, 1)
 
 # ---------------------------------------------------------------- voice (take 1, natural tempo) + gentle ducking

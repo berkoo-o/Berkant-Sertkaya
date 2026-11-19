@@ -90,12 +90,12 @@ const pk=(o,t,e='io')=>[t,{p:o.p,r:o.r,s:o.s,e}];
 // one track per object: emerge from the page, present in front of the calendar, then park
 function hero(tIn,tOut,tPark,park,rot,opt={}){const hp=opt.hp||HP(),s=opt.s||1.45;const parkKey=opt.lay?[tPark,{p:park.p,r:park.r,s:park.s,e:'out',ep:'io'}]:pk(park,tPark);
   return track([[tIn-0.01,{p:EM,r:[0,0,0],s:0}],[tIn,{p:EM,r:[0.6,0,0],s:0.12}],[tIn+0.62,{p:hp,r:rot,s,e:'back',k:1.2,ep:opt.ep}],
-  [tOut,{p:[hp[0]+(opt.drift||0.006),hp[1]+0.004,hp[2]],r:[rot[0],rot[1]+(opt.spin||0.12),rot[2]],s}],parkKey,pk(park,69.95+(opt.k||0)*0.05),[70.75+(opt.k||0)*0.05,{p:opt.form.p,r:opt.form.r,s:opt.form.s,e:'io',ep:'out'}],pk(opt.form,73.35),[74.15,{p:park.p,r:park.r,s:park.s,e:'out',ep:'io'}]]);}
+  [tOut,{p:[hp[0]+(opt.drift||0.006),hp[1]+0.004,hp[2]],r:[rot[0],rot[1]+(opt.spin||0.12),rot[2]],s}],parkKey,pk(park,69.95+(opt.k||0)*0.05),[70.75+(opt.k||0)*0.05,{p:opt.form.p,r:opt.form.r,s:opt.form.s,e:'io',ep:'out'}],pk(opt.form,73.35),[76.5,{p:park.p,r:park.r,s:park.s,e:'out',ep:'io'}]]);}
 const TR={
   cash:track([[0,{p:HP(0,0.066,0),r:[0.95,-0.32,0.05],s:1.3}],[2.6,{p:HP(0.004,0.07,0),r:[0.92,-0.2,0.04],s:1.3}],[3.6,{p:[0.6,0.0,0.15],r:[0,-0.3,0],s:1,e:'out',ep:'io'}],[61.35,{p:[0.6,0.0,0.15],r:[0,-0.3,0],s:1}],
     [62.1,{p:HP(0,0.066,0),r:[0.9,-0.28,0.04],s:1.3,e:'io',ep:'out'}],[64.2,{p:HP(0,0.068,0),r:[0.9,-0.2,0.04],s:1.3}],[64.6,{p:HP(0,CASH_YC,0.01),r:[0.6,-0.1,0],s:1.3}],[67.45,{p:HP(0,CASH_YC,0.01),r:[0.6,-0.05,0],s:1.3}],
     [68.0,{p:[HAND.xb0,0,HAND.z],r:[0,0.06,0],s:HAND.cs}],[HAND.s0,{p:[HAND.xb0,0,HAND.z],r:[0,0.06,0],s:HAND.cs}],[HAND.s1,{p:[HAND.xb1,0,HAND.z],r:[0,-0.03,0],s:HAND.cs,e:'o2'}],
-    [69.95,{p:[HAND.xb1,0,HAND.z],r:[0,-0.03,0],s:HAND.cs}],pk(FORM.cash,70.95),pk(FORM.cash,73.35),pk(PARK.cash,74.15)]),
+    [69.95,{p:[HAND.xb1,0,HAND.z],r:[0,-0.03,0],s:HAND.cs}],pk(FORM.cash,70.95),pk(FORM.cash,73.35),pk(PARK.cash,76.5)]),
   slip:hero(8.5,14.85,15.6,PARK.slip,[-0.3,0.2,-0.03],{hp:HP(0,0.118,0.02),s:1.0,form:FORM.slip,k:0,ep:'out',lay:1}),
   ticket:hero(14.95,19.3,20.0,PARK.ticket,[-0.3,-0.22,0.04],{hp:HP(0,0.075,0),s:1.35,form:FORM.ticket,k:1}),
   binder:track([[19.33,{p:EM,r:[0,0,0],s:0}],[19.34,{p:EM,r:[0,0,0],s:0.12}],[19.95,{p:HP(-0.04,0,-0.05),r:[0,0.5,0],s:0.8,e:'back',k:1.1,ep:'out'}],[21.4,{p:HP(-0.04,0,-0.05),r:[0,0.56,0],s:0.8}],pk(PARK.binder,22.6)]),
@@ -107,7 +107,7 @@ const TR={
     return track([[41.99,{p:[0.5,0.27,0.66],r:[-0.7,-1.5,0.7],s:0}],[42.0,{p:[0.5,0.27,0.66],r:[-0.7,-1.5,0.7],s:1.35}],[42.9,{p:[-0.045,0.0675,0.56],r:[-0.24,0.34,-0.04],s:1.35,e:'out'}],
       [45.35,{p:[-0.042,0.0705,0.56],r:[-0.23,0.4,-0.03],s:1.35}],[46.15,{p:[-0.05,0.0675,0.46],r:[-0.27,0.3,-0.05],s:1.3}],[47.15,{p:[-0.046,0.0685,0.46],r:[-0.27,0.32,-0.05],s:1.3}],
       [47.95,{p:[0.02,0.062,0.52],r:[-0.25,Math.PI+0.04,0.03],s:1.38,e:'io'}],[48.5,{p:[0.025,0.064,0.52],r:[-0.25,Math.PI+0.08,0.03],s:1.38}],[49.3,{p:LP.p,r:LP.r,s:1,e:'out',ep:'io'}],
-      [70.25,{p:LP.p,r:LP.r,s:1}],[71.05,{p:LF.p,r:LF.r,s:LF.s,e:'io',ep:'out'}],[73.35,{p:LF.p,r:LF.r,s:LF.s}],[74.15,{p:LP.p,r:LP.r,s:1,e:'out',ep:'io'}]]);})(),
+      [70.25,{p:LP.p,r:LP.r,s:1}],[71.05,{p:LF.p,r:LF.r,s:LF.s,e:'io',ep:'out'}],[73.35,{p:LF.p,r:LF.r,s:LF.s}],[76.5,{p:LP.p,r:LP.r,s:1,e:'out',ep:'io'}]]);})(),
   stack:hero(49.3,52.78,53.4,PARK.stack,[0.1,0,0],{hp:HP(0,0.006,0.01),s:1.75,spin:0.4,form:FORM.stack,k:7,ep:'out'}),
   env:hero(52.85,61.3,62.0,PARK.env,[-0.2,-0.16,0.02],{hp:HP(0,0.09,0),s:1.25,drift:0.003,spin:0.05,form:FORM.env,k:8}),
 };
@@ -145,8 +145,8 @@ const strokeTip=(S)=>objTip(cash.G,u=>S.tip(u),[0,1,0]);
 const MARK=[[0.85,STROKES.s0[0],STROKES.s0[1],2.85,strokeTip(S0)],[7.45,...RING.jan1,9.25,ringTip(R1)],[45.85,...RING.jan19,47.65,ringTip(R2)],[49.12,...RING.jul1,50.75,ringTip(R3)],
   [63.3,...RING.jul10,65.1,ringTip(R4)],[65.1,STROKES.x1[0],STROKES.x2[1],67.15,u=>u<0.5?strokeTip(SX1)(u*2):strokeTip(SX2)((u-0.5)*2)]];
 // outro: the marker writes the logo; the tip path is set up further down
-// outro v3 (Wunsch des Nutzers 19.11.2026: roter Stempel, nur eine Sekunde): the last page tears off, a rubber stamp comes down and stamps the logo
-const OUT={t0:73.45,s0:73.64,hit:73.84,up:73.89,s1:74.08,end:74.5};
+// outro v5 (Wunsch des Nutzers 19.11.2026: der rote Stift rollt auf die Kamera zu, ganz nah steht „function.“ darauf; 1,5 Sekunden)
+const OUT={t0:73.45,r0:73.6,r1:74.55,end:74.95};
 function noteTip(u){const x=-NOTE.s/2+NOTE.s*(0.1+0.82*u)-NOTE.s/2*0.0,y=6-26+16*Math.sin(u*Math.PI*14);const q=notePt(x+NOTE.s*0.0,y);return {p:pagePt(q[0],q[1]),n:PAGE_N};}
 const kgTip=(px,py)=>objTip(kg.G,()=>[(px/kg.tw-0.5)*0.15,(0.5-py/kg.th)*0.19,0.004],[0,0,1]);
 const PENC=[[26.72,NOTE.w0,NOTE.u1,28.9,u=>{if(u<0.74)return noteTip(u/0.74);const v=(u-0.74)/0.26;const q=notePt(-120+240*v,40-6*v);return {p:pagePt(q[0],q[1]),n:PAGE_N};}],
@@ -202,7 +202,7 @@ const KEYS=[
  [48.4,C(0,0.192,0.1,2.732,2,11)],[49.8,C(0,0.182,0.12,2.571,0,11)],[50.9,C(0,0.142,0.26,2.392,5,14)],[52.4,C(0,0.142,0.26,2.313,6,14)],
  [53.6,C(0,0.152,0.26,2.392,-3,13)],[56.6,C(0,0.162,0.28,2.169,-2,12)],[60.6,C(0,0.162,0.28,2.114,-1,12)],
  [62.2,C(0,0.152,0.24,2.559,0,13)],[63.9,C(0,0.182,0.12,2.571,0,11)],[65.3,C(0,0.132,0.3,2.392,4,16)],[67.6,C(0,0.132,0.3,2.313,3,16)],[68.8,C(0,0.1,0.33,2.6,0,13)],
- [70.6,C(0,0.1,0.36,3.32,0,30)],[73.1,C(0,0.1,0.36,3.2,2,29)],[73.78,C(0,0.2,0.03,1.62,0,7)],[74.6,C(0,0.2,0.03,1.58,0,7)]];
+ [70.6,C(0,0.1,0.36,3.32,0,30)],[73.1,C(0,0.1,0.36,3.2,2,29)],[73.95,C(0.62,0.02,0.5,1.0,20,30)],[74.55,C(0.818,0.011,0.791,0.40,28.65,32)],[75.0,C(0.818,0.011,0.791,0.39,28.65,32)]];
 const KT=KEYS.map(k=>k[0]),KV=KEYS.map(k=>k[1]);
 const KM=[0,1,2,3,4,5].map(j=>{const n=KT.length,d=[],tg=new Array(n).fill(0);for(let i=0;i<n-1;i++)d.push((KV[i+1][j]-KV[i][j])/(KT[i+1]-KT[i]));
   for(let i=1;i<n-1;i++){if(d[i-1]*d[i]<=0)continue;const h0=KT[i]-KT[i-1],h1=KT[i+1]-KT[i],w1=2*h1+h0,w2=h1+2*h0;tg[i]=(w1+w2)/(w1/d[i-1]+w2/d[i]);}return tg;});
@@ -249,35 +249,28 @@ function overlay(t){const O2=OUT.t0;
   // number tags over the parked objects in the overview
   const tk=Math.min(win(t,70.55,73.4,0.3));const objs=TAGOBJ();tags.forEach((e,i)=>{const op=tk*clamp((t-70.55-i*0.07)/0.2,0,1);if(op<=0.01){e.style.opacity=0;return;}const o=objs[i];o.updateMatrixWorld();const b=new THREE.Box3().setFromObject(o);const q=proj([(b.min.x+b.max.x)/2,b.max.y+0.03,(b.min.z+b.max.z)/2]);e.style.left=q[0]+'px';e.style.top=q[1]+'px';e.style.opacity=op;e.style.transform=`translate(-50%,-50%) scale(${lerp(0.6,1,eo((t-70.55-i*0.07)/0.3))})`;});}
 
-// ------------------------------------------------------------------ outro: a rubber stamp stamps the red logo onto the last (blank) page
-const LOGO={sz:150,base:690};
-{const g=document.createElement('canvas').getContext('2d');g.font=`500 ${LOGO.sz}px Poppins`;const tr=-0.04*LOGO.sz;const ws=[...'function.'].map(c=>g.measureText(c).width);LOGO.w=ws.reduce((a,b)=>a+b,0)+tr*8;LOGO.tr=tr;LOGO.ws=ws;
- LOGO.x0=TW/2-LOGO.w/2;LOGO.cy=LOGO.base-LOGO.sz*0.36;LOGO.bw=LOGO.w+110;LOGO.bh=LOGO.sz*1.32;}
-// ink texture: the imprint is a little uneven like a real stamp
-const INK=(()=>{const c=document.createElement('canvas');c.width=TW;c.height=TH;const g=c.getContext('2d');const r=rng(77);
-  g.save();g.translate(TW/2,LOGO.cy);g.rotate(-0.035);g.translate(-TW/2,-LOGO.cy);g.fillStyle=REDS;g.strokeStyle=REDS;
-  g.lineWidth=11;roundRect(g,TW/2-LOGO.bw/2,LOGO.cy-LOGO.bh/2,LOGO.bw,LOGO.bh,26);g.stroke();
-  g.font=`500 ${LOGO.sz}px Poppins`;g.textBaseline='alphabetic';let x=LOGO.x0;[...'function.'].forEach((ch,i)=>{g.fillText(ch,x,LOGO.base);x+=LOGO.ws[i]+LOGO.tr;});g.restore();
-  g.globalCompositeOperation='destination-out';for(let i=0;i<2600;i++){const x=TW/2+(r()-0.5)*LOGO.bw*1.05,y=LOGO.cy+(r()-0.5)*LOGO.bh*1.1;g.globalAlpha=0.25+0.6*r();g.beginPath();g.arc(x,y,0.6+r()*2.4,0,7);g.fill();}
-  g.globalAlpha=0.18;for(let i=0;i<14;i++){const y=LOGO.cy-LOGO.bh/2+r()*LOGO.bh;g.fillRect(TW/2-LOGO.bw/2,y,LOGO.bw,1+r()*2);}return c;})();
-cal.pages[10].draws.push({key:t=>t<OUT.hit?null:'ink',draw:(g,t)=>{g.save();g.globalAlpha=0.94;g.drawImage(INK,0,0);g.restore();}});
-// the stamp: dark wooden handle with a round knob, a block with a red rubber face, it comes down along the page normal
-const stamp=(()=>{const G=new THREE.Group();scene.add(G);const B=new THREE.Group();G.add(B);
-  const fw=(LOGO.bw+40)/TW*PW,fh=(LOGO.bh+40)/TH*PH;const wood=new THREE.MeshStandardMaterial({color:0x2a2630,roughness:0.55}),wood2=new THREE.MeshStandardMaterial({color:0x3a3442,roughness:0.5});
-  const add=(geo,m,y)=>{const o=new THREE.Mesh(geo,m);o.position.y=y;o.castShadow=true;B.add(o);return o;};
-  add(new RoundedBoxGeometry(fw,0.006,fh,2,0.002),new THREE.MeshStandardMaterial({color:0xb3141f,roughness:0.6,emissive:0x400307,emissiveIntensity:0.4}),0.003);
-  add(new RoundedBoxGeometry(fw+0.006,0.018,fh+0.006,3,0.004),wood,0.015);
-  add(new RoundedBoxGeometry(fw*0.5,0.012,fh*0.62,3,0.004),wood2,0.03);
-  add(new THREE.CylinderGeometry(0.009,0.013,0.06,20),wood,0.066);
-  add(new THREE.SphereGeometry(0.02,24,16),wood2,0.108);
-  const q=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),PAGE_N);G.quaternion.copy(q);G.visible=false;return {G,B};})();
-// it swings in from the upper left (the torn page flies off to the right) and leaves the same way
-const STAMP_DIR=new THREE.Vector3(-0.45,Math.cos(0.16),-Math.sin(0.16)).normalize();
-function stampAnim(t){const G=stamp.G,B=stamp.B;if(t<OUT.s0||t>OUT.s1+0.02){G.visible=false;return;}G.visible=true;
-  let h,tilt=0,sq=1;if(t<OUT.hit){const u=(t-OUT.s0)/(OUT.hit-OUT.s0);h=0.42*(1-u*u);tilt=0.22*(1-u)*(1-u);}
-  else if(t<OUT.up){const u=(t-OUT.hit)/(OUT.up-OUT.hit);h=0;sq=1-0.06*Math.sin(Math.PI*u);}
-  else{const u=(t-OUT.up)/(OUT.s1-OUT.up);h=0.5*u*u;tilt=-0.12*u;}
-  const c=pagePt(TW/2,LOGO.cy);G.position.copy(c).addScaledVector(PAGE_N,h+0.0005).addScaledVector(STAMP_DIR,h*1.3);B.rotation.set(tilt,0,-tilt*0.4);B.scale.set(1,sq,1);}
+// ------------------------------------------------------------------ outro v5: the red marker rolls across the desk towards the camera and stops right in front of it;
+// "function." is printed on its barrel and turns to the front just as it comes to rest
+const ROLL=(()=>{const r=0.0096,LY=0.084,EL=32*Math.PI/180;
+  // it rolls straight off its resting place (yaw 0.5 as in REST.marker), after exactly 12 turns minus the camera angle the label faces the camera
+  const yaw=0.5,ax=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw)),v=[Math.sin(yaw),Math.cos(yaw)];const len=r*(2*Math.PI*12-EL);
+  const S=[0.40+ax.x*LY,0.2+ax.z*LY],E=[S[0]+v[0]*len,S[1]+v[1]*len];
+  return {r,S,E,len,v,yaw,ax,EL,LY,phiEnd:-EL};})();
+// the label: a thin sleeve on the white barrel with the red logo, text running from the tip to the cap
+{const T=ctex(512,1024,(g,w,h)=>{g.clearRect(0,0,w,h);g.save();g.translate(w/2,h/2);g.rotate(-Math.PI/2);g.fillStyle=REDS;g.font='500 300px Poppins';g.textAlign='center';g.textBaseline='middle';
+   const tw=g.measureText('function.').width;const k=Math.min(1,(h*0.94)/tw);g.scale(k,k);g.fillText('function.',0,10);g.restore();});
+ const th=1.9,geo=new THREE.CylinderGeometry(0.00856,0.00856,0.05,48,1,true,-th/2,th);
+ const m=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({map:T.tex,transparent:true,roughness:0.4,polygonOffset:true,polygonOffsetFactor:-2,emissive:new THREE.Color(RED),emissiveMap:T.tex,emissiveIntensity:0.12}));
+ m.position.y=ROLL.LY;marker.P.add(m);ROLL.label=m;m.visible=false;}
+const _qa=new THREE.Quaternion(),_qb=new THREE.Quaternion(),_qc=new THREE.Quaternion();
+function rollAnim(t){const on=t>=OUT.r0;ROLL.label.visible=on;marker.P.children[6].visible=!on;if(!on)return;
+  const u=clamp((t-OUT.r0)/(OUT.r1-OUT.r0),0,1),f=1-(1-u)*(1-u);const sdist=ROLL.len*f;
+  const phi=ROLL.phiEnd-(ROLL.len-sdist)/ROLL.r;
+  _qa.setFromAxisAngle(new THREE.Vector3(0,1,0),ROLL.yaw);_qb.setFromAxisAngle(new THREE.Vector3(0,0,1),-Math.PI/2);_qc.setFromAxisAngle(new THREE.Vector3(0,1,0),phi);
+  marker.G.quaternion.copy(_qa).multiply(_qb).multiply(_qc);
+  const cx=ROLL.S[0]+ROLL.v[0]*sdist,cz=ROLL.S[1]+ROLL.v[1]*sdist;
+  // the label centre sits on the path; the tip is LY back along the axis
+  marker.G.position.set(cx,ROLL.r,cz).addScaledVector(ROLL.ax,-ROLL.LY);}
 
 // ------------------------------------------------------------------ per-frame state
 const _b=new THREE.Box3();
@@ -308,14 +301,13 @@ function setTime(t){setCam(t);
   applyPose(env.G,TR.env(t));if(t>52.8&&t<61.3)bob(env.G,8);env.flapG.rotation.x=2.75*eio((t-55.9)/0.45)+(Math.PI+0.03-2.75)*eio((t-61.35)/0.55);env.letter.position.y=0.072*eio((t-56.25)/0.7);env.tick.opacity=clamp((t-60.45)/0.15,0,1);
   applyPose(shop.G,SHOP(t));shop.G.visible=t>64.45&&t<67.85;
   meepleAnim(t);
-  stampAnim(t);
   // tools
-  const mOn=toolPose(marker,MARK,t,REST.marker,1);const pOn=toolPose(pencil,PENC,t,REST.pencil,-1);
+  const mOn=toolPose(marker,MARK,t,REST.marker,1);rollAnim(t);const pOn=toolPose(pencil,PENC,t,REST.pencil,-1);
   {const o=clamp((t-OUT.t0-0.3)/0.6,0,1);shadeEl.style.opacity=(1-0.55*o).toFixed(3);}
   overlay(t);}
 
 const VO=0.15,END_V=OUT.end;window.TOTAL=Math.round((END_V+VO)*30);
-window.renderAt=async f=>{const tv=f/30-VO;setTime(tv);composer.render();const fd=Math.min(clamp((f/30)/0.25,0,1),clamp((END_V-tv)/0.18,0,1));document.body.style.filter=fd<1?`brightness(${fd.toFixed(3)})`:'none';return true;};
+window.renderAt=async f=>{const tv=f/30-VO;setTime(tv);composer.render();const fd=Math.min(clamp((f/30)/0.25,0,1),clamp((END_V-tv)/0.2,0,1));document.body.style.filter=fd<1?`brightness(${fd.toFixed(3)})`:'none';return true;};
 window.setTimeV=tv=>{setTime(tv);composer.render();};
 window.THREE_DBG=THREE;window.DBGOBJ={cash,slip,ticket,binder,depot,piggy,kg,bars,lic,stack,env,shop,ma,mb,marker,pencil};window.setT=tv=>setTime(tv);
 await window.renderAt(0);window.ready=true;
