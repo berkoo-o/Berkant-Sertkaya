@@ -6,4 +6,4 @@ sfx/
 *.wav
 *.raw
 video.mp4
-render.log
+render*.log
