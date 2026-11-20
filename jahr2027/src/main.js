@@ -6,7 +6,7 @@ import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
-import {clamp,lerp,ease,eo,ei,eio,ebk,win,track,applyPose,ctex,grain,rng,RED,REDS,hdr,roundRect} from './util.js';
+import {clamp,lerp,ease,eo,ei,eio,ebk,win,track,applyPose,ctex,grain,rng,RED,REDS,hdr,roundRect,ringPath} from './util.js';
 import {buildCalendar,PW,PH,TW,TH,PY,PZ} from './calendar.js';
 import * as P from './props.js';
 
@@ -44,7 +44,7 @@ const focus=new THREE.SpotLight(0xfff1e2,0,0,0.42,0.9,2);scene.add(focus);scene.
 // ------------------------------------------------------------------ calendar and its pages (voice time)
 const cal=buildCalendar(scene);
 const TEAR={cover:6.72,jan1:41.7,flip:[48.22,48.38,48.53,48.67,48.8,48.92],jul1:63.22,jul10:73.45};
-cal.setTear(0,TEAR.cover,0.85);cal.setTear(1,TEAR.jan1,0.85);TEAR.flip.forEach((t,i)=>cal.setTear(2+i,t,0.62));cal.setTear(8,TEAR.jul1,0.8);cal.setTear(9,TEAR.jul10,0.36);
+cal.setTear(0,TEAR.cover,0.85);cal.setTear(1,TEAR.jan1,0.85);TEAR.flip.forEach((t,i)=>cal.setTear(2+i,t,0.62));cal.setTear(8,TEAR.jul1,0.8);cal.setTear(9,1e9,0.36); // the July page stays: the outro happens over the overview
 const RING={jan1:[7.95,8.75],jan19:[46.3,47.1],jul1:[49.55,50.2],jul10:[63.7,64.45]};
 const R1=cal.addRing(1,...RING.jan1,5),R2=cal.addRing(2,...RING.jan19,8),R3=cal.addRing(8,...RING.jul1,12),R4=cal.addRing(9,...RING.jul10,4);
 // sticky note "geplant" on the 1st of January page, slapped on at "Geplant"
@@ -145,7 +145,7 @@ const strokeTip=(S)=>objTip(cash.G,u=>S.tip(u),[0,1,0]);
 const MARK=[[0.85,STROKES.s0[0],STROKES.s0[1],2.85,strokeTip(S0)],[7.45,...RING.jan1,9.25,ringTip(R1)],[45.85,...RING.jan19,47.65,ringTip(R2)],[49.12,...RING.jul1,50.75,ringTip(R3)],
   [63.3,...RING.jul10,65.1,ringTip(R4)],[65.1,STROKES.x1[0],STROKES.x2[1],67.15,u=>u<0.5?strokeTip(SX1)(u*2):strokeTip(SX2)((u-0.5)*2)]];
 // outro: the marker writes the logo; the tip path is set up further down
-// outro v6 (Wunsch des Nutzers 20.11.2026: „komplett was anderes“, gewählt: Silvester-Feuerwerk, 1,5 Sekunden)
+// outro v7 (Wunsch des Nutzers 20.11.2026: „mach was anderes“, gewählt: „10 Kreise werden zum Punkt“, 1,5 Sekunden)
 const OUT={t0:73.45,end:74.95};
 function noteTip(u){const x=-NOTE.s/2+NOTE.s*(0.1+0.82*u)-NOTE.s/2*0.0,y=6-26+16*Math.sin(u*Math.PI*14);const q=notePt(x+NOTE.s*0.0,y);return {p:pagePt(q[0],q[1]),n:PAGE_N};}
 const kgTip=(px,py)=>objTip(kg.G,()=>[(px/kg.tw-0.5)*0.15,(0.5-py/kg.th)*0.19,0.004],[0,0,1]);
@@ -202,7 +202,7 @@ const KEYS=[
  [48.4,C(0,0.192,0.1,2.732,2,11)],[49.8,C(0,0.182,0.12,2.571,0,11)],[50.9,C(0,0.142,0.26,2.392,5,14)],[52.4,C(0,0.142,0.26,2.313,6,14)],
  [53.6,C(0,0.152,0.26,2.392,-3,13)],[56.6,C(0,0.162,0.28,2.169,-2,12)],[60.6,C(0,0.162,0.28,2.114,-1,12)],
  [62.2,C(0,0.152,0.24,2.559,0,13)],[63.9,C(0,0.182,0.12,2.571,0,11)],[65.3,C(0,0.132,0.3,2.392,4,16)],[67.6,C(0,0.132,0.3,2.313,3,16)],[68.8,C(0,0.1,0.33,2.6,0,13)],
- [70.6,C(0,0.1,0.36,3.32,0,30)],[73.1,C(0,0.1,0.36,3.2,2,29)],[73.78,C(0,0.31,0.06,2.15,0,6)],[75.0,C(0,0.32,0.06,2.1,0,6)]];
+ [70.6,C(0,0.1,0.36,3.32,0,30)],[73.1,C(0,0.1,0.36,3.2,2,29)],[75.0,C(0,0.1,0.36,3.1,2,29)]];
 const KT=KEYS.map(k=>k[0]),KV=KEYS.map(k=>k[1]);
 const KM=[0,1,2,3,4,5].map(j=>{const n=KT.length,d=[],tg=new Array(n).fill(0);for(let i=0;i<n-1;i++)d.push((KV[i+1][j]-KV[i][j])/(KT[i+1]-KT[i]));
   for(let i=1;i<n-1;i++){if(d[i-1]*d[i]<=0)continue;const h0=KT[i]-KT[i-1],h1=KT[i+1]-KT[i],w1=2*h1+h0,w2=h1+2*h0;tg[i]=(w1+w2)/(w1/d[i-1]+w2/d[i]);}return tg;});
@@ -249,61 +249,43 @@ function overlay(t){const O2=OUT.t0;
   // number tags over the parked objects in the overview
   const tk=Math.min(win(t,70.55,73.4,0.3));const objs=TAGOBJ();tags.forEach((e,i)=>{const op=tk*clamp((t-70.55-i*0.07)/0.2,0,1);if(op<=0.01){e.style.opacity=0;return;}const o=objs[i];o.updateMatrixWorld();const b=new THREE.Box3().setFromObject(o);const q=proj([(b.min.x+b.max.x)/2,b.max.y+0.03,(b.min.z+b.max.z)/2]);e.style.left=q[0]+'px';e.style.top=q[1]+'px';e.style.opacity=op;e.style.transform=`translate(-50%,-50%) scale(${lerp(0.6,1,eo((t-70.55-i*0.07)/0.3))})`;});}
 
-// ------------------------------------------------------------------ outro v6: New Year's Eve. The last page jumps to 31 December, a small red rocket rises out of the page,
-// bursts above the calendar and its sparks fly together into "function."; the rocket head becomes the dot
-const FW={rise0:73.72,burst:74.02,form0:74.12,form1:74.42,dot:74.44};
-const rocket=(()=>{const G=new THREE.Group();scene.add(G);G.visible=false;const red=new THREE.MeshStandardMaterial({color:0xE01E2B,roughness:0.4,emissive:0x5a0810,emissiveIntensity:0.6});
-  const paperW=new THREE.MeshStandardMaterial({color:0xf1ece2,roughness:0.6}),wood=new THREE.MeshStandardMaterial({color:0xb08a5a,roughness:0.8}),dk=new THREE.MeshStandardMaterial({color:0x26262c,roughness:0.5});
-  const add=(geo,m,y)=>{const o=new THREE.Mesh(geo,m);o.position.y=y;o.castShadow=true;G.add(o);return o;};
-  add(new THREE.CylinderGeometry(0.0085,0.0085,0.05,24),red,0.025);add(new THREE.CylinderGeometry(0.0087,0.0087,0.008,24),paperW,0.036);
-  add(new THREE.ConeGeometry(0.0095,0.024,24),red,0.062);add(new THREE.CylinderGeometry(0.006,0.0075,0.006,20),dk,-0.002);
-  add(new THREE.CylinderGeometry(0.0012,0.0012,0.1,8),wood,-0.05).position.x=0.0095;
-  const glow=new THREE.PointLight(0xff5a3a,0,0.6,2);glow.position.y=-0.01;G.add(glow);return {G,glow};})();
-const burstLight=new THREE.PointLight(0xff3040,0,2.2,2);scene.add(burstLight);
-// the rocket starts at the "31" on the page and climbs up in front of the calendar, slightly accelerating
-const RK=(()=>{const a=pagePt(TW/2,700),pa=a.clone().addScaledVector(PAGE_N,0.03),pb=new THREE.Vector3(0.0,0.62,0.17);return {pa,pb};})();
-function rocketPos(t){const u=clamp((t-FW.rise0)/(FW.burst-FW.rise0),0,1);const k=u*u*(1.4-0.4*u);const p=RK.pa.clone().lerp(RK.pb,k);p.x+=0.012*Math.sin(u*7);return {p,u};}
-// the logo on screen and the spark targets sampled from its glyphs
-const FWL=(()=>{const c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');const sz=176;g.font=`500 ${sz}px Poppins`;g.letterSpacing=(-0.04*sz)+'px';
-  const tw=g.measureText('function').width,dw=g.measureText('.').width;const x0=W/2-(tw+dw)/2,base=560;g.fillStyle='#fff';g.fillText('function',x0,base);
-  const m=g.measureText('.');const dot={x:x0+tw+dw*0.5,y:base-(m.actualBoundingBoxAscent+m.actualBoundingBoxDescent)/2,r:(m.actualBoundingBoxAscent+m.actualBoundingBoxDescent)/2};
-  const d=g.getImageData(0,0,W,H).data;const pts=[];const r=rng(2027);for(let y=base-200;y<base+60;y+=7)for(let x=Math.floor(x0);x<x0+tw;x+=7){if(d[(y*W+x)*4+3]>128&&r()<0.8)pts.push([x+(r()-0.5)*3,y+(r()-0.5)*3]);}
-  const sp=pts.map(q=>{const a=r()*Math.PI*2,v=260+r()*520;return {tx:q[0],ty:q[1],vx:Math.cos(a)*v,vy:Math.sin(a)*v-120,d:r()*0.12,hot:r()};});
-  const embers=Array.from({length:70},()=>{const a=r()*Math.PI*2,v=120+r()*520;return {vx:Math.cos(a)*v,vy:Math.sin(a)*v-200,life:0.35+r()*0.5,hot:r()};});
-  return {x0,base,sz,tw,dot,sp,embers};})();
-const fwc=document.getElementById('fw').getContext('2d');const TRAIL=[];
-function fireworks(t){fwc.clearRect(0,0,W,H);
-  // rocket
-  const on=t>=FW.rise0-0.12&&t<FW.burst;rocket.G.visible=on;
-  if(on){const em=clamp((t-(FW.rise0-0.12))/0.12,0,1);const {p,u}=rocketPos(t);rocket.G.position.copy(p);rocket.G.scale.setScalar(Math.max(0.01,ebk(em,1.6)));rocket.G.rotation.set(0,0,-0.06*Math.cos(u*7));rocket.glow.intensity=t>FW.rise0?0.22:0;
-    // spark trail behind the rocket (screen space)
-    if(t>FW.rise0){fwc.save();fwc.globalCompositeOperation='lighter';const rr=rng(Math.floor(t*90));for(let i=0;i<60;i++){const back=i*0.0035;if(t-back<FW.rise0)break;const q=rocketPos(t-back).p;q.y-=0.006;const s=proj([q.x,q.y,q.z]);const a=(1-i/60);
-      const jx=(rr()-0.5)*16*i/60,jy=rr()*18*i/60;const g=fwc.createRadialGradient(s[0]+jx,s[1]+jy,0,s[0]+jx,s[1]+jy,4+7*a);g.addColorStop(0,`rgba(255,240,210,${0.9*a})`);g.addColorStop(0.4,`rgba(255,120,80,${0.6*a})`);g.addColorStop(1,'rgba(224,30,43,0)');
-      fwc.fillStyle=g;fwc.beginPath();fwc.arc(s[0]+jx,s[1]+jy,4+7*a,0,7);fwc.fill();}fwc.restore();}}
-  burstLight.position.copy(RK.pb).add(new THREE.Vector3(0,0.065,0));burstLight.intensity=t>=FW.burst?1.5*Math.exp(-(t-FW.burst)*7):0;
-  if(t<FW.burst)return;
-  const B=proj([RK.pb.x,RK.pb.y+0.065,RK.pb.z]);const tb=t-FW.burst;
-  fwc.save();fwc.globalCompositeOperation='lighter';
-  // flash
-  if(tb<0.14){const f=1-tb/0.14;const g=fwc.createRadialGradient(B[0],B[1],0,B[0],B[1],260);g.addColorStop(0,`rgba(255,235,220,${0.85*f})`);g.addColorStop(0.3,`rgba(255,80,70,${0.45*f})`);g.addColorStop(1,'rgba(224,30,43,0)');fwc.fillStyle=g;fwc.fillRect(B[0]-260,B[1]-260,520,520);}
-  // the letter sparks: fly out with the burst, then get pulled into the glyphs
-  const sol=clamp((t-FW.form1+0.05)/0.2,0,1);
-  for(const s of FWL.sp){const te=Math.max(0,tb-s.d*0.3);const ex=B[0]+s.vx*te*Math.exp(-te*3.2)*0.55,ey=B[1]+s.vy*te*Math.exp(-te*3.2)*0.55+60*te*te;
-    const w=eio(clamp((t-FW.form0-s.d)/(FW.form1-FW.form0-0.12),0,1));const x=lerp(ex,s.tx,w),y=lerp(ey,s.ty,w);const a=(1-sol)*(tb<0.04?tb/0.04:1);if(a<=0.01)continue;
-    const hot=0.5+0.5*Math.sin(s.hot*40+t*60);const rad=2.2+1.6*(1-w);fwc.fillStyle=`rgba(255,${Math.round(90+120*hot*(1-w*0.6))},${Math.round(70+90*hot*(1-w))},${0.95*a})`;fwc.beginPath();fwc.arc(x,y,rad,0,7);fwc.fill();
-    if(w<0.9){fwc.fillStyle=`rgba(224,30,43,${0.18*a})`;fwc.beginPath();fwc.arc(x,y,rad*3.2,0,7);fwc.fill();}}
-  // embers that do not become letters drift down and fade
-  for(const e of FWL.embers){const te=tb;if(te>e.life)continue;const k=1-te/e.life;const x=B[0]+e.vx*te*Math.exp(-te*2.6)*0.6,y=B[1]+e.vy*te*Math.exp(-te*2.6)*0.6+140*te*te;
-    fwc.fillStyle=`rgba(255,${Math.round(110+120*e.hot)},90,${0.8*k})`;fwc.beginPath();fwc.arc(x,y,1.8+1.5*k,0,7);fwc.fill();}
+// ------------------------------------------------------------------ outro v7: the ten red rings. After the last sentence the red marker stroke circles each of the ten objects
+// in the overview, then the rings lift off, swirl together and merge into one red dot; "function" appears in front of it
+const RG={draw0:73.45,draw1:73.74,fly0:73.78,fly1:74.12,let0:74.1,let1:74.42};
+const fwc=document.getElementById('fw').getContext('2d');
+const RLOGO=(()=>{const g=document.createElement('canvas').getContext('2d');const sz=176,tr=-0.04*sz;g.font=`500 ${sz}px Poppins`;
+  const ws=[...'function'].map(c=>g.measureText(c).width),dw=g.measureText('.').width;const tw=ws.reduce((a,b)=>a+b,0)+tr*8;const x0=W/2-(tw+dw)/2,base=1490;
+  const xs=[];let x=x0;ws.forEach(w=>{xs.push(x);x+=w+tr;});const m=g.measureText('.');const dr=(m.actualBoundingBoxAscent+m.actualBoundingBoxDescent)/2;
+  return {sz,x0,base,xs,tw,dot:{x:x+(m.actualBoundingBoxRight-m.actualBoundingBoxLeft)/2+m.actualBoundingBoxLeft,y:base-dr,r:dr}};})();
+const _bx=new THREE.Box3(),_cv=new THREE.Vector3();
+function objRing(o){_bx.setFromObject(o);let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(let i=0;i<8;i++){_cv.set(i&1?_bx.max.x:_bx.min.x,i&2?_bx.max.y:_bx.min.y,i&4?_bx.max.z:_bx.min.z);const q=proj([_cv.x,_cv.y,_cv.z]);
+  x0=Math.min(x0,q[0]);x1=Math.max(x1,q[0]);y0=Math.min(y0,q[1]);y1=Math.max(y1,q[1]);}return {cx:(x0+x1)/2,cy:(y0+y1)/2,rx:Math.min(150,(x1-x0)/2*0.82+20),ry:Math.min(150,(y1-y0)/2*0.82+18)};}
+const RSEEDS=[3,7,11,5,9,13,4,8,12,6];
+function ringsOutro(t){fwc.clearRect(0,0,W,H);if(t<RG.draw0)return;const objs=TAGOBJ();
+  // the scene steps back a little so the logo reads
+  const dk=0.6*ease((t-RG.fly0)/0.45);if(dk>0){fwc.fillStyle=`rgba(7,7,11,${dk.toFixed(3)})`;fwc.fillRect(0,0,W,H);}
+  const D=RLOGO.dot;let arrived=0;
+  fwc.save();fwc.lineCap='round';fwc.lineJoin='round';
+  objs.forEach((o,i)=>{const R=objRing(o);const d0=RG.draw0+i*0.018,du=clamp((t-d0)/0.2,0,1);if(du<=0)return;
+    const P=ringPath(R.cx,R.cy,R.rx,R.ry,RSEEDS[i],Math.PI*2+0.5,-2.2+i*0.7);
+    const f0=RG.fly0+i*0.012,ta=RG.fly1-0.1+i*0.011,fu=clamp((t-f0)/(ta-f0),0,1);if(fu>=1){arrived++;return;}
+    // flight: curved path into the dot, the ring shrinks and spins
+    const drawRing=(u,alpha)=>{const e=eio(u);const side=i%2?1:-1;const mx=(R.cx+D.x)/2+side*(170+i*12),my=(R.cy+D.y)/2-120;
+      const cx=(1-e)*(1-e)*R.cx+2*(1-e)*e*mx+e*e*D.x,cy=(1-e)*(1-e)*R.cy+2*(1-e)*e*my+e*e*D.y;const k=lerp(1,D.r*0.9/Math.max(R.rx,R.ry),e);const rot=e*side*2.4;
+      fwc.save();fwc.translate(cx,cy);fwc.rotate(rot);fwc.scale(k,k);fwc.translate(-R.cx,-R.cy);fwc.globalAlpha=alpha;fwc.strokeStyle=REDS;fwc.lineWidth=9/Math.max(k,0.35);
+      const n=Math.max(2,Math.floor((P.length-1)*du));fwc.beginPath();fwc.moveTo(P[0][0],P[0][1]);for(let j=1;j<=n;j++)fwc.lineTo(P[j][0],P[j][1]);fwc.stroke();
+      fwc.globalAlpha=alpha*0.3;fwc.lineWidth=4/Math.max(k,0.35);fwc.strokeStyle='#ff5a64';fwc.stroke();fwc.restore();};
+    if(fu>0)for(let g=3;g>=1;g--){const ug=clamp((t-g*0.025-f0)/(ta-f0),0,1);if(ug>0)drawRing(ug,0.16*(4-g)/3);}
+    drawRing(fu,0.95);});
   fwc.restore();
-  // the solid glowing logo
-  if(sol>0){fwc.save();fwc.font=`500 ${FWL.sz}px Poppins`;fwc.letterSpacing=(-0.04*FWL.sz)+'px';fwc.globalAlpha=sol;fwc.shadowColor='rgba(255,40,55,0.95)';fwc.shadowBlur=34;fwc.fillStyle='#ff2e3c';fwc.fillText('function',FWL.x0,FWL.base);
-    fwc.shadowBlur=0;fwc.fillStyle='rgba(255,215,215,0.35)';fwc.fillText('function',FWL.x0,FWL.base);fwc.restore();}
-  // the rocket head: a bigger spark on its own arc that lands as the dot
-  {const D=FWL.dot;const u=clamp((t-FW.burst)/(FW.dot-FW.burst),0,1);let x,y,r;
-    if(u<1){const c=[B[0]+260,Math.min(B[1],D.y)-210];const e=eio(u);x=(1-e)*(1-e)*B[0]+2*(1-e)*e*c[0]+e*e*D.x;y=(1-e)*(1-e)*B[1]+2*(1-e)*e*c[1]+e*e*D.y;r=lerp(9,D.r,e);}
-    else{x=D.x;y=D.y;const p=clamp((t-FW.dot)/0.22,0,1);r=D.r*(p<0.5?lerp(1,1.35,eo(p/0.5)):lerp(1.35,1,ease((p-0.5)/0.5)));}
-    fwc.save();fwc.shadowColor='rgba(255,40,55,0.95)';fwc.shadowBlur=30;fwc.fillStyle=u<1?'#ffd2c8':'#ff2e3c';fwc.beginPath();fwc.arc(x,y,r,0,7);fwc.fill();fwc.restore();}}
+  // the dot grows with every ring that arrives and pops once at the end
+  if(arrived>0){const last=RG.fly1-0.1+9*0.011;const pop=clamp((t-last)/0.22,0,1);const base=D.r*(0.45+0.55*arrived/10);
+    const r=arrived<10?base:D.r*(pop<0.5?lerp(1,1.3,eo(pop/0.5)):lerp(1.3,1,ease((pop-0.5)/0.5)));
+    fwc.save();fwc.shadowColor='rgba(255,40,55,0.9)';fwc.shadowBlur=26;fwc.fillStyle=REDS;fwc.beginPath();fwc.arc(D.x,D.y,r,0,7);fwc.fill();fwc.restore();}
+  // "function" appears letter by letter in front of the dot
+  fwc.save();fwc.font=`500 ${RLOGO.sz}px Poppins`;fwc.fillStyle='#ee2433';fwc.shadowColor='rgba(255,40,55,0.75)';fwc.shadowBlur=22;
+  [...'function'].forEach((c,i)=>{const u=clamp((t-RG.let0-i*0.032)/0.24,0,1);if(u<=0)return;const e=eo(u);fwc.globalAlpha=e;fwc.filter=u<1?`blur(${((1-e)*8).toFixed(2)}px)`:'none';
+    fwc.fillText(c,RLOGO.xs[i],RLOGO.base+(1-e)*26);});fwc.restore();}
 
 // ------------------------------------------------------------------ per-frame state
 const _b=new THREE.Box3();
@@ -335,7 +317,7 @@ function setTime(t){setCam(t);
   applyPose(shop.G,SHOP(t));shop.G.visible=t>64.45&&t<67.85;
   meepleAnim(t);
   // tools
-  fireworks(t);
+  ringsOutro(t);
   const mOn=toolPose(marker,MARK,t,REST.marker,1);const pOn=toolPose(pencil,PENC,t,REST.pencil,-1);
   {const o=clamp((t-OUT.t0-0.3)/0.6,0,1);shadeEl.style.opacity=(1-0.55*o).toFixed(3);}
   overlay(t);}
