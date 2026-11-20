@@ -1,6 +1,6 @@
 function. – „Was ändert sich 2027 für dich?“ – Beschreibungen
 Stand: 20.11.2026
-Video: jahr2027/Was_aendert_sich_2027_mit_Musik.mp4 · Cover: jahr2027/social/Thumbnail_2027_9x16.png (Profilraster: Thumbnail_2027_Raster_3x4.png)
+Video: jahr2027/Was_aendert_sich_2027_mit_Musik.mp4 · Cover (clean im Stil der anderen Cover, Variante 1 aus Cover_2027_Varianten.jpg): jahr2027/social/Thumbnail_2027_9x16.png (Profilraster: Thumbnail_2027_Raster_3x4.png), gebaut mit cover_clean.html
 Zum Hochladen: das Video mit Musik; das Thumbnail setzt der Nutzer selbst in den Apps (Wunsch vom 20.11.2026, keine Upload-Fassung mehr). TikTok und Instagram nehmen nur 5 Hashtags.
 
 =====================================================================
