@@ -101,6 +101,35 @@ async function openPage(query) {
   if (/swiftshader|llvmpipe|software/i.test(gpu)) console.log('  Hinweis: Die Grafikkarte wird nicht benutzt, es rechnet der Prozessor. Das klappt trotzdem, dauert aber länger.');
 }
 
+// ---------- 5. fertige Videos hochladen, damit Claude sie prüfen und aufs Handy schicken kann (nach jeder Fassung) ----------
+// render.json: "upload": [Endungen der Dateien, die hochgeladen werden], z. B. ["_mit_Musik"]
+function uploadNow(files, label) {
+  if (!cfg.upload || !cfg.upload.length) return;
+  const up = files.filter(f => f.endsWith('.mp4') && cfg.upload.some(sfx => f.endsWith(sfx + '.mp4')));
+  if (!up.length) return;
+  const dest = path.join(ROOT, folder);
+  const g = (...a) => spawnSync('git', a, {cwd: ROOT, stdio: 'inherit', shell: false});
+  const gq = (...a) => spawnSync('git', a, {cwd: ROOT, encoding: 'utf8'});
+  console.log(`\n▶ Lade ${label} in voller Qualität hoch, damit Claude sie bekommt …`);
+  const rdir = path.join(dest, 'renders'); fs.mkdirSync(rdir, {recursive: true});
+  for (const f of up) {
+    const base = path.basename(f);
+    for (const old of fs.readdirSync(rdir)) if (old === base || old.startsWith(base + '.part')) fs.unlinkSync(path.join(rdir, old));
+    const buf = fs.readFileSync(f), PART = 90 * 1024 * 1024;
+    if (buf.length <= 95 * 1024 * 1024) fs.writeFileSync(path.join(rdir, base), buf);
+    else for (let i = 0, k = 1; i < buf.length; i += PART, k++) fs.writeFileSync(path.join(rdir, `${base}.part${String(k).padStart(2, '0')}`), buf.subarray(i, i + PART));
+  }
+  if (!(gq('config', 'user.name').stdout || '').trim()) g('config', 'user.name', 'function PC');
+  if (!(gq('config', 'user.email').stdout || '').trim()) g('config', 'user.email', 'pc-render@users.noreply.github.com');
+  const branch = (gq('rev-parse', '--abbrev-ref', 'HEAD').stdout || '').trim() || 'claude/nice-galileo-neyrpn';
+  g('add', '-A', '-f', path.join(folder, 'renders'));
+  g('commit', '-m', `PC-Render: ${label}`);
+  g('pull', '--no-rebase', '--no-edit', 'origin', branch);
+  const pushed = g('push', 'origin', 'HEAD:' + branch).status === 0;
+  if (pushed) console.log(`✔ ${label} hochgeladen. Claude holt das Video von selbst ab und schickt es dir aufs Handy.`);
+  else console.log(`✖ Das Hochladen hat nicht geklappt. Falls sich ein GitHub-Fenster geöffnet hat, dort anmelden und danach noch einmal doppelt auf „function. rendern“ klicken.\n  Die Videos liegen trotzdem fertig im Ordner.`);
+}
+
 // ---------- 4. Aufträge abarbeiten ----------
 const OUT = path.join(ROOT, 'pc-out', folder);
 fs.mkdirSync(OUT, {recursive: true});
@@ -133,7 +162,7 @@ for (const job of cfg.jobs) {
   const stampF = path.join(OUT, job.name + '.stamp.json');
   const stamp = fs.existsSync(stampF) ? JSON.parse(fs.readFileSync(stampF, 'utf8')) : null;
   if (stamp && JSON.stringify(stamp.enc) === JSON.stringify(ENC) && stamp.frames === N && outsAll.every(f => fs.existsSync(f) && fs.statSync(f).mtimeMs > newestInput(job))) {
-    console.log(`✔ ${job.name} ist schon fertig gerendert (wird nicht noch einmal gerendert)`); made.push(...outsAll); continue;
+    console.log(`✔ ${job.name} ist schon fertig gerendert (wird nicht noch einmal gerendert)`); made.push(...outsAll); uploadNow(outsAll, job.name); continue;
   }
   console.log(`▶ ${job.name}: ${N} Bilder mit ${tabs} Tabs …`);
   const pages = await Promise.all(Array.from({length: tabs}, () => openPage(job.query)));
@@ -176,37 +205,11 @@ for (const job of cfg.jobs) {
   fs.unlinkSync(tmp);
   fs.writeFileSync(stampF, JSON.stringify({enc: ENC, frames: N, at: new Date().toISOString()}));
   console.log(`✔ ${job.name} fertig in ${sec(Date.now() - t0)} (${(N / ((Date.now() - t0) / 1000)).toFixed(1).replace('.', ',')} Bilder/s)`);
+  uploadNow(outsAll, job.name);
 }
 
 await browser.close(); server.close();
 
-// ---------- 5. fertige Videos hochladen, damit Claude sie prüfen und aufs Handy schicken kann ----------
-// render.json: "upload": [Endungen der Dateien, die hochgeladen werden], z. B. ["_mit_Musik"]
-if (cfg.upload && cfg.upload.length) {
-  const up = made.filter(f => f.endsWith('.mp4') && cfg.upload.some(sfx => f.endsWith(sfx + '.mp4')));
-  const dest = path.join(ROOT, folder);
-  const g = (...a) => spawnSync('git', a, {cwd: ROOT, stdio: 'inherit', shell: false});
-  const gq = (...a) => spawnSync('git', a, {cwd: ROOT, encoding: 'utf8'});
-  console.log(`\n▶ Lade ${up.length} Video(s) in voller Qualität hoch, damit Claude sie bekommt …`);
-  const rdir = path.join(dest, 'renders'); fs.mkdirSync(rdir, {recursive: true});
-  const added = [];
-  for (const f of up) {
-    const base = path.basename(f);
-    for (const old of fs.readdirSync(rdir)) if (old === base || old.startsWith(base + '.part')) fs.unlinkSync(path.join(rdir, old));
-    const buf = fs.readFileSync(f), PART = 90 * 1024 * 1024;
-    if (buf.length <= 95 * 1024 * 1024) {fs.writeFileSync(path.join(rdir, base), buf); added.push(base);}
-    else for (let i = 0, k = 1; i < buf.length; i += PART, k++) {const n = `${base}.part${String(k).padStart(2, '0')}`; fs.writeFileSync(path.join(rdir, n), buf.subarray(i, i + PART)); added.push(n);}
-  }
-  if (!(gq('config', 'user.name').stdout || '').trim()) g('config', 'user.name', 'function PC');
-  if (!(gq('config', 'user.email').stdout || '').trim()) g('config', 'user.email', 'pc-render@users.noreply.github.com');
-  const branch = (gq('rev-parse', '--abbrev-ref', 'HEAD').stdout || '').trim() || 'claude/nice-galileo-neyrpn';
-  g('add', '-A', '-f', path.join(folder, 'renders'));
-  g('commit', '-m', `PC-Render: ${cfg.title || folder}`);
-  g('pull', '--no-rebase', '--no-edit', 'origin', branch);
-  const pushed = g('push', 'origin', 'HEAD:' + branch).status === 0;
-  if (pushed) console.log(`✔ Hochgeladen. Claude holt die Videos von selbst ab und schickt sie dir aufs Handy.`);
-  else console.log(`✖ Das Hochladen hat nicht geklappt. Falls sich ein GitHub-Fenster geöffnet hat, dort anmelden und danach noch einmal doppelt auf „function. rendern“ klicken.\n  Die Videos liegen trotzdem fertig im Ordner.`);
-}
 console.log(`\nAlles fertig in ${sec(Date.now() - t0all)}. Die Dateien liegen in:\n  ${OUT}`);
 for (const f of made) console.log('  · ' + path.basename(f));
 if (WIN) spawn('explorer', [OUT], {detached: true, stdio: 'ignore'}).unref();
