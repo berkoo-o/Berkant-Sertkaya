@@ -14,7 +14,8 @@ import {clamp, lerp, ease, eo, ei, eio, ebk, win, rng, ctex, roundRect} from './
 import {L, BLD, FACTORY, PAL, buildTown} from './town.js';
 import {choreo, buildPeople, poseAll, R_P} from './people.js';
 
-await Promise.all(['400 40px Poppins', '500 40px Poppins', '600 40px Poppins', '800 90px "Inter Tight"'].map(f => document.fonts.load(f)));
+// every weight drawn on a canvas must be loaded here first, otherwise the first drawing falls back to a serif font (700: „Bargeld“ on the cash machines)
+await Promise.all(['400 40px Poppins', '500 40px Poppins', '600 40px Poppins', '700 40px Poppins', '800 90px "Inter Tight"'].map(f => document.fonts.load(f)));
 const W = 1080, H = 1920;
 const S = +(new URLSearchParams(location.search).get('s') || 1); const P = PAL[S];
 const VO = 0.15, END_V = 89.0;
@@ -176,7 +177,8 @@ const slipTex = ctex(540, 516, (g, w, h) => {g.fillStyle = '#fbfaf6'; g.fillRect
   g.fillStyle = 'rgba(0,0,0,0.045)'; for (let y = 0; y < h; y += 6) g.fillRect(0, y, w, 1);
   g.fillStyle = '#a3a3a3'; g.font = '500 22px Poppins'; g.textAlign = 'center'; g.fillText('- - - - - - - - - - - - - - - -', w / 2, 52); g.fillText('- - - - - - - - - - - - - - - -', w / 2, h - 40);
 });
-const inkTex = ctex(540, 516, (g, w, h) => {g.clearRect(0, 0, w, h); g.fillStyle = '#16161a'; g.font = '500 104px Poppins'; g.letterSpacing = '-3px'; g.textAlign = 'left';
+// the whole logo is printed in red, like the channel logo (Wunsch des Nutzers, 20.11.2026: „Outro komplett in rot“)
+const inkTex = ctex(540, 516, (g, w, h) => {g.clearRect(0, 0, w, h); g.fillStyle = '#E01E2B'; g.font = '500 104px Poppins'; g.letterSpacing = '-3px'; g.textAlign = 'left';
   let fs = 104; while (g.measureText('function.').width > w * 0.86) {fs -= 2; g.font = `500 ${fs}px Poppins`;}
   const wd = g.measureText('function').width, dot = g.measureText('.').width, x0 = (w - wd - dot) / 2, base = h / 2 + fs * 0.32;
   g.fillText('function', x0, base);

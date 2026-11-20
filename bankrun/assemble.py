@@ -5,7 +5,8 @@
 import json, subprocess, sys
 orig, audio, out = sys.argv[1], sys.argv[2], sys.argv[3]
 pairs = [(sys.argv[i], json.loads(sys.argv[i + 1])) for i in range(4, len(sys.argv), 2)]
-W, H, N = 1080, 1920, 2675; FS = W * H * 3 // 2
+W, H = 1080, 1920; FS = W * H * 3 // 2
+N = int(subprocess.run(['ffprobe', '-v', 'error', '-count_packets', '-select_streams', 'v:0', '-show_entries', 'stream=nb_read_packets', '-of', 'csv=p=0', orig], capture_output=True, text=True).stdout.strip())
 dec = lambda f: subprocess.Popen(['ffmpeg', '-v', 'error', '-i', f, '-f', 'rawvideo', '-pix_fmt', 'yuv420p', '-'], stdout=subprocess.PIPE)
 po = dec(orig); src = []
 for path, rs in pairs: src.append((dec(path), set(f for a, b in rs for f in range(a, b))))
