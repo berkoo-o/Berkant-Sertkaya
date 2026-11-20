@@ -198,7 +198,7 @@ for (const job of cfg.jobs) {
   const outs = job.audio && job.audio.length ? job.audio : [{suffix: ''}];
   for (const a of outs) {
     const file = path.join(OUT, job.name + (a.suffix || '') + '.mp4');
-    const audioIn = a.file ? ['-i', path.join(ROOT, folder, a.file), '-map', '0:v', '-map', '1:a', '-c:a', 'aac', '-b:a', '320k', '-shortest'] : [];
+    const audioIn = a.file ? ['-i', path.join(ROOT, folder, a.file), '-map', '0:v', '-map', '1:a', '-c:a', 'aac', '-b:a', '320k', '-t', (N / FPS).toFixed(4)] : [];   // -t statt -shortest: -shortest schnitt die letzten Bilder ab
     await finished(ff(['-i', tmp, ...audioIn, '-c:v', 'copy', '-movflags', '+faststart', file]));
     made.push(file);
   }
