@@ -1,0 +1,151 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Poppins;font-weight:500;src:url(node_modules/@fontsource/poppins/files/poppins-latin-500-normal.woff2)}
+@font-face{font-family:'Inter Tight';font-weight:800;src:url(node_modules/@fontsource/inter-tight/files/inter-tight-latin-800-normal.woff2)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#07070B}
+canvas{position:absolute;left:0;top:0}
+</style></head><body>
+<canvas id="out" width="1080" height="1920"></canvas>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+// Stiltest „Was wäre, wenn alle gleichzeitig ihr Geld abheben?“: dieselbe Szene in vier Stilen.
+// ?s=1 Tilt-Shift-Miniatur (Modellbahn), ?s=2 isometrische Spielbrett-Welt, ?s=3 Holzspielzeug-Stadt, ?s=4 Papier-Diorama (Pop-up-Buch)
+// Szene: Bank mit Säulen in der Mitte, rechts an der Fassade drei Geldautomaten (der vorderste leuchtet rot „leer“), davor eine lange Schlange, Häuser, Bäume, Autos.
+import * as THREE from 'three';
+import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+await Promise.all(['500 40px Poppins','800 96px "Inter Tight"'].map(f=>document.fonts.load(f)));
+const W=1080,H=1920,S=+(new URLSearchParams(location.search).get('s')||1);
+const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});renderer.setSize(W,H);renderer.setPixelRatio(1);
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=S===1?1.05:1.0;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+const scene=new THREE.Scene();scene.environment=new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(),0.04).texture;scene.environmentIntensity=S===1?0.55:0.35;
+const rng=(s=>()=>(s=(s*16807)%2147483647)/2147483647)(7);
+const tex=(w,h,draw)=>{const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t;};
+const M=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:.7,...o});
+const add=(par,geo,m,x=0,y=0,z=0)=>{const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;par.add(o);return o;};
+const W0=new THREE.Group();scene.add(W0);
+// ---------------- style materials ----------------
+const grainTex=(base,dark,seed,w=256,h=256)=>tex(w,h,(g)=>{g.fillStyle=base;g.fillRect(0,0,w,h);let s=seed;const r=()=>(s=(s*16807)%2147483647)/2147483647;
+  for(let i=0;i<70;i++){const x=r()*w,amp=2+r()*5,ph=r()*6;g.strokeStyle=dark;g.globalAlpha=0.05+r()*0.08;g.lineWidth=0.8+r()*1.2;g.beginPath();for(let y=0;y<=h;y+=8){const xx=x+amp*Math.sin(y*0.02+ph);y?g.lineTo(xx,y):g.moveTo(xx,y);}g.stroke();}g.globalAlpha=1;});
+const paperTex=(base,seed)=>tex(256,256,(g,w,h)=>{g.fillStyle=base;g.fillRect(0,0,w,h);let s=seed;const r=()=>(s=(s*16807)%2147483647)/2147483647;for(let i=0;i<2500;i++){g.fillStyle=`rgba(${r()<.5?0:255},${r()<.5?0:255},${r()<.5?0:255},0.035)`;g.fillRect(r()*w,r()*h,1+r()*2,1+r()*2);}
+  for(let i=0;i<40;i++){g.strokeStyle='rgba(120,100,70,0.06)';g.beginPath();g.moveTo(r()*w,r()*h);g.lineTo(r()*w,r()*h);g.stroke();}});
+const winTex=(wall,win,cols,rows,frame,lit)=>tex(256,256,(g,w,h)=>{g.fillStyle=wall;g.fillRect(0,0,w,h);const cw=w/cols,rh=h/rows;for(let i=0;i<cols;i++)for(let k=0;k<rows;k++){const x=i*cw+cw*0.25,y=k*rh+rh*0.22;
+  g.fillStyle=frame;g.fillRect(x-3,y-3,cw*0.5+6,rh*0.55+6);g.fillStyle=(lit&&((i*3+k*7)%5<2))?lit:win;g.fillRect(x,y,cw*0.5,rh*0.55);}});
+const PAL={
+ 1:{ground:0x6d8a4c,street:0x3a3b40,walk:0xbdb6a8,houses:[0xd8c2a0,0xb9846a,0xe3dccd,0xa7b4c2,0xc9a77c],bank:0xe8e1d2,roof:0x6f4b3a,people:[0x2f5d8a,0xc84f3b,0xe6c34a,0x3d7a4d,0x7b4a8c,0xe7e2d8,0x2b2b30,0xd77fa1],tree:0x4f7d3a,car:[0x2f6db5,0xe0b13a]},
+ 2:{ground:0x9fd3a3,street:0x6d7088,walk:0xe9e5f2,houses:[0xf2b9a0,0xa8c7f0,0xf6e3a1,0xc6b3ef,0xa9e0d0],bank:0xf4f1fb,roof:0x7f78c9,people:[0x5b6ee1,0xf08a6c,0xf5c451,0x58b48c,0xa47ce0,0xffffff,0x3e3f5a,0xef8fb5],tree:0x63b56f,car:[0x5b8ef0,0xf5b84a]},
+ 3:{ground:0xc89c64,street:0x8b5e3c,walk:0xe0c9a0,houses:[0xb5523b,0x3f6f8f,0xd8a443,0x5d8a54,0xe8dcc4],bank:0xf1e7d2,roof:0x8a3f2c,people:[0x2f5d8a,0xb5523b,0xd8a443,0x5d8a54,0x6b4a8c,0xf1e7d2,0x3a2a22,0xc96f8a],tree:0x5d8a54,car:[0x3f6f8f,0xd8a443]},
+ 4:{ground:0xe9dcc0,street:0xb9ad94,walk:0xf7f1e3,houses:[0xf0b7a0,0xa9c8e6,0xf2d68c,0xc7b1e2,0xa6d6ae],bank:0xfbf7ee,roof:0xc98a6e,people:[0x7c96c4,0xd98a74,0xe8c46b,0x86b08f,0xa58fc9,0xfdfaf2,0x8b8378,0xdca2b8],tree:0x9cc39a,car:[0x9fb6dd,0xe9c77e]}}[S];
+const mat=(c,kind='paint')=>{if(S===3){const g=grainTex('#'+new THREE.Color(c).getHexString(),'#3a2414',Math.floor(c%9973));g.wrapS=g.wrapT=THREE.RepeatWrapping;g.repeat.set(3,3);return M(0xffffff,{map:g,roughness:.55});}
+  if(S===4){return M(c,{map:paperTex('#ffffff',Math.floor(c%9973)),roughness:.95});}
+  if(S===2)return M(c,{roughness:.85});return M(c,{roughness:.75});};
+// ---------------- layout ----------------
+const PLW=3.8,PLD=3.2;
+const HOUSES=[{x:-1.42,z:-0.25,w:0.82,d:0.95,h:1.25,c:0,roof:'flat'},{x:1.42,z:-0.25,w:0.8,d:0.95,h:0.95,c:1,roof:'gable'},{x:-0.62,z:-1.2,w:1.05,d:0.55,h:1.5,c:2,roof:'flat'},{x:0.75,z:-1.2,w:0.95,d:0.55,h:1.15,c:3,roof:'gable'},{x:-1.5,z:-1.25,w:0.6,d:0.5,h:0.9,c:4,roof:'gable'},{x:1.55,z:-1.25,w:0.5,d:0.5,h:1.35,c:0,roof:'flat'}];
+const BANK={x:0,z:-0.12,w:1.6,d:1.0,h:0.9};const FRONT=BANK.z+BANK.d/2;
+// ground / base per style
+if(S===1){add(W0,new THREE.PlaneGeometry(14,14).rotateX(-Math.PI/2),M(PAL.ground,{roughness:.95}),0,0,0);}
+else if(S===4){// an open pop-up book: two pages in a shallow V, the town stands up out of the gutter
+  const pt=paperTex('#f3ead6',3);const pg=M(0xffffff,{map:pt,roughness:.95,side:THREE.DoubleSide});
+  for(const s of [-1,1]){add(W0,new THREE.BoxGeometry(PLW/2+0.3,0.02,PLD+0.5),pg,s*(PLW/4+0.15),-0.01,0.1);for(let k=1;k<7;k++)add(W0,new THREE.BoxGeometry(PLW/2+0.3-k*0.004,0.006,PLD+0.5-k*0.004),M(0xf6efe0,{roughness:.95}),s*(PLW/4+0.15),-0.022-k*0.006,0.1);}
+  add(W0,new THREE.BoxGeometry(0.012,0.004,PLD+0.5),M(0xb9ab90,{roughness:.9}),0,0.001,0.1);
+  const cov=M(0x6b2a2f,{roughness:.6});for(const s of [-1,1])add(W0,new THREE.BoxGeometry(PLW/2+0.36,0.04,PLD+0.62),cov,s*(PLW/4+0.17),-0.08,0.1);
+  add(W0,new THREE.PlaneGeometry(30,30).rotateX(-Math.PI/2),M(0x1a1512,{roughness:.9}),0,-0.2,0);}
+else{const base=S===3?mat(0x9b6b40):M(S===2?0x3b3768:0x24205e,{roughness:.5});add(W0,new RoundedBoxGeometry(PLW+0.2,0.22,PLD+0.2,3,0.04),base,0,-0.11,0.1);
+  add(W0,new THREE.BoxGeometry(PLW,0.02,PLD),mat(PAL.ground),0,0.0,0.1);
+  if(S===3)add(W0,new THREE.PlaneGeometry(30,30).rotateX(-Math.PI/2),M(0xffffff,{map:(()=>{const t=grainTex('#5a3a22','#2a170c',11,512,512);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(6,6);return t;})(),roughness:.6}),0,-0.22,0);
+  else add(W0,new THREE.PlaneGeometry(30,30).rotateX(-Math.PI/2),M(0x0b0a14,{roughness:.9}),0,-0.22,0);}
+// street and sidewalk in front of the bank
+const ST={z:0.98,w:0.5};
+add(W0,new THREE.BoxGeometry(S===1?14:PLW,0.012,ST.w),mat(PAL.street),0,0.007,ST.z);
+add(W0,new THREE.BoxGeometry(S===1?14:PLW,0.03,0.42),mat(PAL.walk),0,0.015,FRONT+0.21);
+add(W0,new THREE.BoxGeometry(S===1?14:PLW,0.03,0.3),mat(PAL.walk),0,0.015,ST.z+ST.w/2+0.15);
+for(let i=(S===1?-14:-4);i<=(S===1?14:4);i++)add(W0,new THREE.BoxGeometry(0.18,0.014,0.03),M(S===4?0xffffff:0xf2efe6,{roughness:.6}),i*0.42,0.014,ST.z);
+// ---------------- buildings ----------------
+function house(o){if(S===4)o={...o,d:0.05};const G=new THREE.Group();G.position.set(o.x,0,o.z);W0.add(G);const c=PAL.houses[o.c];
+  const wall=S===4?M(0xffffff,{map:paperTex('#'+new THREE.Color(c).getHexString(),o.c+5),roughness:.95}):S===3?mat(c):
+    M(0xffffff,{map:winTex('#'+new THREE.Color(c).getHexString(),S===2?'#5a5f8f':'#3b4452',Math.max(2,Math.round(o.w*4)),Math.max(3,Math.round(o.h*4)),S===2?'#ffffff':'#e9e3d6',S===1?'#ffd98a':null),roughness:.8});
+  if(S===3||S===4){const b=add(G,S===3?new RoundedBoxGeometry(o.w,o.h,o.d,2,0.02):new THREE.BoxGeometry(o.w,o.h,o.d),wall,0,o.h/2,0);
+    // painted or cut-out windows on the front
+    const wt=tex(256,256,(g,w,h)=>{g.clearRect(0,0,w,h);const cols=Math.max(2,Math.round(o.w*3)),rows=Math.max(2,Math.round(o.h*3));for(let i=0;i<cols;i++)for(let k=0;k<rows;k++){g.fillStyle=S===3?'#2a2a33':'#7a6a58';const cw=w/cols,rh=h/rows;g.fillRect(i*cw+cw*0.28,k*rh+rh*0.25,cw*0.44,rh*0.5);
+      if(S===3){g.fillStyle='rgba(255,255,255,0.8)';g.fillRect(i*cw+cw*0.28,k*rh+rh*0.25,cw*0.44,4);}}});
+    const p=new THREE.Mesh(new THREE.PlaneGeometry(o.w*0.9,o.h*0.85),new THREE.MeshStandardMaterial({map:wt,transparent:true,roughness:.8}));p.position.set(0,o.h*0.48,o.d/2+0.002);G.add(p);}
+  else{add(G,S===2?new RoundedBoxGeometry(o.w,o.h,o.d,2,0.03):new THREE.BoxGeometry(o.w,o.h,o.d),[M(c),M(c),M(c),M(c),wall,M(c)],0,o.h/2,0);}
+  if(o.roof==='gable'){const r=new THREE.Shape();r.moveTo(-o.w/2-0.03,0);r.lineTo(o.w/2+0.03,0);r.lineTo(0,o.w*0.38);r.closePath();const g=new THREE.ExtrudeGeometry(r,{depth:o.d+0.04,bevelEnabled:false});g.translate(0,0,-(o.d+0.04)/2);
+    add(G,g,S===3||S===4?mat(PAL.roof):M(PAL.roof,{roughness:.6}),0,o.h,0);}
+  else add(G,new THREE.BoxGeometry(o.w+0.04,0.05,o.d+0.04),S===3||S===4?mat(0x8a8178):M(S===2?0xdcd8ee:0x8a8580),0,o.h+0.025,0);
+  return G;}
+HOUSES.forEach(house);
+// tilt-shift: the miniature world goes on beyond the model
+if(S===1){let i=0;for(const [x,z] of [[-3.0,-0.3],[3.0,-0.2],[-3.0,-1.15],[3.0,-1.15],[-3.0,-2.5],[-1.4,-2.5],[0,-2.5],[1.4,-2.5],[3.0,-2.5],[-3.0,2.4],[-1.4,2.4],[0,2.4],[1.4,2.4],[3.0,2.4]])house({x,z,w:0.6+rng()*0.25,d:0.55+rng()*0.2,h:0.6+rng()*0.9,c:i++,roof:rng()<0.5?'gable':'flat'});
+  add(W0,new THREE.BoxGeometry(14,0.012,0.5),mat(PAL.street),0,0.007,-1.75);add(W0,new THREE.BoxGeometry(0.5,0.012,14),mat(PAL.street),-2.2,0.006,0);add(W0,new THREE.BoxGeometry(0.5,0.012,14),mat(PAL.street),2.2,0.006,0);}
+// pop-up book: every card has a folded paper support behind it
+if(S===4)for(const o of HOUSES){const L=Math.min(0.45,o.h*0.55),ang=0.75;const sp=add(W0,new THREE.BoxGeometry(o.w*0.4,0.004,L),M(0xffffff,{map:paperTex('#efe4cc',9),roughness:.95}),o.x,Math.sin(ang)*L/2,o.z-0.025-Math.cos(ang)*L/2);sp.rotation.x=ang;}
+// the bank: steps, columns, pediment with the sign, the ATM wall on the right with three machines, the front one glows red
+{const G=new THREE.Group();G.position.set(BANK.x,0,BANK.z);W0.add(G);const bw=mat(PAL.bank);
+ add(G,S===2?new RoundedBoxGeometry(BANK.w,BANK.h,BANK.d,2,0.03):new THREE.BoxGeometry(BANK.w,BANK.h,BANK.d),bw,0,BANK.h/2,0);
+ for(let i=0;i<3;i++)add(G,new THREE.BoxGeometry(0.95-i*0.06,0.03,0.12),mat(PAL.walk),-0.3,0.015+i*0.03,BANK.d/2+0.16-i*0.04);
+ for(let i=0;i<4;i++)add(G,new THREE.CylinderGeometry(0.035,0.04,0.62,S===2?8:16),bw,-0.7+i*0.26,0.09+0.31,BANK.d/2+0.08);
+ add(G,new THREE.BoxGeometry(0.95,0.06,0.18),bw,-0.3,0.74,BANK.d/2+0.06);
+ {const r=new THREE.Shape();r.moveTo(-0.52,0);r.lineTo(0.52,0);r.lineTo(0,0.2);r.closePath();const g=new THREE.ExtrudeGeometry(r,{depth:0.18,bevelEnabled:false});add(G,g,bw,-0.3,0.77,BANK.d/2-0.03);}
+ const sign=tex(512,128,(g,w,h)=>{g.fillStyle=S===4?'#fbf7ee':'#'+new THREE.Color(PAL.bank).getHexString();g.fillRect(0,0,w,h);g.fillStyle=S===2?'#5b56a8':'#3a3530';g.font='800 92px "Inter Tight"';g.textAlign='center';g.letterSpacing='18px';g.fillText('BANK',w/2+9,98);});
+ const sp=new THREE.Mesh(new THREE.PlaneGeometry(0.62,0.15),new THREE.MeshStandardMaterial({map:sign,roughness:.7}));sp.position.set(-0.3,0.84,BANK.d/2+0.152);G.add(sp);
+ // door
+ add(G,new THREE.BoxGeometry(0.22,0.36,0.02),M(S===3?0x6b4423:S===4?0xd9c9b0:0x3a3f4a),-0.3,0.27,BANK.d/2+0.005);
+ // ATM wall on the right part of the facade
+ for(let i=0;i<3;i++){const x=0.32+i*0.17,red=i===2;const A=new THREE.Group();A.position.set(x,0,BANK.d/2);G.add(A);
+   add(A,new THREE.BoxGeometry(0.13,0.3,0.06),M(S===4?0xe6e0d4:S===3?0x5a6a7a:0x4a5160,{roughness:.5}),0,0.25,0.03);
+   const scr=new THREE.Mesh(new THREE.PlaneGeometry(0.09,0.07),new THREE.MeshBasicMaterial({color:red?0xff2a3a:(S===4?0xa9c6e8:0x8fd0ff),toneMapped:false}));scr.position.set(0,0.31,0.062);A.add(scr);
+   add(A,new THREE.BoxGeometry(0.07,0.012,0.012),M(0x22232a),0,0.24,0.062);
+   if(red){const l=new THREE.PointLight(0xff2030,1.6,1.4,2);l.position.set(0,0.35,0.2);A.add(l);}}}
+// people queue: from the ATMs along the sidewalk to the left, a few gather at the machines
+function person(x,z,c,ry){const G=new THREE.Group();G.position.set(x,0.03,z);G.rotation.y=S===4?(rng()-0.5)*0.3:ry;W0.add(G);const col=PAL.people[c%PAL.people.length];
+  if(S===4){const T=tex(64,128,(g,w,h)=>{g.clearRect(0,0,w,h);g.fillStyle='#'+new THREE.Color(col).getHexString();g.beginPath();g.arc(w/2,22,15,0,7);g.fill();g.beginPath();g.moveTo(14,42);g.lineTo(50,42);g.lineTo(46,96);g.lineTo(40,126);g.lineTo(34,126);g.lineTo(32,100);g.lineTo(30,126);g.lineTo(24,126);g.lineTo(18,96);g.closePath();g.fill();
+      g.strokeStyle='rgba(255,255,255,0.9)';g.lineWidth=3;g.stroke();});
+    const p=new THREE.Mesh(new THREE.PlaneGeometry(0.09,0.18),new THREE.MeshStandardMaterial({map:T,transparent:true,alphaTest:0.4,side:THREE.DoubleSide,roughness:.9}));p.position.y=0.09;p.castShadow=true;G.add(p);return;}
+  if(S===3){add(G,new THREE.CylinderGeometry(0.03,0.036,0.11,16),mat(col),0,0.055,0);add(G,new THREE.SphereGeometry(0.03,16,12),mat(0xe8d0a8),0,0.14,0);return;}
+  const seg=S===2?6:12;add(G,new THREE.CylinderGeometry(0.012,0.012,0.06,seg),M(0x2b2b33),-0.012,0.03,0);add(G,new THREE.CylinderGeometry(0.012,0.012,0.06,seg),M(0x2b2b33),0.012,0.03,0);
+  add(G,new THREE.CapsuleGeometry(0.026,0.045,4,seg),M(col),0,0.1,0);add(G,new THREE.SphereGeometry(0.02,seg,seg),M(0xe0b896),0,0.165,0);}
+{let k=0;const qz=FRONT+0.22;for(let i=0;i<4;i++)person(0.66+(rng()-0.5)*0.15,qz+0.02+(i%2)*0.08,k++,Math.PI+(rng()-0.5)*0.6);
+ for(let i=0;i<20;i++){const x=0.5-i*0.105;person(x+(rng()-0.5)*0.02,qz+(rng()-0.5)*0.04,k++,Math.PI/2+(rng()-0.5)*0.3);}
+ for(let i=0;i<7;i++)person(-1.58-(i%4)*0.09,qz-0.06+Math.floor(i/4)*0.11,k++,Math.PI/2+(rng()-0.5)*0.5);}
+// trees, lamps, cars
+for(const [x,z] of [[-1.7,1.42],[-0.75,1.42],[0.35,1.42],[1.4,1.42],[-1.85,-0.75],[1.85,-0.75]]){const T=new THREE.Group();T.position.set(x,0.03,z);W0.add(T);
+  add(T,new THREE.CylinderGeometry(0.02,0.026,0.16,10),S===3||S===4?mat(0x7a5236):M(0x6b4a33),0,0.08,0);
+  if(S===4){const t=tex(128,128,(g,w,h)=>{g.clearRect(0,0,w,h);g.fillStyle='#'+new THREE.Color(PAL.tree).getHexString();g.beginPath();g.arc(64,64,58,0,7);g.fill();g.strokeStyle='#fff';g.lineWidth=4;g.stroke();});
+    const p=new THREE.Mesh(new THREE.PlaneGeometry(0.3,0.3),new THREE.MeshStandardMaterial({map:t,transparent:true,alphaTest:.4,side:THREE.DoubleSide}));p.position.y=0.3;p.castShadow=true;T.add(p);}
+  else add(T,S===2?new THREE.IcosahedronGeometry(0.15,0):new THREE.SphereGeometry(0.15,20,16),S===3?mat(PAL.tree):M(PAL.tree,{roughness:.8}),0,0.3,0);}
+for(const [x,c] of [[-1.0,0],[1.15,1]]){const C=new THREE.Group();C.position.set(x,0.013,ST.z+0.1);W0.add(C);
+  add(C,S===2||S===3?new RoundedBoxGeometry(0.34,0.08,0.16,2,0.03):new THREE.BoxGeometry(0.34,0.08,0.16),mat(PAL.car[c]),0,0.06,0);
+  add(C,S===2||S===3?new RoundedBoxGeometry(0.2,0.07,0.15,2,0.025):new THREE.BoxGeometry(0.2,0.07,0.15),mat(PAL.car[c]),-0.02,0.13,0);
+  for(const [wx,wz] of [[-0.11,0.08],[0.11,0.08],[-0.11,-0.08],[0.11,-0.08]])add(C,new THREE.CylinderGeometry(0.03,0.03,0.025,12).rotateX(Math.PI/2),M(0x1b1b20),wx,0.03,wz);}
+for(const x of [-1.25,0.95]){add(W0,new THREE.CylinderGeometry(0.008,0.008,0.4,8),M(0x3a3a40,{metalness:.5}),x,0.23,FRONT+0.38);const b=add(W0,new THREE.SphereGeometry(0.025,10,8),new THREE.MeshBasicMaterial({color:0xfff2c8,toneMapped:false}),x,0.44,FRONT+0.38);
+  if(S!==2){const l=new THREE.PointLight(0xffd9a0,0.5,1.0,2);l.position.set(x,0.42,FRONT+0.42);W0.add(l);}}
+// ---------------- light and camera per style ----------------
+let cam;const tgt=new THREE.Vector3(0,0.25,0.2);
+if(S===2){const k=1.95;cam=new THREE.OrthographicCamera(-k,k,k*H/W,-k*H/W,0.1,50);const d=12;cam.position.set(tgt.x+d*Math.cos(Math.atan(1/Math.SQRT2))*Math.sin(-Math.PI/4+0.0),tgt.y+d*Math.sin(Math.atan(1/Math.SQRT2)),tgt.z+d*Math.cos(Math.atan(1/Math.SQRT2))*Math.cos(-Math.PI/4));
+  cam.position.set(tgt.x-d*0.5,tgt.y+d*0.577,tgt.z+d*0.65);cam.lookAt(tgt);cam.updateMatrixWorld();cam.clearViewOffset();cam.setViewOffset(W,H,0,-180,W,H);}
+else{cam=new THREE.PerspectiveCamera(S===1?24:26,W/H,0.05,80);const d=S===1?15.5:S===3?14.5:13.5,el=(S===1?46:S===3?30:32)*Math.PI/180,az=(S===4?0:-22)*Math.PI/180;
+  cam.position.set(tgt.x+d*Math.cos(el)*Math.sin(az),tgt.y+d*Math.sin(el),tgt.z+d*Math.cos(el)*Math.cos(az));cam.lookAt(tgt);cam.setViewOffset(W,H,0,S===1?-40:-90,W,H);}
+cam.updateProjectionMatrix();
+const sun=new THREE.DirectionalLight(S===1?0xffe6c4:S===3?0xffd8a8:0xfff4e6,S===1?2.0:S===2?1.6:S===3?1.8:1.25);sun.position.set(-4,7,4);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.radius=S===2?2:6;
+Object.assign(sun.shadow.camera,{left:-4,right:4,top:4,bottom:-4});sun.shadow.bias=-0.0005;scene.add(sun);
+scene.add(new THREE.HemisphereLight(S===1?0xbfd8ff:S===2?0xdcd6ff:0xffe8d0,S===1?0x3a3020:0x1a1430,S===2?1.1:0.55));
+if(S!==1){const rim=new THREE.DirectionalLight(0x8a78ff,S===2?0.6:0.9);rim.position.set(4,3,-3);scene.add(rim);const rr=new THREE.DirectionalLight(0xff3344,0.6);rr.position.set(3,2,-4);scene.add(rr);}
+if(S===1)scene.background=new THREE.Color(0x9fb8c8);else scene.background=new THREE.Color(S===3?0x120c08:0x07070B);
+renderer.render(scene,cam);
+// ---------------- composite: tilt-shift blur for style 1, then the title and the logo ----------------
+const out=document.getElementById('out').getContext('2d');const src=renderer.domElement;
+if(S===1){out.filter='blur(7px) saturate(1.3)';out.drawImage(src,0,0);out.filter='none';
+  const tc=document.createElement('canvas');tc.width=W;tc.height=H;const tg=tc.getContext('2d');tg.filter='saturate(1.3) contrast(1.05)';tg.drawImage(src,0,0);tg.filter='none';tg.globalCompositeOperation='destination-in';
+  const gr=tg.createLinearGradient(0,0,0,H);gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(0.38,'rgba(0,0,0,0)');gr.addColorStop(0.47,'rgba(0,0,0,1)');gr.addColorStop(0.6,'rgba(0,0,0,1)');gr.addColorStop(0.7,'rgba(0,0,0,0)');gr.addColorStop(1,'rgba(0,0,0,0)');tg.fillStyle=gr;tg.fillRect(0,0,W,H);out.drawImage(tc,0,0);}
+else out.drawImage(src,0,0);
+// darker top and bottom like in the videos so the text reads
+{const g=out.createLinearGradient(0,0,0,600);g.addColorStop(0,'rgba(7,7,11,.82)');g.addColorStop(1,'rgba(7,7,11,0)');out.fillStyle=g;out.fillRect(0,0,W,600);
+ const g2=out.createLinearGradient(0,H-480,0,H);g2.addColorStop(0,'rgba(7,7,11,0)');g2.addColorStop(1,'rgba(7,7,11,.88)');out.fillStyle=g2;out.fillRect(0,H-480,W,480);}
+out.fillStyle='#fff';out.font='800 76px "Inter Tight"';out.letterSpacing='-1.8px';out.fillText('Was wäre, wenn alle',78,300);out.fillText('ihr Geld abheben?',78,382);out.letterSpacing='0px';
+out.font='500 26px Poppins';out.fillStyle='rgba(255,255,255,.75)';out.fillText(['','Stil 1 · Tilt-Shift-Miniatur','Stil 2 · Isometrische Spielbrett-Welt','Stil 3 · Holzspielzeug-Stadt','Stil 4 · Papier-Diorama (Pop-up-Buch)'][S],80,1700);
+out.fillStyle='#E01E2B';out.font='500 58px Poppins';out.letterSpacing='-1px';out.fillText('function.',78,1812);
+window.ready=true;
+</script></body></html>
