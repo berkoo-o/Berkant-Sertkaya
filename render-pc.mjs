@@ -1,6 +1,7 @@
 // function. – Videos auf dem eigenen PC mit der Grafikkarte rendern.
 //
 // Aufruf (in PowerShell im Projektordner):
+//   node render-pc.mjs                → aktueller Auftrag aus pc-auftrag.json (so startet ihn „Video rendern.cmd“)
 //   node render-pc.mjs <ordner> [auftrag]
 //   z. B. node render-pc.mjs bankrun test   → liest bankrun/test.render.json
 //         node render-pc.mjs bankrun        → liest bankrun/render.json
@@ -28,8 +29,14 @@ import {fileURLToPath} from 'node:url';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const WIN = process.platform === 'win32';
-const [, , folder, task = 'render'] = process.argv;
 const fail = msg => { console.error('\n✖ ' + msg + '\n'); process.exit(1); };
+// Ohne Angaben (Doppelklick auf „Video rendern.cmd“) gilt der aktuelle Auftrag aus pc-auftrag.json.
+let [, , folder, task = 'render'] = process.argv;
+if (!folder || folder === 'auto') {
+  const a = JSON.parse(fs.readFileSync(path.join(ROOT, 'pc-auftrag.json'), 'utf8'));
+  folder = a.folder; task = a.task || 'render';
+  console.log(`▶ Aktueller Auftrag: ${a.title || folder + ' / ' + task}`);
+}
 const sec = ms => (ms / 1000).toFixed(1).replace('.', ',') + ' s';
 
 if (!folder) fail('Bitte den Ordner angeben, zum Beispiel: node render-pc.mjs bankrun test');
