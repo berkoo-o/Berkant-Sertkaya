@@ -1,9 +1,11 @@
 # function. – „Was wäre, wenn alle gleichzeitig ihr Geld abheben?“
 
-Stand: 20.11.2026 · geplante Länge: etwa 87 Sekunden (Stimme etwa 84 s bei 227 Wörtern, danach rund 3 s Outro) · 9:16 · Stimme: Tom Magic (ElevenLabs, eleven_v4)
+Stand: 20.11.2026 · Länge 89,2 Sekunden (Stimme Take 2, 85,5 s ab 0,15 s, danach 3,4 s Outro) · ursprünglich geplante Länge: etwa 87 Sekunden (Stimme etwa 84 s bei 227 Wörtern, danach rund 3 s Outro) · 9:16 · Stimme: Tom Magic (ElevenLabs, eleven_v4)
 Zwei Fassungen mit identischem Ablauf, Text und Ton: **Stil 1 Tilt-Shift-Miniatur** und **Stil 2 isometrische Spielbrett-Welt** (Stiltest: `bankrun/Stiltest_Vergleich.jpg`). Gerendert wird auf dem PC des Nutzers mit `render-pc.mjs` (Doppelklick auf „function. rendern“).
 
 ## Look
+
+Umsetzung: `bankrun/modell.html` mit Code in `bankrun/src/` (`town.js` Stadt und Bank, `people.js` Figuren und ihre Wege, `main.js` Ablauf, Kamera, Licht, Texte). Die Häuserreihe vor der Bank wurde beim Bauen durch einen niedrigen Park mit Brunnen ersetzt, damit die Kamera bei den Nahaufnahmen freie Sicht auf die Automaten hat. Die Geldbündel fliegen deshalb in Häuser hinter der Bank. Für „Geld drucken“ kreist die Kamera einmal um die Bank und schaut von hinten in den Hof. Der Turm besteht aus echten Geldbündeln statt aus Glas, weil gläserne Bündel im Überblick kaum zu sehen waren. `window.CHECK()` prüft das ganze Video auf Figuren, die sich zu nahe kommen oder durch Gebäude laufen, und auf Bündel, die durch Häuser fliegen.
 
 Eine einzige kleine Stadt, in der Mitte eine Bank mit Säulen und dem Schild „BANK“, rechts an der Fassade drei Geldautomaten, davor der Gehweg mit der Schlange, eine Straße mit Autos auf geschlossenen Runden, Bäume, Laternen und Häuser in gedeckten, unterschiedlichen Farben. Stil 1 wirkt wie eine von oben fotografierte Modellstadt mit unscharfem oberen und unteren Bildrand und warmem Sonnenlicht, Stil 2 wie ein Spielbrett in Pastell auf einer dicken Platte vor dunklem Hintergrund, ohne Fluchtpunkt. Die Kamera fährt in beiden Stilen ruhig und ohne Schnitt, die Stelle, um die es geht, ist immer am hellsten.
 
@@ -57,7 +59,10 @@ Zeiten sind geplant und werden nach der Stimmaufnahme an Toms Wortzeiten angepas
 [curious] Würdest du dein Geld abheben? [short pause] [warm] Schreib's in die Kommentare.
 ```
 
-## Outro-Auswahl (vor dem Bauen vom Nutzer wählen lassen)
+## Outro-Auswahl
+
+Vom Nutzer gewählt (20.11.2026): **Variante 2, der Automat gibt das Logo aus.** Umsetzung: Die Kamera taucht vom Überblick an den roten Automaten, ein Beleg schiebt sich aus dem Geldschlitz, kippt nach unten und hängt wie ein echter Kassenbon. Darauf erscheint „function“ in Poppins Medium, kurz danach ploppt der rote Punkt auf. Oben im Bild leuchtet das rote „LEER“-Display.
+
 
 1. **Bankschild wird zum Logo (Empfehlung):** Die Stadt wird dunkel, nur das rote „LEER“-Display leuchtet. Die Buchstaben „BANK“ auf dem Giebel klappen nacheinander um und werden zu „function“, das rote Licht des Displays steigt auf und rastet als Punkt ein.
 2. **Der Automat gibt das Logo aus:** Der rote Automat surrt, aus dem Geldschlitz schiebt sich statt eines Scheins ein weißer Zettel mit „function.“, der rote Punkt leuchtet auf.

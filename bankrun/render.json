@@ -1,0 +1,12 @@
+{
+  "page": "modell.html",
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "jobs": [
+    { "name": "Bankrun_Stil1_TiltShift", "query": "?s=1", "frames": 2675,
+      "audio": [ { "file": "mix_music.m4a", "suffix": "_mit_Musik" }, { "file": "mix_fx.m4a", "suffix": "_nur_Effekte" } ] },
+    { "name": "Bankrun_Stil2_Isometrisch", "query": "?s=2", "frames": 2675,
+      "audio": [ { "file": "mix_music.m4a", "suffix": "_mit_Musik" }, { "file": "mix_fx.m4a", "suffix": "_nur_Effekte" } ] }
+  ]
+}
