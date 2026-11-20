@@ -90,12 +90,12 @@ const pk=(o,t,e='io')=>[t,{p:o.p,r:o.r,s:o.s,e}];
 // one track per object: emerge from the page, present in front of the calendar, then park
 function hero(tIn,tOut,tPark,park,rot,opt={}){const hp=opt.hp||HP(),s=opt.s||1.45;const parkKey=opt.lay?[tPark,{p:park.p,r:park.r,s:park.s,e:'out',ep:'io'}]:pk(park,tPark);
   return track([[tIn-0.01,{p:EM,r:[0,0,0],s:0}],[tIn,{p:EM,r:[0.6,0,0],s:0.12}],[tIn+0.62,{p:hp,r:rot,s,e:'back',k:1.2,ep:opt.ep}],
-  [tOut,{p:[hp[0]+(opt.drift||0.006),hp[1]+0.004,hp[2]],r:[rot[0],rot[1]+(opt.spin||0.12),rot[2]],s}],parkKey,pk(park,69.95+(opt.k||0)*0.05),[70.75+(opt.k||0)*0.05,{p:opt.form.p,r:opt.form.r,s:opt.form.s,e:'io',ep:'out'}],pk(opt.form,73.35),[76.5,{p:park.p,r:park.r,s:park.s,e:'out',ep:'io'}]]);}
+  [tOut,{p:[hp[0]+(opt.drift||0.006),hp[1]+0.004,hp[2]],r:[rot[0],rot[1]+(opt.spin||0.12),rot[2]],s}],parkKey,pk(park,69.95+(opt.k||0)*0.05),[70.75+(opt.k||0)*0.05,{p:opt.form.p,r:opt.form.r,s:opt.form.s,e:'io',ep:'out'}],pk(opt.form,73.35),pk(opt.form,76.5)]);}
 const TR={
   cash:track([[0,{p:HP(0,0.066,0),r:[0.95,-0.32,0.05],s:1.3}],[2.6,{p:HP(0.004,0.07,0),r:[0.92,-0.2,0.04],s:1.3}],[3.6,{p:[0.6,0.0,0.15],r:[0,-0.3,0],s:1,e:'out',ep:'io'}],[61.35,{p:[0.6,0.0,0.15],r:[0,-0.3,0],s:1}],
     [62.1,{p:HP(0,0.066,0),r:[0.9,-0.28,0.04],s:1.3,e:'io',ep:'out'}],[64.2,{p:HP(0,0.068,0),r:[0.9,-0.2,0.04],s:1.3}],[64.6,{p:HP(0,CASH_YC,0.01),r:[0.6,-0.1,0],s:1.3}],[67.45,{p:HP(0,CASH_YC,0.01),r:[0.6,-0.05,0],s:1.3}],
     [68.0,{p:[HAND.xb0,0,HAND.z],r:[0,0.06,0],s:HAND.cs}],[HAND.s0,{p:[HAND.xb0,0,HAND.z],r:[0,0.06,0],s:HAND.cs}],[HAND.s1,{p:[HAND.xb1,0,HAND.z],r:[0,-0.03,0],s:HAND.cs,e:'o2'}],
-    [69.95,{p:[HAND.xb1,0,HAND.z],r:[0,-0.03,0],s:HAND.cs}],pk(FORM.cash,70.95),pk(FORM.cash,73.35),pk(PARK.cash,76.5)]),
+    [69.95,{p:[HAND.xb1,0,HAND.z],r:[0,-0.03,0],s:HAND.cs}],pk(FORM.cash,70.95),pk(FORM.cash,73.35),pk(FORM.cash,76.5)]),
   slip:hero(8.5,14.85,15.6,PARK.slip,[-0.3,0.2,-0.03],{hp:HP(0,0.118,0.02),s:1.0,form:FORM.slip,k:0,ep:'out',lay:1}),
   ticket:hero(14.95,19.3,20.0,PARK.ticket,[-0.3,-0.22,0.04],{hp:HP(0,0.075,0),s:1.35,form:FORM.ticket,k:1}),
   binder:track([[19.33,{p:EM,r:[0,0,0],s:0}],[19.34,{p:EM,r:[0,0,0],s:0.12}],[19.95,{p:HP(-0.04,0,-0.05),r:[0,0.5,0],s:0.8,e:'back',k:1.1,ep:'out'}],[21.4,{p:HP(-0.04,0,-0.05),r:[0,0.56,0],s:0.8}],pk(PARK.binder,22.6)]),
@@ -107,7 +107,7 @@ const TR={
     return track([[41.99,{p:[0.5,0.27,0.66],r:[-0.7,-1.5,0.7],s:0}],[42.0,{p:[0.5,0.27,0.66],r:[-0.7,-1.5,0.7],s:1.35}],[42.9,{p:[-0.045,0.0675,0.56],r:[-0.24,0.34,-0.04],s:1.35,e:'out'}],
       [45.35,{p:[-0.042,0.0705,0.56],r:[-0.23,0.4,-0.03],s:1.35}],[46.15,{p:[-0.05,0.0675,0.46],r:[-0.27,0.3,-0.05],s:1.3}],[47.15,{p:[-0.046,0.0685,0.46],r:[-0.27,0.32,-0.05],s:1.3}],
       [47.95,{p:[0.02,0.062,0.52],r:[-0.25,Math.PI+0.04,0.03],s:1.38,e:'io'}],[48.5,{p:[0.025,0.064,0.52],r:[-0.25,Math.PI+0.08,0.03],s:1.38}],[49.3,{p:LP.p,r:LP.r,s:1,e:'out',ep:'io'}],
-      [70.25,{p:LP.p,r:LP.r,s:1}],[71.05,{p:LF.p,r:LF.r,s:LF.s,e:'io',ep:'out'}],[73.35,{p:LF.p,r:LF.r,s:LF.s}],[76.5,{p:LP.p,r:LP.r,s:1,e:'out',ep:'io'}]]);})(),
+      [70.25,{p:LP.p,r:LP.r,s:1}],[71.05,{p:LF.p,r:LF.r,s:LF.s,e:'io',ep:'out'}],[73.35,{p:LF.p,r:LF.r,s:LF.s}],[76.5,{p:LF.p,r:LF.r,s:LF.s}]]);})(),
   stack:hero(49.3,52.78,53.4,PARK.stack,[0.1,0,0],{hp:HP(0,0.006,0.01),s:1.75,spin:0.4,form:FORM.stack,k:7,ep:'out'}),
   env:hero(52.85,61.3,62.0,PARK.env,[-0.2,-0.16,0.02],{hp:HP(0,0.09,0),s:1.25,drift:0.003,spin:0.05,form:FORM.env,k:8}),
 };
@@ -252,11 +252,17 @@ function overlay(t){const O2=OUT.t0;
 // ------------------------------------------------------------------ outro v8 (Wunsch des Nutzers 20.11.2026: „einfach nur, dass function. erscheint, 2 Sekunden“):
 // the picture fades to the dark background and the red logo appears in the middle and stays
 const fwc=document.getElementById('fw').getContext('2d');
-function logoOutro(t){fwc.clearRect(0,0,W,H);if(t<OUT.t0)return;
-  fwc.fillStyle=`rgba(7,7,11,${ease((t-OUT.t0)/0.3).toFixed(3)})`;fwc.fillRect(0,0,W,H);
-  const u=ease((t-OUT.t0-0.12)/0.4);if(u<=0)return;
-  fwc.save();fwc.globalAlpha=u;fwc.translate(W/2,H/2);const k=0.97+0.03*u;fwc.scale(k,k);
-  fwc.font='500 190px Poppins';fwc.letterSpacing='-7px';fwc.textAlign='center';fwc.textBaseline='middle';fwc.fillStyle='#E01E2B';fwc.fillText('function.',0,0);fwc.restore();}
+// the scene stays faintly visible behind the logo, "function" fades in first and the dot pops in a moment later
+const LO={dark:0.62,word:0.1,dot:0.62};
+function logoOutro(t){fwc.clearRect(0,0,W,H);if(t<OUT.t0)return;const tt=t-OUT.t0;
+  fwc.fillStyle=`rgba(7,7,11,${(LO.dark*ease(tt/0.3)).toFixed(3)})`;fwc.fillRect(0,0,W,H);
+  const u=ease((tt-LO.word)/0.4);if(u<=0)return;
+  fwc.save();fwc.font='500 190px Poppins';fwc.letterSpacing='-7px';fwc.textAlign='left';fwc.textBaseline='middle';fwc.fillStyle='#E01E2B';fwc.shadowColor='rgba(0,0,0,0.65)';fwc.shadowBlur=24;
+  const wAll=fwc.measureText('function.').width,wWord=fwc.measureText('function').width,x0=W/2-wAll/2,y=H/2;
+  fwc.globalAlpha=u;fwc.save();fwc.translate(0,(1-u)*14);fwc.fillText('function',x0,y);fwc.restore();
+  const d=clamp((tt-LO.dot)/0.28,0,1);if(d>0){const m=fwc.measureText('.');const xd=x0+wWord,cx=xd+(m.actualBoundingBoxRight-m.actualBoundingBoxLeft)/2,cy=y+(m.actualBoundingBoxDescent-m.actualBoundingBoxAscent)/2;
+    const k=d<0.55?1.35*eo(d/0.55):lerp(1.35,1,ease((d-0.55)/0.45));fwc.globalAlpha=1;fwc.translate(cx,cy);fwc.scale(k,k);fwc.translate(-cx,-cy);fwc.fillText('.',xd,y);}
+  fwc.restore();}
 
 // ------------------------------------------------------------------ per-frame state
 const _b=new THREE.Box3();

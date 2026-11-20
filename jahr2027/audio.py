@@ -130,7 +130,8 @@ knock(69.17, 0.14, 0, 1.1); knock(69.82, 0.22, 1, 1.05)
 # ---------------------------------------------------------------- overview and end card
 whoosh(70.25, 0.4, 1)
 add(cut(sz('shimmer'), 0.0, 1.4, 0.003, 0.5), 70.6, 0.1)
-# outro v8 (2 s): only the logo appears, no effects; the music carries the end
+# outro v8 (2 s): only the logo appears; a soft click when the dot pops in a moment later
+add(CK[1], 73.45 + 0.62 + 0.08, 0.45)
 fx *= np.clip((END - t) / 0.2, 0, 1)
 
 # ---------------------------------------------------------------- voice (take 1, natural tempo) + gentle ducking
