@@ -1,0 +1,166 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Poppins;font-weight:500;src:url(node_modules/@fontsource/poppins/files/poppins-latin-500-normal.woff2)}
+@font-face{font-family:'Inter Tight';font-weight:800;src:url(node_modules/@fontsource/inter-tight/files/inter-tight-latin-800-normal.woff2)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#07070B}
+canvas{position:absolute;left:0;top:0}
+</style></head><body>
+<canvas id="out" width="1080" height="1920"></canvas>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+// Testbild Knete (Stil 6, vom Nutzer gewählt am 20.11.2026): die Stadt füllt den ganzen Bildschirm.
+// ?v=1 schräg von oben, nur Stadt; ?v=2 flacher mit Horizont, Knetehügeln und Himmel.
+// In der Mitte die Szene aus dem Stiltest: alles, was den reichsten zehn Prozent gehört, trägt ein rotes Fähnchen, vorne zehn Figuren, die reichste rot.
+import * as THREE from 'three';
+import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+await Promise.all(['500 40px Poppins', '800 96px "Inter Tight"'].map(f => document.fonts.load(f)));
+const W = 1080, H = 1920, V = +(new URLSearchParams(location.search).get('v') || 1);
+const RED = 0xE01E2B;
+const renderer = new THREE.WebGLRenderer({antialias: true, preserveDrawingBuffer: true}); renderer.setSize(W, H); renderer.setPixelRatio(1);
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0; renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene(); scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture; scene.environmentIntensity = 0.4;
+const rng = (s => () => (s = (s * 16807) % 2147483647) / 2147483647)(23);
+const tex = (w, h, draw) => {const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;};
+const hex = c => '#' + new THREE.Color(c).getHexString();
+const add = (par, geo, m, x = 0, y = 0, z = 0) => {const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = true; o.receiveShadow = true; par.add(o); return o;};
+const rbox = (w, h, d, r = 0.05) => new RoundedBoxGeometry(w, h, d, 3, Math.min(r, w / 2 - 0.001, h / 2 - 0.001, d / 2 - 0.001));
+const W0 = new THREE.Group(); scene.add(W0);
+
+// ---------------- clay material: matte, soft lumps and fingerprints ----------------
+const clayBump = tex(512, 512, (g, w, h) => {g.fillStyle = '#808080'; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 2600; i++) {const x = rng() * w, y = rng() * h, r = 2 + rng() * 12; const gr = g.createRadialGradient(x, y, 0, x, y, r); const v = rng() < 0.5 ? 255 : 0;
+    gr.addColorStop(0, `rgba(${v},${v},${v},0.09)`); gr.addColorStop(1, 'rgba(128,128,128,0)'); g.fillStyle = gr; g.fillRect(x - r, y - r, 2 * r, 2 * r);}
+  g.lineWidth = 1.2; for (let i = 0; i < 40; i++) {const x = rng() * w, y = rng() * h; g.strokeStyle = 'rgba(70,70,70,0.10)'; for (let k = 0; k < 6; k++) {g.beginPath(); g.arc(x, y, 5 + k * 3.5, rng() * 3, rng() * 3 + 2.5); g.stroke();}}});
+clayBump.wrapS = clayBump.wrapT = THREE.RepeatWrapping; clayBump.colorSpace = THREE.NoColorSpace;
+const clay = (c, o = {}) => new THREE.MeshStandardMaterial({color: c, roughness: 0.93, bumpMap: clayBump, bumpScale: 2.2, ...o});
+const PAL = {grass: 0x8fd18a, street: 0x6b6f86, walk: 0xf3e3c8, houses: [0xf6b38f, 0x9cc8f2, 0xf7dd7c, 0xc4a8f0, 0x9fe0c6, 0xf2a7c3, 0xffd2a6, 0xb8d8a0], roof: [0x8a6fd0, 0xe07f6a, 0x6f9fd8, 0xd9a03f],
+  tree: [0x5fc46a, 0x4fb07a, 0x7fcf5a], people: [0x5b8ef0, 0xf5c451, 0x58b48c, 0xa47ce0, 0xffffff, 0x3e3f5a, 0xef8fb5, 0xf08a6c, 0x6fd0e0], car: [0x5b8ef0, 0xf5c451, 0x58b48c, 0xef8fb5]};
+const winTex = (wall, win, cols, rows) => tex(256, 256, (g, w, h) => {g.fillStyle = wall; g.fillRect(0, 0, w, h); const cw = w / cols, rh = h / rows;
+  for (let i = 0; i < cols; i++) for (let k = 0; k < rows; k++) {const x = i * cw + cw * 0.25, y = k * rh + rh * 0.22; g.fillStyle = win; g.beginPath(); g.roundRect(x, y, cw * 0.5, rh * 0.55, 6); g.fill();}});
+
+// ---------------- ground: clay grass, streets and sidewalks over the whole picture ----------------
+const EXT = 40;
+add(W0, new THREE.PlaneGeometry(EXT, EXT).rotateX(-Math.PI / 2), clay(PAL.grass, {bumpScale: 3}), 0, 0, -6);
+const streetM = clay(PAL.street), walkM = clay(PAL.walk), dashM = clay(0xf7f1e6);
+const XS = [-7.3, -2.45, 2.45, 7.3], ZS = [0.62, -2.55, -5.75, -8.95, 3.75];   // streets along z (x = const) and along x (z = const)
+for (const z of ZS) {add(W0, rbox(EXT, 0.02, 0.42, 0.008), streetM, 0, 0.012, z); for (const s of [-1, 1]) add(W0, rbox(EXT, 0.04, 0.22, 0.015), walkM, 0, 0.02, z + s * 0.32);
+  for (let x = -18; x <= 18; x += 0.44) if (!XS.some(xx => Math.abs(x - xx) < 0.4)) add(W0, rbox(0.18, 0.014, 0.03, 0.006), dashM, x, 0.026, z);}
+for (const x of XS) {add(W0, rbox(0.42, 0.022, EXT, 0.008), streetM, x, 0.013, -6); for (const s of [-1, 1]) add(W0, rbox(0.22, 0.042, EXT, 0.015), walkM, x + s * 0.32, 0.021, -6);}
+// the front sidewalk where the ten figures stand is a little wider
+add(W0, rbox(EXT, 0.045, 0.5, 0.015), walkM, 0, 0.022, 1.12);
+
+// ---------------- buildings ----------------
+function flag(par, y, sc = 1.5) {   // the red thread: a red flag on everything the richest ten percent own
+  const F = new THREE.Group(); F.position.set(0, y, 0); F.scale.setScalar(sc); par.add(F);
+  add(F, new THREE.CylinderGeometry(0.009, 0.009, 0.3, 10), clay(0xf3ece0), 0, 0.15, 0);
+  const sh = new THREE.Shape(); sh.moveTo(0, 0); sh.quadraticCurveTo(0.09, -0.01, 0.17, -0.045); sh.quadraticCurveTo(0.09, -0.07, 0, -0.095); sh.closePath();
+  const f = add(F, new THREE.ExtrudeGeometry(sh, {depth: 0.012, bevelEnabled: true, bevelSize: 0.005, bevelThickness: 0.005, bevelSegments: 2}), clay(RED, {bumpScale: 1.2}), 0.006, 0.3, -0.006); f.rotation.y = -0.5;
+  add(F, new THREE.SphereGeometry(0.014, 12, 10), clay(0xf3ece0), 0, 0.305, 0);
+  return F;}
+function building(o) {
+  const G = new THREE.Group(); G.position.set(o.x, 0, o.z); G.rotation.y = o.ry || 0; W0.add(G);
+  const c = o.col ?? PAL.houses[(o.c || 0) % PAL.houses.length];
+  const cols = Math.max(2, Math.round(o.w * 3)), rows = Math.max(2, Math.round(o.h * 3));
+  const wm = new THREE.MeshStandardMaterial({map: winTex(hex(c), '#5b5a8a', cols, rows), roughness: .93, bumpMap: clayBump, bumpScale: 2.2}), pm = clay(c);
+  add(G, rbox(o.w, o.h, o.d, 0.06), [wm, wm, pm, pm, wm, wm], 0, o.h / 2, 0);
+  let top = o.h;
+  if (o.t === 'house' || o.t === 'villa') {const r = new THREE.Shape(); r.moveTo(-o.w / 2 - 0.03, 0); r.lineTo(o.w / 2 + 0.03, 0); r.lineTo(0, o.w * 0.36); r.closePath();
+    const g = new THREE.ExtrudeGeometry(r, {depth: o.d + 0.04, bevelEnabled: true, bevelSize: 0.02, bevelThickness: 0.02, bevelSegments: 3}); g.translate(0, 0, -(o.d + 0.04) / 2);
+    add(G, g, clay(PAL.roof[(o.c || 0) % PAL.roof.length]), 0, o.h, 0); top = o.h + o.w * 0.36;}
+  else add(G, rbox(o.w + 0.05, 0.06, o.d + 0.05, 0.025), clay(0xfaf3e8), 0, o.h + 0.03, 0);
+  // a door on the front
+  add(G, rbox(Math.min(0.12, o.w * 0.25), 0.16, 0.03, 0.012), clay(0x7a5a8a), 0, 0.08, o.d / 2 + 0.005);
+  if (o.t === 'factory') {for (const [x, hh] of [[-0.28, 0.75], [0.0, 0.6]]) add(G, new THREE.CylinderGeometry(0.065, 0.08, hh, 16), clay(0xf6b38f), x, o.h + hh / 2, -0.15);
+    for (const [x, y] of [[-0.28, 0.75], [0.0, 0.6]]) for (let k = 0; k < 3; k++) add(G, new THREE.SphereGeometry(0.07 + k * 0.025, 14, 12), clay(0xf4f1f7, {bumpScale: 1}), x + k * 0.05, o.h + y + 0.08 + k * 0.09, -0.15 - k * 0.02);   // clay smoke puffs
+    for (let i = 0; i < 3; i++) {const s = new THREE.Shape(); s.moveTo(0, 0); s.lineTo(0.25, 0); s.lineTo(0, 0.14); s.closePath(); const g = new THREE.ExtrudeGeometry(s, {depth: o.d * 0.7, bevelEnabled: true, bevelSize: .01, bevelThickness: .01}); g.translate(0, 0, -o.d * 0.35);
+      add(G, g, clay(0xf7dd7c), 0.06 + i * 0.13 - 0.2, o.h + 0.06, 0.12);}}
+  if (o.t === 'tower') {add(G, rbox(o.w * 0.6, 0.12, o.d * 0.6, 0.04), clay(0xffffff), 0, o.h + 0.06, 0); top = o.h + 0.12;}
+  if (o.t === 'villa') add(G, rbox(0.3, 0.02, 0.13, 0.008), clay(0x46b6e0, {roughness: .4, bumpScale: .4}), 0, 0.02, o.d / 2 + 0.11);
+  if (o.own) {const F = flag(G, top, o.fs || 1.5); F.position.x = o.fx || 0; F.position.z = o.fz || 0;}
+  return G;}
+function tree(x, z, s = 1) {const T = new THREE.Group(); T.position.set(x, 0.01, z); T.scale.setScalar(s); W0.add(T);
+  add(T, new THREE.CylinderGeometry(0.02, 0.026, 0.14, 10), clay(0xa0704a), 0, 0.07, 0);
+  add(T, new THREE.IcosahedronGeometry(0.15, 2), clay(PAL.tree[Math.floor(rng() * 3)]), 0, 0.27, 0); if (rng() < 0.5) add(T, new THREE.IcosahedronGeometry(0.1, 2), clay(PAL.tree[Math.floor(rng() * 3)]), 0.06, 0.4, 0.02);}
+function car(x, z, c, ry = 0) {const C = new THREE.Group(); C.position.set(x, 0.022, z); C.rotation.y = ry; W0.add(C); const m = clay(PAL.car[c % PAL.car.length]);
+  add(C, rbox(0.34, 0.08, 0.16, 0.035), m, 0, 0.06, 0); add(C, rbox(0.2, 0.07, 0.15, 0.03), m, -0.02, 0.13, 0);
+  for (const [wx, wz] of [[-0.11, 0.08], [0.11, 0.08], [-0.11, -0.08], [0.11, -0.08]]) add(C, new THREE.CylinderGeometry(0.03, 0.03, 0.025, 14).rotateX(Math.PI / 2), clay(0x3e3f5a), wx, 0.03, wz);}
+
+// the centre: the scene from the style test (owned by the richest 10 % → red flag)
+const CORE = [
+  {t: 'factory', x: -1.45, z: -1.2, w: 1.0, d: 0.75, h: 0.75, own: 1, fx: 0.36, fz: 0.22, col: 0xc4a8f0},
+  {t: 'tower', x: -0.3, z: -1.25, w: 0.62, d: 0.62, h: 2.2, own: 1, col: 0x9cc8f2},
+  {t: 'block', x: 0.72, z: -1.2, w: 0.95, d: 0.65, h: 1.45, own: 1, c: 1},
+  {t: 'house', x: 1.62, z: -1.22, w: 0.52, d: 0.55, h: 0.6, own: 0, c: 4},
+  {t: 'house', x: -1.68, z: -0.12, w: 0.5, d: 0.52, h: 0.5, own: 0, c: 5},
+  {t: 'block', x: -0.88, z: -0.15, w: 0.78, d: 0.62, h: 1.05, own: 1, c: 0},
+  {t: 'villa', x: 0.12, z: -0.12, w: 0.72, d: 0.58, h: 0.55, own: 1, c: 2},
+  {t: 'block', x: 1.0, z: -0.15, w: 0.62, d: 0.6, h: 1.2, own: 1, c: 3},
+  {t: 'house', x: 1.72, z: -0.1, w: 0.42, d: 0.5, h: 0.48, own: 0, c: 1},
+  {t: 'house', x: 1.72, z: -0.62, w: 0.4, d: 0.36, h: 0.42, own: 0, c: 2}];
+CORE.forEach(building);
+for (const [x, z] of [[-1.9, 0.24], [-0.42, 0.24], [0.62, 0.24], [1.95, 0.24], [-1.05, -0.64], [1.25, -0.7]]) tree(x, z);
+// the rest of the town: every block between the streets is filled, more than half of it belongs to the richest (big buildings mostly)
+function fillBlock(x0, x1, z0, z1) {
+  const mx = 0.5, mz = 0.48; let z = z1 - mz;   // front row faces the street at z1
+  while (z - 0.3 > z0 + 0.25) {let x = x0 + mx * 0.6; const rowD = 0.5 + rng() * 0.25;
+    while (x + 0.45 < x1 - 0.2) {const r = rng(), big = r < 0.45, w = big ? 0.6 + rng() * 0.35 : 0.42 + rng() * 0.2, d = Math.min(rowD, big ? 0.55 + rng() * 0.2 : 0.42 + rng() * 0.12);
+      if (x + w > x1 - 0.2) break;
+      if (rng() < 0.12) {tree(x + w / 2, z - d / 2, 0.9 + rng() * 0.4); x += w + 0.12; continue;}
+      const t = big ? (rng() < 0.2 ? 'tower' : 'block') : 'house', h = t === 'tower' ? 1.6 + rng() * 0.8 : big ? 0.8 + rng() * 0.6 : 0.4 + rng() * 0.25;
+      building({t, x: x + w / 2, z: z - d / 2, w, d, h, own: big ? (rng() < 0.85 ? 1 : 0) : (rng() < 0.25 ? 1 : 0), c: Math.floor(rng() * 8)});
+      x += w + 0.1 + rng() * 0.08;}
+    z -= rowD + 0.28;}}
+for (let i = 0; i < XS.length - 1; i++) for (const [z0, z1] of [[-5.42, -2.88], [-8.62, -6.08], [-12, -9.28]]) fillBlock(XS[i] + 0.45, XS[i + 1] - 0.45, z0, z1);
+fillBlock(-12, XS[0] - 0.45, -5.42, -2.88); fillBlock(XS[3] + 0.45, 12, -5.42, -2.88); fillBlock(-12, XS[0] - 0.45, -2.25, 0.3); fillBlock(XS[3] + 0.45, 12, -2.25, 0.3);
+fillBlock(-12, XS[0] - 0.45, -8.62, -6.08); fillBlock(XS[3] + 0.45, 12, -8.62, -6.08);
+fillBlock(-6.85, -2.9, -2.25, 0.3); fillBlock(2.9, 6.85, -2.25, 0.3);
+fillBlock(-6.85, -2.9, 1.5, 3.42); fillBlock(2.9, 6.85, 1.5, 3.42);
+// in front of the ten figures: a low park, so nothing hides them (fountain, bushes, benches)
+{add(W0, new THREE.CylinderGeometry(0.42, 0.46, 0.08, 40), clay(0xf3e3c8), 0, 0.04, 2.5); add(W0, new THREE.CylinderGeometry(0.34, 0.34, 0.03, 40), clay(0x7fc8ee, {roughness: .35, bumpScale: .6}), 0, 0.085, 2.5);
+ add(W0, new THREE.CylinderGeometry(0.04, 0.06, 0.22, 16), clay(0xf3e3c8), 0, 0.16, 2.5); add(W0, new THREE.SphereGeometry(0.07, 16, 12), clay(0xcfeeff, {bumpScale: .5}), 0, 0.3, 2.5);
+ for (const [x, z] of [[-1.7, 1.9], [-1.25, 2.9], [-0.8, 1.85], [0.8, 1.9], [1.3, 2.95], [1.75, 1.95], [-1.8, 3.2], [1.85, 3.25]]) {const b = add(W0, new THREE.IcosahedronGeometry(0.13 + rng() * 0.05, 2), clay(PAL.tree[Math.floor(rng() * 3)]), x, 0.1, z); b.scale.y = 0.75;}
+ for (const x of [-0.75, 0.75]) {const B = new THREE.Group(); B.position.set(x, 0, 2.5); B.rotation.y = x < 0 ? 0.5 : -0.5; W0.add(B); add(B, rbox(0.26, 0.03, 0.09, 0.012), clay(0xd9a07a), 0, 0.08, 0); add(B, rbox(0.26, 0.08, 0.02, 0.01), clay(0xd9a07a), 0, 0.13, -0.04);
+   for (const sx of [-0.1, 0.1]) add(B, rbox(0.02, 0.07, 0.07, 0.006), clay(0x3e3f5a), sx, 0.035, 0);}}
+for (let i = 0; i < 9; i++) tree(-6.5 + i * 1.6 + rng() * 0.3, 4.3 + rng() * 0.3, 1.1);
+// cars on the streets
+[[-0.9, 0.7, 0], [1.05, 0.54, 1], [-4.2, -2.47, 2], [3.6, -2.63, 3], [0.2, -5.67, 1], [-2.37, -4.0, 0, Math.PI / 2], [2.53, -1.6, 2, Math.PI / 2], [5.0, 0.7, 3], [-5.5, 0.54, 2]].forEach(([x, z, c, r]) => car(x, z, c, r || 0));
+// the ten figures: each one stands for ten percent of the people, the richest is red
+function figure(x, z, c, rich) {const G = new THREE.Group(); G.position.set(x, 0.045, z); G.rotation.y = (rng() - 0.5) * 0.25; W0.add(G); const k = 2.3; const col = rich ? RED : c;
+  for (const sx of [-1, 1]) add(G, new THREE.CylinderGeometry(0.013 * k, 0.012 * k, 0.06 * k, 14), clay(0x3e3f5a), sx * 0.012 * k, 0.03 * k, 0);
+  add(G, new THREE.CapsuleGeometry(0.03 * k, 0.045 * k, 6, 16), clay(col), 0, 0.1 * k, 0); add(G, new THREE.SphereGeometry(0.024 * k, 18, 14), clay(0xf3c9a5), 0, 0.165 * k, 0);
+  if (rich) add(G, new THREE.CylinderGeometry(0.02 * k, 0.022 * k, 0.032 * k, 18), clay(0x2b2b33), 0, 0.197 * k, 0);}
+for (let i = 0; i < 10; i++) figure(-1.6 + i * 0.35, 1.15, PAL.people[i % PAL.people.length], i === 9);
+// people walking elsewhere in town
+for (let i = 0; i < 26; i++) {const z = ZS[Math.floor(rng() * 4)] + (rng() < 0.5 ? -0.32 : 0.32), x = -7 + rng() * 14; if (Math.abs(z - 1.12) < 0.4 && Math.abs(x) < 2.2) continue; const G = new THREE.Group(); G.position.set(x, 0.045, z); W0.add(G); const k = 1.6;
+  add(G, new THREE.CapsuleGeometry(0.03 * k, 0.045 * k, 6, 12), clay(PAL.people[Math.floor(rng() * 9)]), 0, 0.1 * k, 0); add(G, new THREE.SphereGeometry(0.024 * k, 14, 12), clay(0xf3c9a5), 0, 0.165 * k, 0);
+  for (const sx of [-1, 1]) add(G, new THREE.CylinderGeometry(0.013 * k, 0.012 * k, 0.06 * k, 10), clay(0x3e3f5a), sx * 0.012 * k, 0.03 * k, 0);}
+
+// ---------------- sky and hills for the flatter view ----------------
+if (V === 2) {for (let i = 0; i < 9; i++) {const r = 2.5 + rng() * 2.5; add(W0, new THREE.SphereGeometry(r, 32, 20), clay(PAL.tree[i % 3], {bumpScale: 4}), -16 + i * 4 + rng(), -r * 0.62, -15 - rng() * 3);}
+  for (let i = 0; i < 5; i++) {const C = new THREE.Group(); C.position.set(-6 + i * 3.2 + rng(), 4 + rng() * 1.5, -17); W0.add(C); for (let k = 0; k < 4; k++) add(C, new THREE.SphereGeometry(0.5 + rng() * 0.4, 18, 14), clay(0xffffff, {bumpScale: 1.5}), k * 0.55 - 0.8, rng() * 0.25, 0);}}
+
+// ---------------- light and camera ----------------
+const tgt = V === 1 ? new THREE.Vector3(0.45, 0.3, -1.5) : new THREE.Vector3(1.0, 0.8, -1.8);
+const cam = new THREE.PerspectiveCamera(26, W / H, 0.05, 120); const d = V === 1 ? 19.5 : 16.5, el = (V === 1 ? 50 : 11) * Math.PI / 180, az = -22 * Math.PI / 180;
+cam.position.set(tgt.x + d * Math.cos(el) * Math.sin(az), tgt.y + d * Math.sin(el), tgt.z + d * Math.cos(el) * Math.cos(az)); cam.lookAt(tgt); cam.setViewOffset(W, H, 0, V === 1 ? 40 : 60, W, H); cam.updateProjectionMatrix();
+const sun = new THREE.DirectionalLight(0xffeedd, 2.0); sun.position.set(-5, 9, 5); sun.castShadow = true; sun.shadow.mapSize.set(4096, 4096); sun.shadow.radius = 6;
+Object.assign(sun.shadow.camera, {left: -11, right: 11, top: 11, bottom: -11, far: 40}); sun.shadow.bias = -0.0004; sun.target.position.set(0, 0, -3); scene.add(sun, sun.target);
+scene.add(new THREE.HemisphereLight(0xffe8f0, 0x6a5a80, 0.85));
+const rim = new THREE.DirectionalLight(0x9a88ff, 0.6); rim.position.set(5, 3, -4); scene.add(rim);
+scene.background = V === 2 ? null : new THREE.Color(0x8fd18a);
+if (V === 2) {scene.background = tex(16, 256, (g, w, h) => {const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#6f5fd0'); gr.addColorStop(0.55, '#c6b8f4'); gr.addColorStop(1, '#ffe2cf'); g.fillStyle = gr; g.fillRect(0, 0, w, h);});
+  scene.fog = new THREE.Fog(0xe4d6f4, 22, 42);}
+renderer.render(scene, cam);
+
+// ---------------- composite: title, logo ----------------
+const out = document.getElementById('out').getContext('2d'); out.drawImage(renderer.domElement, 0, 0);
+{const g = out.createLinearGradient(0, 0, 0, 640); g.addColorStop(0, 'rgba(7,7,11,.78)'); g.addColorStop(1, 'rgba(7,7,11,0)'); out.fillStyle = g; out.fillRect(0, 0, W, 640);
+ const g2 = out.createLinearGradient(0, H - 520, 0, H); g2.addColorStop(0, 'rgba(7,7,11,0)'); g2.addColorStop(1, 'rgba(7,7,11,.85)'); out.fillStyle = g2; out.fillRect(0, H - 520, W, 520);}
+out.fillStyle = '#fff'; out.font = '800 76px "Inter Tight"'; out.letterSpacing = '-1.8px'; out.fillText('Wem gehört', 78, 300); out.fillText('eigentlich Deutschland?', 78, 382); out.letterSpacing = '0px';
+out.font = '500 26px Poppins'; out.fillStyle = 'rgba(255,255,255,.8)'; out.fillText(V === 1 ? 'Knete · Testbild 1 (schräg von oben)' : 'Knete · Testbild 2 (mit Horizont)', 80, 1700);
+out.fillStyle = '#E01E2B'; out.font = '500 58px Poppins'; out.letterSpacing = '-1px'; out.fillText('function.', 78, 1812);
+window.ready = true;
+</script></body></html>
