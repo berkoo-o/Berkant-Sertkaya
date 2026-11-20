@@ -126,7 +126,7 @@ for (const job of cfg.jobs) {
   const pages = await Promise.all(Array.from({length: tabs}, () => openPage(job.query)));
   const tmp = path.join(OUT, job.name + '.video.mp4');
   const enc = ff(['-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-', '-c:v', 'libx264', '-preset', 'medium',
-    '-crf', '16', '-pix_fmt', 'yuv420p', '-r', String(FPS), tmp]);
+    '-crf', '17', '-maxrate', '8M', '-bufsize', '16M', '-pix_fmt', 'yuv420p', '-r', String(FPS), tmp]);
   const encDone = finished(enc);
   const ready = new Map(); let next = 0, flushing = false, lastLog = Date.now();
   async function flush() {
@@ -165,6 +165,26 @@ for (const job of cfg.jobs) {
 }
 
 await browser.close(); server.close();
+
+// ---------- 5. fertige Videos hochladen, damit Claude sie prüfen und aufs Handy schicken kann ----------
+// render.json: "upload": [Endungen der Dateien, die hochgeladen werden], z. B. ["_mit_Musik"]
+if (cfg.upload && cfg.upload.length) {
+  const up = made.filter(f => f.endsWith('.mp4') && cfg.upload.some(sfx => f.endsWith(sfx + '.mp4')));
+  const dest = path.join(ROOT, folder);
+  const g = (...a) => spawnSync('git', a, {cwd: ROOT, stdio: 'inherit', shell: false});
+  const gq = (...a) => spawnSync('git', a, {cwd: ROOT, encoding: 'utf8'});
+  console.log(`\n▶ Lade ${up.length} Video(s) hoch, damit Claude sie bekommt …`);
+  for (const f of up) fs.copyFileSync(f, path.join(dest, path.basename(f)));
+  if (!(gq('config', 'user.name').stdout || '').trim()) g('config', 'user.name', 'function PC');
+  if (!(gq('config', 'user.email').stdout || '').trim()) g('config', 'user.email', 'pc-render@users.noreply.github.com');
+  const branch = (gq('rev-parse', '--abbrev-ref', 'HEAD').stdout || '').trim() || 'claude/nice-galileo-neyrpn';
+  g('add', '-f', ...up.map(f => path.join(folder, path.basename(f))));
+  g('commit', '-m', `PC-Render: ${cfg.title || folder}`);
+  g('pull', '--no-rebase', '--no-edit', 'origin', branch);
+  const pushed = g('push', 'origin', 'HEAD:' + branch).status === 0;
+  if (pushed) console.log(`✔ Hochgeladen. Schreib Claude einfach „fertig“, dann holt Claude die Videos ab und schickt sie dir aufs Handy.`);
+  else console.log(`✖ Das Hochladen hat nicht geklappt. Falls sich ein GitHub-Fenster geöffnet hat, dort anmelden und danach noch einmal doppelt auf „function. rendern“ klicken.\n  Die Videos liegen trotzdem fertig im Ordner.`);
+}
 console.log(`\nAlles fertig in ${sec(Date.now() - t0all)}. Die Dateien liegen in:\n  ${OUT}`);
 for (const f of made) console.log('  · ' + path.basename(f));
 if (WIN) spawn('explorer', [OUT], {detached: true, stdio: 'ignore'}).unref();
