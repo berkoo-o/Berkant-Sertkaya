@@ -1,6 +1,6 @@
 # function. – „Was wäre, wenn alle gleichzeitig ihr Geld abheben?“
 
-Stand: 20.11.2026 · geplante Länge: etwa 80 bis 85 Sekunden (Stimme etwa 78 s, danach rund 3 s Outro) · 9:16 · Stimme: Tom Magic (ElevenLabs, eleven_v4)
+Stand: 20.11.2026 · geplante Länge: etwa 87 Sekunden (Stimme etwa 84 s bei 227 Wörtern, danach rund 3 s Outro) · 9:16 · Stimme: Tom Magic (ElevenLabs, eleven_v4)
 Zwei Fassungen mit identischem Ablauf, Text und Ton: **Stil 1 Tilt-Shift-Miniatur** und **Stil 2 isometrische Spielbrett-Welt** (Stiltest: `bankrun/Stiltest_Vergleich.jpg`). Gerendert wird auf dem PC des Nutzers mit `render-pc.mjs` (Doppelklick auf „function. rendern“).
 
 ## Look
