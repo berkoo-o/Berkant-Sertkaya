@@ -1,0 +1,12 @@
+{
+  "page": "stiltest.html",
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "jobs": [
+    { "name": "PC-Test_Stil1_Standbild", "query": "?s=1", "still": true },
+    { "name": "PC-Test_Stil2_Standbild", "query": "?s=2", "still": true },
+    { "name": "PC-Test_Stil1_Kamerafahrt", "query": "?s=1", "frames": 90 },
+    { "name": "PC-Test_Stil2_Kamerafahrt", "query": "?s=2", "frames": 90 }
+  ]
+}

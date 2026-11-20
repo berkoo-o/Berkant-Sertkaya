@@ -124,19 +124,22 @@ for(const x of [-1.25,0.95]){add(W0,new THREE.CylinderGeometry(0.008,0.008,0.4,8
   if(S!==2){const l=new THREE.PointLight(0xffd9a0,0.5,1.0,2);l.position.set(x,0.42,FRONT+0.42);W0.add(l);}}
 // ---------------- light and camera per style ----------------
 let cam;const tgt=new THREE.Vector3(0,0.25,0.2);
-if(S===2){const k=1.95;cam=new THREE.OrthographicCamera(-k,k,k*H/W,-k*H/W,0.1,50);const d=12;cam.position.set(tgt.x+d*Math.cos(Math.atan(1/Math.SQRT2))*Math.sin(-Math.PI/4+0.0),tgt.y+d*Math.sin(Math.atan(1/Math.SQRT2)),tgt.z+d*Math.cos(Math.atan(1/Math.SQRT2))*Math.cos(-Math.PI/4));
-  cam.position.set(tgt.x-d*0.5,tgt.y+d*0.577,tgt.z+d*0.65);cam.lookAt(tgt);cam.updateMatrixWorld();cam.clearViewOffset();cam.setViewOffset(W,H,0,-180,W,H);}
-else{cam=new THREE.PerspectiveCamera(S===1?24:26,W/H,0.05,80);const d=S===1?15.5:S===3?14.5:13.5,el=(S===1?46:S===3?30:32)*Math.PI/180,az=(S===4?0:-22)*Math.PI/180;
+// placeCam(a): the camera orbits slowly around the model by the angle a (used for the PC speed test, a=0 is the still)
+function placeCam(a){
+if(S===2){const k=1.95,d=12;if(!cam)cam=new THREE.OrthographicCamera(-k,k,k*H/W,-k*H/W,0.1,50);const ox=-d*0.5,oz=d*0.65,c=Math.cos(a),s=Math.sin(a);
+  cam.position.set(tgt.x+ox*c+oz*s,tgt.y+d*0.577,tgt.z-ox*s+oz*c);cam.lookAt(tgt);cam.updateMatrixWorld();cam.clearViewOffset();cam.setViewOffset(W,H,0,-180,W,H);}
+else{if(!cam)cam=new THREE.PerspectiveCamera(S===1?24:26,W/H,0.05,80);const d=S===1?15.5:S===3?14.5:13.5,el=(S===1?46:S===3?30:32)*Math.PI/180,az=(S===4?0:-22)*Math.PI/180+a;
   cam.position.set(tgt.x+d*Math.cos(el)*Math.sin(az),tgt.y+d*Math.sin(el),tgt.z+d*Math.cos(el)*Math.cos(az));cam.lookAt(tgt);cam.setViewOffset(W,H,0,S===1?-40:-90,W,H);}
-cam.updateProjectionMatrix();
+cam.updateProjectionMatrix();}
+placeCam(0);
 const sun=new THREE.DirectionalLight(S===1?0xffe6c4:S===3?0xffd8a8:0xfff4e6,S===1?2.0:S===2?1.6:S===3?1.8:1.25);sun.position.set(-4,7,4);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.radius=S===2?2:6;
 Object.assign(sun.shadow.camera,{left:-4,right:4,top:4,bottom:-4});sun.shadow.bias=-0.0005;scene.add(sun);
 scene.add(new THREE.HemisphereLight(S===1?0xbfd8ff:S===2?0xdcd6ff:0xffe8d0,S===1?0x3a3020:0x1a1430,S===2?1.1:0.55));
 if(S!==1){const rim=new THREE.DirectionalLight(0x8a78ff,S===2?0.6:0.9);rim.position.set(4,3,-3);scene.add(rim);const rr=new THREE.DirectionalLight(0xff3344,0.6);rr.position.set(3,2,-4);scene.add(rr);}
 if(S===1)scene.background=new THREE.Color(0x9fb8c8);else scene.background=new THREE.Color(S===3?0x120c08:0x07070B);
-renderer.render(scene,cam);
-// ---------------- composite: tilt-shift blur for style 1, then the title and the logo ----------------
 const out=document.getElementById('out').getContext('2d');const src=renderer.domElement;
+function draw(f){placeCam(-f*0.004);renderer.render(scene,cam);out.clearRect(0,0,W,H);
+// ---------------- composite: tilt-shift blur for style 1, then the title and the logo ----------------
 if(S===1){out.filter='blur(7px) saturate(1.3)';out.drawImage(src,0,0);out.filter='none';
   const tc=document.createElement('canvas');tc.width=W;tc.height=H;const tg=tc.getContext('2d');tg.filter='saturate(1.3) contrast(1.05)';tg.drawImage(src,0,0);tg.filter='none';tg.globalCompositeOperation='destination-in';
   const gr=tg.createLinearGradient(0,0,0,H);gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(0.38,'rgba(0,0,0,0)');gr.addColorStop(0.47,'rgba(0,0,0,1)');gr.addColorStop(0.6,'rgba(0,0,0,1)');gr.addColorStop(0.7,'rgba(0,0,0,0)');gr.addColorStop(1,'rgba(0,0,0,0)');tg.fillStyle=gr;tg.fillRect(0,0,W,H);out.drawImage(tc,0,0);}
@@ -147,5 +150,8 @@ else out.drawImage(src,0,0);
 out.fillStyle='#fff';out.font='800 76px "Inter Tight"';out.letterSpacing='-1.8px';out.fillText('Was wäre, wenn alle',78,300);out.fillText('ihr Geld abheben?',78,382);out.letterSpacing='0px';
 out.font='500 26px Poppins';out.fillStyle='rgba(255,255,255,.75)';out.fillText(['','Stil 1 · Tilt-Shift-Miniatur','Stil 2 · Isometrische Spielbrett-Welt','Stil 3 · Holzspielzeug-Stadt','Stil 4 · Papier-Diorama (Pop-up-Buch)'][S],80,1700);
 out.fillStyle='#E01E2B';out.font='500 58px Poppins';out.letterSpacing='-1px';out.fillText('function.',78,1812);
+}
+draw(0);
+window.renderFrame=f=>draw(f);
 window.ready=true;
 </script></body></html>
