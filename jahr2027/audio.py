@@ -4,7 +4,7 @@
 import numpy as np, subprocess
 from scipy.io import wavfile
 from scipy.signal import butter, sosfilt
-SR = 48000; VO = 0.15; OUT = 73.45; END = 74.95 + VO; N = int(SR * END)
+SR = 48000; VO = 0.15; OUT = 73.45; END = 75.45 + VO; N = int(SR * END)
 t = np.arange(N) / SR
 def lp(x, f, o=2): return sosfilt(butter(o, f, 'low', fs=SR, output='sos'), x)
 def hp(x, f, o=2): return sosfilt(butter(o, f, 'high', fs=SR, output='sos'), x)
@@ -130,11 +130,7 @@ knock(69.17, 0.14, 0, 1.1); knock(69.82, 0.22, 1, 1.05)
 # ---------------------------------------------------------------- overview and end card
 whoosh(70.25, 0.4, 1)
 add(cut(sz('shimmer'), 0.0, 1.4, 0.003, 0.5), 70.6, 0.1)
-# outro v7 (1,5 s): the marker stroke circles the ten objects, the rings swirl together into the dot, "function" appears
-marker(73.45, 0.28, 0.34, 1.25)                                               # the ten rings are drawn (one quick stroke sound, not ten)
-whoosh(73.86, 0.22, 1)                                                        # the rings lift off and swirl together
-add(CK[1], 74.12, 0.5)                                                        # they merge into the dot
-add(cut(sz('glock'), 0.0, 0.9, 0.002, 0.35), 74.4, 0.12)                      # soft chime as the logo stands
+# outro v8 (2 s): only the logo appears, no effects; the music carries the end
 fx *= np.clip((END - t) / 0.2, 0, 1)
 
 # ---------------------------------------------------------------- voice (take 1, natural tempo) + gentle ducking

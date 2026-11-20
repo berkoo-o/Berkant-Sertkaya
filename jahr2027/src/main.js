@@ -145,8 +145,8 @@ const strokeTip=(S)=>objTip(cash.G,u=>S.tip(u),[0,1,0]);
 const MARK=[[0.85,STROKES.s0[0],STROKES.s0[1],2.85,strokeTip(S0)],[7.45,...RING.jan1,9.25,ringTip(R1)],[45.85,...RING.jan19,47.65,ringTip(R2)],[49.12,...RING.jul1,50.75,ringTip(R3)],
   [63.3,...RING.jul10,65.1,ringTip(R4)],[65.1,STROKES.x1[0],STROKES.x2[1],67.15,u=>u<0.5?strokeTip(SX1)(u*2):strokeTip(SX2)((u-0.5)*2)]];
 // outro: the marker writes the logo; the tip path is set up further down
-// outro v7 (Wunsch des Nutzers 20.11.2026: „mach was anderes“, gewählt: „10 Kreise werden zum Punkt“, 1,5 Sekunden)
-const OUT={t0:73.45,end:74.95};
+// outro v8: only the logo for 2 seconds (the themed outros before were rejected)
+const OUT={t0:73.45,end:75.45};
 function noteTip(u){const x=-NOTE.s/2+NOTE.s*(0.1+0.82*u)-NOTE.s/2*0.0,y=6-26+16*Math.sin(u*Math.PI*14);const q=notePt(x+NOTE.s*0.0,y);return {p:pagePt(q[0],q[1]),n:PAGE_N};}
 const kgTip=(px,py)=>objTip(kg.G,()=>[(px/kg.tw-0.5)*0.15,(0.5-py/kg.th)*0.19,0.004],[0,0,1]);
 const PENC=[[26.72,NOTE.w0,NOTE.u1,28.9,u=>{if(u<0.74)return noteTip(u/0.74);const v=(u-0.74)/0.26;const q=notePt(-120+240*v,40-6*v);return {p:pagePt(q[0],q[1]),n:PAGE_N};}],
@@ -249,43 +249,14 @@ function overlay(t){const O2=OUT.t0;
   // number tags over the parked objects in the overview
   const tk=Math.min(win(t,70.55,73.4,0.3));const objs=TAGOBJ();tags.forEach((e,i)=>{const op=tk*clamp((t-70.55-i*0.07)/0.2,0,1);if(op<=0.01){e.style.opacity=0;return;}const o=objs[i];o.updateMatrixWorld();const b=new THREE.Box3().setFromObject(o);const q=proj([(b.min.x+b.max.x)/2,b.max.y+0.03,(b.min.z+b.max.z)/2]);e.style.left=q[0]+'px';e.style.top=q[1]+'px';e.style.opacity=op;e.style.transform=`translate(-50%,-50%) scale(${lerp(0.6,1,eo((t-70.55-i*0.07)/0.3))})`;});}
 
-// ------------------------------------------------------------------ outro v7: the ten red rings. After the last sentence the red marker stroke circles each of the ten objects
-// in the overview, then the rings lift off, swirl together and merge into one red dot; "function" appears in front of it
-const RG={draw0:73.45,draw1:73.74,fly0:73.78,fly1:74.12,let0:74.1,let1:74.42};
+// ------------------------------------------------------------------ outro v8 (Wunsch des Nutzers 20.11.2026: „einfach nur, dass function. erscheint, 2 Sekunden“):
+// the picture fades to the dark background and the red logo appears in the middle and stays
 const fwc=document.getElementById('fw').getContext('2d');
-const RLOGO=(()=>{const g=document.createElement('canvas').getContext('2d');const sz=176,tr=-0.04*sz;g.font=`500 ${sz}px Poppins`;
-  const ws=[...'function'].map(c=>g.measureText(c).width),dw=g.measureText('.').width;const tw=ws.reduce((a,b)=>a+b,0)+tr*8;const x0=W/2-(tw+dw)/2,base=1490;
-  const xs=[];let x=x0;ws.forEach(w=>{xs.push(x);x+=w+tr;});const m=g.measureText('.');const dr=(m.actualBoundingBoxAscent+m.actualBoundingBoxDescent)/2;
-  return {sz,x0,base,xs,tw,dot:{x:x+(m.actualBoundingBoxRight-m.actualBoundingBoxLeft)/2+m.actualBoundingBoxLeft,y:base-dr,r:dr}};})();
-const _bx=new THREE.Box3(),_cv=new THREE.Vector3();
-function objRing(o){_bx.setFromObject(o);let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(let i=0;i<8;i++){_cv.set(i&1?_bx.max.x:_bx.min.x,i&2?_bx.max.y:_bx.min.y,i&4?_bx.max.z:_bx.min.z);const q=proj([_cv.x,_cv.y,_cv.z]);
-  x0=Math.min(x0,q[0]);x1=Math.max(x1,q[0]);y0=Math.min(y0,q[1]);y1=Math.max(y1,q[1]);}return {cx:(x0+x1)/2,cy:(y0+y1)/2,rx:Math.min(150,(x1-x0)/2*0.82+20),ry:Math.min(150,(y1-y0)/2*0.82+18)};}
-const RSEEDS=[3,7,11,5,9,13,4,8,12,6];
-function ringsOutro(t){fwc.clearRect(0,0,W,H);if(t<RG.draw0)return;const objs=TAGOBJ();
-  // the scene steps back a little so the logo reads
-  const dk=0.6*ease((t-RG.fly0)/0.45);if(dk>0){fwc.fillStyle=`rgba(7,7,11,${dk.toFixed(3)})`;fwc.fillRect(0,0,W,H);}
-  const D=RLOGO.dot;let arrived=0;
-  fwc.save();fwc.lineCap='round';fwc.lineJoin='round';
-  objs.forEach((o,i)=>{const R=objRing(o);const d0=RG.draw0+i*0.018,du=clamp((t-d0)/0.2,0,1);if(du<=0)return;
-    const P=ringPath(R.cx,R.cy,R.rx,R.ry,RSEEDS[i],Math.PI*2+0.5,-2.2+i*0.7);
-    const f0=RG.fly0+i*0.012,ta=RG.fly1-0.1+i*0.011,fu=clamp((t-f0)/(ta-f0),0,1);if(fu>=1){arrived++;return;}
-    // flight: curved path into the dot, the ring shrinks and spins
-    const drawRing=(u,alpha)=>{const e=eio(u);const side=i%2?1:-1;const mx=(R.cx+D.x)/2+side*(170+i*12),my=(R.cy+D.y)/2-120;
-      const cx=(1-e)*(1-e)*R.cx+2*(1-e)*e*mx+e*e*D.x,cy=(1-e)*(1-e)*R.cy+2*(1-e)*e*my+e*e*D.y;const k=lerp(1,D.r*0.9/Math.max(R.rx,R.ry),e);const rot=e*side*2.4;
-      fwc.save();fwc.translate(cx,cy);fwc.rotate(rot);fwc.scale(k,k);fwc.translate(-R.cx,-R.cy);fwc.globalAlpha=alpha;fwc.strokeStyle=REDS;fwc.lineWidth=9/Math.max(k,0.35);
-      const n=Math.max(2,Math.floor((P.length-1)*du));fwc.beginPath();fwc.moveTo(P[0][0],P[0][1]);for(let j=1;j<=n;j++)fwc.lineTo(P[j][0],P[j][1]);fwc.stroke();
-      fwc.globalAlpha=alpha*0.3;fwc.lineWidth=4/Math.max(k,0.35);fwc.strokeStyle='#ff5a64';fwc.stroke();fwc.restore();};
-    if(fu>0)for(let g=3;g>=1;g--){const ug=clamp((t-g*0.025-f0)/(ta-f0),0,1);if(ug>0)drawRing(ug,0.16*(4-g)/3);}
-    drawRing(fu,0.95);});
-  fwc.restore();
-  // the dot grows with every ring that arrives and pops once at the end
-  if(arrived>0){const last=RG.fly1-0.1+9*0.011;const pop=clamp((t-last)/0.22,0,1);const base=D.r*(0.45+0.55*arrived/10);
-    const r=arrived<10?base:D.r*(pop<0.5?lerp(1,1.3,eo(pop/0.5)):lerp(1.3,1,ease((pop-0.5)/0.5)));
-    fwc.save();fwc.shadowColor='rgba(255,40,55,0.9)';fwc.shadowBlur=26;fwc.fillStyle=REDS;fwc.beginPath();fwc.arc(D.x,D.y,r,0,7);fwc.fill();fwc.restore();}
-  // "function" appears letter by letter in front of the dot
-  fwc.save();fwc.font=`500 ${RLOGO.sz}px Poppins`;fwc.fillStyle='#ee2433';fwc.shadowColor='rgba(255,40,55,0.75)';fwc.shadowBlur=22;
-  [...'function'].forEach((c,i)=>{const u=clamp((t-RG.let0-i*0.032)/0.24,0,1);if(u<=0)return;const e=eo(u);fwc.globalAlpha=e;fwc.filter=u<1?`blur(${((1-e)*8).toFixed(2)}px)`:'none';
-    fwc.fillText(c,RLOGO.xs[i],RLOGO.base+(1-e)*26);});fwc.restore();}
+function logoOutro(t){fwc.clearRect(0,0,W,H);if(t<OUT.t0)return;
+  fwc.fillStyle=`rgba(7,7,11,${ease((t-OUT.t0)/0.3).toFixed(3)})`;fwc.fillRect(0,0,W,H);
+  const u=ease((t-OUT.t0-0.12)/0.4);if(u<=0)return;
+  fwc.save();fwc.globalAlpha=u;fwc.translate(W/2,H/2);const k=0.97+0.03*u;fwc.scale(k,k);
+  fwc.font='500 190px Poppins';fwc.letterSpacing='-7px';fwc.textAlign='center';fwc.textBaseline='middle';fwc.fillStyle='#E01E2B';fwc.fillText('function.',0,0);fwc.restore();}
 
 // ------------------------------------------------------------------ per-frame state
 const _b=new THREE.Box3();
@@ -317,7 +288,7 @@ function setTime(t){setCam(t);
   applyPose(shop.G,SHOP(t));shop.G.visible=t>64.45&&t<67.85;
   meepleAnim(t);
   // tools
-  ringsOutro(t);
+  logoOutro(t);
   const mOn=toolPose(marker,MARK,t,REST.marker,1);const pOn=toolPose(pencil,PENC,t,REST.pencil,-1);
   {const o=clamp((t-OUT.t0-0.3)/0.6,0,1);shadeEl.style.opacity=(1-0.55*o).toFixed(3);}
   overlay(t);}
