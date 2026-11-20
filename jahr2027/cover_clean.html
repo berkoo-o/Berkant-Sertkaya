@@ -20,7 +20,7 @@ import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js'
 await Promise.all(['600 40px Poppins','800 96px "Inter Tight"'].map(f=>document.fonts.load(f)));
 const W=1080,H=1920;const Q=new URLSearchParams(location.search);const V=+(Q.get('v')||1);
 const bg=document.getElementById('bg').getContext('2d'),fg=document.getElementById('fg').getContext('2d');
-const DEF={1:{cy:1330,el:14,ry:-0.38,s:1.12},2:{cy:1330,el:14,ry:-0.38,s:1.12},3:{cy:1360,el:14,ry:-0.34,s:1.05}}[V];
+const DEF={1:{cy:1450,el:14,ry:-0.38,s:1.12},2:{cy:1330,el:14,ry:-0.38,s:1.12},3:{cy:1360,el:14,ry:-0.34,s:1.05}}[V];
 const CX=+(Q.get('cx')||540),CY=+(Q.get('cy')||DEF.cy);
 // ---------- background (same recipe as the other clean covers) ----------
 {bg.fillStyle='#07070B';bg.fillRect(0,0,W,H);
@@ -76,24 +76,32 @@ RB(C,PW+0.08,0.26,PD+0.14,DARK,0,BY+PH+0.12,0.0,0.04);
 for(const s of [-1,1])add(C,new THREE.CylinderGeometry(0.035,0.035,0.03,24).rotateX(Math.PI/2),METAL,s*0.5,BY+PH+0.12,PD/2+0.08);
 // glass page block: the edges glow, the inside is visible
 const gb=new THREE.BoxGeometry(PW,PH,PD);glass(C,gb,0,BY+PH/2,0,.12);edges(C,gb,0,BY+PH/2,0);
-// inside: what 2027 changes – coins, a ticket, a piggy bank, a bundle of notes, a driving licence card
-const IN=new THREE.Group();IN.position.set(0,BY,0);C.add(IN);
-for(let i=0;i<9;i++)coin(IN,-0.42,0.03+i*0.022,0.0,-Math.PI/2,0,i);coin(IN,-0.2,0.03,0.12,-Math.PI/2+0.2,0.4,1);coin(IN,-0.05,0.03,-0.08,-Math.PI/2,0.9,2);
+// inside: what 2027 changes. Nothing floats: coins and the piggy bank stand on the floor, the cards and the bundle stand on two glass shelves and lean against the back pane
+const IN=new THREE.Group();IN.position.set(0,BY,0);C.add(IN);const ZB=-PD/2+0.004,S1=0.55,S2=1.0;
+for(const sy of [S1,S2]){const g=new THREE.BoxGeometry(PW-0.02,0.016,PD-0.02);glass(IN,g,0,sy-0.008,0,.16);edges(IN,g,0,sy-0.008,0);}
+// lean a slab (height h along its local y, thickness t along local z) back against the back pane, standing on height y0
+const leanSlab=(o,y0,h,t,a)=>{o.rotation.x=-a;o.position.y=y0+h/2*Math.cos(a)+t/2*Math.sin(a);o.position.z=ZB+t/2*Math.cos(a)+h/2*Math.sin(a);};
+const CT=0.018;for(let i=0;i<9;i++)coin(IN,-0.42,0.009+i*CT,0.0,-Math.PI/2,0,i*0.7);coin(IN,-0.2,0.009,0.13,-Math.PI/2,0,1);coin(IN,-0.04,0.009,-0.06,-Math.PI/2,0,2);
 {const T=canvasTex(512,320,(g,w,h)=>{const gr=g.createLinearGradient(0,0,w,h);gr.addColorStop(0,'#1f3a8a');gr.addColorStop(1,'#3f2a9a');g.fillStyle=gr;g.fillRect(0,0,w,h);g.fillStyle='#fff';g.font='800 54px "Inter Tight"';g.fillText('Deutschlandticket',30,80);
    g.font='800 78px "Inter Tight"';g.fillText('66,80 €',30,270);g.fillStyle='#fff';g.fillRect(380,170,100,100);g.fillStyle='#1f3a8a';for(let i=0;i<5;i++)for(let k=0;k<5;k++)if((i*7+k*3)%4)g.fillRect(388+i*18,178+k*18,14,14);});
- const t=new THREE.Mesh(new RoundedBoxGeometry(0.42,0.26,0.012,2,0.01),[M(0x2a3a8a),M(0x2a3a8a),M(0x2a3a8a),M(0x2a3a8a),new THREE.MeshStandardMaterial({map:T,roughness:.4}),M(0x2a3a8a)]);t.position.set(0.2,0.66,0.05);t.rotation.set(-0.05,-0.15,0.1);t.scale.setScalar(1.25);IN.add(t);}
-{const P=new THREE.Group();P.position.set(0.32,0.0,0.06);P.rotation.y=-0.75;P.scale.setScalar(1.35);IN.add(P);const pk=M(0xf3c6d4,{roughness:.5});
+ const sc=1.25,t=new THREE.Mesh(new RoundedBoxGeometry(0.42*sc,0.26*sc,0.012*sc,2,0.01),[M(0x2a3a8a),M(0x2a3a8a),M(0x2a3a8a),M(0x2a3a8a),new THREE.MeshStandardMaterial({map:T,roughness:.4}),M(0x2a3a8a)]);
+ t.castShadow=true;t.position.x=0.27;leanSlab(t,S1,0.26*sc,0.012*sc,0.26);IN.add(t);}
+{const P=new THREE.Group();P.position.set(0.3,0.0,0.04);P.rotation.y=-0.75;P.scale.setScalar(1.3);IN.add(P);const pk=M(0xf3c6d4,{roughness:.5});
  const b=add(P,new THREE.SphereGeometry(0.13,28,20),pk,0,0.16,0);b.scale.set(1.25,1,1);add(P,new THREE.CylinderGeometry(0.05,0.055,0.05,20).rotateZ(Math.PI/2),pk,0.17,0.16,0);
  add(P,new THREE.CylinderGeometry(0.04,0.04,0.012,20).rotateZ(Math.PI/2),M(0xe2a3b8),0.197,0.16,0);for(const [x,z] of [[0.08,0.06],[0.08,-0.06],[-0.08,0.06],[-0.08,-0.06]])add(P,new THREE.CylinderGeometry(0.025,0.025,0.06,12),pk,x,0.03,z);
  for(const s of [-1,1])add(P,new THREE.ConeGeometry(0.035,0.06,12),pk,0.1,0.28,s*0.06);add(P,new THREE.BoxGeometry(0.07,0.005,0.012),DARK,0,0.29,0);
  for(const s of [-1,1])add(P,new THREE.SphereGeometry(0.011,10,8),DARK,0.15,0.2,s*0.045);}
-{const B=new THREE.Group();B.position.set(-0.2,1.08,0.02);B.rotation.set(0.35,0.35,-0.12);B.scale.setScalar(1.2);IN.add(B);const nt=canvasTex(512,256,(g,w,h)=>{g.fillStyle='#bfe3c4';g.fillRect(0,0,w,h);g.fillStyle='#7fb48a';g.font='800 90px "Inter Tight"';g.fillText('100',20,100);g.strokeStyle='#7fb48a';g.lineWidth=6;g.beginPath();g.arc(350,128,70,0,7);g.stroke();});
- RB(B,0.44,0.09,0.24,new THREE.MeshStandardMaterial({map:nt,roughness:.6}),0,0,0,0.01);RB(B,0.08,0.095,0.245,M(0xece3cc),0,0,0,0.005);
- // the red marker cross on the bundle
- for(const s of [-1,1]){const c=new THREE.Mesh(new THREE.BoxGeometry(0.36,0.006,0.022),REDS);c.position.y=0.048;c.rotation.y=s*0.55;B.add(c);}}
+{// the bundle of notes stands on its long edge on the upper shelf, the red marker cross on its face
+ const nt=canvasTex(512,256,(g,w,h)=>{g.fillStyle='#bfe3c4';g.fillRect(0,0,w,h);g.fillStyle='#7fb48a';g.font='800 90px "Inter Tight"';g.fillText('100',20,100);g.strokeStyle='#7fb48a';g.lineWidth=6;g.beginPath();g.arc(350,128,70,0,7);g.stroke();});
+ const sc=1.2,BL=0.44*sc,BT=0.09*sc,BD=0.24*sc;const B=new THREE.Group();IN.add(B);
+ RB(B,BL,BT,BD,new THREE.MeshStandardMaterial({map:nt,roughness:.6}),0,0,0,0.01);RB(B,0.08*sc,BT+0.004,BD+0.004,M(0xece3cc),0,0,0,0.005);
+ const dx=BL-0.07,dz=BD-0.06,ang=Math.atan2(dz,dx),len=Math.hypot(dx,dz);for(const s of [-1,1]){const c=new THREE.Mesh(new THREE.BoxGeometry(len,0.006,0.024),REDS);c.position.y=BT/2+0.004;c.rotation.y=s*ang;B.add(c);}
+ // face (+y) towards the camera, tipped back against the back pane
+ const a=0.32;B.rotation.x=Math.PI/2-a;B.position.set(-0.14,S2+BD/2*Math.cos(a)+BT/2*Math.sin(a),ZB+BT/2*Math.cos(a)+BD/2*Math.sin(a));}
 {const L=canvasTex(512,320,(g,w,h)=>{g.fillStyle='#f3d9e6';g.fillRect(0,0,w,h);g.fillStyle='#1f3a8a';g.fillRect(0,0,w,70);g.fillStyle='#fff';g.font='800 46px "Inter Tight"';g.fillText('FÜHRERSCHEIN',24,52);
    g.fillStyle='#9aa0b8';g.fillRect(30,100,130,170);g.fillStyle='#55596b';for(let i=0;i<5;i++)g.fillRect(190,110+i*34,240-i*20,14);});
- const l=new THREE.Mesh(new RoundedBoxGeometry(0.36,0.23,0.01,2,0.01),[M(0xf3d9e6),M(0xf3d9e6),M(0xf3d9e6),M(0xf3d9e6),new THREE.MeshStandardMaterial({map:L,roughness:.4}),M(0xf3d9e6)]);l.position.set(-0.28,0.5,0.12);l.rotation.set(0.0,0.25,-0.18);l.scale.setScalar(1.15);IN.add(l);}
+ const sc=1.15,l=new THREE.Mesh(new RoundedBoxGeometry(0.36*sc,0.23*sc,0.01*sc,2,0.01),[M(0xf3d9e6),M(0xf3d9e6),M(0xf3d9e6),M(0xf3d9e6),new THREE.MeshStandardMaterial({map:L,roughness:.4}),M(0xf3d9e6)]);
+ l.castShadow=true;l.position.x=-0.33;leanSlab(l,S1,0.23*sc,0.01*sc,0.3);l.position.z+=0.06;l.rotation.x=-0.3;IN.add(l);}
 {const p=new THREE.PointLight(0xfff0d8,0.9,1.8,2);p.position.set(0,BY+0.8,0.1);C.add(p);}
 // the front page: "2027" with the red marker ring; v1 tears off at the top corner
 const pageT=canvasTex(1024,1180,(g,w,h)=>{g.fillStyle='#ece6ff';g.fillRect(0,0,w,h);g.fillStyle='#2b2778';g.fillRect(0,0,w,170);g.fillStyle='#f4f1ff';g.font='800 92px "Inter Tight"';g.textAlign='center';g.letterSpacing='12px';g.fillText('JANUAR',w/2+6,118);g.letterSpacing='0px';
@@ -111,15 +119,20 @@ function PAGES(){const pw=PW-0.04,ph=PH-0.04;
   // v1/v3: the page has just been torn off and flies up to the right; a jagged strip of paper is left under the header
   const scrap=canvasTex(1024,128,(g,w,h)=>{g.fillStyle='#ece6ff';g.beginPath();g.moveTo(0,0);g.lineTo(w,0);let x=w;while(x>0){x-=18+Math.random()*26;g.lineTo(Math.max(0,x),40+Math.random()*60);}g.lineTo(0,50);g.closePath();g.fill();});
   {const m=new THREE.Mesh(new THREE.PlaneGeometry(pw,0.12),new THREE.MeshStandardMaterial({map:scrap,transparent:true,roughness:.6,side:THREE.DoubleSide}));m.position.set(0,BY+PH-0.06,PD/2+0.012);C.add(m);}
-  const G=pageMesh(pageGeo(pw,ph,v=>0.55*Math.sin(v*Math.PI)*0.6+v*0.5),pageT);G.scale.setScalar(0.62);G.position.set(0.98,BY+PH+0.32,0.55);G.rotation.set(-0.35,-0.55,-0.38);C.add(G);}
+  const torn=(()=>{const c=document.createElement('canvas');c.width=pageT.image.width;c.height=pageT.image.height;const g=c.getContext('2d');g.drawImage(pageT.image,0,0);
+    g.globalCompositeOperation='destination-out';g.beginPath();g.moveTo(0,0);let x=0;while(x<c.width){x+=16+Math.random()*24;g.lineTo(Math.min(c.width,x),8+Math.random()*26);}g.lineTo(c.width,0);g.closePath();g.fill();
+    const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t;})();
+  const G=pageMesh(pageGeo(pw,ph,v=>0.55*Math.sin(v*Math.PI)*0.6+v*0.5),torn);G.children.forEach(m=>{m.material.transparent=true;m.material.alphaTest=0.5;});
+  if(!G.children[1].material.map){G.children[1].material.alphaMap=null;}
+  G.scale.setScalar(0.56);G.position.set(1.02,BY+PH+0.74,0.5);G.rotation.set(-0.3,-0.6,-0.42);C.add(G);}
 PAGES();
 // v3: three more torn pages drift above the calendar
 if(V===3){const months=['FEBRUAR','JULI','DEZEMBER'],days=['1','10','31'];months.forEach((mn,i)=>{const T=canvasTex(512,590,(g,w,h)=>{g.fillStyle='#ece6ff';g.fillRect(0,0,w,h);g.fillStyle='#2b2778';g.fillRect(0,0,w,86);g.fillStyle='#f4f1ff';g.font='800 46px "Inter Tight"';g.textAlign='center';g.fillText(mn,w/2,60);
     g.fillStyle='#1d1a4a';g.font='800 280px "Inter Tight"';g.fillText(days[i],w/2,400);});const p=new THREE.Mesh(new THREE.PlaneGeometry(0.42,0.48,8,8),new THREE.MeshStandardMaterial({map:T,roughness:.55,side:THREE.DoubleSide}));
-  const pos=p.geometry.attributes.position;for(let k=0;k<pos.count;k++){const x=pos.getX(k);pos.setZ(k,0.12*Math.sin((x+0.21)/0.42*Math.PI)*(i%2?1:-1));}p.geometry.computeVertexNormals();
-  p.position.set([-0.85,-0.2,0.35][i],BY+PH+[0.45,0.95,0.95][i],[0.25,0.1,0.15][i]);p.rotation.set(-0.3+i*0.2,[0.5,-0.2,-0.6][i],[0.35,-0.15,-0.4][i]);p.castShadow=true;C.add(p);});}
+  const pos=p.geometry.attributes.position;for(let k=0;k<pos.count;k++){const x=pos.getX(k);pos.setZ(k,0.06*Math.sin((x+0.21)/0.42*Math.PI)*(i%2?1:-1));}p.geometry.computeVertexNormals();
+  p.position.set([-1.0,-0.38,0.2][i],BY+PH+[0.68,0.98,1.08][i],[0.25,0.1,0.05][i]);p.rotation.set(-0.3+i*0.2,[0.5,-0.2,-0.6][i],[0.35,-0.15,-0.4][i]);p.castShadow=true;C.add(p);});}
 // the red marker lying on the plinth in front
-{const Mk=new THREE.Group();Mk.position.set(0.55,0.2,0.62);Mk.rotation.set(0,0.5,Math.PI/2);C.add(Mk);const wh=M(0xeceae5,{roughness:.35});
+{const Mk=new THREE.Group();Mk.position.set(0.3,0.16+0.05,0.45);Mk.rotation.set(0,0.12,Math.PI/2);C.add(Mk);const wh=M(0xeceae5,{roughness:.35});
  add(Mk,new THREE.CylinderGeometry(0.045,0.045,0.5,28),wh,0,0.25,0);add(Mk,new THREE.CylinderGeometry(0.046,0.046,0.06,28),REDS,0,0.12,0);add(Mk,new THREE.CylinderGeometry(0.05,0.048,0.18,28),REDS,0,0.58,0);
  add(Mk,new THREE.SphereGeometry(0.05,24,12,0,Math.PI*2,0,Math.PI/2),REDS,0,0.67,0);add(Mk,new THREE.CylinderGeometry(0.02,0.04,0.08,20),M(0x2a2a30),0,-0.04,0);add(Mk,new THREE.ConeGeometry(0.018,0.05,16).rotateX(Math.PI),REDM,0,-0.1,0);
  const p=new THREE.PointLight(0xff2030,0.8,0.8,2);p.position.set(0,0.0,0.1);Mk.add(p);}
