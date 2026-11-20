@@ -1,6 +1,6 @@
 function. – „Was wäre, wenn alle gleichzeitig ihr Geld abheben?“ – Beschreibungen
 Stand: 20.11.2026
-Video: bankrun/renders/Bankrun_Stil1_TiltShift_mit_Musik.mp4 (Stil 1, Tilt-Shift-Miniatur)
+Video: bankrun/renders/Bankrun_Stil1_TiltShift_mit_Musik.mp4 (Stil 1, Tilt-Shift-Miniatur, gekürzte Fassung 71 s)
 TikTok und Instagram nehmen höchstens 5 Hashtags.
 
 =====================================================================
@@ -13,7 +13,7 @@ TIKTOK – Text
 =====================================================================
 Von 100 Euro auf deutschen Konten haben die Banken nicht mal einen Euro als Bargeld da. Wir zeigen dir, was bei einem Bankrun passiert: leere Automaten, geschlossene Banken und warum dein Geld trotzdem nicht weg ist. Würdest du abheben? Schreib's in die Kommentare! 👇
 
-Quellen: Deutsche Bundesbank, EZB, Einlagensicherungsgesetz (Stand: 20.11.2026)
+Quellen: Deutsche Bundesbank, Einlagensicherungsgesetz, kalifornische Finanzaufsicht (Stand: 20.11.2026)
 
 #function #bankrun #geld #bank #waswärewenn
 
@@ -26,12 +26,11 @@ Was wäre, wenn alle gleichzeitig ihr Geld abheben? 🏦
 🏧 In den Tresoren und Automaten aller Banken sind es nur rund 20 Milliarden, also weniger als 1 Euro von 100.
 ⏱️ Bei der Silicon Valley Bank wollten Kunden 2023 an einem Tag 42 Milliarden Dollar abziehen, am nächsten Morgen war sie zu.
 🇬🇷 In Griechenland blieben die Banken 2015 drei Wochen geschlossen, am Automaten gab es höchstens 60 Euro am Tag.
-🖨️ Alle Euro-Scheine zusammen sind nur rund 1.600 Milliarden Euro wert.
 🛡️ Bis 100.000 Euro pro Person und Bank sind gesetzlich geschützt und werden innerhalb von 7 Arbeitstagen ausgezahlt.
 
 Würdest du dein Geld abheben? Schreib's in die Kommentare 👇
 
-Quellen: Deutsche Bundesbank (Bankenstatistik, Bargeld), EZB (Bilanz des Eurosystems 2025), Einlagensicherungsgesetz, kalifornische Finanzaufsicht
+Quellen: Deutsche Bundesbank (Bankenstatistik, Bargeld), Einlagensicherungsgesetz, kalifornische Finanzaufsicht
 Stand: 20.11.2026 · Modell vereinfacht
 
 #function #bankrun #geld #bank #waswärewenn
@@ -52,8 +51,6 @@ Die wichtigsten Fakten:
 • Der Rest ist zum Großteil verliehen, als Kredit für Häuser, Autos und Firmen.
 • Silicon Valley Bank: Am 9. März 2023 wollten Kunden 42 Milliarden Dollar abziehen, am 10. März wurde die Bank geschlossen.
 • Griechenland 2015: Banken vom 29. Juni bis 20. Juli geschlossen, am Automaten höchstens 60 Euro pro Tag.
-• Deutschland 1931: Nach dem Ansturm auf die Banken erklärte die Regierung den 14. und 15. Juli zu Bankfeiertagen.
-• Alle Euro-Banknoten zusammen: rund 1.600 Milliarden Euro (Ende 2025).
 • Gesetzliche Einlagensicherung: bis 100.000 Euro pro Person und Bank, Auszahlung spätestens 7 Arbeitstage nach Feststellung des Entschädigungsfalls.
 • 5. Oktober 2008: Angela Merkel und Peer Steinbrück sagten den Sparern, dass ihre Einlagen sicher sind.
 
@@ -61,10 +58,8 @@ Würdest du dein Geld abheben? Schreib es in die Kommentare.
 
 Quellen:
 • Deutsche Bundesbank, Bankenstatistik und Monatsbericht Februar 2026
-• Europäische Zentralbank, konsolidierte Bilanz des Eurosystems zum 31.12.2025
 • Einlagensicherungsgesetz, Entschädigungseinrichtung deutscher Banken
 • California Department of Financial Protection and Innovation (März 2023)
-• Deutscher Bundestag, „Bankenkrise 1931“
 Stand: 20.11.2026 · Das Modell im Video ist vereinfacht.
 
 #function #bankrun #geld #bank #shorts
@@ -73,3 +68,12 @@ Stand: 20.11.2026 · Das Modell im Video ist vereinfacht.
 ANGEPINNTER KOMMENTAR (alle Kanäle)
 =====================================================================
 Würdest du bei einer Bankenkrise dein Geld abheben oder liegen lassen? 🤔 Schreib „abheben“ oder „bleibt“ 👇
+
+=====================================================================
+VORBEREITETE ANTWORTEN FÜR DIE KOMMENTARE (die beiden Stellen wurden aus dem Video gekürzt)
+=====================================================================
+Wenn jemand fragt, warum man nicht einfach mehr Geld druckt:
+Das würde nicht reichen 🖨️ Alle Euro-Scheine, die es überhaupt gibt, sind zusammen nur rund 1.600 Milliarden Euro wert (EZB, Ende 2025). Das ist nicht mal halb so viel, wie allein auf deutschen Konten liegt.
+
+Wenn jemand fragt, ob das in Deutschland schon mal passiert ist:
+Ja, 1931 🇩🇪 Nach einem Ansturm auf die Banken erklärte die Regierung den 14. und 15. Juli zu Bankfeiertagen, und die Schalter blieben zu. Der Zahlungsverkehr war danach noch bis Anfang August eingeschränkt (Quelle: Deutscher Bundestag, „Bankenkrise 1931“).

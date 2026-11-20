@@ -82,7 +82,7 @@ export function choreo() {
   leaveAtm(1, 22.45); nextToAtm(1, 22.85);
   leaveAtm(0, 23.55); nextToAtm(0, 23.95);
   // people at the machines look at each other when the screens turn red
-  atmUser.forEach((a, i) => {const dy = [0.75, -0.5, -0.8][i]; a.look(25.35 + i * 0.12, 36.0, dy); a.look(44.0, 50.0, -dy * 0.6);});
+  atmUser.forEach((a, i) => {const dy = [0.75, -0.5, -0.8][i]; a.look(25.35 + i * 0.12, 36.0, dy);});
   // a few in the queue look around now and then
   queue.forEach((a, k) => {if (k % 3 === 1) a.look(26.0 + (k % 5) * 0.4, 30.5 + (k % 4) * 0.5, (k % 2 ? 0.7 : -0.7));});
   // panic: more and more people come out of the house at the back and join the queue
@@ -116,15 +116,15 @@ export function buildPeople(scene, S, P, agents) {
   }
   return out;
 }
-export function poseAll(people, t) {
+export function poseAll(people, t, tc = t) {   // tc: continuous clock for the idle sway (video time)
   for (const p of people) {
     const s = p.a.state(t); if (!s || s.scale <= 0.001) {p.G.visible = false; continue;}
     p.G.visible = true; p.G.position.set(s.x, 0.025, s.z); p.G.scale.setScalar(s.scale);
-    const idle = s.moving > 0 ? 0 : 0.06 * Math.sin(t * 0.7 * p.sway + p.ph);
+    const idle = s.moving > 0 ? 0 : 0.06 * Math.sin(tc * 0.7 * p.sway + p.ph);
     p.G.rotation.y = s.yaw + idle;
     const ph = s.dist * 52; const amp = 0.55 * s.moving;
     p.legs[0].rotation.x = amp * Math.sin(ph); p.legs[1].rotation.x = -amp * Math.sin(ph);
     p.arms[0].rotation.x = -amp * 0.8 * Math.sin(ph); p.arms[1].rotation.x = amp * 0.8 * Math.sin(ph);
-    p.G.position.y += 0.0035 * Math.abs(Math.sin(ph)) * s.moving + (s.moving ? 0 : 0.0012 * Math.sin(t * 1.3 + p.ph));
+    p.G.position.y += 0.0035 * Math.abs(Math.sin(ph)) * s.moving + (s.moving ? 0 : 0.0012 * Math.sin(tc * 1.3 + p.ph));
   }
 }

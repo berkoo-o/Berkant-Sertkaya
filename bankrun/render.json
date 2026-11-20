@@ -7,7 +7,7 @@
     {
       "name": "Bankrun_Stil1_TiltShift",
       "query": "?s=1",
-      "frames": 2675,
+      "frames": 2138,
       "audio": [
         {
           "file": "mix_music.flac",
@@ -20,7 +20,7 @@
       ]
     }
   ],
-  "title": "Bankrun Stil 1 (Tilt-Shift)",
+  "title": "Bankrun Stil 1 (Tilt-Shift), gekürzt auf 71 s",
   "upload": [
     "_mit_Musik"
   ]

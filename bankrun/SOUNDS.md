@@ -12,13 +12,13 @@ Musik: „Radar Focus“ (Blue Saga, Epidemic Sound, ID 6f90c76d-de15-4a4d-9d51-
 | shutter | 7aa8827a-1712-4157-8da0-04791cb998dc | Vehicles, Door, Car, Van, Side Shutter, Roll Down | Rollladen herunter (Bank geschlossen, Pleite) und etwas schneller hinauf |
 | receipt | ff0f74c4-982e-4b24-a567-4a49e755b92f | Machines, Misc, Receipt Machine, Print Out, Remove Receipt | Outro: der Automat druckt den Beleg mit dem Logo |
 | money_count | 45986e3f-12c8-4914-b106-956defaf3460 | Money, Notes, Count Into Hand | die Geldbündel fliegen in die Stadt (vier Takes, leicht verstimmt) |
-| money_handling | f44fd9e3-ed6c-4751-b95a-7fd664ccc39b | Paper, Handle, Money, Banknotes, Handling | Turm wächst; der Stapel aller Euro-Scheine wächst in vier Stufen |
+| money_handling | f44fd9e3-ed6c-4751-b95a-7fd664ccc39b | Paper, Handle, Money, Banknotes, Handling | Turm wächst (der Stapel aller Euro-Scheine ist in der gekürzten Fassung gestrichen) |
 | latch | 1b6d739d-2a18-4e1b-8c2d-bf16d68a670b | Doors, Gate, Metal, Fence, Latch | Schranke landet und öffnet sich wieder |
 | neon_flicker | 41f45a4d-ae2c-4260-842b-f6338714ae0d | Electricity, Buzz & Hum, Flickering Neon Light | die Lichter der Bank flackern bei „Panik“ |
 | glass_down | 779e5c9a-0450-49ac-83ac-68b1549e9a36 | Objects, Container, Glass Jar, Large, Place Down On Hard Surface | die Glashaube setzt über der Bank auf |
 | footsteps | a4613fd8-4459-4790-9549-dd5b18f07b98 | Footsteps, Human, Shoes, Multiple, Walk, Concrete, City, People, Walla | Neuankömmlinge in der Panik und der Heimweg am Ende |
 | safe_open | 4bd430ed-bd05-4727-816b-3330123cdd4d | Doors, Metal, Doors, Safe, Electronic, Digital, Open 02 | Blick in den Tresor |
-| cloth_flap | af1cd4d8-402d-42ba-86f7-74b55a8dead8 | Cloth, Flap, Flag Move 01 | Banner „Bankfeiertag“ rollt sich ab und wieder auf |
+| cloth_flap | af1cd4d8-402d-42ba-86f7-74b55a8dead8 | Cloth, Flap, Flag Move 01 | nicht mehr im Video (Banner „Bankfeiertag“, in der gekürzten Fassung gestrichen) |
 
 Aus der Soundza-Bibliothek (echte Aufnahmen, keine KI, Dateien in `jahr2027/sfx/soundza/`): shimmer (Sparkle Shimmer, cmvjom5v0wesjkcnnq42gu3ql) ganz leise beim gläsernen Bankgebäude und bei der Glashaube, glock (Glockenspiel Success Chime, cmvcmgxpuvpqbjdx0i99c21ia) tiefer gestimmt und leise, wenn der rote Punkt erscheint.
 

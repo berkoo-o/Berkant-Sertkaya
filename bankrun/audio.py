@@ -2,10 +2,19 @@
 # Musik „Radar Focus“ und Effekte aus dem Epidemic-Sound-Connector (lokal in sfx/epidemic, nicht im Repo), dazu einige
 # Soundza-Aufnahmen aus dem 2027-Video. Liste in SOUNDS.md. Alle Zeiten sind Stimm-Zeiten; im Video beginnt die Stimme bei 0,15 s.
 # Ergebnis: mix_music.flac und mix_fx.flac, verlustfrei (render-pc.mjs hängt sie als AAC 320 kbit/s an die Videos).
+# Kürzung (Wunsch des Nutzers, 20.11.2026): „Deutschland 1931“ und „Und einfach mehr Geld drucken?“ sind gestrichen. Die Stimme wird
+# zwischen „… 60 Euro am Tag.“ und „Verloren wäre …“ geschnitten (CUT_C1 … CUT_C2, beides Stille), dazu eine kurze Atempause.
+# Die Zeiten unten bleiben die der ganzen Aufnahme; T() rechnet sie in Videozeit um (wie ot()/nt() in src/main.js).
 import numpy as np, subprocess, sys
 from scipy.io import wavfile
 from scipy.signal import butter, sosfilt
-SR = 48000; VO = 0.15; OUT = 85.62; END_V = 89.0; END = END_V + VO; N = int(SR * END)
+SR = 48000; VO = 0.15
+CUT_C1, CUT_C2, GAP = 44.90, 62.94, 0.17                 # voice cut points (silence) and the extra pause
+CUT_A = CUT_C1 + GAP; CUT_D = CUT_C2 - CUT_A               # = CUT_A, CUT_D in src/main.js (45.07, 17.87)
+def T(x):
+    assert not (CUT_A <= x < CUT_C2), f'Zeit {x} liegt im gestrichenen Abschnitt'
+    return x if x < CUT_A else x - CUT_D
+OUT = T(85.62); END_V = T(89.0); END = END_V + VO; N = int(SR * END)
 t = np.arange(N) / SR
 def lp(x, f, o=2): return sosfilt(butter(o, f, 'low', fs=SR, output='sos'), x)
 def hp(x, f, o=2): return sosfilt(butter(o, f, 'high', fs=SR, output='sos'), x)
@@ -27,7 +36,7 @@ def cut(x, a, d, fi=0.004, fo=0.06):
 def rate(y, r): return np.interp(np.arange(int(len(y) / r)) * r, np.arange(len(y)), y) if r != 1 else y
 fx = np.zeros(N); amb = np.zeros(N)
 def add(sig, at, g=1.0, buf=None):
-    b = fx if buf is None else buf; i = int((at + VO) * SR)
+    b = fx if buf is None else buf; i = int((T(at) + VO) * SR)
     if i < 0: sig = sig[-i:]; i = 0
     if i < N: j = min(N, i + len(sig)); b[i:j] += g * sig[:j - i]
 # the user's own transition sounds (soft swooshes and UI clicks)
@@ -39,7 +48,7 @@ def click(at, g=0.11, i=0): add(CK[i % 3], at, g)
 
 # ---------------------------------------------------------------- city bed: distant traffic and murmur, quieter in the evening
 bed = lp(hp(ep('ambience_city')[:N], 120), 6000)
-bed *= np.clip(t / 0.8, 0, 1) * (1 - 0.45 * np.clip((t - 63.5) / 6, 0, 1)) * np.clip((END - 0.3 - t) / 1.2, 0, 1)
+bed *= np.clip(t / 0.8, 0, 1) * (1 - 0.45 * np.clip((t - T(63.5)) / 6, 0, 1)) * np.clip((END - 0.3 - t) / 1.2, 0, 1)
 amb += 0.16 * bed
 # ---------------------------------------------------------------- hook: the queue, somebody takes money out
 add(cut(ep('atm'), 11.1, 0.55), 2.15, 0.16)                                      # machine beeps as the first one finishes
@@ -67,14 +76,8 @@ add(cut(ep('shutter'), 0.2, 1.4, 0.01, 0.25), 35.75 - 0.13, 0.4)                
 whoosh(38.25, 0.18, 1)
 add(cut(ep('latch'), 0.95, 0.7, 0.004, 0.25), 39.36 - 0.17, 0.38)                 # barrier lands
 add(cut(ep('atm'), 11.1, 0.4), 43.3, 0.12); click(43.4, 0.12, 2)                  # max. 60 €
-add(cut(ep('cloth_flap'), 2.3, 0.9, 0.02, 0.3), 49.72, 0.3)                       # banner unrolls (1931)
-add(cut(ep('cloth_flap'), 6.1, 0.7, 0.02, 0.3), 52.25, 0.18)                      # and rolls up again
-# ---------------------------------------------------------------- printing money: the stack grows in four steps
-whoosh(52.75, 0.32, 0)
-for k, (at, a) in enumerate(((54.6, 0.3), (55.45, 1.7), (56.4, 3.85), (57.7, 4.6))):
-    add(lp(cut(ep('money_handling'), a, 0.75, 0.01, 0.25), 6500), at, 0.26)
-click(57.55, 0.13, 1); click(59.98, 0.08, 2)
-whoosh(63.05, 0.16, 1)
+# (1931 and "Geld drucken" are cut; the camera pulls back from the machine to the bank)
+whoosh(63.5, 0.2, 1)
 # ---------------------------------------------------------------- deposits are protected: barrier and shutter open, the glass cover comes down
 add(cut(ep('latch'), 1.95, 0.6, 0.004, 0.25), 63.32, 0.24)
 add(rate(cut(ep('shutter'), 0.2, 1.3, 0.01, 0.25), 1.08), 63.55, 0.26)
@@ -102,6 +105,8 @@ fx *= np.clip((END - t) / 0.25, 0, 1)
 # ---------------------------------------------------------------- voice (take 2, natural tempo) + gentle ducking
 subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', 'voice/voice.mp3', '-ac', '1', '-ar', str(SR), '-f', 'f32le', '/tmp/bankrun_voice.raw'], check=True)
 v = np.fromfile('/tmp/bankrun_voice.raw', dtype=np.float32).astype(np.float64)
+def fade(x, k=int(0.005 * SR)): x = x.copy(); x[:k] *= np.linspace(0, 1, k); x[-k:] *= np.linspace(1, 0, k); return x
+v = np.concatenate([fade(v[:int(CUT_C1 * SR)]), np.zeros(int(round(GAP * SR))), fade(v[int(CUT_C2 * SR):])])
 voice = np.zeros(N); i0 = int(VO * SR); voice[i0:i0 + len(v)] = v[:N - i0]
 ve = lp(np.abs(voice), 4); ve = ve / (ve.max() + 1e-9)
 duck = lp(1 - 0.42 * np.clip(ve * 6, 0, 1), 3)          # about -5 dB under speech (CLAUDE.md: Musik)

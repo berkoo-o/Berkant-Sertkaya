@@ -1,6 +1,8 @@
 // function. – „Was wäre, wenn alle gleichzeitig ihr Geld abheben?“
 // One continuous camera move through a miniature town. ?s=1 tilt-shift miniature, ?s=2 isometric board.
 // All times below are voice times (take 2, bankrun/voice/words_take2.json); the voice starts 0.15 s into the video.
+// Kürzung (Wunsch des Nutzers, 20.11.2026): „Deutschland 1931“ und „Und einfach mehr Geld drucken?“ sind gestrichen. Die Zeiten
+// bleiben die der ganzen Aufnahme; im Video fehlt der Abschnitt CUT_A … CUT_B (ot() rechnet Videozeit in Aufnahmezeit um).
 import * as THREE from 'three';
 import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
 import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
@@ -16,6 +18,8 @@ await Promise.all(['400 40px Poppins', '500 40px Poppins', '600 40px Poppins', '
 const W = 1080, H = 1920;
 const S = +(new URLSearchParams(location.search).get('s') || 1); const P = PAL[S];
 const VO = 0.15, END_V = 89.0;
+const CUT_A = 45.07, CUT_B = 62.94, CUT_D = CUT_B - CUT_A, END_N = END_V - CUT_D;   // audio.py schneidet die Stimme an denselben Stellen
+const ot = tv => tv < CUT_A ? tv : tv + CUT_D, nt = t => t < CUT_A ? t : t - CUT_D;
 
 // ------------------------------------------------------------------ renderer, scene, post
 const renderer = new THREE.WebGLRenderer({antialias: true, preserveDrawingBuffer: true});
@@ -80,16 +84,13 @@ const bundles = Array.from({length: TW.n}, (_, j) => {const G = new THREE.Group(
   const m = new THREE.Mesh(new THREE.BoxGeometry(TW.w * 0.97, TW.hb * 0.9, TW.d * 0.97), [bSideM, bSideM, bTopM, bTopM, bSideM, bSideM]); m.castShadow = true; m.receiveShadow = true; G.add(m);
   const b = new THREE.Mesh(bandGeo, bandM); b.castShadow = true; G.add(b);
   return {G, j};});
-// ghost outline of the full tower (for "Der Rest ist verliehen" and the comparison with all banknotes)
+// ghost outline of the full tower (for "Der Rest ist verliehen")
 const ghostM = new THREE.LineBasicMaterial({color: 0xffffff, transparent: true, opacity: 0, depthWrite: false});
 const ghost = new THREE.Group(); ghost.position.set(TW.x, 0, TW.z); scene.add(ghost);
 const ghostRim = rimMat(0xffffff, 0); const ghostFill = new THREE.MeshStandardMaterial({color: 0xffffff, transparent: true, opacity: 0, roughness: 0.1, depthWrite: false});
 {const bx = new RoundedBoxGeometry(TW.w, 4.0, TW.d, 2, 0.01); const gm = new THREE.Mesh(bx, ghostFill); gm.position.y = 2.0; gm.renderOrder = 2; ghost.add(gm); const gr = new THREE.Mesh(bx, ghostRim); gr.position.y = 2.0; gr.renderOrder = 3; ghost.add(gr);
  const g = new THREE.EdgesGeometry(new THREE.BoxGeometry(TW.w, 4.0, TW.d)); const l = new THREE.LineSegments(g, ghostM); l.position.y = 2.0; ghost.add(l);
  for (let k = 1; k < 4; k++) {const pts = [new THREE.Vector3(-TW.w / 2, k, TW.d / 2 + 0.001), new THREE.Vector3(TW.w / 2, k, TW.d / 2 + 0.001)]; ghost.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), ghostM));}}
-const halfM = new THREE.LineDashedMaterial({color: 0xffffff, dashSize: 0.05, gapSize: 0.035, transparent: true, opacity: 0, depthWrite: false});
-const halfBar = new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: 0, depthWrite: false}); const halfLine = new THREE.Group(); scene.add(halfLine);
-for (let i = 0; i < 12; i++) {const m = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.012, 0.012), halfBar); m.position.set(-0.3 + i * 0.1, 2.0, TW.z); halfLine.add(m);}
 
 // where the bundles go: houses, cars and the factory (voice: "Häuser" 20.35, "Autos" 21.0, "Firmen" 21.6)
 const DW = T.doorsWorld;
@@ -135,20 +136,7 @@ function poseBundles(t) {
   }
 }
 
-// ------------------------------------------------------------------ all euro banknotes as one stack (1.600 Mrd. € = 1.6 units)
-const noteSide = ctex(64, 512, (g, w, h) => {const r = rng(3); const cols = ['#8fb27a', '#d9a05c', '#7fa0cf', '#c9b48a', '#e8e0c8'];
-  for (let y = 0; y < h; y += 3) {g.fillStyle = cols[Math.floor(r() * cols.length)]; g.fillRect(0, y, w, 3);} g.fillStyle = 'rgba(0,0,0,0.08)'; for (let y = 0; y < h; y += 12) g.fillRect(0, y, w, 1);}, {repeat: true});
-noteSide.tex.repeat.set(1, 6);
-const noteTop = ctex(256, 160, (g, w, h) => {g.fillStyle = '#9cc28a'; g.fillRect(0, 0, w, h); g.fillStyle = '#7fae70'; g.fillRect(0, 0, w * 0.34, h);
-  g.strokeStyle = 'rgba(255,255,255,0.55)'; g.lineWidth = 6; g.beginPath(); g.arc(w * 0.62, h * 0.95, h * 0.55, Math.PI, 0); g.stroke();
-  g.fillStyle = '#f7f3e6'; g.font = '800 54px "Inter Tight"'; g.textAlign = 'right'; g.fillText('100', w - 14, 52); g.font = '700 24px Poppins'; g.textAlign = 'left'; g.fillText('EURO', 14, h - 16);});
-const stackM = [M(0xffffff, {map: noteSide.tex, clippingPlanes: [ground]}), M(0xffffff, {map: noteSide.tex, clippingPlanes: [ground]}), M(0xffffff, {map: noteTop.tex, clippingPlanes: [ground]}),
-  M(0x9cc28a, {clippingPlanes: [ground]}), M(0xffffff, {map: noteSide.tex, clippingPlanes: [ground]}), M(0xffffff, {map: noteSide.tex, clippingPlanes: [ground]})];
-const stack = new THREE.Mesh(new THREE.BoxGeometry(0.30, 1.6, 0.18), stackM); stack.castShadow = true; stack.receiveShadow = true; scene.add(stack);
-function stackTop(t) {const steps = [[54.55, 0.4], [55.4, 0.8], [56.35, 1.2], [57.65, 1.6]]; let h = 0; for (const [ts, hv] of steps) h = Math.max(h, lerp(h, hv, eio((t - ts) / 0.55)));
-  return h - 1.75 * eio((t - 63.0) / 0.7);}
-
-// ------------------------------------------------------------------ barrier, banner, glass cover, slip
+// ------------------------------------------------------------------ barrier, glass cover, slip
 const barrier = new THREE.Group(); barrier.position.set(-0.765, 0, 0.565); scene.add(barrier);
 const postM = M(S === 1 ? 0x5d636c : 0x6d6a9a, {metalness: .3, roughness: .5});
 {const p = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.1, 0.03), postM); p.position.y = 0.075; p.castShadow = true; barrier.add(p);}
@@ -164,12 +152,6 @@ function poseBarrier(t) {const grow = eo((t - 38.3) / 0.4) * (1 - eio((t - 63.85
   barrier.visible = grow > 0.002; barrier.scale.set(1, Math.max(0.001, grow), 1);
   const down = (t < 39.6 ? ebk(clamp((t - 38.8) / 0.6, 0, 1), 1.2) : 1) * (1 - eio((t - 63.25) / 0.5));
   boom.rotation.z = Math.PI / 2 * (1 - down);}
-// banner for 1931 under the beam of the portico
-const banner = new THREE.Group(); banner.position.set(-0.30, 0.622, 0.502); scene.add(banner);
-{const bt = ctex(512, 96, (g, w, h) => {g.fillStyle = '#f1ebdc'; g.fillRect(0, 0, w, h); g.strokeStyle = '#2b2f36'; g.lineWidth = 4; g.strokeRect(8, 8, w - 16, h - 16);
-   g.fillStyle = '#2b2f36'; g.font = '800 50px "Inter Tight"'; g.textAlign = 'center'; g.letterSpacing = '4px'; g.fillText('BANKFEIERTAG', w / 2, 66);});
- const m = new THREE.Mesh(new THREE.PlaneGeometry(0.64, 0.12), new THREE.MeshStandardMaterial({map: bt.tex, roughness: .9, side: THREE.DoubleSide})); m.position.y = -0.06; m.castShadow = true; banner.add(m);}
-function poseBanner(t) {const u = eo((t - 49.72) / 0.55) * (1 - eio((t - 52.25) / 0.45)); banner.visible = u > 0.003; banner.scale.y = Math.max(0.001, u); banner.rotation.x = 0.04 * Math.sin(t * 2.1) * u;}
 // glass cover over the bank ("gesetzlich geschützt")
 const cover = new THREE.Group(); scene.add(cover);
 const coverM = new THREE.MeshPhysicalMaterial({color: 0xe9f6ff, transparent: true, opacity: 0.22, roughness: 0.03, metalness: 0.0, clearcoat: 1, clearcoatRoughness: 0.05, depthWrite: false, envMapIntensity: 3.0, side: THREE.DoubleSide});
@@ -230,7 +212,7 @@ const rim = new THREE.DirectionalLight(0x8a78ff, S === 2 ? 0.55 : 0.0); rim.posi
 const focus = new THREE.SpotLight(0xfff0dc, 0, 6, 0.42, 0.75, 1.4); scene.add(focus); scene.add(focus.target);
 const vaultSpot = new THREE.SpotLight(0xfff2d8, 0, 3, 0.35, 0.6, 1.2); vaultSpot.position.set(0.05, 1.8, -0.1); scene.add(vaultSpot); vaultSpot.target.position.set(0.05, 0.06, -0.24); scene.add(vaultSpot.target);
 const moon = new THREE.DirectionalLight(0x8fa6ff, 0); moon.position.set(3, 5, 2); scene.add(moon);
-function night(t) {return clamp(0.25 * clamp((t - 52.5) / 10, 0, 1) + 0.37 * clamp((t - 63.0) / 3.0, 0, 1) + 0.12 * clamp((t - 66) / 14, 0, 1) + 0.18 * clamp((t - 82.4) / 1.6, 0, 1), 0, 0.92);}
+function night(t) {return clamp(0.62 * eio((t - CUT_B) / 4.0) + 0.12 * clamp((t - 66) / 14, 0, 1) + 0.18 * clamp((t - 82.4) / 1.6, 0, 1), 0, 0.92);}   // dusk falls while the glass cover comes down
 const C_SUN_DAY = new THREE.Color(0xffe6c4), C_SUN_DUSK = new THREE.Color(0xff9a5a);
 function bankLit(t) {
   if (t < 35.72) return 1; if (t < 64.1) return 0;
@@ -255,23 +237,22 @@ const KEYS = [
   [19.1, C(0, 0.6, -0.5, S === 1 ? 4.0 : 4.8, -18, 46)], [21.9, C(0, 0.4, -0.5, S === 1 ? 4.1 : 5.0, -20, 48)],
   [23.0, C(0.38, 0.24, 0.55, 0.78, -22, 24)], [25.5, C(0.40, 0.24, 0.55, 0.72, -18, 22)], [26.6, C(0.1, 0.3, 0.5, 1.15, -16, 26)], [33.8, C(0.05, 0.3, 0.5, 1.05, -12, 26)],
   [35.2, C(-0.25, 0.26, 0.47, 0.7, -6, 18)], [36.6, C(-0.25, 0.28, 0.5, 0.8, 0, 20)], [37.9, C(-0.2, 0.32, 0.5, 1.15, 8, 26)], [41.6, C(0.0, 0.3, 0.5, 1.0, -4, 24)],
-  [42.7, C(0.3, 0.3, 0.5, 0.55, -10, 18)], [44.6, C(0.3, 0.3, 0.5, 0.55, -6, 18)], [45.7, C(-0.3, 0.45, 0.48, 0.95, 10, 20)], [51.8, C(-0.3, 0.48, 0.48, 0.85, 6, 20)],
-  [52.7, C(0.0, 0.8, -0.5, 2.0, -40, 48)], [53.7, C(0.25, 1.5, -1.12, 2.45, -120, 40)], [54.6, C(0.28, 1.65, -1.12, 2.4, -150, 40)],
-  [58.6, C(0.28, 1.7, -1.12, 2.35, -156, 41)], [62.8, C(0.25, 1.5, -1.0, 2.4, -160, 40)],
-  [64.4, C(0.0, 0.6, -0.1, 1.95, -142, 36)], [70.8, C(-0.2, 0.55, -0.1, 1.8, -112, 38)],
+  [42.7, C(0.3, 0.3, 0.5, 0.55, -10, 18)], [44.6, C(0.3, 0.3, 0.5, 0.55, -6, 18)],
+  // cut: from the "60 €" machine the camera pulls back to the bank front while barrier and shutter open and the glass cover comes down
+  [64.7, C(-0.12, 0.5, 0.05, 1.9, -32, 30)], [70.8, C(-0.3, 0.5, -0.05, 1.8, -56, 36)],
   [72.4, C(-2.0, 0.2, -0.35, 1.45, -72, 48)], [75.8, C(-2.0, 0.2, -0.2, 1.35, -66, 46)], [77.1, C(-0.2, 0.3, 0.35, 1.5, -18, 32)], [81.6, C(-0.1, 0.3, 0.35, 1.45, -14, 30)],
   [83.6, C(0.18, 0.3, 0.42, 1.0, -18, 22)], [85.4, C(0.42, 0.33, 0.45, 0.55, -10, 15)],
   [86.7, C(0.64, 0.37, 0.48, 0.15, -4, 8, 14)], [89.0, C(0.64, 0.38, 0.48, 0.13, -3, 7, 12)]];
-const KT = KEYS.map(k => k[0]), KV = KEYS.map(k => k[1]);
+const KT = KEYS.map(k => nt(k[0])), KV = KEYS.map(k => k[1]);   // interpolated in video time, so the camera runs smoothly across the cut
 const KM = [0, 1, 2, 3, 4, 5, 6].map(j => {const n = KT.length, d = [], tg = new Array(n).fill(0); for (let i = 0; i < n - 1; i++) d.push((KV[i + 1][j] - KV[i][j]) / (KT[i + 1] - KT[i]));
   for (let i = 1; i < n - 1; i++) {if (d[i - 1] * d[i] <= 0) continue; const h0 = KT[i] - KT[i - 1], h1 = KT[i + 1] - KT[i], w1 = 2 * h1 + h0, w2 = h1 + 2 * h0; tg[i] = (w1 + w2) / (w1 / d[i - 1] + w2 / d[i]);} return tg;});
-function camAt(t) {let i = 0; while (i < KT.length - 2 && t > KT[i + 1]) i++; const h = KT[i + 1] - KT[i], u = clamp((t - KT[i]) / h, 0, 1), u2 = u * u, u3 = u2 * u;
+function camAt(to) {const t = nt(to); let i = 0; while (i < KT.length - 2 && t > KT[i + 1]) i++; const h = KT[i + 1] - KT[i], u = clamp((t - KT[i]) / h, 0, 1), u2 = u * u, u3 = u2 * u;
   const a = 2 * u3 - 3 * u2 + 1, b = u3 - 2 * u2 + u, c = -2 * u3 + 3 * u2, e = u3 - u2;
   return [0, 1, 2, 3, 4, 5, 6].map(j => a * KV[i][j] + b * h * KM[j][i] + c * KV[i + 1][j] + e * h * KM[j][i + 1]);}
 const CAMT = new THREE.Vector3();
 function setCam(t) {
-  const v = camAt(t); const size = Math.exp(v[3]); const calm = lerp(1, 0.25, eio((t - 85.4) / 1.4));
-  const az = (v[4] + calm * (0.35 * Math.sin(t * 0.23) + 0.2 * Math.sin(t * 0.51 + 1.3))) * Math.PI / 180, el = (v[5] + calm * 0.18 * Math.sin(t * 0.31 + 0.7)) * Math.PI / 180;
+  const v = camAt(t); const size = Math.exp(v[3]); const calm = lerp(1, 0.25, eio((t - 85.4) / 1.4)); const tn = nt(t);
+  const az = (v[4] + calm * (0.35 * Math.sin(tn * 0.23) + 0.2 * Math.sin(tn * 0.51 + 1.3))) * Math.PI / 180, el = (v[5] + calm * 0.18 * Math.sin(tn * 0.31 + 0.7)) * Math.PI / 180;
   CAMT.set(v[0], v[1], v[2]);
   const dir = new THREE.Vector3(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el));
   if (S === 1) {camP.fov = v[6]; const d = size / Math.tan(v[6] / 2 * Math.PI / 180); camP.position.copy(CAMT).addScaledVector(dir, d); camP.near = Math.max(0.02, d * 0.08); camP.far = d + 40; if (scene.fog) {scene.fog.near = d + 3; scene.fog.far = d + 22;}}
@@ -288,21 +269,19 @@ const SUBS = [[0.08, 2.0, 'Von 100 Euro auf deutschen Konten'], [2.0, 5.3, 'habe
   [17.64, 19.55, 'Der Rest ist zum Großteil verliehen:'], [19.55, 22.25, 'als Kredit für Häuser, Autos und Firmen.'], [22.38, 25.55, 'Schon nach wenigen Stunden wären die ersten Automaten leer.'],
   [25.6, 29.65, 'Wie schnell das geht, zeigte 2023 die Silicon Valley Bank:'], [29.68, 31.6, 'An einem einzigen Tag wollten Kunden'], [31.6, 34.25, '42 Milliarden Dollar abziehen.'],
   [34.46, 36.45, 'Am nächsten Morgen war die Bank geschlossen.'], [36.63, 38.15, 'Dann greift der Staat ein.'], [38.24, 41.95, 'In Griechenland blieben die Banken 2015 drei Wochen zu,'],
-  [42.0, 44.85, 'am Automaten gab es höchstens 60 Euro am Tag.'], [44.96, 47.8, 'Deutschland hat das 1931 schon erlebt:'], [47.84, 50.82, 'Nach einem Ansturm erklärte die Regierung Bankfeiertage,'],
-  [50.84, 52.25, 'und die Schalter blieben zu.'], [52.51, 54.25, 'Und einfach mehr Geld drucken?'], [54.4, 56.5, 'Alle Euro-Scheine, die es überhaupt gibt,'],
-  [56.53, 59.95, 'sind zusammen nur rund 1.600 Milliarden Euro wert,'], [59.97, 63.0, 'nicht mal halb so viel, wie allein auf deutschen Konten liegt.'],
+  [42.0, 44.85, 'am Automaten gab es höchstens 60 Euro am Tag.'],
   [63.25, 65.3, 'Verloren wäre dein Geld trotzdem nicht.'], [65.36, 68.38, 'Bis 100.000 Euro pro Bank sind gesetzlich geschützt'], [68.4, 71.5, 'und müssen innerhalb von 7 Arbeitstagen ausgezahlt werden.'],
   [71.73, 72.85, 'Das Verrückte ist:'], [72.88, 76.05, 'Eine gesunde Bank kann allein durch Panik pleitegehen.'], [76.23, 79.15, 'Deshalb trat Angela Merkel 2008 vor die Kameras'],
   [79.2, 82.35, 'und sagte den Sparern: „Ihre Einlagen sind sicher.“'], [82.54, 84.2, 'Würdest du dein Geld abheben?'], [84.24, 85.62, 'Schreib’s in die Kommentare.']];
 const NUMS = [[3.2, 5.45, 'unter 1 €', 'von 100 € auf dem Konto liegt als Bargeld bei der Bank'], [10.85, 12.9, '4.000 Mrd. €', 'auf deutschen Konten'],
   [16.25, 17.62, '20 Mrd. €', 'Bargeld bei allen Banken zusammen'], [31.65, 34.3, '42 Mrd. $', 'an einem Tag abgezogen (Silicon Valley Bank, 2023)'],
-  [43.4, 44.9, '60 €', 'pro Tag am Automaten (Griechenland 2015)'], [57.55, 63.0, '1.600 Mrd. €', 'alle Euro-Scheine zusammen'], [65.55, 68.38, '100.000 €', 'pro Person und Bank gesetzlich geschützt']];
+  [43.4, 44.9, '60 €', 'pro Tag am Automaten (Griechenland 2015)'], [65.55, 68.38, '100.000 €', 'pro Person und Bank gesetzlich geschützt']];
 const TITLES = [[0.0, 3.2, 'Was wäre, wenn alle<br>gleichzeitig ihr Geld<br>abheben?'], [5.45, 9.5, 'Alle wollen<br>gleichzeitig abheben'], [12.92, 16.25, 'Und wie viel<br>als Bargeld?'],
   [17.64, 22.3, 'Der Rest ist<br>verliehen'], [22.38, 25.55, 'Die Automaten<br>werden leer'], [25.6, 31.65, 'Silicon Valley<br>Bank, 2023'], [34.46, 36.55, 'Bank<br>geschlossen'],
-  [36.63, 38.24, 'Der Staat<br>greift ein'], [38.24, 43.4, 'Griechenland 2015:<br>3 Wochen zu'], [44.96, 52.35, 'Deutschland 1931:<br>Bankfeiertage'], [52.51, 57.55, 'Einfach mehr<br>Geld drucken?'],
+  [36.63, 38.24, 'Der Staat<br>greift ein'], [38.24, 43.4, 'Griechenland 2015:<br>3 Wochen zu'],
   [63.25, 65.55, 'Ist dein Geld<br>verloren?'], [68.4, 71.55, 'Auszahlung in<br>7 Arbeitstagen'], [71.73, 76.2, 'Panik allein<br>reicht'], [76.23, 82.45, '2008: „Ihre Einlagen<br>sind sicher“'],
   [82.54, 85.62, 'Würdest du dein<br>Geld abheben?']];
-const SRC = 'Quellen: Deutsche Bundesbank, EZB, Einlagensicherungsgesetz, kalifornische Finanzaufsicht\nStand 20.11.2026 · Modell vereinfacht';
+const SRC = 'Quellen: Deutsche Bundesbank, Einlagensicherungsgesetz, kalifornische Finanzaufsicht\nStand 20.11.2026 · Modell vereinfacht';
 const subwEl = document.getElementById('subw'), titleEl = document.getElementById('title'), numEl = document.getElementById('num'), subEl = document.getElementById('sub'), srcEl = document.getElementById('src'), logoEl = document.getElementById('logo'), fadeEl = document.getElementById('fade'), shadeEl = document.getElementById('shade');
 srcEl.innerHTML = SRC.replace('\n', '<br>');
 const OUT0 = 85.62;
@@ -351,23 +330,21 @@ function setTime(t) {
     const flick = (i === 2 && t > 24.9 && t < 25.1) || (i === 1 && t > 25.2 && t < 25.36) || (i === 0 && t > 25.5 && t < 25.66) || (i === 0 && t > 43.33 && t < 43.45) ? (Math.floor(t * 40) % 2 ? 0.35 : 1) : 1; a.scrM.color.setScalar(flick);});
   // objects
   poseBundles(t);
-  {const gv = win(t, 19.3, 23.4, 0.5) + win(t, 52.7, 63.3, 0.5); ghostM.opacity = 0.8 * gv; ghostFill.opacity = 0.1 * gv; ghostRim.uniforms.k.value = 0.9 * gv; ghost.visible = gv > 0.003;}
-  halfBar.opacity = 0.9 * win(t, 59.95, 62.95, 0.35); halfLine.visible = halfBar.opacity > 0.003; halfLine.children.forEach((m, i) => m.scale.x = clamp((t - 59.95 - i * 0.04) / 0.15, 0.001, 1));
-  const sh = stackTop(t); stack.visible = sh > 0.001; stack.position.set(L.stack.x, sh - 0.8, L.stack.z);
-  poseBarrier(t); poseBanner(t); poseCover(t); poseSlip(t);
-  cars.forEach(c => {const [x, z, dx, dz] = carPose(c, t); c.G.position.set(x, 0.004, z); c.G.rotation.y = Math.atan2(-dz, dx);});
-  poseAll(people, t);
-  // grading: tilt-shift saturation, 1931 in sepia
-  const sep = 0.7 * win(t, 44.95, 52.4, 0.55);
-  CANVAS.style.filter = `${S === 1 ? 'saturate(1.22) contrast(1.04) ' : ''}sepia(${sep.toFixed(3)}) brightness(${(1 - 0.08 * sep).toFixed(3)})`;
+  {const gv = win(t, 19.3, 23.4, 0.5); ghostM.opacity = 0.8 * gv; ghostFill.opacity = 0.1 * gv; ghostRim.uniforms.k.value = 0.9 * gv; ghost.visible = gv > 0.003;}
+  poseBarrier(t); poseCover(t); poseSlip(t);
+  // cars and the idle sway of the figures run on video time, so nothing jumps at the cut
+  cars.forEach(c => {const [x, z, dx, dz] = carPose(c, nt(t)); c.G.position.set(x, 0.004, z); c.G.rotation.y = Math.atan2(-dz, dx);});
+  poseAll(people, t, nt(t));
+  // grading: tilt-shift saturation
+  CANVAS.style.filter = S === 1 ? 'saturate(1.22) contrast(1.04)' : 'none';
   {const sz = Math.exp(camAt(t)[3]); tilt.forEach((p, i) => {const ou = eio((t - 85.6) / 1.2); p.uniforms.r.value = 0.5; p.uniforms.band.value = 0.07 + 0.2 * win(t, 10.4, 13.2, 0.5) + 0.16 * ou; p.uniforms.amt.value = 3.0 * clamp(0.45 + sz / 3.2, 0.5, 1) * (i < 2 ? 1 : 0.8) * (1 - 0.45 * win(t, 10.4, 13.2, 0.5));});}
   overlay(t);
 }
 
 // ------------------------------------------------------------------ render hooks
-window.TOTAL = Math.round((END_V + VO) * 30);
-function drawAt(tv) {setTime(tv); composer.render();
-  const fv = tv + VO; const fd = Math.min(clamp(fv / 0.25, 0, 1), clamp((END_V - tv) / 0.3, 0, 1)); fadeEl.style.opacity = (1 - fd).toFixed(3);}
+window.TOTAL = Math.round((END_N + VO) * 30);
+function drawAt(tv) {setTime(ot(tv)); composer.render();   // tv: video time minus VO (after the cut)
+  const fv = tv + VO; const fd = Math.min(clamp(fv / 0.25, 0, 1), clamp((END_N - tv) / 0.3, 0, 1)); fadeEl.style.opacity = (1 - fd).toFixed(3);}
 window.renderFrame = f => drawAt(f / 30 - VO);
 window.setT = tv => drawAt(tv);
 
@@ -376,7 +353,7 @@ const FOOT = Object.entries(BLD).map(([k, o]) => [k, o.x0, o.x1, o.z0, o.z1, o.h
   ['STEPS', -0.75, 0.15, 0.42, 0.49, 0.05]].concat(L.atmX.map((x, i) => ['ATM' + i, x - 0.065, x + 0.065, 0.42, 0.47, 0.4])));
 window.CHECK = (step = 1 / 30) => {
   const bad = []; let minPP = 9, minPPt = 0;
-  for (let t = 0; t <= END_V; t += step) {
+  for (let tn = 0; tn <= END_N; tn += step) {const t = ot(tn);
     const st = agents.map(a => a.state(t));
     for (let i = 0; i < st.length; i++) {const a = st[i]; if (!a || a.scale < 0.999) continue;
       for (let j = i + 1; j < st.length; j++) {const b = st[j]; if (!b || b.scale < 0.999) continue; const d = Math.hypot(a.x - b.x, a.z - b.z); if (d < minPP) {minPP = d; minPPt = t;} if (d < 2 * R_P) bad.push(['pp', +t.toFixed(2), i, j, +d.toFixed(3)]);}
@@ -394,7 +371,7 @@ window.CHECK = (step = 1 / 30) => {
   }
   return {minPP: +minPP.toFixed(3), minPPt: +minPPt.toFixed(2), n: bad.length, bad: bad.slice(0, 60)};
 };
-window.atmPx = tv => {setCam(tv); let best = 0; const v = new THREE.Vector3();
+window.atmPx = tv => {setCam(ot(tv)); let best = 0; const v = new THREE.Vector3();
   for (const x of L.atmX) {let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9, ok = false;
     for (const dx of [-0.07, 0.07]) for (const y of [0.05, 0.49]) for (const z of [0.42, 0.51]) {v.set(x + dx, y, z).applyMatrix4(cam.matrixWorldInverse); if (v.z > -0.01) continue; ok = true;
       v.set(x + dx, y, z).project(cam); const px = (v.x + 1) / 2 * W, py = (1 - v.y) / 2 * H; x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py);}
@@ -402,7 +379,7 @@ window.atmPx = tv => {setCam(tv); let best = 0; const v = new THREE.Vector3();
   return best;};
 // like atmPx, but only counts a machine when a sample point on it is not hidden behind something opaque (bank, houses, cars)
 const _rc = new THREE.Raycaster();
-window.atmSeen = tv => {setTime(tv); const px = window.atmPx(tv); if (px < 6) return 0; scene.updateMatrixWorld(true);
+window.atmSeen = tv => {setTime(ot(tv)); const px = window.atmPx(tv); if (px < 6) return 0; scene.updateMatrixWorld(true);
   const occ = []; scene.traverse(o => {if (o.isMesh && o.visible && o.material && !Array.isArray(o.material) && !(o.material.transparent && o.material.opacity < 0.6) && !o.material.isShaderMaterial) occ.push(o);
     else if (o.isMesh && o.visible && Array.isArray(o.material)) occ.push(o);});
   const atmSet = new Set(); T.bank.atms.forEach(a => a.A.traverse(o => atmSet.add(o)));
@@ -415,5 +392,5 @@ window.atmSeen = tv => {setTime(tv); const px = window.atmPx(tv); if (px < 6) re
     const hits = _rc.intersectObjects(occ, false); const target = cam.isOrthographicCamera ? 30 : dist;
     const first = hits.find(h => !atmSet.has(h.object)); if (!first || first.distance > target - 0.03) return px;}
   return 0;};
-window.DBGO = {THREE, scene, cam, T, agents, people, bundles, flights, cars, cover, slip, barrier, banner, stack};
+window.DBGO = {THREE, scene, cam, T, agents, people, bundles, flights, cars, cover, slip, barrier};
 drawAt(0); window.ready = true;
