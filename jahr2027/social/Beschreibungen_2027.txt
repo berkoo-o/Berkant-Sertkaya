@@ -1,7 +1,7 @@
 function. – „Was ändert sich 2027 für dich?“ – Beschreibungen
-Stand: 19.11.2026
+Stand: 20.11.2026
 Video: jahr2027/Was_aendert_sich_2027_mit_Musik.mp4 · Cover: jahr2027/social/Thumbnail_2027_9x16.png (Profilraster: Thumbnail_2027_Raster_3x4.png)
-Zum Hochladen: jahr2027/social/Was_aendert_sich_2027_Upload_mit_Cover.mp4 (das Cover steht als Standbild in den ersten 0,2 Sekunden und lässt sich in TikTok, Instagram und YouTube als Titelbild auswählen; bei Metricool videoCoverMilliseconds = 100)
+Zum Hochladen: das Video mit Musik; das Thumbnail setzt der Nutzer selbst in den Apps (Wunsch vom 20.11.2026, keine Upload-Fassung mehr). TikTok und Instagram nehmen nur 5 Hashtags.
 
 =====================================================================
 TIKTOK
@@ -14,7 +14,7 @@ Mehr Mindestlohn, ein teureres Deutschlandticket, keine neuen Riester-Verträge,
 
 Quellen: Bundesregierung, Bundestag, Deutsche Rentenversicherung, EU-Geldwäscheverordnung 2024/1624, Koordinierungsrat Deutschlandticket (Stand: 19.11.2026)
 
-#function #2027 #wasändertsich #mindestlohn #deutschlandticket #rente #bargeld #musterung #geld #wissen #erklärt #lernenmittiktok #fyp
+#function #2027 #mindestlohn #bargeld #deutschland
 
 
 =====================================================================
@@ -36,7 +36,7 @@ Welche Nummer trifft dich am meisten? Schreib sie in die Kommentare 👇
 Quellen: Bundesregierung, Deutscher Bundestag, Deutsche Rentenversicherung, EU-Geldwäscheverordnung (EU) 2024/1624, Koordinierungsrat Deutschlandticket
 Stand: 19.11.2026
 
-#function #2027 #wasändertsich #mindestlohn #deutschlandticket #rente #riester #kindergeld #führerschein #musterung #bargeld #geld #wissen #erklärvideo #deutschland
+#function #2027 #mindestlohn #rente #bargeld
 
 
 =====================================================================
