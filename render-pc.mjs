@@ -109,6 +109,13 @@ const finished = p => new Promise((ok, no) => p.on('close', c => c === 0 ? ok() 
 const tabs = Math.max(1, Math.min(cfg.tabs || 4, Math.floor(os.cpus().length / 2)));
 const made = [];
 const t0all = Date.now();
+const ENC = {crf: 14, preset: 'slow', frames: 'png', v: 2};
+function newestInput(job) {   // newest of the page, its code and the sound files: a render older than this is out of date
+  const files = [path.join(ROOT, folder, cfg.page)]; const src = path.join(ROOT, folder, 'src');
+  if (fs.existsSync(src)) for (const f of fs.readdirSync(src)) files.push(path.join(src, f));
+  for (const a of job.audio || []) if (a.file) files.push(path.join(ROOT, folder, a.file));
+  return Math.max(...files.filter(f => fs.existsSync(f)).map(f => fs.statSync(f).mtimeMs));
+}
 
 for (const job of cfg.jobs) {
   const t0 = Date.now();
@@ -122,11 +129,17 @@ for (const job of cfg.jobs) {
     continue;
   }
   const N = job.frames;
+  const outsAll = (job.audio && job.audio.length ? job.audio : [{suffix: ''}]).map(a => path.join(OUT, job.name + (a.suffix || '') + '.mp4'));
+  const stampF = path.join(OUT, job.name + '.stamp.json');
+  const stamp = fs.existsSync(stampF) ? JSON.parse(fs.readFileSync(stampF, 'utf8')) : null;
+  if (stamp && JSON.stringify(stamp.enc) === JSON.stringify(ENC) && stamp.frames === N && outsAll.every(f => fs.existsSync(f) && fs.statSync(f).mtimeMs > newestInput(job))) {
+    console.log(`✔ ${job.name} ist schon fertig gerendert (wird nicht noch einmal gerendert)`); made.push(...outsAll); continue;
+  }
   console.log(`▶ ${job.name}: ${N} Bilder mit ${tabs} Tabs …`);
   const pages = await Promise.all(Array.from({length: tabs}, () => openPage(job.query)));
   const tmp = path.join(OUT, job.name + '.video.mp4');
-  const enc = ff(['-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-', '-c:v', 'libx264', '-preset', 'medium',
-    '-crf', '17', '-maxrate', '8M', '-bufsize', '16M', '-pix_fmt', 'yuv420p', '-r', String(FPS), tmp]);
+  const enc = ff(['-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'png', '-i', '-', '-c:v', 'libx264', '-preset', 'slow',
+    '-crf', String(ENC.crf), '-profile:v', 'high', '-level', '4.2', '-pix_fmt', 'yuv420p', '-r', String(FPS), tmp]);
   const encDone = finished(enc);
   const ready = new Map(); let next = 0, flushing = false, lastLog = Date.now();
   async function flush() {
@@ -146,7 +159,7 @@ for (const job of cfg.jobs) {
     for (let f = w; f < N; f += tabs) {
       while (f - next > 48) await new Promise(r => setTimeout(r, 5));   // nicht zu weit vorauslaufen
       await page.evaluate(n => window.renderFrame(n), f);
-      ready.set(f, await page.screenshot({type: 'jpeg', quality: 95}));
+      ready.set(f, await page.screenshot({type: 'png'}));
       flush();
     }
   }));
@@ -156,11 +169,12 @@ for (const job of cfg.jobs) {
   const outs = job.audio && job.audio.length ? job.audio : [{suffix: ''}];
   for (const a of outs) {
     const file = path.join(OUT, job.name + (a.suffix || '') + '.mp4');
-    const audioIn = a.file ? ['-i', path.join(ROOT, folder, a.file), '-map', '0:v', '-map', '1:a', '-c:a', 'aac', '-b:a', '192k', '-shortest'] : [];
+    const audioIn = a.file ? ['-i', path.join(ROOT, folder, a.file), '-map', '0:v', '-map', '1:a', '-c:a', 'aac', '-b:a', '320k', '-shortest'] : [];
     await finished(ff(['-i', tmp, ...audioIn, '-c:v', 'copy', '-movflags', '+faststart', file]));
     made.push(file);
   }
   fs.unlinkSync(tmp);
+  fs.writeFileSync(stampF, JSON.stringify({enc: ENC, frames: N, at: new Date().toISOString()}));
   console.log(`✔ ${job.name} fertig in ${sec(Date.now() - t0)} (${(N / ((Date.now() - t0) / 1000)).toFixed(1).replace('.', ',')} Bilder/s)`);
 }
 
@@ -173,16 +187,24 @@ if (cfg.upload && cfg.upload.length) {
   const dest = path.join(ROOT, folder);
   const g = (...a) => spawnSync('git', a, {cwd: ROOT, stdio: 'inherit', shell: false});
   const gq = (...a) => spawnSync('git', a, {cwd: ROOT, encoding: 'utf8'});
-  console.log(`\n▶ Lade ${up.length} Video(s) hoch, damit Claude sie bekommt …`);
-  for (const f of up) fs.copyFileSync(f, path.join(dest, path.basename(f)));
+  console.log(`\n▶ Lade ${up.length} Video(s) in voller Qualität hoch, damit Claude sie bekommt …`);
+  const rdir = path.join(dest, 'renders'); fs.mkdirSync(rdir, {recursive: true});
+  const added = [];
+  for (const f of up) {
+    const base = path.basename(f);
+    for (const old of fs.readdirSync(rdir)) if (old === base || old.startsWith(base + '.part')) fs.unlinkSync(path.join(rdir, old));
+    const buf = fs.readFileSync(f), PART = 90 * 1024 * 1024;
+    if (buf.length <= 95 * 1024 * 1024) {fs.writeFileSync(path.join(rdir, base), buf); added.push(base);}
+    else for (let i = 0, k = 1; i < buf.length; i += PART, k++) {const n = `${base}.part${String(k).padStart(2, '0')}`; fs.writeFileSync(path.join(rdir, n), buf.subarray(i, i + PART)); added.push(n);}
+  }
   if (!(gq('config', 'user.name').stdout || '').trim()) g('config', 'user.name', 'function PC');
   if (!(gq('config', 'user.email').stdout || '').trim()) g('config', 'user.email', 'pc-render@users.noreply.github.com');
   const branch = (gq('rev-parse', '--abbrev-ref', 'HEAD').stdout || '').trim() || 'claude/nice-galileo-neyrpn';
-  g('add', '-f', ...up.map(f => path.join(folder, path.basename(f))));
+  g('add', '-A', '-f', path.join(folder, 'renders'));
   g('commit', '-m', `PC-Render: ${cfg.title || folder}`);
   g('pull', '--no-rebase', '--no-edit', 'origin', branch);
   const pushed = g('push', 'origin', 'HEAD:' + branch).status === 0;
-  if (pushed) console.log(`✔ Hochgeladen. Schreib Claude einfach „fertig“, dann holt Claude die Videos ab und schickt sie dir aufs Handy.`);
+  if (pushed) console.log(`✔ Hochgeladen. Claude holt die Videos von selbst ab und schickt sie dir aufs Handy.`);
   else console.log(`✖ Das Hochladen hat nicht geklappt. Falls sich ein GitHub-Fenster geöffnet hat, dort anmelden und danach noch einmal doppelt auf „function. rendern“ klicken.\n  Die Videos liegen trotzdem fertig im Ordner.`);
 }
 console.log(`\nAlles fertig in ${sec(Date.now() - t0all)}. Die Dateien liegen in:\n  ${OUT}`);

@@ -10,11 +10,11 @@
       "frames": 2675,
       "audio": [
         {
-          "file": "mix_music.m4a",
+          "file": "mix_music.flac",
           "suffix": "_mit_Musik"
         },
         {
-          "file": "mix_fx.m4a",
+          "file": "mix_fx.flac",
           "suffix": "_nur_Effekte"
         }
       ]
@@ -25,11 +25,11 @@
       "frames": 2675,
       "audio": [
         {
-          "file": "mix_music.m4a",
+          "file": "mix_music.flac",
           "suffix": "_mit_Musik"
         },
         {
-          "file": "mix_fx.m4a",
+          "file": "mix_fx.flac",
           "suffix": "_nur_Effekte"
         }
       ]

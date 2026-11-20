@@ -1,7 +1,7 @@
 # Ton für „Was wäre, wenn alle gleichzeitig ihr Geld abheben?“: python3 audio.py  (läuft im Ordner bankrun/)
 # Musik „Radar Focus“ und Effekte aus dem Epidemic-Sound-Connector (lokal in sfx/epidemic, nicht im Repo), dazu einige
 # Soundza-Aufnahmen aus dem 2027-Video. Liste in SOUNDS.md. Alle Zeiten sind Stimm-Zeiten; im Video beginnt die Stimme bei 0,15 s.
-# Ergebnis: mix_music.m4a und mix_fx.m4a (werden von render-pc.mjs an die Videos gehängt).
+# Ergebnis: mix_music.flac und mix_fx.flac, verlustfrei (render-pc.mjs hängt sie als AAC 320 kbit/s an die Videos).
 import numpy as np, subprocess, sys
 from scipy.io import wavfile
 from scipy.signal import butter, sosfilt
@@ -121,7 +121,7 @@ for name, mix in [('music', vo + mus + fxn), ('fx', vo + fxn)]:
     mix = mix / max(1.0, np.max(np.abs(mix)) / 0.97)
     wavfile.write('mix_' + name + '.wav', SR, mix.astype(np.float32))
     # loudness to -14 LUFS and AAC for the PC render
-    subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', 'mix_' + name + '.wav', '-af', 'loudnorm=I=-14:TP=-1.5:LRA=11', '-ar', '48000', '-c:a', 'aac', '-b:a', '192k', 'mix_' + name + '.m4a'], check=True)
+    subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', 'mix_' + name + '.wav', '-af', 'loudnorm=I=-14:TP=-1.5:LRA=11', '-ar', '48000', '-c:a', 'flac', '-sample_fmt', 's32', 'mix_' + name + '.flac'], check=True)
 print('ok', END)
 if '-v' in sys.argv:
     W = int(0.05 * SR); f = np.sqrt(np.convolve(fxn ** 2, np.ones(W) / W, 'same')); vv = np.sqrt(np.convolve(vo ** 2, np.ones(W) / W, 'same')); vr = np.percentile(vv[vv > 1e-3], 90)
