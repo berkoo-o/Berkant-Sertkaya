@@ -20,8 +20,8 @@ import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js'
 await Promise.all(['600 40px Poppins','800 96px "Inter Tight"'].map(f=>document.fonts.load(f)));
 const W=1080,H=1920;const Q=new URLSearchParams(location.search);const V=+(Q.get('v')||1);
 const bg=document.getElementById('bg').getContext('2d'),fg=document.getElementById('fg').getContext('2d');
-const DEF={1:{cy:1450,el:14,ry:-0.38,s:1.12},2:{cy:1330,el:14,ry:-0.38,s:1.12},3:{cy:1360,el:14,ry:-0.34,s:1.05}}[V];
-const CX=+(Q.get('cx')||540),CY=+(Q.get('cy')||DEF.cy);
+const DEF={1:{cy:1360,el:14,ry:-0.38,s:1.05},2:{cy:1330,el:14,ry:-0.38,s:1.12},3:{cy:1360,el:14,ry:-0.34,s:1.05}}[V];
+const CX=+(Q.get('cx')||(V===2?540:445)),CY=+(Q.get('cy')||DEF.cy);
 // ---------- background (same recipe as the other clean covers) ----------
 {bg.fillStyle='#07070B';bg.fillRect(0,0,W,H);
  const blob=(x,y,r,c)=>{const g=bg.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,c);g.addColorStop(1,'rgba(0,0,0,0)');bg.fillStyle=g;bg.fillRect(0,0,W,H);};
@@ -65,9 +65,10 @@ const coin=(par,x,y,z,rx,ry,rz=0)=>{const G=new THREE.Group();G.position.set(x,y
 // ---------------- the calendar ----------------
 const C=obj;const PW=1.3,PH=1.5,PD=0.5,BY=0.16;
 // plinth with a lit edge
-RB(C,PW+0.55,0.12,PD+0.7,PAN,0,0.06,0.05,0.04);
-add(C,new THREE.BoxGeometry(PW+0.5,0.012,PD+0.65),new THREE.MeshBasicMaterial({color:0x9a8cff,toneMapped:false}),0,0.122,0.05);
-RB(C,PW+0.45,0.04,PD+0.6,PAN,0,0.14,0.05,0.015);
+const XW=(V===2?0:0.58),XO=XW/2; // v1/v3: the plinth is longer to the right, the torn page stands there in a small holder
+RB(C,PW+0.55+XW,0.12,PD+0.7,PAN,XO,0.06,0.05,0.04);
+add(C,new THREE.BoxGeometry(PW+0.5+XW,0.012,PD+0.65),new THREE.MeshBasicMaterial({color:0x9a8cff,toneMapped:false}),XO,0.122,0.05);
+RB(C,PW+0.45+XW,0.04,PD+0.6,PAN,XO,0.14,0.05,0.015);
 // back plate and header bar with rivets
 RB(C,PW+0.12,PH+0.28,0.06,NAVY,0,BY+(PH+0.28)/2,-PD/2-0.05,0.03);
 const hb=canvasTex(1024,180,(g,w,h)=>{g.fillStyle='#1b1846';g.fillRect(0,0,w,h);g.fillStyle='rgba(220,214,255,0.8)';g.font='600 70px Poppins';g.textAlign='center';g.letterSpacing='22px';g.fillText('2027',w/2+11,118);});
@@ -122,15 +123,21 @@ function PAGES(){const pw=PW-0.04,ph=PH-0.04;
   const torn=(()=>{const c=document.createElement('canvas');c.width=pageT.image.width;c.height=pageT.image.height;const g=c.getContext('2d');g.drawImage(pageT.image,0,0);
     g.globalCompositeOperation='destination-out';g.beginPath();g.moveTo(0,0);let x=0;while(x<c.width){x+=16+Math.random()*24;g.lineTo(Math.min(c.width,x),8+Math.random()*26);}g.lineTo(c.width,0);g.closePath();g.fill();
     const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t;})();
-  const G=pageMesh(pageGeo(pw,ph,v=>0.55*Math.sin(v*Math.PI)*0.6+v*0.5),torn);G.children.forEach(m=>{m.material.transparent=true;m.material.alphaTest=0.5;});
+  const G=pageMesh(pageGeo(pw,ph,v=>0.05*Math.sin(v*Math.PI*2)),torn); // nearly flat: it stands in the holderG.children.forEach(m=>{m.material.transparent=true;m.material.alphaTest=0.5;});
   if(!G.children[1].material.map){G.children[1].material.alphaMap=null;}
-  G.scale.setScalar(0.56);G.position.set(1.02,BY+PH+0.74,0.5);G.rotation.set(-0.3,-0.6,-0.42);C.add(G);}
+  // the torn page stands right next to the calendar in a small holder on the plinth: a ledge in front, a wire stand behind, leaning back slightly
+  const sc=0.5,w=pw*sc,h=ph*sc,a=0.2,x0=1.07,y0=0.16+0.03,z0=0.12;G.scale.setScalar(sc);G.rotation.set(-a,0,0);
+  G.position.set(x0,y0+h/2*Math.cos(a),z0-h/2*Math.sin(a));C.add(G);
+  RB(C,w+0.06,0.03,0.07,DARK,x0,0.16+0.015,z0+0.01,0.01);RB(C,w+0.06,0.05,0.012,DARK,x0,0.16+0.04,z0+0.045,0.005);
+  const back=z0-0.02-h*0.62*Math.sin(a);for(const sx of [-1,1]){const A=new THREE.Vector3(x0+sx*w*0.3,0.16,z0-0.32),B=new THREE.Vector3(x0+sx*w*0.3,y0+h*0.62*Math.cos(a),back);
+    const g=new THREE.CylinderGeometry(0.008,0.008,A.distanceTo(B),10);g.translate(0,A.distanceTo(B)/2,0);g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),B.clone().sub(A).normalize()));const m=new THREE.Mesh(g,METAL);m.position.copy(A);m.castShadow=true;C.add(m);}
+  {const g=new THREE.CylinderGeometry(0.008,0.008,w*0.6,10).rotateZ(Math.PI/2);const m=new THREE.Mesh(g,METAL);m.position.set(x0,y0+h*0.62*Math.cos(a),back);C.add(m);}}
 PAGES();
 // v3: three more torn pages drift above the calendar
 if(V===3){const months=['FEBRUAR','JULI','DEZEMBER'],days=['1','10','31'];months.forEach((mn,i)=>{const T=canvasTex(512,590,(g,w,h)=>{g.fillStyle='#ece6ff';g.fillRect(0,0,w,h);g.fillStyle='#2b2778';g.fillRect(0,0,w,86);g.fillStyle='#f4f1ff';g.font='800 46px "Inter Tight"';g.textAlign='center';g.fillText(mn,w/2,60);
     g.fillStyle='#1d1a4a';g.font='800 280px "Inter Tight"';g.fillText(days[i],w/2,400);});const p=new THREE.Mesh(new THREE.PlaneGeometry(0.42,0.48,8,8),new THREE.MeshStandardMaterial({map:T,roughness:.55,side:THREE.DoubleSide}));
   const pos=p.geometry.attributes.position;for(let k=0;k<pos.count;k++){const x=pos.getX(k);pos.setZ(k,0.06*Math.sin((x+0.21)/0.42*Math.PI)*(i%2?1:-1));}p.geometry.computeVertexNormals();
-  p.position.set([-1.0,-0.38,0.2][i],BY+PH+[0.68,0.98,1.08][i],[0.25,0.1,0.05][i]);p.rotation.set(-0.3+i*0.2,[0.5,-0.2,-0.6][i],[0.35,-0.15,-0.4][i]);p.castShadow=true;C.add(p);});}
+  p.position.set([-0.78,-0.05,0.68][i],BY+PH+[0.66,0.84,0.72][i],[0.25,0.1,0.05][i]);p.rotation.set(-0.3+i*0.2,[0.5,-0.2,-0.6][i],[0.35,-0.15,-0.4][i]);p.castShadow=true;C.add(p);});}
 // the red marker lying on the plinth in front
 {const Mk=new THREE.Group();Mk.position.set(0.3,0.16+0.05,0.45);Mk.rotation.set(0,0.12,Math.PI/2);C.add(Mk);const wh=M(0xeceae5,{roughness:.35});
  add(Mk,new THREE.CylinderGeometry(0.045,0.045,0.5,28),wh,0,0.25,0);add(Mk,new THREE.CylinderGeometry(0.046,0.046,0.06,28),REDS,0,0.12,0);add(Mk,new THREE.CylinderGeometry(0.05,0.048,0.18,28),REDS,0,0.58,0);
