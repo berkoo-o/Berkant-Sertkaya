@@ -337,9 +337,9 @@ function bank(W0, S, P, T) {
   const shutter = new THREE.Mesh(new THREE.BoxGeometry(0.165, 0.31, 0.006), shutterM); shutter.castShadow = true;
   const shutterG = new THREE.Group(); shutterG.position.set(-0.30, 0.355, B.z1 + 0.016); shutterG.add(shutter); shutter.position.y = -0.155; shutterG.scale.y = 0.001; G.add(shutterG);
   // cash machines on the right part of the facade, under a small canopy with a light strip
-  add(G, new THREE.BoxGeometry(0.54, 0.022, 0.085), mk(S === 1 ? 0x4a4f58 : 0x6d6a9a, {roughness: .5}), 0.47, 0.425, B.z1 + 0.0425);
+  add(G, new RoundedBoxGeometry(0.56, 0.018, 0.09, 2, 0.006), mk(S === 1 ? 0x3c4149 : 0x6d6a9a, {roughness: .4, metalness: .2}), 0.47, 0.478, B.z1 + 0.045);
   const strip = new THREE.MeshStandardMaterial({color: 0xffffff, emissive: 0xfff6e8, emissiveIntensity: 0.7}); shell.push(strip);
-  add(G, new THREE.BoxGeometry(0.5, 0.004, 0.012), strip, 0.47, 0.412, B.z1 + 0.07, false);
+  add(G, new THREE.BoxGeometry(0.52, 0.003, 0.01), strip, 0.47, 0.4675, B.z1 + 0.078, false);
   const atms = L.atmX.map((x, i) => atm(G, S, P, x, B.z1, shell, i));
   // interior, only visible while the walls are glass: floor, counter and an open vault with a very small stack of cash
   const IN = new THREE.Group(); IN.visible = false; G.add(IN);
@@ -358,28 +358,62 @@ function bank(W0, S, P, T) {
   T.bank = {G, shell, wall, win, atms, shutterG, IN, cash, vault: V, doorM, strip, inLight, body: bodyM};
 }
 
+// draw text so that it always fits into maxW (font size shrinks until it does)
+function fit(g, text, x, y, maxW, weight, size, family, align = 'center') {
+  let fs = size; g.font = `${weight} ${fs}px ${family}`;
+  while (g.measureText(text).width > maxW && fs > 8) {fs -= 1; g.font = `${weight} ${fs}px ${family}`;}
+  g.textAlign = align; g.fillText(text, x, y); return fs;
+}
+// modern cash machine (v2, Wunsch des Nutzers 20.11.2026): same footprint and screen position as before, so wide shots stay the same.
+// Rounded body, dark glass front, screen in a glossy bezel with a small privacy hood, receipt printer slot in the lit header,
+// angled keypad with contactless pad, card slot with green LED, cash slot with a white light ring.
 // screen states: 'idle' (blue), 'leer' (red), 'sixty' (max. 60 €)
 function atm(G, S, P, x, zf, shell, i) {
   const A = new THREE.Group(); A.position.set(x, 0, zf); G.add(A);
-  const bodyC = S === 1 ? 0x59606b : 0x7f7cb0;
-  add(A, new THREE.BoxGeometry(0.13, 0.33, 0.05), M(bodyC, {roughness: .45, metalness: .2}), 0, 0.22, 0.025);
-  add(A, new THREE.BoxGeometry(0.11, 0.08, 0.008), M(0x1d2026, {roughness: .3}), 0, 0.305, 0.052);
-  const sc = ctex(256, 184); const draw = (state, k = 1) => {const g = sc.g, w = 256, h = 184; g.save();
-    if (state === 'leer') {g.fillStyle = '#E01E2B'; g.fillRect(0, 0, w, h); g.fillStyle = '#fff'; g.font = '800 70px "Inter Tight"'; g.textAlign = 'center'; g.fillText('LEER', w / 2, h / 2 + 25);}
-    else if (state === 'sixty') {const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#2f6fd1'); gr.addColorStop(1, '#1d4ea0'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
-      g.fillStyle = '#fff'; g.textAlign = 'center'; g.font = '600 28px Poppins'; g.fillText('Auszahlung', w / 2, 52); g.font = '800 64px "Inter Tight"'; g.fillText('max. 60 €', w / 2, 126); g.font = '500 24px Poppins'; g.fillText('pro Tag', w / 2, 160);}
-    else {const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, S === 1 ? '#3b82d6' : '#6f8ef2'); gr.addColorStop(1, S === 1 ? '#1f56a8' : '#4c63c9'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
-      g.fillStyle = 'rgba(255,255,255,0.95)'; g.textAlign = 'center'; g.font = '700 38px Poppins'; g.fillText('Bargeld', w / 2, 74);
-      [['20 €', 40, 108], ['50 €', 136, 108], ['100 €', 40, 146], ['200 €', 136, 146]].forEach(([t, xx, yy]) => {g.fillStyle = 'rgba(255,255,255,0.22)'; roundRect(g, xx, yy - 26, 80, 32, 6); g.fill(); g.fillStyle = '#fff'; g.font = '600 20px Poppins'; g.fillText(t, xx + 40, yy - 3);});}
+  const bodyC = S === 1 ? 0x5a616c : 0x7f7cb0, frontC = S === 1 ? 0x2c3037 : 0x55528a, metal = S === 1 ? 0xb9bec6 : 0xd9d6f2;
+  add(A, new RoundedBoxGeometry(0.13, 0.33, 0.05, 3, 0.012), M(bodyC, {roughness: .35, metalness: .25}), 0, 0.22, 0.025);
+  add(A, new RoundedBoxGeometry(0.114, 0.305, 0.004, 2, 0.006), M(frontC, {roughness: .18, metalness: .1}), 0, 0.215, 0.0505);
+  // lit header with a € pictogram and the receipt printer slot (outro)
+  const hd = ctex(256, 64, (g, w, h) => {const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, S === 1 ? '#e9f3ff' : '#f2f0ff'); gr.addColorStop(1, S === 1 ? '#c9dcf2' : '#d9d4f6'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    g.fillStyle = S === 1 ? '#1f4f8f' : '#4b45a8'; g.beginPath(); g.arc(w / 2, h / 2, 21, 0, 7); g.fill(); g.fillStyle = '#fff'; fit(g, '€', w / 2, h / 2 + 11, 30, 800, 32, '"Inter Tight"');});
+  const hdM = new THREE.MeshStandardMaterial({map: hd.tex, emissive: 0xffffff, emissiveMap: hd.tex, emissiveIntensity: 0.55, roughness: .4});
+  const head = new THREE.Mesh(new THREE.PlaneGeometry(0.1, 0.026), hdM); head.position.set(0, 0.358, 0.0527); A.add(head);
+  add(A, new THREE.BoxGeometry(0.094, 0.004, 0.006), M(0x0b0c0f, {roughness: .3}), 0, 0.3735, 0.0525, false);       // printer slot
+  // screen in a glossy bezel with a privacy hood
+  add(A, new RoundedBoxGeometry(0.108, 0.082, 0.004, 2, 0.006), M(0x0c0d10, {roughness: .08, metalness: .2}), 0, 0.302, 0.053);
+  const hood = M(bodyC, {roughness: .35, metalness: .25});
+  add(A, new THREE.BoxGeometry(0.114, 0.004, 0.016), hood, 0, 0.3445, 0.059); [-1, 1].forEach(sd => add(A, new THREE.BoxGeometry(0.004, 0.084, 0.016), hood, sd * 0.055, 0.302, 0.059));
+  const sc = ctex(512, 370); const draw = (state) => {const g = sc.g, w = 512, h = 370; g.save(); g.clearRect(0, 0, w, h);
+    if (state === 'leer') {g.fillStyle = '#E01E2B'; g.fillRect(0, 0, w, h); g.fillStyle = '#fff'; fit(g, 'LEER', w / 2, h / 2 + 40, w * 0.74, 800, 150, '"Inter Tight"');
+      g.fillStyle = 'rgba(255,255,255,0.88)'; fit(g, 'Keine Auszahlung möglich', w / 2, h - 52, w * 0.8, 500, 30, 'Poppins');}
+    else if (state === 'sixty') {const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#2f6fd1'); gr.addColorStop(1, '#1b4a98'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+      g.fillStyle = 'rgba(255,255,255,0.9)'; fit(g, 'Auszahlung höchstens', w / 2, 92, w * 0.8, 600, 34, 'Poppins');
+      g.fillStyle = '#fff'; fit(g, '60 €', w / 2, 232, w * 0.7, 800, 130, '"Inter Tight"');
+      g.fillStyle = 'rgba(255,255,255,0.9)'; fit(g, 'pro Tag', w / 2, 298, w * 0.6, 500, 32, 'Poppins');}
+    else {const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, S === 1 ? '#2d78d6' : '#6f8ef2'); gr.addColorStop(1, S === 1 ? '#173f86' : '#4559c4'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+      g.fillStyle = 'rgba(255,255,255,0.14)'; g.fillRect(0, 0, w, 54); g.fillStyle = 'rgba(255,255,255,0.92)'; fit(g, 'Willkommen', 28, 37, w * 0.5, 500, 26, 'Poppins', 'left');
+      g.fillStyle = '#fff'; fit(g, 'Bargeld', w / 2, 128, w * 0.7, 700, 62, 'Poppins');
+      [['50 €', 36, 168], ['100 €', 266, 168], ['200 €', 36, 262], ['Andere', 266, 262]].forEach(([tx, bx, by]) => {g.fillStyle = 'rgba(255,255,255,0.2)'; roundRect(g, bx, by, 210, 72, 14); g.fill();
+        g.fillStyle = '#fff'; fit(g, tx, bx + 105, by + 48, 180, 600, 36, 'Poppins');});}
     g.restore(); sc.tex.needsUpdate = true;};
   draw('idle');
   const scrM = new THREE.MeshBasicMaterial({map: sc.tex, toneMapped: false});
-  const scr = new THREE.Mesh(new THREE.PlaneGeometry(0.094, 0.068), scrM); scr.position.set(0, 0.307, 0.0566); A.add(scr);
-  add(A, new THREE.BoxGeometry(0.07, 0.006, 0.03), M(0x2a2d33), 0, 0.235, 0.064);              // keypad shelf
-  for (let k = 0; k < 9; k++) add(A, new THREE.BoxGeometry(0.012, 0.003, 0.008), M(0xd9dde3), -0.018 + (k % 3) * 0.018, 0.2395, 0.054 + Math.floor(k / 3) * 0.009, false);
-  add(A, new THREE.BoxGeometry(0.075, 0.009, 0.004), M(0x101114), 0, 0.19, 0.0505);             // cash slot
-  add(A, new THREE.BoxGeometry(0.03, 0.006, 0.004), M(0x101114), 0.035, 0.262, 0.0505);          // card slot
+  const scr = new THREE.Mesh(new THREE.PlaneGeometry(0.098, 0.0708), scrM); scr.position.set(0, 0.302, 0.0553); A.add(scr);
+  // angled keypad shelf with keys and a contactless pad, card slot with green LED
+  const shelf = new THREE.Group(); shelf.position.set(0, 0.226, 0.051); shelf.rotation.x = 0.5; A.add(shelf);
+  const sh = new THREE.Mesh(new RoundedBoxGeometry(0.104, 0.005, 0.034, 2, 0.002), M(frontC, {roughness: .3, metalness: .2})); sh.position.set(0, 0, 0.017); sh.castShadow = true; shelf.add(sh);
+  for (let k = 0; k < 12; k++) {const kb = new THREE.Mesh(new THREE.BoxGeometry(0.0095, 0.002, 0.0065), M(metal, {metalness: .6, roughness: .3})); kb.position.set(-0.034 + (k % 3) * 0.0125, 0.003, 0.0065 + Math.floor(k / 3) * 0.0075); shelf.add(kb);}
+  const nfc = ctex(64, 64, (g, w, h) => {g.fillStyle = S === 1 ? '#3a404a' : '#6e6aa8'; roundRect(g, 2, 2, w - 4, h - 4, 10); g.fill(); g.strokeStyle = '#e8f1ff'; g.lineWidth = 3;
+    for (let r = 10; r <= 22; r += 6) {g.beginPath(); g.arc(22, 32, r, -0.8, 0.8); g.stroke();}});
+  const np = new THREE.Mesh(new THREE.PlaneGeometry(0.024, 0.024).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({map: nfc.tex, roughness: .4})); np.position.set(0.026, 0.0029, 0.018); shelf.add(np);
+  add(A, new THREE.BoxGeometry(0.03, 0.006, 0.004), M(0x0b0c0f), 0.034, 0.262, 0.0525, false);                     // card slot
+  const led = new THREE.MeshStandardMaterial({color: 0x2fd27a, emissive: 0x2fd27a, emissiveIntensity: 1.4}); add(A, new THREE.BoxGeometry(0.03, 0.0015, 0.002), led, 0.034, 0.2665, 0.0535, false);
+  // cash slot with a white light ring (off when the machine is empty)
+  const ringM = new THREE.MeshStandardMaterial({color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 1.2});
+  add(A, new RoundedBoxGeometry(0.086, 0.017, 0.003, 2, 0.004), ringM, 0, 0.172, 0.0525, false);
+  add(A, new THREE.BoxGeometry(0.076, 0.008, 0.004), M(0x08090b), 0, 0.172, 0.0535, false);
   const glow = new THREE.PointLight(0xff2030, 0, 0.9, 2); glow.position.set(0, 0.31, 0.14); A.add(glow);
   let cur = 'idle';
-  return {A, x, set: (s) => {if (s !== cur) {cur = s; draw(s);}}, scrM, glow, slotY: 0.19, slotZ: zf + 0.0505};
+  return {A, x, set: (s) => {if (s !== cur) {cur = s; draw(s); ringM.emissiveIntensity = s === 'leer' ? 0.05 : 1.2; led.emissiveIntensity = s === 'leer' ? 0.3 : 1.4;}}, scrM, glow,
+    slotY: 0.3735, slotZ: zf + 0.056, screenY: 0.302};
 }

@@ -93,10 +93,10 @@ add(rate(cut(ep('shutter'), 0.2, 1.3, 0.01, 0.25), 1.08), 81.85, 0.24)
 add(lp(cut(ep('footsteps'), 8.0, 4.2, 0.5, 1.4), 5000), 82.0, 0.24)
 whoosh(83.45, 0.26, 0)
 # ---------------------------------------------------------------- outro: the empty machine prints the logo
-whoosh(85.75, 0.3, 1)
-add(cut(ep('receipt'), 0.55, 1.5, 0.02, 0.3), 86.45, 0.42)                         # receipt printer
-add(rate(cut(sz('glock'), 0.0, 1.8, 0.002, 0.7), 2 ** (-3 / 12)), 87.72, 0.1)      # soft chime when the red dot appears
-click(87.72, 0.14, 1)
+whoosh(85.5, 0.16, 1)                                                              # slow push-in onto the red machine
+add(cut(ep('receipt'), 0.55, 1.15, 0.02, 0.25), 86.3, 0.42)                        # receipt printer (outro v2: the receipt rises while it prints)
+add(rate(cut(sz('glock'), 0.0, 1.8, 0.002, 0.7), 2 ** (-3 / 12)), 87.62, 0.1)      # soft chime when the red dot appears
+click(87.62, 0.14, 1)
 fx *= np.clip((END - t) / 0.25, 0, 1)
 
 # ---------------------------------------------------------------- voice (take 2, natural tempo) + gentle ducking

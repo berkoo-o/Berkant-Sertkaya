@@ -185,33 +185,40 @@ const coverZ0 = -0.545, coverZ1 = 0.505, coverH = 1.26;
  const knob = new THREE.Mesh(new THREE.SphereGeometry(0.05, 20, 14), new THREE.MeshStandardMaterial({color: 0xe6f4ff, transparent: true, opacity: 0.4, roughness: 0.05, depthWrite: false})); knob.position.set(0, coverH + 0.035, (coverZ0 + coverZ1) / 2); cover.add(knob);}
 function poseCover(t) {const d = t < 66 ? eo((t - 64.3) / 1.1) : 1; const up = eio((t - 71.8) / 0.8); const y = lerp(2.8, 0, d) + 3.2 * up;
   cover.visible = t > 64.25 && t < 72.7; cover.position.y = y; coverM.opacity = 0.22 * (1 - up); cover.userData.edge.opacity = 0.35 * (1 - up); cover.userData.rim.uniforms.k.value = 1.3 * (1 - up);}
-// receipt slip with the logo that comes out of the red cash machine (outro)
+// receipt with the logo (outro v2, Wunsch des Nutzers 20.11.2026: neuer, flüssiger): the empty red machine prints a receipt
+// that rises out of the printer slot in its lit header; the print scrolls up with the paper, then the red dot pops in
 const ATM2 = T.bank.atms[2];
+const slipW = 0.09, slipH = 0.086;
 const slip = new THREE.Group(); scene.add(slip);
-const slipW = 0.072, slipH = 0.118;
-const slipTex = ctex(360, 590, (g, w, h) => {g.fillStyle = '#fbfaf6'; g.fillRect(0, 0, w, h);
-  g.fillStyle = 'rgba(0,0,0,0.05)'; for (let y = 0; y < h; y += 6) g.fillRect(0, y, w, 1);
-  g.fillStyle = '#a3a3a3'; g.font = '500 20px Poppins'; g.textAlign = 'center'; g.fillText('- - - - - - - - - - - - - -', w / 2, 60); g.fillText('- - - - - - - - - - - - - -', w / 2, h - 80);});
-const inkTex = ctex(360, 590, (g, w, h) => {g.clearRect(0, 0, w, h); g.fillStyle = '#1b1b20'; g.font = '500 70px Poppins'; g.letterSpacing = '-2px'; g.textAlign = 'left';
-  const wd = g.measureText('function').width; const dot = g.measureText('.').width; const x0 = (w - wd - dot) / 2; g.fillText('function', x0, h / 2 + 24);
-  slip.userData.dot = [(x0 + wd + dot * 0.5) / w, (h / 2 + 24 - 9) / h];});
-const slipM = new THREE.MeshStandardMaterial({map: slipTex.tex, roughness: .8, side: THREE.DoubleSide, emissive: 0xffffff, emissiveMap: slipTex.tex, emissiveIntensity: 0.55});
-const slipMesh = new THREE.Mesh(new THREE.PlaneGeometry(slipW, slipH), slipM); slipMesh.position.y = -slipH / 2; slip.add(slipMesh);
-const inkM = new THREE.MeshBasicMaterial({map: inkTex.tex, transparent: true, opacity: 0, depthWrite: false});
-const ink = new THREE.Mesh(new THREE.PlaneGeometry(slipW, slipH), inkM); ink.position.set(0, -slipH / 2, 0.0004); slip.add(ink);
+const slipTex = ctex(540, 516, (g, w, h) => {g.fillStyle = '#fbfaf6'; g.fillRect(0, 0, w, h);
+  g.fillStyle = 'rgba(0,0,0,0.045)'; for (let y = 0; y < h; y += 6) g.fillRect(0, y, w, 1);
+  g.fillStyle = '#a3a3a3'; g.font = '500 22px Poppins'; g.textAlign = 'center'; g.fillText('- - - - - - - - - - - - - - - -', w / 2, 52); g.fillText('- - - - - - - - - - - - - - - -', w / 2, h - 40);
+});
+const inkTex = ctex(540, 516, (g, w, h) => {g.clearRect(0, 0, w, h); g.fillStyle = '#16161a'; g.font = '500 104px Poppins'; g.letterSpacing = '-3px'; g.textAlign = 'left';
+  let fs = 104; while (g.measureText('function.').width > w * 0.86) {fs -= 2; g.font = `500 ${fs}px Poppins`;}
+  const wd = g.measureText('function').width, dot = g.measureText('.').width, x0 = (w - wd - dot) / 2, base = h / 2 + fs * 0.32;
+  g.fillText('function', x0, base);
+  slip.userData.dot = [(x0 + wd + dot * 0.5) / w, (base - fs * 0.085) / h, fs / h];});
+inkTex.tex.wrapS = inkTex.tex.wrapT = THREE.ClampToEdgeWrapping;
+slipTex.tex.wrapS = slipTex.tex.wrapT = THREE.ClampToEdgeWrapping;
+const slipM = new THREE.MeshStandardMaterial({map: slipTex.tex, roughness: .8, emissive: 0xffffff, emissiveMap: slipTex.tex, emissiveIntensity: 0.5});
+const slipGeo = new THREE.PlaneGeometry(slipW, slipH); slipGeo.translate(0, slipH / 2, 0);
+const slipMesh = new THREE.Mesh(slipGeo, slipM); slip.add(slipMesh);
+const inkMesh = new THREE.Mesh(slipGeo, new THREE.MeshBasicMaterial({map: inkTex.tex, transparent: true, depthWrite: false, toneMapped: false})); inkMesh.position.z = 0.0003; slip.add(inkMesh);
 const dotM = new THREE.MeshBasicMaterial({color: 0xE01E2B, toneMapped: false, transparent: true, opacity: 0});
-const dotMesh = new THREE.Mesh(new THREE.CircleGeometry(0.0027, 24), dotM);
-{const [u, v] = slip.userData.dot; dotMesh.position.set((u - 0.5) * slipW, -v * slipH, 0.0008); slip.add(dotMesh);}
+const dotMesh = new THREE.Mesh(new THREE.CircleGeometry(1, 32), dotM);
+{const [u, v, k] = slip.userData.dot; dotMesh.scale.setScalar(k * slipH * 0.11); dotMesh.userData.base = k * slipH * 0.11; dotMesh.position.set((u - 0.5) * slipW, (1 - v) * slipH, 0.0006); slip.add(dotMesh);}
 const slotWorld = new THREE.Vector3(ATM2.x, ATM2.slotY, ATM2.slotZ);
+const PRINT = {t0: 86.35, t1: 87.4, dot: 87.6};
 function poseSlip(t) {
-  const a = eio((t - 86.55) / 0.45), b = eio((t - 87.0) / 0.45);
-  slip.visible = t > 86.5;
-  slip.position.set(slotWorld.x, slotWorld.y - 0.002, slotWorld.z + 0.003);
-  const sw = t > 87.45 ? 0.16 * Math.sin((t - 87.45) * 7.5) * Math.exp(-(t - 87.45) * 3.2) : 0;
-  slip.rotation.set(lerp(-Math.PI / 2 + 0.04, 0.02, b) + sw, 0, 0);
-  slip.scale.set(1, Math.max(0.001, a), 1);
-  inkM.opacity = eo((t - 87.3) / 0.3);
-  const d = clamp((t - 87.7) / 0.3, 0, 1); dotM.opacity = d; const k = d < 0.6 ? 1.5 * eo(d / 0.6) : lerp(1.5, 1, ease((d - 0.6) / 0.4)); dotMesh.scale.setScalar(Math.max(0.001, k));
+  const u = clamp((t - PRINT.t0) / (PRINT.t1 - PRINT.t0), 0, 1); const L = slipH * (u < 0.85 ? u / 0.85 * 0.93 : 0.93 + 0.07 * eo((u - 0.85) / 0.15));   // steady feed, gentle stop
+  slip.visible = L > 0.0005;
+  slip.position.set(slotWorld.x, slotWorld.y, slotWorld.z + 0.002);
+  slip.rotation.set(-0.06 * (L / slipH), 0, 0);                          // the paper leans back a little as it gets longer
+  slipMesh.scale.y = inkMesh.scale.y = Math.max(0.001, L / slipH);
+  for (const tx of [slipTex.tex, inkTex.tex]) {tx.repeat.set(1, L / slipH); tx.offset.set(0, 1 - L / slipH);}   // the top of the print comes out first and rises with the paper
+  const d = clamp((t - PRINT.dot) / 0.3, 0, 1); dotM.opacity = d; const k = d < 0.6 ? 1.5 * eo(d / 0.6) : lerp(1.5, 1, ease((d - 0.6) / 0.4));
+  dotMesh.scale.setScalar(Math.max(1e-5, dotMesh.userData.base * k));
 }
 
 // ------------------------------------------------------------------ light and time of day
@@ -253,8 +260,8 @@ const KEYS = [
   [58.6, C(0.28, 1.7, -1.12, 2.35, -156, 41)], [62.8, C(0.25, 1.5, -1.0, 2.4, -160, 40)],
   [64.4, C(0.0, 0.6, -0.1, 1.95, -142, 36)], [70.8, C(-0.2, 0.55, -0.1, 1.8, -112, 38)],
   [72.4, C(-2.0, 0.2, -0.35, 1.45, -72, 48)], [75.8, C(-2.0, 0.2, -0.2, 1.35, -66, 46)], [77.1, C(-0.2, 0.3, 0.35, 1.5, -18, 32)], [81.6, C(-0.1, 0.3, 0.35, 1.45, -14, 30)],
-  [83.4, C(0, 0.3, -0.35, S === 1 ? 3.9 : 4.9, -20, 50)], [85.45, C(0, 0.3, -0.35, S === 1 ? 4.0 : 5.0, -20, 50)],
-  [86.95, C(0.64, 0.2, 0.49, 0.165, -3, 7, 11)], [89.0, C(0.64, 0.2, 0.49, 0.158, -2, 7, 11)]];
+  [83.6, C(0.18, 0.3, 0.42, 1.0, -18, 22)], [85.4, C(0.42, 0.33, 0.45, 0.55, -10, 15)],
+  [86.7, C(0.64, 0.37, 0.48, 0.15, -4, 8, 14)], [89.0, C(0.64, 0.38, 0.48, 0.13, -3, 7, 12)]];
 const KT = KEYS.map(k => k[0]), KV = KEYS.map(k => k[1]);
 const KM = [0, 1, 2, 3, 4, 5, 6].map(j => {const n = KT.length, d = [], tg = new Array(n).fill(0); for (let i = 0; i < n - 1; i++) d.push((KV[i + 1][j] - KV[i][j]) / (KT[i + 1] - KT[i]));
   for (let i = 1; i < n - 1; i++) {if (d[i - 1] * d[i] <= 0) continue; const h0 = KT[i] - KT[i - 1], h1 = KT[i + 1] - KT[i], w1 = 2 * h1 + h0, w2 = h1 + 2 * h0; tg[i] = (w1 + w2) / (w1 / d[i - 1] + w2 / d[i]);} return tg;});
@@ -263,7 +270,7 @@ function camAt(t) {let i = 0; while (i < KT.length - 2 && t > KT[i + 1]) i++; co
   return [0, 1, 2, 3, 4, 5, 6].map(j => a * KV[i][j] + b * h * KM[j][i] + c * KV[i + 1][j] + e * h * KM[j][i + 1]);}
 const CAMT = new THREE.Vector3();
 function setCam(t) {
-  const v = camAt(t); const size = Math.exp(v[3]); const calm = t > 86.6 ? 0.3 : 1;
+  const v = camAt(t); const size = Math.exp(v[3]); const calm = lerp(1, 0.25, eio((t - 85.4) / 1.4));
   const az = (v[4] + calm * (0.35 * Math.sin(t * 0.23) + 0.2 * Math.sin(t * 0.51 + 1.3))) * Math.PI / 180, el = (v[5] + calm * 0.18 * Math.sin(t * 0.31 + 0.7)) * Math.PI / 180;
   CAMT.set(v[0], v[1], v[2]);
   const dir = new THREE.Vector3(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el));
@@ -340,7 +347,7 @@ function setTime(t) {
   const lit = bankLit(t); bank.inLight.intensity = 1.4 * lit * (0.4 + n); bank.doorM.emissiveIntensity = 0.25 + 1.4 * lit * (0.3 + n); bank.strip.emissiveIntensity = 0.2 + 1.6 * lit;
   bank.win.forEach(m => m.emissiveIntensity = lit * (0.15 + 1.3 * n));
   bank.shutterG.scale.y = Math.max(0.001, shutterDown(t));
-  bank.atms.forEach((a, i) => {const st = atmState(i, t); a.set(st); a.glow.intensity = st === 'leer' && i === 2 ? (0.25 + 1.3 * n) * (t > 86.4 ? 0.12 : 1) : 0;
+  bank.atms.forEach((a, i) => {const st = atmState(i, t); a.set(st); a.glow.intensity = st === 'leer' && i === 2 ? (0.25 + 1.3 * n) * (1 - 0.7 * eio((t - 85.6) / 1.0)) : 0;
     const flick = (i === 2 && t > 24.9 && t < 25.1) || (i === 1 && t > 25.2 && t < 25.36) || (i === 0 && t > 25.5 && t < 25.66) || (i === 0 && t > 43.33 && t < 43.45) ? (Math.floor(t * 40) % 2 ? 0.35 : 1) : 1; a.scrM.color.setScalar(flick);});
   // objects
   poseBundles(t);
@@ -353,7 +360,7 @@ function setTime(t) {
   // grading: tilt-shift saturation, 1931 in sepia
   const sep = 0.7 * win(t, 44.95, 52.4, 0.55);
   CANVAS.style.filter = `${S === 1 ? 'saturate(1.22) contrast(1.04) ' : ''}sepia(${sep.toFixed(3)}) brightness(${(1 - 0.08 * sep).toFixed(3)})`;
-  {const sz = Math.exp(camAt(t)[3]); tilt.forEach((p, i) => {const ou = eio((t - 86.2) / 0.8); p.uniforms.r.value = lerp(0.5, 0.33, ou); p.uniforms.band.value = 0.07 + 0.2 * win(t, 10.4, 13.2, 0.5) + 0.12 * ou; p.uniforms.amt.value = 3.0 * clamp(0.45 + sz / 3.2, 0.5, 1) * (i < 2 ? 1 : 0.8) * (1 - 0.45 * win(t, 10.4, 13.2, 0.5));});}
+  {const sz = Math.exp(camAt(t)[3]); tilt.forEach((p, i) => {const ou = eio((t - 85.6) / 1.2); p.uniforms.r.value = 0.5; p.uniforms.band.value = 0.07 + 0.2 * win(t, 10.4, 13.2, 0.5) + 0.16 * ou; p.uniforms.amt.value = 3.0 * clamp(0.45 + sz / 3.2, 0.5, 1) * (i < 2 ? 1 : 0.8) * (1 - 0.45 * win(t, 10.4, 13.2, 0.5));});}
   overlay(t);
 }
 
@@ -387,5 +394,26 @@ window.CHECK = (step = 1 / 30) => {
   }
   return {minPP: +minPP.toFixed(3), minPPt: +minPPt.toFixed(2), n: bad.length, bad: bad.slice(0, 60)};
 };
+window.atmPx = tv => {setCam(tv); let best = 0; const v = new THREE.Vector3();
+  for (const x of L.atmX) {let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9, ok = false;
+    for (const dx of [-0.07, 0.07]) for (const y of [0.05, 0.49]) for (const z of [0.42, 0.51]) {v.set(x + dx, y, z).applyMatrix4(cam.matrixWorldInverse); if (v.z > -0.01) continue; ok = true;
+      v.set(x + dx, y, z).project(cam); const px = (v.x + 1) / 2 * W, py = (1 - v.y) / 2 * H; x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py);}
+    if (!ok || x1 < 0 || x0 > W || y1 < 0 || y0 > H) continue; best = Math.max(best, y1 - y0);}
+  return best;};
+// like atmPx, but only counts a machine when a sample point on it is not hidden behind something opaque (bank, houses, cars)
+const _rc = new THREE.Raycaster();
+window.atmSeen = tv => {setTime(tv); const px = window.atmPx(tv); if (px < 6) return 0; scene.updateMatrixWorld(true);
+  const occ = []; scene.traverse(o => {if (o.isMesh && o.visible && o.material && !Array.isArray(o.material) && !(o.material.transparent && o.material.opacity < 0.6) && !o.material.isShaderMaterial) occ.push(o);
+    else if (o.isMesh && o.visible && Array.isArray(o.material)) occ.push(o);});
+  const atmSet = new Set(); T.bank.atms.forEach(a => a.A.traverse(o => atmSet.add(o)));
+  const cp = cam.getWorldPosition(new THREE.Vector3()); const v = new THREE.Vector3();
+  for (const x of L.atmX) for (const [y, z] of [[0.302, 0.477], [0.36, 0.477], [0.2, 0.477], [0.478, 0.512], [0.1, 0.477]]) {
+    v.set(x, y, z); const q = v.clone().project(cam); if (q.x < -1 || q.x > 1 || q.y < -1 || q.y > 1 || q.z > 1) continue;
+    const dir = v.clone().sub(cp); const dist = dir.length(); dir.normalize();
+    if (cam.isOrthographicCamera) {const o = v.clone().addScaledVector(cam.getWorldDirection(new THREE.Vector3()), -30); _rc.set(o, cam.getWorldDirection(new THREE.Vector3()));}
+    else _rc.set(cp, dir);
+    const hits = _rc.intersectObjects(occ, false); const target = cam.isOrthographicCamera ? 30 : dist;
+    const first = hits.find(h => !atmSet.has(h.object)); if (!first || first.distance > target - 0.03) return px;}
+  return 0;};
 window.DBGO = {THREE, scene, cam, T, agents, people, bundles, flights, cars, cover, slip, barrier, banner, stack};
 drawAt(0); window.ready = true;
