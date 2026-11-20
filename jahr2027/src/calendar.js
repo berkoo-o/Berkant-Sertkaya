@@ -51,7 +51,7 @@ export function buildCalendar(scene,shadowLight){
   [-0.12,0.12].forEach(x=>{const r=new THREE.Mesh(new THREE.CylinderGeometry(0.006,0.006,0.004,20),new THREE.MeshStandardMaterial({color:0x9a9ca3,metalness:0.9,roughness:0.3}));r.rotation.x=Math.PI/2;r.position.set(x,PY+PH/2+0.026,0.038);TG.add(r);});
 
   // ---------------------------------------------------------------- pages
-  const DEFS=[{kind:'cover'},{d:1,m:0,note:'Neujahr'},{d:19,m:0},{d:1,m:1},{d:12,m:2},{d:6,m:3},{d:20,m:4},{d:14,m:5},{d:1,m:6},{d:10,m:6},{kind:'blank'}];
+  const DEFS=[{kind:'cover'},{d:1,m:0,note:'Neujahr'},{d:19,m:0},{d:1,m:1},{d:12,m:2},{d:6,m:3},{d:20,m:4},{d:14,m:5},{d:1,m:6},{d:10,m:6},{d:31,m:11,note:'Silvester'}];
   const backM=new THREE.MeshStandardMaterial({color:0xdcd5c8,roughness:0.97,side:THREE.BackSide});
   const pages=DEFS.map((def,i)=>{const small=i>=3&&i<=7;const w=small?512:TW,h=small?Math.round(512*TH/TW):TH;
     const base=document.createElement('canvas');base.width=w;base.height=h;const bg=base.getContext('2d');let ring=null;

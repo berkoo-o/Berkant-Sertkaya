@@ -130,20 +130,13 @@ knock(69.17, 0.14, 0, 1.1); knock(69.82, 0.22, 1, 1.05)
 # ---------------------------------------------------------------- overview and end card
 whoosh(70.25, 0.4, 1)
 add(cut(sz('shimmer'), 0.0, 1.4, 0.003, 0.5), 70.6, 0.1)
-# outro v5 (1,5 s): the red marker rolls off its resting place towards the camera and stops with "function." facing it
-add(rate(cut(sz('cover_tear1'), 0.0, 0.7, 0.002, 0.15), 1.1), 73.45 - 0.03, 0.3)    # last page tears off (in the background)
-def roll_sound(t0, t1, length=0.7185, r=0.0096, seed=11):
-    # no library has a rolling pen: soft friction noise that pulses once per turn and slows down with the marker (constant friction)
-    n = int((t1 - t0 + 0.05) * SR); tt = np.arange(n) / SR; T = t1 - t0; u = np.clip(tt / T, 0, 1)
-    speed = 2 * length / T * (1 - u)                                   # m/s, linear decay
-    ph = np.cumsum(speed / (2 * np.pi * r)) / SR                       # turns
-    rng = np.random.default_rng(seed); nz = rng.standard_normal(n)
-    body = sosfilt(butter(2, [500, 2600], 'band', fs=SR, output='sos'), nz)
-    puls = 0.55 + 0.45 * np.abs(np.sin(np.pi * ph)) ** 6               # a slightly flatter spot touches the desk once per turn
-    env = np.clip(speed / speed.max(), 0, 1) ** 0.7 * np.clip(tt / 0.02, 0, 1)
-    y = body * puls * env; return y / (np.max(np.abs(y)) + 1e-9)
-add(roll_sound(73.6, 74.55), 73.6, 0.3)
-add(cut(sz('glock'), 0.0, 1.0, 0.002, 0.4), 74.5, 0.12)                       # soft chime as the logo comes to rest
+# outro v6 (1,5 s, New Year's Eve): the last page jumps to 31 December, a red rocket whistles up out of the page, bursts, sparks form the logo
+add(rate(cut(sz('cover_tear1'), 0.0, 0.6, 0.002, 0.12), 1.15), 73.45 - 0.03, 0.4)   # the July page tears off
+wh = cut(sz('rocket'), 0.72, 0.42, 0.06, 0.03); wh = wh / (np.max(np.abs(wh)) + 1e-9)
+add(hp(wh, 900), 73.72 - 0.12, 0.16)                                          # rising whistle while the rocket climbs
+hit('rocket', 74.02, 0.42, 1.1766)                                            # the bang (pop of the same recording)
+add(cut(sz('burst'), 0.0, 0.95, 0.002, 0.35), 74.02 - 0.095 + 0.03, 0.22)      # crackle as the sparks spread
+add(cut(sz('glock'), 0.0, 0.8, 0.002, 0.35), 74.44, 0.1)                      # soft chime as the dot lands
 fx *= np.clip((END - t) / 0.2, 0, 1)
 
 # ---------------------------------------------------------------- voice (take 1, natural tempo) + gentle ducking
