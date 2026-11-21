@@ -92,14 +92,12 @@ add(cut(ge('chant'), 4.6, 2.4, 0.2, 0.8), 46.75, 0.1)
 # ---------------------------------------------------------------- the question mark podium
 pop(51.05, 0.11, 0.95); add(rate(cut(sz('glock'), 0.0, 1.4, 0.002, 0.6), 2 ** (2 / 12)), 51.12, 0.05)
 
-# ---------------------------------------------------------------- outro: the sign jumps, everything sinks, confetti burst, the letters form, the dot lands
-whoosh(OUT + 0.3, 0.14, 0)
-add(lp(cut(vm('rumble'), 0.0, 1.2, 0.05, 0.5), 2500), OUT + 0.1, 0.12)
-add(cut(sz('burst'), 0.0, 1.0, 0.002, 0.4), OUT + 0.15, 0.12)
-add(rate(cut(sz('shimmer'), 0.0, 1.4, 0.01, 0.6), 0.95), OUT + 0.85, 0.07)
-pop(OUT + 1.5, 0.08, 0.9)
-whoosh(OUT + 2.15, 0.08, 1)
-pop(OUT + 2.35, 0.13, 0.9); add(rate(cut(sz('glock'), 0.0, 1.8, 0.002, 0.7), 2 ** (-3 / 12)), OUT + 2.37, 0.09)
+# ---------------------------------------------------------------- outro (2D): the card fades in, the sign pops up, flies into the dot, the letters fade in
+whoosh(OUT + 0.1, 0.1, 0)
+pop(OUT + 0.24, 0.1, 0.85)
+whoosh(OUT + 1.1, 0.1, 1)
+pop(OUT + 1.08, 0.06, 1.0); pop(OUT + 1.26, 0.055, 1.1); pop(OUT + 1.44, 0.05, 1.2)   # three soft plops for the letters, not one per letter
+pop(OUT + 1.66, 0.13, 0.9); add(rate(cut(sz('glock'), 0.0, 1.8, 0.002, 0.7), 2 ** (-3 / 12)), OUT + 1.68, 0.09)
 fx *= np.clip((END - t) / 0.25, 0, 1)
 
 # ---------------------------------------------------------------- voice (natural tempo) + gentle ducking, music like the Merz video

@@ -3,7 +3,7 @@
 // 5 Soldat salutiert, Schüler streiken im Kreis · 4 Traktor springt an und qualmt, die Steuerhilfe fliegt weg und kommt halb zurück,
 // eine Traktorkolonne rollt vorbei · 3 Heizkörper heizt, die Ampel hat es eilig, das rote § stoppt alles · 2 Treppe, Absperrgitter,
 // die Menge stürmt die Stufen · 1 Stempel auf dem Hartz-IV-Antrag, der Platz füllt sich mit Menschen. Am Ende ein Fragezeichen-Podest.
-// Outro 1: Das § springt nach vorn, die Podeste versinken, aus Konfetti entsteht „function“, das § wird zum Punkt.
+// Outro (21.11.2026 neu, Wunsch des Nutzers „einfach eine 2D-Animation“): dunkelvioletter 2D-Abspann, das rote § ploppt auf und fliegt als Punkt hinter „function“.
 // Rot ist nur das Paragrafenzeichen (roter Faden) und das Logo. Alle Zeiten sind Stimm-Zeiten (voice/words.json, Take 2);
 // im Video beginnt die Stimme bei 0,15 s.
 import * as THREE from 'three';
@@ -197,7 +197,6 @@ const CLIP = grp(POD[4].B, 0, POD[4].h, 0); CLIP.rotation.y = 0.1; let STAMP, IN
 
 // ---------------- the red paragraph sign (red thread) ----------------
 const PARA = add(scene, centered(textGeo(FONT, '§', 0.46, 0.1)), paraMat);
-const BALL = add(scene, new THREE.SphereGeometry(1, 32, 20), paraMat); BALL.scale.setScalar(0.0001); BALL.castShadow = false;
 // hover spot above each podium (world)
 const HOV = [1.1, 1.6, 1.62, 1.5, 1.92].map((y, i) => new THREE.Vector3(PX(i) + (i === 1 ? 0.08 : 0), y, PZ(i) + (i === 2 ? -0.12 : 0.05)));
 
@@ -232,7 +231,7 @@ const CONF = [], CCOL = [0x6fe3c4, 0x6cc0ff, 0xffd45e, 0xffffff, 0xc9b8ff, 0xffb
     if (HOV.some(v => Math.hypot(x - v.x, y - v.y - 0.25, z - v.z) < 0.6)) continue;
     if (z > 0.2 && Math.abs(x) < 1.95) continue;
     const m = add(scene, shapes[n % 3], M(CCOL[n % CCOL.length])); m.castShadow = false; CONF.push({m, p: new THREE.Vector3(x, y, z), r: new THREE.Euler(rng() * 6, rng() * 6, rng() * 6), ph: rng() * 6.28}); n++;}
-  for (let j = 0; j < 150; j++) {const m = add(scene, shapes[j % 3], M(CCOL[j % CCOL.length])); m.castShadow = false; m.visible = false; CONF.push({m, burst: true, j, r: new THREE.Euler(rng() * 6, rng() * 6, rng() * 6), ph: rng() * 6.28});}}
+  }
 const BLOBS = [];
 for (const [x, y, z, r, c] of [[-2.5, 1.15, -2.4, 0.2, 0xffd45e], [2.1, 0.45, -1.9, 0.14, 0xffb3e6], [-2.3, 0.4, -1.6, 0.12, 0x6fe3c4]]) {const m = add(scene, new THREE.SphereGeometry(r, 40, 24), M(c)); m.position.set(x, y, z); m.castShadow = false; BLOBS.push({m, y, ph: x * 3});}
 {const ring = add(scene, new THREE.TorusGeometry(0.2, 0.045, 20, 60), M(0xffb3e6), -2.2, 1.95, -3.2); ring.rotation.set(1.0, 0.4, 0); ring.castShadow = false; BLOBS.push({m: ring, y: 1.95, ph: 1});}
@@ -288,30 +287,6 @@ function camAt(v, out = cam) {
   const a = CAM[k], b = CAM[k + 1], u = smr(seg(v, a[0], b[0])), q = a.map((x, i) => lerp(x, b[i], u));
   const [, tx, ty, tz, d, az, el] = q, A = az * Math.PI / 180, E = el * Math.PI / 180;
   out.position.set(tx + d * Math.cos(E) * Math.sin(A), ty + d * Math.sin(E), tz + d * Math.cos(E) * Math.cos(A)); out.lookAt(tx, ty, tz); out.updateMatrixWorld(); return out;}
-
-// ---------------- outro: logo built from confetti, the paragraph sign becomes the dot ----------------
-const LOGO = grp(scene); let DOTP, LETTERS, DOTM, LOGO_PTS = [];
-{const s = 0.3, depth = 0.06;
-  const lg = textGeo(LOGOF, 'function', s, depth), dg = textGeo(LOGOF, '.', s, depth);
-  let adv = 0; const sc = s / LOGOF.data.resolution; for (const ch of 'function') adv += LOGOF.data.glyphs[ch].ha * sc;
-  dg.translate(adv, 0, 0); dg.computeBoundingBox();
-  const minX = lg.boundingBox.min.x, maxX = dg.boundingBox.max.x, cx = (minX + maxX) / 2;
-  lg.translate(-cx, 0, -depth / 2); dg.translate(-cx, 0, -depth / 2); lg.computeBoundingBox(); dg.computeBoundingBox();
-  // the logo keeps the exact brand red on its front; the extruded sides are a darker red
-  const lm = () => [new THREE.MeshBasicMaterial({color: RED, toneMapped: false, transparent: true, opacity: 0}), new THREE.MeshBasicMaterial({color: 0x8e0f19, toneMapped: false, transparent: true, opacity: 0})];
-  LETTERS = add(LOGO, lg, lm()); DOTM = add(LOGO, dg, lm()); LETTERS.castShadow = DOTM.castShadow = false;
-  const db = dg.boundingBox; DOTP = new THREE.Vector3((db.min.x + db.max.x) / 2, (db.min.y + db.max.y) / 2, 0);
-  // points on the front faces of the letters for the confetti
-  const pos = lg.attributes.position, idx = lg.index, tris = [], A = new THREE.Vector3(), B = new THREE.Vector3(), C = new THREE.Vector3(), nrm = new THREE.Vector3();
-  const nTri = idx ? idx.count / 3 : pos.count / 3; let total = 0;
-  for (let t = 0; t < nTri; t++) {const i0 = idx ? idx.getX(3 * t) : 3 * t, i1 = idx ? idx.getX(3 * t + 1) : 3 * t + 1, i2 = idx ? idx.getX(3 * t + 2) : 3 * t + 2;
-    A.fromBufferAttribute(pos, i0); B.fromBufferAttribute(pos, i1); C.fromBufferAttribute(pos, i2); nrm.subVectors(C, B).cross(new THREE.Vector3().subVectors(A, B));
-    if (Math.abs(nrm.z) < nrm.length() * 0.95 || A.z < depth / 2 - 0.01) continue; const ar = nrm.length() / 2; total += ar; tris.push([A.clone(), B.clone(), C.clone(), total]);}
-  for (let j = 0; j < 196; j++) {const r = hash(j + 0.5) * total; const T = tris.find(q => q[3] >= r) || tris[tris.length - 1]; let u = hash(j + 7.1), v = hash(j + 3.3); if (u + v > 1) {u = 1 - u; v = 1 - v;}
-    LOGO_PTS.push(new THREE.Vector3().copy(T[0]).multiplyScalar(1 - u - v).addScaledVector(T[1], u).addScaledVector(T[2], v).add(new THREE.Vector3(0, 0, depth / 2 + 0.012)));}}
-{const c = camAt(57.0, new THREE.PerspectiveCamera(26, W / H, 0.05, 80)); const dir = new THREE.Vector3(); c.getWorldDirection(dir);
-  LOGO.position.copy(c.position).addScaledVector(dir, 9.0).add(new THREE.Vector3(0, -0.05, 0)); LOGO.quaternion.copy(c.quaternion); LOGO.updateMatrixWorld();}
-const logoW = p => p.clone().applyMatrix4(LOGO.matrixWorld);
 
 // ---------------- text overlays ----------------
 const $ = id => document.getElementById(id);
@@ -452,41 +427,37 @@ function setT(v) {
   // ---- outro
   outro(v);}
 
+// Outro (Wunsch des Nutzers, 21.11.2026: „einfach eine 2D-Animation“): The picture fades to a dark violet card, the red
+// paragraph sign pops up in the middle, shrinks and flies as the dot behind „function“ while the letters fade in one by one.
+const endEl = document.getElementById('end'), endG = endEl.getContext('2d');
+const LOGO_FS = 170, LOGO_Y = 1010;
+endG.font = `500 ${LOGO_FS}px Poppins`; endG.letterSpacing = '-7px';
+const LW = endG.measureText('function').width, DW = endG.measureText('.').width, DOT = endG.measureText('.');
+const LX = W / 2 - (LW + DW) / 2, DOTX = LX + LW + (DOT.actualBoundingBoxRight - DOT.actualBoundingBoxLeft) / 2 + DOT.actualBoundingBoxLeft * 0, DOTR = (DOT.actualBoundingBoxAscent + DOT.actualBoundingBoxDescent) / 2, DOTY = LOGO_Y - DOT.actualBoundingBoxAscent + DOTR;
+const LETX = []; {let x = LX; for (const ch of 'function') {LETX.push(x); x = LX + endG.measureText('function'.slice(0, LETX.length)).width;}}
 function outro(v) {
-  const sinkAll = [...POD.map(p => p.G), PQ.G];
-  sinkAll.forEach((g, i) => {const order = i < 5 ? 4 - i : 5, a = OUT0 + 0.1 + order * 0.05; g.position.y = -2.6 * sm(seg(v, a, a + 0.5));});
-  const crowdSink = -1.0 * sm(seg(v, OUT0 + 0.05, OUT0 + 0.45));
   PARA.castShadow = v < OUT0;
-  CROWD.forEach(c => {c.p.G.position.y = crowdSink;});
-  LOGO.visible = v >= OUT0; BALL.visible = v >= OUT0;
-  const op = (m, o) => m.material.forEach(x => {x.opacity = o;});
-  BLOBS.forEach(b => b.m.scale.setScalar(Math.max(0.0001, 1 - sm(seg(v, OUT0, OUT0 + 0.5)))));
-  if (v < OUT0) {op(LETTERS, 0); op(DOTM, 0); BALL.scale.setScalar(0.0001); CONF.forEach(c => {if (c.burst) c.m.visible = false;}); return;}
-  // confetti: the floating pieces and a burst from podium 1 fly into the letters
-  const burstC = HOV[4].clone().add(new THREE.Vector3(0, -0.2, 0)), conv0 = OUT0 + 0.7, conv1 = OUT0 + 1.55, fade0 = OUT0 + 1.55, fade1 = OUT0 + 1.9;
-  let pi = 0;
-  CONF.forEach((c, j) => {const tgt = LOGO_PTS[pi++ % LOGO_PTS.length]; const T = logoW(tgt);
-    let start;
-    if (c.burst) {const a = hash(j * 1.3) * Math.PI * 2, el = 0.3 + hash(j * 2.1) * 1.1, sp = 0.6 + hash(j * 3.7) * 0.9, u = eo(seg(v, OUT0 + 0.15, OUT0 + 0.75));
-      start = burstC.clone().add(new THREE.Vector3(Math.cos(a) * Math.cos(el) * sp * u, Math.sin(el) * sp * u, Math.sin(a) * Math.cos(el) * sp * u * 0.6)); c.m.visible = v > OUT0 + 0.15;}
-    else start = new THREE.Vector3(c.p.x + 0.04 * Math.sin(v * 0.6 + c.ph), c.p.y + 0.06 * Math.sin(v * 0.45 + c.ph * 1.3), c.p.z);
-    const u = eio(seg(v, conv0 + hash(j) * 0.25, conv1 - 0.1 + hash(j) * 0.1));
-    c.m.position.copy(start).lerp(T, u); if (u > 0 && u < 1) c.m.position.y += Math.sin(Math.PI * u) * 0.25;
-    const k = 1 - sm(seg(v, fade0 + hash(j + 1) * 0.15, fade1)); c.m.scale.setScalar(Math.max(0.0001, (c.burst ? Math.min(1, seg(v, OUT0 + 0.15, OUT0 + 0.3) * 4) : 1) * k * (1 - 0.4 * u)));
-    c.m.rotation.set(c.r.x + v * 2, c.r.y + v * 1.5, c.r.z);});
-  const lu = sm(seg(v, OUT0 + 1.45, OUT0 + 1.85)); op(LETTERS, lu); LETTERS.scale.setScalar(0.94 + 0.06 * lu);
-  // the paragraph sign jumps forward, spins while the letters form, turns into a ball and lands as the dot
-  const D = logoW(DOTP), jumpTo = logoW(DOTP.clone().add(new THREE.Vector3(-0.32, 0.62, 0.25)));
-  const st = HOV[4], u1 = eio(seg(v, OUT0, OUT0 + 0.75));
-  let p = st.clone().lerp(jumpTo, u1); p.y += Math.sin(Math.PI * u1) * 0.7;
-  const morph = sm(seg(v, OUT0 + 1.75, OUT0 + 2.05)), fall = seg(v, OUT0 + 1.95, OUT0 + 2.35);
-  if (fall > 0) {p = jumpTo.clone().lerp(D, ei(fall)); }
-  const dotR = 0.032;
-  PARA.position.copy(p); PARA.rotation.set(0, AZ0 * 0.6 + (v - OUT0) * 5 * (1 - morph), 0); PARA.scale.setScalar(Math.max(0.0001, 1 - morph));
-  const land = fall >= 1, sq = land ? Math.sin(Math.PI * seg(v, OUT0 + 2.35, OUT0 + 2.55)) * 0.3 : 0;
-  BALL.position.copy(p); BALL.scale.set(dotR * morph * (1 + sq), dotR * morph * (1 - sq), dotR * morph * (1 + sq));
-  if (land) {const dl = sm(seg(v, OUT0 + 2.4, OUT0 + 2.6)); op(DOTM, dl); BALL.scale.multiplyScalar(1 - dl + 0.0001);}
-  else op(DOTM, 0);}
+  const u = v - OUT0; endG.clearRect(0, 0, W, H);
+  if (u < 0) return;
+  // dark violet card over the 3D picture
+  const f = sm(seg(u, 0, 0.45)); const bg = endG.createRadialGradient(W / 2, 980, 60, W / 2, 980, 1250);
+  bg.addColorStop(0, '#2c2178'); bg.addColorStop(0.55, '#1a1250'); bg.addColorStop(1, '#0b0820');
+  endG.globalAlpha = f; endG.fillStyle = bg; endG.fillRect(0, 0, W, H); endG.globalAlpha = 1;
+  // the red paragraph sign: pops up in the middle, then flies on an arc into the dot of the logo and becomes a round dot
+  const popS = back(seg(u, 0.2, 0.6)), fly = eio(seg(u, 1.05, 1.65)), morph = sm(seg(u, 1.4, 1.65));
+  const p0 = {x: W / 2, y: 900}, p1 = {x: DOTX, y: DOTY}, c = {x: (p0.x + p1.x) / 2 + 120, y: Math.min(p0.y, p1.y) - 260};
+  const bx = (1 - fly) ** 2 * p0.x + 2 * (1 - fly) * fly * c.x + fly * fly * p1.x, by = (1 - fly) ** 2 * p0.y + 2 * (1 - fly) * fly * c.y + fly * fly * p1.y;
+  const size = lerp(330, DOTR * 2.6, eio(seg(u, 1.05, 1.6)));
+  const land = seg(u, 1.65, 1.85), sq = land > 0 && land < 1 ? Math.sin(Math.PI * land) * 0.25 : 0;
+  if (u >= 0.2) {
+    endG.save(); endG.translate(bx, by); endG.rotate((1 - popS) * -0.6 + fly * Math.PI * 2);
+    endG.globalAlpha = 1 - morph; endG.fillStyle = '#E01E2B'; endG.font = `800 ${size}px "Inter Tight"`; endG.textAlign = 'center'; endG.textBaseline = 'middle';
+    endG.scale(popS || 0.0001, popS || 0.0001); endG.fillText('§', 0, size * 0.04); endG.restore();
+    if (morph > 0) {endG.save(); endG.globalAlpha = morph; endG.fillStyle = '#E01E2B'; endG.beginPath(); endG.ellipse(bx, by + DOTR * sq, DOTR * (1 + sq), DOTR * (1 - sq), 0, 0, Math.PI * 2); endG.fill(); endG.restore();}}
+  // the letters fade in one by one (slide up a little)
+  endG.font = `500 ${LOGO_FS}px Poppins`; endG.letterSpacing = '-7px'; endG.fillStyle = '#E01E2B'; endG.textAlign = 'left'; endG.textBaseline = 'alphabetic';
+  'function'.split('').forEach((ch, i) => {const a = sm(seg(u, 1.0 + i * 0.06, 1.42 + i * 0.06)); if (a <= 0) return;
+    endG.save(); endG.globalAlpha = a; endG.fillText(ch, LETX[i], LOGO_Y + (1 - a) * 34); endG.restore();});}
 
 // collision check over the whole video: people must not touch each other, podiums, stairs or tractors
 window.CHECK = () => {
@@ -503,7 +474,7 @@ window.CHECK = () => {
 window.TOTAL = Math.round((END_V + VO) * 30);
 window.setT = setT;
 window.renderFrame = f => {setT(f / 30 - VO); renderer.render(scene, cam);};
-window.DBG = {THREE, scene, cam, POD, CROWD, CORO, STUD, CONV, PARA, SOLD, paraState, HOV, PX, PZ, PH, PW, STEP, LOGO, CONF};
+window.DBG = {THREE, scene, cam, POD, CROWD, CORO, STUD, CONV, PARA, SOLD, paraState, HOV, PX, PZ, PH, PW, STEP, CONF};
 // ?cover=1: clean thumbnail (no text, the whole staircase large in the middle, safe for the 3:4 crop of the profile grid)
 if (new URLSearchParams(location.search).get('cover')) {document.getElementById('ov').style.display = 'none'; document.getElementById('shade').style.display = 'none';
   const f = fit([...allPts(), ...paraTop(4)], -16, 17, {x0: 70, x1: 1010, y0: 470, y1: 1450}); const v0 = 3.2;
