@@ -33,7 +33,7 @@ Zeiten sind Stimm-Zeiten (Take 2, `voice/words.json`), im Video beginnt die Stim
 | 0:32–0:40 | „Platz zwei: die Corona-Regeln. Monatelang gab es Großdemos, und Hunderte stürmten sogar die Treppe vor dem Reichstag.“ | Zoom auf die Maske, die „atmet“. Vor dem Podest wächst eine Treppe aus dem Boden, Absperrgitter ploppen auf, davor eine Menge mit Schildern. Bei „stürmten“ kippen die Gitter, die Leute rennen die Stufen hoch und drehen sich oben zur Kamera. | **2** · Corona-Regeln · 2020/21 |
 | 0:40–0:51 | „Platz eins: Hartz IV. An einem einzigen Tag gingen über zweihunderttausend Menschen auf die Straße, und aus der Wut entstand eine neue Partei, die später in der Linken aufging.“ | Zoom auf das Klemmbrett, ein Stempel drückt „HARTZ IV“ auf den Antrag. Die Kamera fährt weit zurück, der Boden füllt sich in einer Welle mit über 60 Figuren, ein Zähler läuft bis 200.000. Bei „Wut“ gehen die Arme in einer Welle hoch. | **1** · Hartz IV · 2004, dann **200.000+** · Menschen an einem Tag · 30.08.2004, dann WASG/Die Linke |
 | 0:51–0:55 | „Und welches Gesetz fehlt hier? Schreib's in die Kommentare.“ | Vorne links ploppt ein weißes Podest mit „?“ und „DEIN TIPP?“ auf. | Titel „Welches Gesetz fehlt?“ |
-| 0:55–0:58 | (Outro, 2D) | Abblende auf Dunkelviolett, das rote § ploppt auf und fliegt als Punkt hinter „function“, die Buchstaben blenden nacheinander ein. | Logo |
+| 0:55–0:58 | (Outro, 2D) | Abblende auf Dunkelviolett, „function“ blendet Buchstabe für Buchstabe ein, dann ploppt der rote Punkt auf. | Logo |
 
 ## D. Sprechertext für Tom (eleven_v4, Audio-Tags)
 
@@ -57,7 +57,7 @@ Platz zwei: die Corona-Regeln. Monatelang gab es Großdemos, und Hunderte stürm
 
 ## Outro (2D, neu am 21.11.2026)
 
-Die zuerst gebaute Podest-Outro 1 (das § springt nach vorn, die Podeste versinken, „function“ entsteht aus Konfetti in 3D) gefiel dem Nutzer nicht („Outro sieht nicht gut aus, einfach eine 2D-Animation“). Jetzt: Das Bild blendet in 0,45 s auf einen dunkelvioletten Abspann über, das rote § ploppt groß in der Mitte auf, dreht sich, schrumpft und fliegt im Bogen an die Stelle des Punkts, wo es zu einem runden roten Punkt wird. Gleichzeitig blenden die Buchstaben „function“ nacheinander von unten ein (Poppins Medium, 170 px, Rot #E01E2B). Ton: leiser Whoosh, Plopp beim §, drei leise Plopps für die Buchstaben, Plopp und Glocken-Akkord beim Punkt. Umsetzung als 2D-Canvas (`#end`) in `src/podest.js` → `outro()`.
+Die zuerst gebaute Podest-Outro 1 (das § springt nach vorn, die Podeste versinken, „function“ entsteht aus Konfetti in 3D) gefiel dem Nutzer nicht („Outro sieht nicht gut aus, einfach eine 2D-Animation“), die erste 2D-Fassung mit dem fliegenden § auch nicht („Mach ohne dem Paragrafen“). Jetzt: Das Bild blendet in 0,45 s auf einen dunkelvioletten Abspann über, die Buchstaben „function“ blenden nacheinander von unten ein (Poppins Medium, 170 px, Rot #E01E2B), dann ploppt der rote Punkt auf. Ton: leiser Whoosh, drei leise Plopps für die Buchstaben, Plopp und Glocken-Akkord beim Punkt. Umsetzung als 2D-Canvas (`#end`) in `src/podest.js` → `outro()`.
 ## E. Szenenplan (Technik)
 
 Umsetzung in Three.js: `podest.html` mit `src/podest.js` (Standbilder `node shot.mjs <präfix> t…`, Prüfung `node shot.mjs check`, Testclip `node preview_podest.mjs out.mp4 4 <von> <bis>`, Server Port 8780 im Hauptordner). Jede Einstellung wird automatisch eingepasst (`fit()`): Podest, Zahl, Objekt und § müssen in das freie Band zwischen großer Zahl oben und Untertitel unten passen.

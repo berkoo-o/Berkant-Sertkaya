@@ -3,7 +3,7 @@
 // 5 Soldat salutiert, Schüler streiken im Kreis · 4 Traktor springt an und qualmt, die Steuerhilfe fliegt weg und kommt halb zurück,
 // eine Traktorkolonne rollt vorbei · 3 Heizkörper heizt, die Ampel hat es eilig, das rote § stoppt alles · 2 Treppe, Absperrgitter,
 // die Menge stürmt die Stufen · 1 Stempel auf dem Hartz-IV-Antrag, der Platz füllt sich mit Menschen. Am Ende ein Fragezeichen-Podest.
-// Outro (21.11.2026 neu, Wunsch des Nutzers „einfach eine 2D-Animation“): dunkelvioletter 2D-Abspann, das rote § ploppt auf und fliegt als Punkt hinter „function“.
+// Outro (21.11.2026 neu, Wunsch des Nutzers „einfach eine 2D-Animation“, „ohne den Paragrafen“): dunkelvioletter 2D-Abspann, „function“ blendet Buchstabe für Buchstabe ein, dann ploppt der rote Punkt auf.
 // Rot ist nur das Paragrafenzeichen (roter Faden) und das Logo. Alle Zeiten sind Stimm-Zeiten (voice/words.json, Take 2);
 // im Video beginnt die Stimme bei 0,15 s.
 import * as THREE from 'three';
@@ -427,8 +427,8 @@ function setT(v) {
   // ---- outro
   outro(v);}
 
-// Outro (Wunsch des Nutzers, 21.11.2026: „einfach eine 2D-Animation“): The picture fades to a dark violet card, the red
-// paragraph sign pops up in the middle, shrinks and flies as the dot behind „function“ while the letters fade in one by one.
+// Outro (Wunsch des Nutzers, 21.11.2026: „einfach eine 2D-Animation“, dann „ohne den Paragrafen“): The picture fades to a dark
+// violet card, the letters of „function“ fade in one by one from below, then the red dot pops in.
 const endEl = document.getElementById('end'), endG = endEl.getContext('2d');
 const LOGO_FS = 170, LOGO_Y = 1010;
 endG.font = `500 ${LOGO_FS}px Poppins`; endG.letterSpacing = '-7px';
@@ -443,20 +443,12 @@ function outro(v) {
   const f = sm(seg(u, 0, 0.45)); const bg = endG.createRadialGradient(W / 2, 980, 60, W / 2, 980, 1250);
   bg.addColorStop(0, '#2c2178'); bg.addColorStop(0.55, '#1a1250'); bg.addColorStop(1, '#0b0820');
   endG.globalAlpha = f; endG.fillStyle = bg; endG.fillRect(0, 0, W, H); endG.globalAlpha = 1;
-  // the red paragraph sign: pops up in the middle, then flies on an arc into the dot of the logo and becomes a round dot
-  const popS = back(seg(u, 0.2, 0.6)), fly = eio(seg(u, 1.05, 1.65)), morph = sm(seg(u, 1.4, 1.65));
-  const p0 = {x: W / 2, y: 900}, p1 = {x: DOTX, y: DOTY}, c = {x: (p0.x + p1.x) / 2 + 120, y: Math.min(p0.y, p1.y) - 260};
-  const bx = (1 - fly) ** 2 * p0.x + 2 * (1 - fly) * fly * c.x + fly * fly * p1.x, by = (1 - fly) ** 2 * p0.y + 2 * (1 - fly) * fly * c.y + fly * fly * p1.y;
-  const size = lerp(330, DOTR * 2.6, eio(seg(u, 1.05, 1.6)));
-  const land = seg(u, 1.65, 1.85), sq = land > 0 && land < 1 ? Math.sin(Math.PI * land) * 0.25 : 0;
-  if (u >= 0.2) {
-    endG.save(); endG.translate(bx, by); endG.rotate((1 - popS) * -0.6 + fly * Math.PI * 2);
-    endG.globalAlpha = 1 - morph; endG.fillStyle = '#E01E2B'; endG.font = `800 ${size}px "Inter Tight"`; endG.textAlign = 'center'; endG.textBaseline = 'middle';
-    endG.scale(popS || 0.0001, popS || 0.0001); endG.fillText('§', 0, size * 0.04); endG.restore();
-    if (morph > 0) {endG.save(); endG.globalAlpha = morph; endG.fillStyle = '#E01E2B'; endG.beginPath(); endG.ellipse(bx, by + DOTR * sq, DOTR * (1 + sq), DOTR * (1 - sq), 0, 0, Math.PI * 2); endG.fill(); endG.restore();}}
+  // the red dot pops in after the letters (squash and settle)
+  const dp = back(seg(u, 1.28, 1.62)), land = seg(u, 1.28, 1.62), sq = land > 0 && land < 1 ? Math.sin(Math.PI * land) * 0.18 : 0;
+  if (dp > 0) {endG.save(); endG.fillStyle = '#E01E2B'; endG.beginPath(); endG.ellipse(DOTX, DOTY, DOTR * dp * (1 + sq), DOTR * dp * (1 - sq), 0, 0, Math.PI * 2); endG.fill(); endG.restore();}
   // the letters fade in one by one (slide up a little)
   endG.font = `500 ${LOGO_FS}px Poppins`; endG.letterSpacing = '-7px'; endG.fillStyle = '#E01E2B'; endG.textAlign = 'left'; endG.textBaseline = 'alphabetic';
-  'function'.split('').forEach((ch, i) => {const a = sm(seg(u, 1.0 + i * 0.06, 1.42 + i * 0.06)); if (a <= 0) return;
+  'function'.split('').forEach((ch, i) => {const a = sm(seg(u, 0.4 + i * 0.07, 0.85 + i * 0.07)); if (a <= 0) return;
     endG.save(); endG.globalAlpha = a; endG.fillText(ch, LETX[i], LOGO_Y + (1 - a) * 34); endG.restore();});}
 
 // collision check over the whole video: people must not touch each other, podiums, stairs or tractors
