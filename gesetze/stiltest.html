@@ -1,0 +1,345 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>Stiltest Gesetze</title>
+<style>
+@font-face{font-family:Poppins;font-weight:500;src:url(node_modules/@fontsource/poppins/files/poppins-latin-500-normal.woff2)}
+@font-face{font-family:'Inter Tight';font-weight:800;src:url(node_modules/@fontsource/inter-tight/files/inter-tight-latin-800-normal.woff2)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#07070B}
+canvas{position:absolute;left:0;top:0}
+</style></head><body>
+<canvas id="out" width="1080" height="1920"></canvas>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+// Stiltest „Diese 5 Gesetze haben Deutschland richtig wütend gemacht“: vier Stile zur Auswahl.
+// ?s=1 Knete-Demo, ?s=2 Nacht-Modell (Kanal-Klassiker), ?s=3 Pop-up-Gesetzbuch, ?s=4 Countdown-Podest (Cover-Look ohne Diorama)
+// Stil 1 bis 3 zeigen dieselbe Szene: Reichstag mit Glaskuppel, davor eine Demo mit Schildern, Traktoren auf der Straße
+// und als roter Faden ein großes rotes Paragrafenzeichen. Stil 4 zeigt die fünf Plätze als Treppe aus Podesten.
+// Kamera zum Ausprobieren: &d=&el=&az=&oy= (Abstand, Höhe und Drehung in Grad, Verschiebung in Pixeln)
+import * as THREE from 'three';
+import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+import {TTFLoader} from 'three/addons/loaders/TTFLoader.js';
+import {FontLoader} from 'three/addons/loaders/FontLoader.js';
+import {TextGeometry} from 'three/addons/geometries/TextGeometry.js';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+await Promise.all(['500 40px Poppins', '800 96px "Inter Tight"'].map(f => document.fonts.load(f)));
+const FONT = new FontLoader().parse(new TTFLoader().parse(await (await fetch('node_modules/@fontsource/inter-tight/files/inter-tight-latin-800-normal.woff')).arrayBuffer()));
+const Q = new URLSearchParams(location.search), S = +(Q.get('s') || 1);
+const CLAY = S === 1, NIGHT = S === 2, PAPER = S === 3, POD = S === 4;
+const NAMES = ['', 'Knete-Demo', 'Nacht-Modell (Kanal-Klassiker)', 'Pop-up-Gesetzbuch', 'Countdown-Podest'];
+const W = 1080, H = 1920, RED = 0xE01E2B;
+const renderer = new THREE.WebGLRenderer({antialias: true, preserveDrawingBuffer: true}); renderer.setSize(W, H); renderer.setPixelRatio(1);
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = [1, 1.0, 1.05, 1.0, 1.05][S];
+renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene(); scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = [0, 0.4, 0.14, 0.3, 0.3][S];
+const rng = (s => () => (s = (s * 16807) % 2147483647) / 2147483647)(7);
+const tex = (w, h, draw) => {const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;};
+const css = c => '#' + new THREE.Color(c).getHexString();
+const INK = new THREE.LineBasicMaterial({color: 0x2e2925});
+const W0 = new THREE.Group(); scene.add(W0);
+const add = (par, geo, m, x = 0, y = 0, z = 0, edge = true) => {const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = true; o.receiveShadow = true; par.add(o);
+  if (PAPER && edge) o.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo, 30), INK)); return o;};
+const box = (w, h, d, r = 0.02) => CLAY ? new RoundedBoxGeometry(w, h, d, 3, Math.min(r, w / 2 - 1e-3, h / 2 - 1e-3, d / 2 - 1e-3))
+  : POD && r > 0.004 ? new RoundedBoxGeometry(w, h, d, 2, Math.min(r, 0.03, w / 2 - 1e-3, h / 2 - 1e-3, d / 2 - 1e-3)) : new THREE.BoxGeometry(w, h, d);
+const clayBump = tex(256, 256, (g, w, h) => {g.fillStyle = '#808080'; g.fillRect(0, 0, w, h); for (let i = 0; i < 900; i++) {const x = rng() * w, y = rng() * h, r = 2 + rng() * 9; const gr = g.createRadialGradient(x, y, 0, x, y, r);
+  const v = rng() < 0.5 ? 255 : 0; gr.addColorStop(0, `rgba(${v},${v},${v},0.10)`); gr.addColorStop(1, 'rgba(128,128,128,0)'); g.fillStyle = gr; g.fillRect(x - r, y - r, 2 * r, 2 * r);}});
+clayBump.wrapS = clayBump.wrapT = THREE.RepeatWrapping; clayBump.colorSpace = THREE.NoColorSpace;
+function M(c, o = {}) {
+  if (CLAY) return new THREE.MeshStandardMaterial({color: c, roughness: 0.92, bumpMap: clayBump, bumpScale: 1.4, ...o});
+  if (PAPER) return new THREE.MeshStandardMaterial({color: c, roughness: 1, ...o});
+  if (POD) return new THREE.MeshPhysicalMaterial({color: c, roughness: 0.4, clearcoat: 0.6, clearcoatRoughness: 0.25, ...o});
+  return new THREE.MeshStandardMaterial({color: c, roughness: 0.75, ...o});
+}
+const P = {
+  1: {base: 0x6c5ac8, plate: 0xf3e3c8, lawn: 0x8fd18a, path: 0xf6e7c9, street: 0x6b6f86, walk: 0xf3e3c8, wall: 0xf1d9b0, win: '#7c78a8', plinth: 0xd8c3a2, trim: 0xfff6e6, roof: 0xb9b3d6,
+    tree: 0x5fc46a, trunk: 0xa0704a, skin: 0xf3c9a5, legs: 0x3e3f5a, hair: [0x5a3a2a, 0x2b2b33, 0xe0b060, 0x8a5a3a], tractor: [0x58b048, 0x3f7fd0, 0x9ccf4a], hub: 0xf5c451,
+    people: [0x5b8ef0, 0xf5c451, 0x58b48c, 0xa47ce0, 0xffffff, 0x3e3f5a, 0xef8fb5, 0xf08a6c, 0x6fd0e0], sign: ['#ffffff', '#f7dd7c', '#cfe6ff', '#d9f2d0'], ink: '#3e3f5a'},
+  2: {base: 0x1b1a1f, plate: 0x2c3a2a, lawn: 0x2f4a2c, path: 0x5d5a55, street: 0x1d1e22, walk: 0x5d5a55, wall: 0x8a7c6b, win: '#1c1f26', plinth: 0x6e655a, trim: 0x9a8d7a, roof: 0x3a3836,
+    tree: 0x355a33, trunk: 0x4a3a2a, skin: 0xc9a07e, legs: 0x2a2a30, hair: [0x3a2a20, 0x1b1b20, 0x8a6a3a, 0x5a3a2a], tractor: [0x3f7a3a, 0x2f5f9a, 0x7a9a3a], hub: 0xc9a94a,
+    people: [0x4a6f9a, 0xc9a94a, 0x4f8a5c, 0x8a6a9c, 0xd8d2c6, 0x3a3a40, 0xc28aa0, 0x8a6a45, 0x5b8fb8], sign: ['#ece6d8', '#e8d08a', '#c9d8e8', '#d8e8cc'], ink: '#26262c'},
+  3: {base: 0x1f2a3a, plate: 0xf4efe3, lawn: 0xd6e4c0, path: 0xf7f3ea, street: 0xcfcac0, walk: 0xf4efe3, wall: 0xfbf8f1, win: '#fbf8f1', plinth: 0xefe9dc, trim: 0xfbf8f1, roof: 0xe6dfcf,
+    tree: 0xbcd3a4, trunk: 0xd8c4a8, skin: 0xf1dcc6, legs: 0x9a958e, hair: [0x8f8a84, 0xb39a7a, 0x6f6a64, 0xd8c09a], tractor: [0xa9c9a4, 0x9db4cf, 0xd7e3a0], hub: 0xf3e3a8,
+    people: [0x9db4cf, 0xe9cf8a, 0xa9c9a4, 0xc4b3d9, 0xf7f3ea, 0x8f8a84, 0xe8c4b8, 0xd9b48f, 0xa8d0d8], sign: ['#ffffff', '#f3e3a8', '#dbe8f3', '#e4efd8'], ink: '#2e2925'}}[S] || {};
+
+// ---------------- the red thread: a big red paragraph sign ----------------
+function paraGeo(size, depth, bevel = true) {
+  const g = new TextGeometry('§', {font: FONT, size, depth, curveSegments: 12, bevelEnabled: bevel, bevelThickness: depth * 0.22, bevelSize: size * 0.022, bevelSegments: 3});
+  g.computeBoundingBox(); const b = g.boundingBox; g.translate(-(b.min.x + b.max.x) / 2, -b.min.y, -(b.min.z + b.max.z) / 2); return g;}
+function paraMat() {
+  if (NIGHT || POD) return new THREE.MeshPhysicalMaterial({color: RED, emissive: 0xff1626, emissiveIntensity: NIGHT ? 0.12 : 0.3, roughness: 0.3, clearcoat: 0.8});
+  return M(RED, PAPER ? {} : {roughness: 0.6});}
+
+// ---------------- facade with windows (top row arched like the Reichstag) ----------------
+function facade(cols, rows, wall) {
+  const cw = 40, rh = 72, w = cols * cw, h = rows * rh;
+  const lit = (i, k) => ((i * 7 + k * 3 + cols) % 5) < 3;
+  const draw = emi => (g) => {
+    g.fillStyle = emi ? '#000' : wall; g.fillRect(0, 0, w, h);
+    if (!emi && !PAPER) {g.fillStyle = 'rgba(0,0,0,0.09)'; for (let k = 1; k < rows; k++) g.fillRect(0, k * rh - 3, w, 5);}
+    for (let i = 0; i < cols; i++) for (let k = 0; k < rows; k++) {
+      const x = i * cw + cw * 0.28, ww = cw * 0.44, y = k * rh + rh * 0.2, hh = rh * 0.58, arch = k === 0 && rows > 1;
+      g.beginPath(); if (arch) {g.moveTo(x, y + hh); g.lineTo(x, y + ww / 2); g.arc(x + ww / 2, y + ww / 2, ww / 2, Math.PI, 0); g.lineTo(x + ww, y + hh); g.closePath();} else g.rect(x, y, ww, hh);
+      if (PAPER) {g.strokeStyle = '#3a3530'; g.lineWidth = 2.4; g.stroke(); g.beginPath(); g.moveTo(x + ww / 2, y + (arch ? ww / 2 : 0)); g.lineTo(x + ww / 2, y + hh); g.lineWidth = 1.3; g.stroke();}
+      else if (emi) {g.fillStyle = lit(i, k) ? '#ffb45a' : '#000'; g.fill();}
+      else {g.fillStyle = NIGHT ? (lit(i, k) ? '#ffd9a0' : P.win) : P.win; g.fill(); if (CLAY) {g.strokeStyle = '#fff6e6'; g.lineWidth = 3; g.stroke();}}}
+    if (PAPER) {g.strokeStyle = '#3a3530'; g.lineWidth = 1.6; for (let k = 1; k < rows; k++) {g.beginPath(); g.moveTo(0, k * rh); g.lineTo(w, k * rh); g.stroke();}}};
+  return {map: tex(w, h, draw(false)), emi: NIGHT ? tex(w, h, draw(true)) : null};}
+function facadeMats(w, h, d, rows) {
+  const k = 7.5, fz = facade(Math.max(2, Math.round(w * k)), rows, css(P.wall)), fx = facade(Math.max(1, Math.round(d * k)), rows, css(P.wall));
+  const mk = f => NIGHT ? M(0xffffff, {map: f.map, emissive: 0xffffff, emissiveMap: f.emi, emissiveIntensity: 1.25}) : M(0xffffff, {map: f.map});
+  const top = M(P.roof); return [mk(fx), mk(fx), top, top, mk(fz), mk(fz)];}
+
+// ---------------- Reichstag ----------------
+function reichstag(par) {
+  const G = new THREE.Group(); G.position.set(0, 0, -0.98); par.add(G);
+  const BW = 2.1, BD = 1.0, BH = 0.42, PH = 0.07, wall = M(P.wall), trim = M(P.trim), plinth = M(P.plinth);
+  add(G, box(BW + 0.12, PH, BD + 0.12, 0.02), plinth, 0, PH / 2, 0);
+  add(G, box(BW, BH, BD, 0.03), facadeMats(BW, BH, BD, 2), 0, PH + BH / 2, 0);
+  add(G, box(BW + 0.04, 0.03, BD + 0.04, 0.012), trim, 0, PH + BH + 0.015, 0);
+  const TW = 0.36, TH = 0.58;
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) {const x = sx * (BW / 2 - TW / 2 + 0.04), z = sz * (BD / 2 - TW / 2 + 0.04);
+    add(G, box(TW, TH, TW, 0.03), facadeMats(TW, TH, TW, 3), x, PH + TH / 2, z);
+    add(G, box(TW + 0.04, 0.03, TW + 0.04, 0.012), trim, x, PH + TH + 0.015, z);
+    add(G, box(TW * 0.72, 0.05, TW * 0.72, 0.015), M(P.roof), x, PH + TH + 0.055, z);}
+  // portico with six columns, inscription and pediment
+  const PW = 0.76, PD = 0.16, front = BD / 2;
+  add(G, box(PW, BH + 0.02, PD, 0.02), facadeMats(PW, BH, PD, 2), 0, PH + (BH + 0.02) / 2, front + PD / 2 - 0.02);
+  const colZ = front + PD + 0.07, colH = 0.36, base = PH + 0.04;
+  add(G, box(PW + 0.08, 0.04, 0.2, 0.01), plinth, 0, PH + 0.02, colZ - 0.03);
+  for (let i = 0; i < 6; i++) add(G, new THREE.CylinderGeometry(0.024, 0.028, colH, CLAY ? 14 : 18), wall, -0.3 + i * 0.12, base + colH / 2, colZ);
+  const insc = tex(512, 48, (g, w, h) => {g.fillStyle = css(P.trim); g.fillRect(0, 0, w, h); g.fillStyle = NIGHT ? '#3a2f22' : PAPER ? '#2e2925' : '#5a4a3a'; g.font = '800 30px "Inter Tight"';
+    g.textAlign = 'center'; g.textBaseline = 'middle'; g.letterSpacing = '4px'; g.fillText('DEM DEUTSCHEN VOLKE', w / 2, h / 2 + 2);});
+  const im = M(0xffffff, {map: insc}), entY = base + colH + 0.03;
+  add(G, box(PW + 0.1, 0.06, 0.24, 0.01), [trim, trim, trim, trim, im, trim], 0, entY, colZ - 0.06);
+  const tri = new THREE.Shape(); tri.moveTo(-(PW + 0.1) / 2, 0); tri.lineTo((PW + 0.1) / 2, 0); tri.lineTo(0, 0.15); tri.closePath();
+  const tg = new THREE.ExtrudeGeometry(tri, {depth: 0.24, bevelEnabled: CLAY, bevelSize: 0.012, bevelThickness: 0.012, bevelSegments: 2}); tg.translate(0, 0, -0.12);
+  add(G, tg, trim, 0, entY + 0.03, colZ - 0.06);
+  // stairs down to the square
+  for (let j = 0; j < 4; j++) {const top = base - j * (base / 4), z0 = colZ - 0.13, z1 = colZ + 0.07 + j * 0.065;
+    add(G, box(PW + 0.24 + j * 0.08, top, z1 - z0, 0.008), plinth, 0, top / 2, (z0 + z1) / 2);}
+  // glass dome on the roof with ribs and the mirror cone inside
+  const roofY = PH + BH + 0.03;
+  add(G, new THREE.CylinderGeometry(0.3, 0.31, 0.06, 40), wall, 0, roofY + 0.03, 0);
+  const gm = CLAY ? new THREE.MeshStandardMaterial({color: 0xbfe6ff, transparent: true, opacity: 0.5, roughness: 0.25, depthWrite: false})
+    : NIGHT ? new THREE.MeshStandardMaterial({color: 0xffe2b0, emissive: 0xffb860, emissiveIntensity: 0.75, transparent: true, opacity: 0.62, roughness: 0.3, depthWrite: false})
+    : new THREE.MeshStandardMaterial({color: 0xffffff, transparent: true, opacity: 0.35, roughness: 1, depthWrite: false});
+  const dome = add(G, new THREE.SphereGeometry(0.29, 40, 20, 0, Math.PI * 2, 0, Math.PI / 2), gm, 0, roofY + 0.06, 0, false); dome.castShadow = false; dome.renderOrder = 3;
+  const rib = PAPER ? new THREE.MeshBasicMaterial({color: 0x2e2925}) : M(NIGHT ? 0x6e655a : 0xffffff), rt = CLAY ? 0.007 : 0.004;
+  for (let i = 0; i < 12; i++) {const r = add(G, new THREE.TorusGeometry(0.29, rt, 5, 28, Math.PI), rib, 0, roofY + 0.06, 0, false); r.rotation.y = i * Math.PI / 12;}
+  for (const a of [0.35, 0.7, 1.05]) {const r = add(G, new THREE.TorusGeometry(0.29 * Math.cos(a), rt, 5, 40), rib, 0, roofY + 0.06 + 0.29 * Math.sin(a), 0, false); r.rotation.x = Math.PI / 2;}
+  if (!PAPER) add(G, new THREE.CylinderGeometry(0.03, 0.12, 0.2, 20), new THREE.MeshStandardMaterial({color: NIGHT ? 0xffd9a0 : 0xd9e6f0, metalness: 0.9, roughness: 0.2}), 0, roofY + 0.16, 0, false);
+  if (NIGHT) {const l = new THREE.PointLight(0xffc070, 1.6, 2.2, 2); l.position.set(0, roofY + 0.2, 0); G.add(l);}
+  return G;}
+
+// ---------------- people, signs, trees, tractors, lamps ----------------
+const SIGNS = ['NEIN!', 'STOPP!', 'SO NICHT!', 'NICHT MIT UNS!', 'WIR SIND HIER!'];
+const signMats = SIGNS.map((t, i) => {const bg = P.sign ? P.sign[i % P.sign.length] : '#fff';
+  const tx = tex(240, 160, (g, w, h) => {g.fillStyle = bg; g.fillRect(0, 0, w, h); if (PAPER) {g.strokeStyle = '#2e2925'; g.lineWidth = 4; g.strokeRect(3, 3, w - 6, h - 6);}
+    g.fillStyle = P.ink || '#222'; g.textAlign = 'center'; g.textBaseline = 'middle'; const words = t.split(' ');
+    if (words.length > 1 && t.length > 8) {g.font = '800 46px "Inter Tight"'; const half = Math.ceil(words.length / 2); g.fillText(words.slice(0, half).join(' '), w / 2, h * 0.33); g.fillText(words.slice(half).join(' '), w / 2, h * 0.7);}
+    else {g.font = '800 62px "Inter Tight"'; g.fillText(t, w / 2, h / 2 + 3);}});
+  return M(0xffffff, {map: tx});});
+function person(par, x, z, i, sign, rotY) {
+  const G = new THREE.Group(); G.position.set(x, 0.018, z); G.rotation.y = rotY; par.add(G);
+  const col = P.people[i % P.people.length], k = 1.0;
+  const board = (sx, sy) => {const sm = signMats[i % signMats.length], e = M(css(P.sign[0]) === '#ffffff' ? 0xf0f0f0 : 0xe9e3d6);
+    add(G, new THREE.BoxGeometry(0.15 * k, 0.1 * k, 0.008), [e, e, e, e, sm, sm], sx, sy, 0.012);};
+  if (PAPER) {   // flat paper cut-outs
+    const sh = new THREE.Shape(); sh.moveTo(-0.026, 0); sh.lineTo(-0.005, 0); sh.lineTo(-0.005, 0.05); sh.lineTo(0.005, 0.05); sh.lineTo(0.005, 0); sh.lineTo(0.026, 0);
+    sh.lineTo(0.03, 0.1); sh.quadraticCurveTo(0.034, 0.16, 0.012, 0.162); sh.lineTo(-0.012, 0.162); sh.quadraticCurveTo(-0.034, 0.16, -0.03, 0.1); sh.closePath();
+    add(G, new THREE.ExtrudeGeometry(sh, {depth: 0.005, bevelEnabled: false}), M(col), 0, 0, 0);
+    const hd = new THREE.Shape(); hd.absarc(0, 0, 0.022, 0, Math.PI * 2); add(G, new THREE.ExtrudeGeometry(hd, {depth: 0.005, bevelEnabled: false, curveSegments: 16}), M(P.skin), 0, 0.186, 0.001);
+    if (sign) {add(G, new THREE.BoxGeometry(0.006, 0.24, 0.004), M(0xd8c4a8), 0.045, 0.2, 0.004); board(0.045, 0.31);}
+    return G;}
+  const seg = CLAY ? 12 : 10, body = M(col), skin = M(P.skin), legs = M(P.legs);
+  for (const sx of [-1, 1]) add(G, new THREE.CylinderGeometry(0.012 * k, 0.012 * k, 0.07 * k, seg), legs, sx * 0.013 * k, 0.035 * k, 0);
+  add(G, new THREE.CapsuleGeometry(0.029 * k, 0.05 * k, 4, seg), body, 0, 0.113 * k, 0);
+  add(G, new THREE.SphereGeometry(0.023 * k, seg, seg), skin, 0, 0.187 * k, 0);
+  const hair = add(G, new THREE.SphereGeometry(0.0245 * k, seg, seg, 0, Math.PI * 2, 0, Math.PI * 0.5), M(P.hair[i % 4]), 0, 0.19 * k, -0.003); hair.rotation.x = -0.35;
+  const left = add(G, new THREE.CapsuleGeometry(0.009 * k, 0.05 * k, 3, 8), body, -0.034 * k, 0.11 * k, 0); left.rotation.z = 0.18;
+  if (sign) {const arm = add(G, new THREE.CapsuleGeometry(0.009 * k, 0.05 * k, 3, 8), body, 0.043 * k, 0.168 * k, 0.004); arm.rotation.z = -0.45;
+    add(G, new THREE.CylinderGeometry(0.004, 0.004, 0.24 * k, 6), M(P.trunk), 0.058 * k, 0.24 * k, 0.006); board(0.058 * k, 0.33 * k);}
+  else {const r = add(G, new THREE.CapsuleGeometry(0.009 * k, 0.05 * k, 3, 8), body, 0.034 * k, 0.11 * k, 0); r.rotation.z = -0.18;}
+  return G;}
+function tree(par, x, z, s = 1) {
+  const T = new THREE.Group(); T.position.set(x, 0.01, z); T.scale.setScalar(s); par.add(T);
+  if (PAPER) {const c = new THREE.Shape(); c.absarc(0, 0, 0.13, 0, Math.PI * 2); const cg = new THREE.ExtrudeGeometry(c, {depth: 0.005, bevelEnabled: false, curveSegments: 18}); cg.translate(0, 0, -0.0025);
+    for (const r of [0, Math.PI / 2]) {const a = add(T, cg, M(P.tree), 0, 0.27, 0); a.rotation.y = r; const t = add(T, new THREE.BoxGeometry(0.022, 0.16, 0.005), M(P.trunk), 0, 0.08, 0); t.rotation.y = r;} return;}
+  add(T, new THREE.CylinderGeometry(0.018, 0.024, 0.14, 10), M(P.trunk), 0, 0.07, 0);
+  add(T, CLAY ? new THREE.IcosahedronGeometry(0.14, 2) : new THREE.SphereGeometry(0.14, 22, 16), M(P.tree), 0, 0.27, 0);}
+function tractor(par, x, z, col, s = 1, rotY = 0) {
+  const G = new THREE.Group(); G.position.set(x, 0, z); G.scale.setScalar(s); G.rotation.y = rotY; par.add(G);
+  const c = M(col), dark = M(0x222228), tyre = M(0x1d1d22, {roughness: 0.9}), hub = M(P.hub ?? 0xf5c451);
+  add(G, box(0.3, 0.035, 0.08, 0.01), dark, 0.02, 0.07, 0);
+  add(G, box(0.19, 0.085, 0.1, 0.022), c, 0.07, 0.11, 0);
+  add(G, box(0.006, 0.06, 0.07, 0.002), dark, 0.166, 0.105, 0);
+  const glass = new THREE.MeshStandardMaterial({color: NIGHT ? 0x6a5a40 : 0xbfe6ff, emissive: NIGHT ? 0xffb45a : 0x000000, emissiveIntensity: NIGHT ? 0.35 : 0, transparent: true, opacity: PAPER ? 0.25 : 0.55, roughness: 0.2, depthWrite: false});
+  add(G, new THREE.BoxGeometry(0.12, 0.12, 0.12), glass, -0.07, 0.19, 0, !PAPER);
+  for (const [px, pz] of [[-0.127, -0.057], [-0.127, 0.057], [-0.013, -0.057], [-0.013, 0.057]]) add(G, new THREE.BoxGeometry(0.008, 0.13, 0.008), c, px, 0.19, pz);
+  add(G, box(0.15, 0.016, 0.14, 0.006), c, -0.07, 0.262, 0);
+  for (const sz of [-1, 1]) {add(G, new THREE.CylinderGeometry(0.07, 0.07, 0.045, 22).rotateX(Math.PI / 2), tyre, -0.07, 0.07, sz * 0.078);
+    add(G, new THREE.CylinderGeometry(0.036, 0.036, 0.048, 16).rotateX(Math.PI / 2), hub, -0.07, 0.07, sz * 0.079);
+    add(G, box(0.15, 0.014, 0.055, 0.005), c, -0.07, 0.148, sz * 0.078);
+    add(G, new THREE.CylinderGeometry(0.042, 0.042, 0.03, 18).rotateX(Math.PI / 2), tyre, 0.11, 0.042, sz * 0.058);
+    add(G, new THREE.CylinderGeometry(0.02, 0.02, 0.032, 12).rotateX(Math.PI / 2), hub, 0.11, 0.042, sz * 0.059);}
+  add(G, new THREE.CylinderGeometry(0.006, 0.006, 0.1, 8), dark, 0.11, 0.2, 0.03);
+  if (NIGHT) {const hl = new THREE.MeshBasicMaterial({color: 0xfff4d6, toneMapped: false}); for (const z of [-0.035, 0.035]) add(G, new THREE.BoxGeometry(0.006, 0.016, 0.022), hl, 0.168, 0.13, z, false);
+    const sp = new THREE.SpotLight(0xfff0d0, 2.5, 1.1, 0.5, 0.6, 1.5); sp.position.set(0.17, 0.13, 0); sp.target.position.set(0.7, 0, 0); G.add(sp, sp.target);
+    const t = add(G, new THREE.SphereGeometry(0.01, 8, 6), new THREE.MeshBasicMaterial({color: 0xffa020, toneMapped: false}), -0.07, 0.275, 0, false);}
+  return G;}
+function lamp(par, x, z) {
+  add(par, new THREE.CylinderGeometry(0.008, 0.01, 0.42, 8), M(NIGHT ? 0x3a3a40 : PAPER ? 0xe6dfcf : 0x3e3f5a), x, 0.21, z);
+  add(par, new THREE.SphereGeometry(0.024, 12, 10), NIGHT ? new THREE.MeshBasicMaterial({color: 0xe8f2ff, toneMapped: false}) : M(PAPER ? 0xfbf8f1 : 0xffffff), x, 0.43, z);
+  if (NIGHT) {const l = new THREE.PointLight(0xdfeaff, 1.1, 1.5, 2); l.position.set(x, 0.42, z); par.add(l);}}
+
+// ---------------- page of the law book (style 3) ----------------
+function pageTex() {
+  return tex(2048, 1664, (g, w, h) => {
+    g.fillStyle = '#f4efe3'; g.fillRect(0, 0, w, h);
+    const gr = g.createLinearGradient(w / 2 - 160, 0, w / 2 + 160, 0); gr.addColorStop(0, 'rgba(90,70,50,0)'); gr.addColorStop(0.5, 'rgba(90,70,50,0.28)'); gr.addColorStop(1, 'rgba(90,70,50,0)'); g.fillStyle = gr; g.fillRect(w / 2 - 160, 0, 320, h);
+    g.fillStyle = '#5a534b'; g.font = '800 40px "Inter Tight"'; g.fillText('Bundesgesetzblatt', 90, 92); g.font = '500 26px Poppins'; g.fillText('Teil I · Nr. 5', w - 330, 92);
+    g.fillStyle = 'rgba(70,62,55,0.32)';
+    for (const [x0, x1] of [[90, 950], [1100, 1960]]) for (let y = 150; y < h - 90; y += 30) {if ((y / 30) % 11 === 0) {g.fillStyle = 'rgba(70,62,55,0.7)'; g.font = '800 30px "Inter Tight"'; g.fillText('§ ' + (1 + Math.round(y / 330) + (x0 > 1000 ? 5 : 0)), x0, y + 10); g.fillStyle = 'rgba(70,62,55,0.32)'; continue;}
+      const len = (x1 - x0) * (0.75 + 0.25 * rng()); g.fillRect(x0 + ((y / 30) % 11 === 1 ? 40 : 0), y, len - ((y / 30) % 11 === 1 ? 40 : 0), 9);}
+    g.fillStyle = '#5a534b'; g.font = '500 24px Poppins'; g.fillText('12', 90, h - 40); g.fillText('13', w - 130, h - 40);});}
+
+// ---------------- the scene for styles 1 to 3 ----------------
+const az0 = (+(Q.get('az') ?? (POD ? -16 : -16))) * Math.PI / 180;
+if (!POD) {
+  const PLW = 4.4, PLD = 3.8, PZ = -0.05;
+  if (PAPER) {   // open law book on a dark desk; the town is a pop-up on its pages
+    add(scene, new RoundedBoxGeometry(5.0, 0.05, 4.16, 2, 0.02), new THREE.MeshStandardMaterial({color: P.base, roughness: 0.8}), 0, 0.025, PZ, false);
+    const edgeT = tex(64, 64, (g, w, h) => {g.fillStyle = '#efe8d8'; g.fillRect(0, 0, w, h); g.fillStyle = 'rgba(120,105,85,0.35)'; for (let y = 0; y < h; y += 3) g.fillRect(0, y, w, 1);});
+    const em = new THREE.MeshStandardMaterial({map: edgeT, roughness: 1});
+    for (const sx of [-1, 1]) add(scene, new THREE.BoxGeometry(2.42, 0.15, 3.95), [em, em, em, em, em, em], sx * 1.22, 0.125, PZ, false);
+    add(scene, new THREE.PlaneGeometry(4.86, 3.95).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({map: pageTex(), roughness: 1}), 0, 0.2005, PZ, false);
+    W0.position.y = 0.2;
+    add(scene, new THREE.PlaneGeometry(40, 40).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({color: 0x15100c, roughness: 0.8}), 0, 0, 0, false);
+  } else {
+    add(W0, new RoundedBoxGeometry(PLW + 0.24, 0.22, PLD + 0.24, 3, 0.05), M(P.base), 0, -0.11, PZ);
+    add(W0, new THREE.BoxGeometry(PLW, 0.02, PLD), M(P.plate), 0, 0, PZ);
+    if (NIGHT) {const led = new THREE.MeshBasicMaterial({color: 0xe8f2ff, toneMapped: false});
+      for (const [w, d, x, z] of [[PLW + 0.25, 0.012, 0, PZ + PLD / 2 + 0.122], [PLW + 0.25, 0.012, 0, PZ - PLD / 2 - 0.122], [0.012, PLD + 0.25, PLW / 2 + 0.122, PZ], [0.012, PLD + 0.25, -PLW / 2 - 0.122, PZ]])
+        add(W0, new THREE.BoxGeometry(w, 0.02, d), led, x, -0.06, z, false);}
+    add(scene, new THREE.PlaneGeometry(40, 40).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({color: CLAY ? 0x1a1430 : 0x16120f, roughness: 0.85}), 0, -0.22, 0, false);
+  }
+  // square in front of the Reichstag (Platz der Republik), path, street and sidewalk
+  add(W0, new THREE.BoxGeometry(3.7, 0.016, 1.1), M(P.lawn), 0, 0.012, 0.42);
+  add(W0, new THREE.BoxGeometry(0.52, 0.02, 1.1), M(P.path), 0, 0.014, 0.42);
+  add(W0, new THREE.BoxGeometry(PAPER ? 4.6 : PLW, 0.012, 0.44), M(P.street), 0, 0.012, 1.24);
+  add(W0, new THREE.BoxGeometry(PAPER ? 4.6 : PLW, 0.03, 0.26), M(P.walk), 0, 0.02, 1.6);
+  for (let i = -4; i <= 4; i++) add(W0, new THREE.BoxGeometry(0.18, 0.004, 0.025), M(PAPER ? 0xfbf8f1 : 0xf2efe6), i * 0.5, 0.02, 1.24, false);
+  reichstag(W0);
+  // the crowd: figures with signs left and right of the path, all turned towards the viewer
+  const pts = []; let tries = 0;
+  while (pts.length < 34 && tries++ < 5000) {const side = rng() < 0.5 ? -1 : 1, x = side * (0.36 + rng() * 1.42), z = 0.0 + rng() * 0.88;
+    if (pts.every(([a, b]) => Math.hypot(a - x, b - z) > 0.16)) pts.push([x, z]);}
+  pts.sort((a, b) => a[1] - b[1]).forEach(([x, z], i) => person(W0, x, z, i, (i % 5) < 2 || i % 7 === 3, az0 + (rng() - 0.5) * 0.4));
+  // tractors on the street (agricultural diesel), trees of the Tiergarten, lamps
+  tractor(W0, -1.15, 1.24, P.tractor[0]); tractor(W0, -0.02, 1.24, P.tractor[1]); tractor(W0, 1.08, 1.24, P.tractor[2]);
+  for (let i = 0; i < 10; i++) tree(W0, -1.95 + i * 0.43, -1.78 + (i % 2) * 0.06, 0.9 + rng() * 0.25);
+  for (const [x, z] of [[-1.98, -1.1], [-1.98, -0.55], [1.98, -1.1], [1.98, -0.5], [-2.0, 0.0], [2.0, 0.05]]) tree(W0, x, z, 0.85 + rng() * 0.25);
+  for (const x of [-1.6, -0.55, 0.55, 1.6]) lamp(W0, x, 1.52);
+  // the red paragraph sign stands on the path in front of the crowd
+  const para = add(W0, paraGeo(PAPER ? 0.46 : 0.48, PAPER ? 0.02 : 0.08, !PAPER), paraMat(), 0, 0.024, 0.68);
+  para.rotation.y = az0; if (PAPER) para.children.forEach(c => c.material = INK);
+  if (NIGHT) {const l = new THREE.PointLight(0xff2030, 0.7, 1.4, 2); l.position.set(0, 0.6, 1.25); W0.add(l); const k = new THREE.SpotLight(0xffe8d0, 3, 3, 0.25, 0.6, 1.5); k.position.set(-0.6, 1.6, 1.8); k.target = para; W0.add(k);}
+}
+
+// ---------------- style 4: five pedestals as a countdown staircase ----------------
+if (POD) {
+  const grid = tex(512, 512, (g, w, h) => {g.fillStyle = '#0c0b13'; g.fillRect(0, 0, w, h); g.strokeStyle = 'rgba(160,140,255,0.16)'; g.lineWidth = 2; for (let i = 0; i <= 4; i++) {g.beginPath(); g.moveTo(i * w / 4, 0); g.lineTo(i * w / 4, h); g.moveTo(0, i * h / 4); g.lineTo(w, i * h / 4); g.stroke();}});
+  grid.wrapS = grid.wrapT = THREE.RepeatWrapping; grid.repeat.set(20, 20);
+  add(scene, new THREE.PlaneGeometry(40, 40).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({map: grid, roughness: 0.6, metalness: 0.2}), 0, 0, 0, false);
+  scene.fog = new THREE.Fog(0x07070b, 17, 27);
+  const LAB = ['WEHRDIENST', 'AGRARDIESEL', 'HEIZUNGSGESETZ', 'CORONA-REGELN', 'HARTZ IV'], PW = 0.74;
+  const pedC = 0x1a1824, pm = M(pedC);
+  const tops = [];
+  for (let i = 0; i < 5; i++) {
+    const x = -1.5 + i * 0.75, z = 0.66 - i * 0.33, h = 0.44 + i * 0.2; tops.push([x, h, z]);
+    const ch = Math.round(256 * h / PW), fs = Math.min(118, ch * 0.5);
+    const ft = tex(256, ch, (g, w, hh) => {g.fillStyle = css(pedC); g.fillRect(0, 0, w, hh); g.fillStyle = '#ffffff'; g.textAlign = 'center';
+      g.font = `800 ${fs}px "Inter Tight"`; g.fillText(String(5 - i), w / 2, 22 + fs * 0.86); g.font = '500 19px Poppins'; g.fillStyle = 'rgba(255,255,255,0.8)'; g.fillText(LAB[i], w / 2, 22 + fs * 0.86 + 36);});
+    const fm = M(0xffffff, {map: ft});
+    add(scene, box(PW, h, PW, 0.03), [pm, pm, pm, pm, fm, pm], x, h / 2, z);
+    add(scene, box(PW - 0.06, 0.012, PW - 0.06, 0.004), M(0x24212f), x, h + 0.006, z);
+    add(scene, new THREE.BoxGeometry(PW - 0.04, 0.006, 0.006), new THREE.MeshBasicMaterial({color: 0x9f8cff, toneMapped: false}), x, h - 0.012, z + PW / 2 + 0.002, false);}
+  // 5: Bundeswehr helmet with Flecktarn camouflage and chin strap
+  {const [x, h, z] = tops[0], G = new THREE.Group(); G.position.set(x, h + 0.012, z); G.rotation.y = 0.35; G.scale.setScalar(1.25); scene.add(G);
+    const fleck = tex(512, 256, (g, w, hh) => {g.fillStyle = '#7d8656'; g.fillRect(0, 0, w, hh); for (const [c, n, r] of [['#4f5a33', 160, 9], ['#6b5a3a', 120, 8], ['#2a2a22', 140, 5], ['#9aa06a', 80, 7]])
+      {g.fillStyle = c; for (let i = 0; i < n; i++) {const x0 = rng() * w, y0 = rng() * hh; g.beginPath(); for (let k = 0; k < 4; k++) g.arc(x0 + (rng() - 0.5) * r * 1.6, y0 + (rng() - 0.5) * r * 1.6, r * (0.5 + rng() * 0.6), 0, 7); g.fill();}}});
+    const ol = M(0xffffff, {map: fleck, roughness: 0.8, clearcoat: 0.05});
+    const sh = add(G, new THREE.SphereGeometry(0.19, 40, 20, 0, Math.PI * 2, 0, Math.PI / 2), ol, 0, 0.02, 0); sh.scale.set(1, 0.88, 1.15);
+    const rim = add(G, new THREE.TorusGeometry(0.19, 0.016, 8, 48).rotateX(Math.PI / 2), M(0x5a6238, {roughness: 0.8, clearcoat: 0.05}), 0, 0.024, 0); rim.scale.set(1.05, 1, 1.2);
+    const strap = add(G, new THREE.TorusGeometry(0.13, 0.007, 6, 28, Math.PI), M(0x2b2b26), 0, 0.028, 0.04); strap.rotation.x = Math.PI / 2; strap.rotation.z = Math.PI; strap.scale.set(1.3, 1, 1);
+    add(G, box(0.03, 0.012, 0.02, 0.004), M(0x8a8a80, {metalness: 0.7, roughness: 0.35}), 0, 0.03, 0.17);}
+  // 4: tractor
+  {const [x, h, z] = tops[1]; tractor(scene, x, z, 0x3f8a3c, 1.65, -0.55).position.y = h + 0.012;}
+  // 3: radiator with thermostat
+  {const [x, h, z] = tops[2], G = new THREE.Group(); G.position.set(x, h + 0.012, z); G.rotation.y = 0.32; G.scale.setScalar(1.15); scene.add(G);
+    const wm = M(0xe9e9e4, {roughness: 0.35});
+    for (let i = 0; i < 9; i++) add(G, box(0.042, 0.3, 0.09, 0.016), wm, -0.2 + i * 0.05, 0.2, 0);
+    for (const y of [0.07, 0.33]) add(G, new THREE.CylinderGeometry(0.016, 0.016, 0.46, 14).rotateZ(Math.PI / 2), wm, 0, y, 0);
+    for (const sx of [-1, 1]) add(G, box(0.03, 0.06, 0.08, 0.008), wm, sx * 0.17, 0.03, 0);
+    add(G, new THREE.CylinderGeometry(0.034, 0.034, 0.07, 24).rotateZ(Math.PI / 2), wm, 0.28, 0.33, 0);
+    const dial = tex(128, 128, (g, w, hh) => {g.fillStyle = '#f2f2ee'; g.fillRect(0, 0, w, hh); g.fillStyle = '#3a3a44'; g.font = '800 30px "Inter Tight"'; g.textAlign = 'center'; for (const [t, a] of [['1', -1.2], ['3', 0], ['5', 1.2]]) g.fillText(t, w / 2 + 40 * Math.sin(a), hh / 2 - 40 * Math.cos(a) + 10);});
+    const dm = add(G, new THREE.CircleGeometry(0.033, 24), M(0xffffff, {map: dial}), 0.316, 0.33, 0); dm.rotation.y = Math.PI / 2;
+    add(G, new THREE.CylinderGeometry(0.012, 0.012, 0.08, 10), M(0xb8b8bc, {metalness: 0.8, roughness: 0.3}), 0.28, 0.03, 0);}
+  // 2: surgical face mask with pleats and ear loops
+  {const [x, h, z] = tops[3], G = new THREE.Group(); G.position.set(x, h + 0.012 + 0.012 + 0.115 * Math.sin(1.15), z + 0.04); G.rotation.set(1.15, -0.25, 0); G.scale.setScalar(1.15); scene.add(G);
+    const mt = tex(256, 128, (g, w, hh) => {g.fillStyle = '#9fcbe6'; g.fillRect(0, 0, w, hh); for (const y of [0.3, 0.5, 0.7]) {g.fillStyle = 'rgba(40,80,110,0.28)'; g.fillRect(0, y * hh - 3, w, 6); g.fillStyle = 'rgba(255,255,255,0.35)'; g.fillRect(0, y * hh + 3, w, 4);}
+      g.fillStyle = '#d9e9f2'; g.fillRect(0, 0, w, 10); g.fillRect(0, hh - 10, w, 10); g.fillRect(0, 0, 10, hh); g.fillRect(w - 10, 0, 10, hh);});
+    const mg = new THREE.PlaneGeometry(0.34, 0.2, 24, 1); const pa = mg.attributes.position; for (let i = 0; i < pa.count; i++) {const u = pa.getX(i) / 0.17; pa.setZ(i, 0.05 * (1 - u * u));} mg.computeVertexNormals(); mg.rotateX(-Math.PI / 2);
+    add(G, mg, M(0xffffff, {map: mt, roughness: 0.9, side: THREE.DoubleSide}), 0, 0.0, 0);
+    add(G, new THREE.BoxGeometry(0.1, 0.004, 0.006), M(0xdfe4e8, {metalness: 0.5}), 0, 0.0, -0.098);
+    for (const sx of [-1, 1]) {const l = add(G, new THREE.TorusGeometry(0.07, 0.0045, 6, 28), M(0xf4f4f0), sx * 0.215, -0.004, 0); l.rotation.x = Math.PI / 2; l.scale.set(0.7, 1, 1);}
+    const ac = new THREE.MeshPhysicalMaterial({color: 0xdfe8ff, transparent: true, opacity: 0.22, roughness: 0.05, clearcoat: 1, depthWrite: false});
+    const st = add(scene, new THREE.BoxGeometry(0.3, 0.22, 0.012), ac, x, h + 0.012 + 0.11, z - 0.06, false); st.rotation.set(-0.38, -0.25, 0); st.castShadow = false;
+    add(scene, new THREE.BoxGeometry(0.3, 0.012, 0.12), ac, x, h + 0.018, z - 0.02, false).rotation.y = -0.25;}
+  // 1: clipboard with the Hartz IV application form, and the red paragraph sign hovering above
+  {const [x, h, z] = tops[4], G = new THREE.Group(); G.position.set(x, h + 0.012, z); G.rotation.y = 0.1; scene.add(G);
+    const form = tex(360, 480, (g, w, hh) => {g.fillStyle = '#f7f6f1'; g.fillRect(0, 0, w, hh); g.fillStyle = '#2b2b33'; g.font = '800 34px "Inter Tight"'; g.fillText('Antrag auf', 26, 62); g.fillText('Arbeitslosengeld II', 26, 100);
+      g.font = '500 20px Poppins'; g.fillStyle = 'rgba(40,40,50,0.7)'; g.fillText('Jobcenter', 26, 136);
+      g.strokeStyle = 'rgba(40,40,50,0.55)'; g.lineWidth = 2; for (let y = 170; y < hh - 30; y += 38) {g.strokeRect(26, y, 20, 20); g.fillStyle = 'rgba(40,40,50,0.3)'; g.fillRect(60, y + 7, 130 + ((y * 7) % 140), 7);}});
+    const B = new THREE.Group(); B.position.set(0, 0.0, -0.05); B.rotation.x = -0.32; G.add(B);
+    add(B, box(0.36, 0.48, 0.016, 0.01), M(0x8a6a48, {roughness: 0.6}), 0, 0.24, 0);
+    add(B, new THREE.BoxGeometry(0.31, 0.41, 0.003), [M(0xf7f6f1), M(0xf7f6f1), M(0xf7f6f1), M(0xf7f6f1), M(0xc9c9c6, {map: form, roughness: 0.9, clearcoat: 0}), M(0xf7f6f1)], 0, 0.225, 0.0095);
+    add(B, box(0.14, 0.04, 0.03, 0.008), M(0xb8b8bc, {metalness: 0.85, roughness: 0.3}), 0, 0.455, 0.012);
+    const leg = add(G, new THREE.BoxGeometry(0.02, 0.4, 0.012), M(0x6a5038), 0, 0.19, -0.2); leg.rotation.x = 0.42;
+    const pen = add(G, new THREE.CylinderGeometry(0.008, 0.008, 0.24, 12).rotateZ(Math.PI / 2), M(0x23232b), 0.05, 0.008, 0.2); pen.rotation.y = 0.5;
+    const para = add(scene, paraGeo(0.46, 0.1), paraMat(), x + 0.02, h + 0.66, z + 0.02); para.rotation.y = az0 * 0.6;
+    const l = new THREE.PointLight(0xff2030, 1.4, 1.4, 1.8); l.position.set(x, h + 0.8, z + 0.3); scene.add(l);}
+}
+
+// ---------------- light and camera ----------------
+const tgt = POD ? new THREE.Vector3(-0.12, 0.95, 0) : new THREE.Vector3(0, PAPER ? 0.5 : 0.32, -0.15);
+const d = +(Q.get('d') ?? [0, 14, 14, 14.4, 15.4][S]), el = (+(Q.get('el') ?? [0, 36, 36, 39, 17][S])) * Math.PI / 180, oy = +(Q.get('oy') ?? [0, -20, -20, -10, -110][S]);
+const cam = new THREE.PerspectiveCamera(26, W / H, 0.05, 80);
+cam.position.set(tgt.x + d * Math.cos(el) * Math.sin(az0), tgt.y + d * Math.sin(el), tgt.z + d * Math.cos(el) * Math.cos(az0)); cam.lookAt(tgt); cam.setViewOffset(W, H, 0, oy, W, H); cam.updateProjectionMatrix();
+const sun = new THREE.DirectionalLight([0, 0xffeedd, 0xa8c4ff, 0xfff1dc, 0xfff4ec][S], [0, 1.9, 0.9, 2.3, 1.3][S]);
+if (NIGHT) sun.position.set(5, 5, 1.5); else sun.position.set(-4, 7, 4);
+sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.radius = 6; Object.assign(sun.shadow.camera, {left: -4, right: 4, top: 4, bottom: -4}); sun.shadow.bias = -0.0005; scene.add(sun);
+scene.add(new THREE.HemisphereLight([0, 0xffe8f0, 0x5a6a90, 0xfff2e0, 0x8a7cff][S], [0, 0x3a2a50, 0x0b0a10, 0x1a120c, 0x07070b][S], [0, 0.75, 0.32, 0.45, 0.35][S]));
+if (!PAPER) {const rim = new THREE.DirectionalLight(0x8a78ff, POD ? 1.4 : 0.8); rim.position.set(POD ? -4 : 4, 3, -3); scene.add(rim); const rr = new THREE.DirectionalLight(0xff3344, POD ? 0.6 : 0.4); rr.position.set(3, 2, -4); scene.add(rr);}
+if (NIGHT) {const warm = new THREE.SpotLight(0xffe2b8, 6, 9, 0.45, 0.7, 1.2); warm.position.set(-1.2, 4.2, 2.6); warm.target.position.set(0, 0.3, -0.2); scene.add(warm, warm.target);}
+if (POD) {const key = new THREE.SpotLight(0xffffff, 11, 14, 0.5, 0.8, 1.3); key.position.set(-2.5, 6, 5); key.target.position.set(0, 0.6, 0); key.castShadow = true; scene.add(key, key.target);}
+scene.background = new THREE.Color([0, 0x150f26, 0x0a0a0e, 0x0d0a08, 0x07070b][S]);
+if (NIGHT || POD) {const comp = new EffectComposer(renderer); comp.addPass(new RenderPass(scene, cam)); comp.addPass(new UnrealBloomPass(new THREE.Vector2(W, H), NIGHT ? 0.5 : 0.45, 0.5, NIGHT ? 0.86 : 0.9)); comp.addPass(new OutputPass()); comp.render();}
+else renderer.render(scene, cam);
+
+// ---------------- composite: title, style name and logo ----------------
+const out = document.getElementById('out').getContext('2d');
+out.drawImage(renderer.domElement, 0, 0);
+if (PAPER) {const v = out.createRadialGradient(W / 2, H * 0.56, 300, W / 2, H * 0.56, 1150); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(5,4,3,0.75)'); out.fillStyle = v; out.fillRect(0, 0, W, H);}
+{const g = out.createLinearGradient(0, 0, 0, 640); g.addColorStop(0, 'rgba(7,7,11,.85)'); g.addColorStop(0.7, 'rgba(7,7,11,.5)'); g.addColorStop(1, 'rgba(7,7,11,0)'); out.fillStyle = g; out.fillRect(0, 0, W, 640);
+ const g2 = out.createLinearGradient(0, H - 480, 0, H); g2.addColorStop(0, 'rgba(7,7,11,0)'); g2.addColorStop(1, 'rgba(7,7,11,.88)'); out.fillStyle = g2; out.fillRect(0, H - 480, W, 480);}
+out.fillStyle = '#fff'; out.font = '800 76px "Inter Tight"'; out.letterSpacing = '-1.8px'; out.shadowColor = 'rgba(0,0,0,.45)'; out.shadowBlur = 18;
+['Diese 5 Gesetze haben', 'Deutschland richtig', 'wütend gemacht'].forEach((t, i) => out.fillText(t, 78, 300 + i * 82)); out.letterSpacing = '0px'; out.shadowBlur = 0;
+out.font = '500 26px Poppins'; out.fillStyle = 'rgba(255,255,255,.75)'; out.fillText('Stil ' + S + ' · ' + NAMES[S], 80, 1700);
+out.fillStyle = '#E01E2B'; out.font = '500 58px Poppins'; out.letterSpacing = '-1px'; out.fillText('function.', 78, 1812);
+window.ready = true;
+</script></body></html>
