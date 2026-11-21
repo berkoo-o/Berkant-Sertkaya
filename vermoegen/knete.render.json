@@ -7,7 +7,7 @@
     {
       "name": "Wem_gehoert_Deutschland_Knete",
       "query": "",
-      "frames": 2297,
+      "frames": 2321,
       "audio": [
         {"file": "mix_knete_music.flac", "suffix": "_mit_Musik"},
         {"file": "mix_knete_fx.flac", "suffix": "_nur_Effekte"}

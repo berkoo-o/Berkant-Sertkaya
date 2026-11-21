@@ -1,6 +1,6 @@
 # function. – „Wem gehört eigentlich Deutschland?“ (Knete-Fassung)
 
-Stand: 21.11.2026 · Länge 76,5 Sekunden (Stimme 73,2 s, danach rund 3 s Logo) · 9:16 · Stimme: Tom Magic (ElevenLabs, eleven_v4, Take 1 in `voice/knete/voice.mp3`) · Szene `knete.html` mit Code in `src/knete.js` · gerendert auf dem PC des Nutzers (`knete.render.json`)
+Stand: 21.11.2026 · Länge 77,4 Sekunden (Stimme 73,2 s, danach rund 4 s Outro) · 9:16 · Stimme: Tom Magic (ElevenLabs, eleven_v4, Take 1 in `voice/knete/voice.mp3`) · Szene `knete.html` mit Code in `src/knete.js` · gerendert auf dem PC des Nutzers (`knete.render.json`)
 
 ## Warum neu
 
@@ -31,7 +31,7 @@ Der Gegensatz von „mehr als die Hälfte“ und „zwei bis drei Prozent“ ist
 | 0:47–0:57 | „Ein großer Grund: Mehr als die Hälfte wohnt zur Miete, so viele wie in keinem anderen Land der EU. Und die Miete fließt jeden Monat an die, denen die Häuser gehören.“ | Über den Figuren 1 bis 6 steht die Klammer „Wohnen zur Miete“, dahinter die Mietshäuser mit roten Fähnchen. Dann hüpft über jedem Mieter eine Münze hoch und fliegt zur roten Figur. | **58 %**, „Die Miete fließt zu den Eigentümern“ |
 | 0:57–1:09 | „Dazu wird viel Vermögen nicht verdient, sondern vererbt. Allein zweitausendvierundzwanzig wurden über hundertdreizehn Milliarden Euro vererbt und verschenkt. Und das ist nur der Teil, den das Finanzamt erfasst.“ | Ein Stapel aus acht Münzen mit roter Schleife schwebt von oben auf den roten Stapel. | „Verdient oder vererbt?“, „Erbe“, **113 Mrd. €** |
 | 1:09–1:13 | „Und du? Welche Figur bist du? Schreib deine Nummer in die Kommentare.“ | Die ganze Reihe mit beiden Schildern, die Nummernscheiben leuchten nacheinander auf. | „Welche Figur bist du?“ |
-| 1:13–1:16 | (Outro) | Das Bild wird dunkel, das rote „function.“ erscheint mittig (Platzhalter, siehe Outro-Ideen). | Logo |
+| 1:13–1:17 | (Outro) | Das Licht geht herunter, die Kamera senkt sich vor den Platz. Rote Knetbuchstaben „function“ ploppen nacheinander aus dem Boden. Die rote Figur drückt sich zu einer Knetkugel zusammen, hüpft nach vorne und landet als Punkt. | – |
 
 ## D. Sprechertext für Tom (eleven_v4, Audio-Tags)
 
@@ -54,7 +54,9 @@ Der Gegensatz von „mehr als die Hälfte“ und „zwei bis drei Prozent“ ist
 1. **Die rote Figur wird zum Punkt:** Die Kamera fährt zurück, die rote Knetfigur wird wie Knete zu einer Kugel zusammengedrückt, rollt nach vorne und rastet als Punkt hinter dem Schriftzug „function“ ein, der aus roten Knetwürsten entsteht.
 2. **Der Zylinder fällt:** Der schwarze Zylinder der roten Figur fliegt hoch, dreht sich und landet als Punkt hinter „function“, das sich wie gestempelt in den Knetboden drückt.
 3. **Die Münzen legen das Logo:** Alle Münzen rollen von den Stapeln und legen sich zum Schriftzug „function“, die rote Schleife vom Erbe-Stapel wird zum Punkt.
-4. **Schlicht (jetzt eingebaut):** Das Bild wird dunkel, und das rote „function.“ erscheint zwei Sekunden lang mittig, wie beim 2027-Video.
+4. **Schlicht:** Das Bild wird dunkel, und das rote „function.“ erscheint zwei Sekunden lang mittig, wie beim 2027-Video.
+
+**Eingebaut (Entscheidung von Claude, der Nutzer hat sie freigegeben):** eine Mischung aus 1 und 4. Der Schriftzug besteht aus echten roten Knetbuchstaben (Poppins Medium, aus der Schriftdatei als 3D-Körper erzeugt), die nacheinander aufploppen, und die rote Figur wird zur Knetkugel und landet als Punkt (`src/knete.js`, Abschnitt „outro“).
 
 ## E. Szenenplan (Technik)
 
@@ -68,7 +70,8 @@ Der Gegensatz von „mehr als die Hälfte“ und „zwei bis drei Prozent“ ist
 | 0:33–0:47 | Grenze 9/10, dann vorne an den Gegenständen, dann Grenze 5/6 | – | Schilder ploppen auf, Linie wird gezeichnet |
 | 0:47–0:57 | Mieter mit Stadt, dann ganze Reihe | – | Münzen fliegen von den Mietern zum roten Stapel |
 | 0:57–1:09 | oben am roten Stapel | – | der Erbe-Stapel senkt sich ab |
-| 1:09–1:16 | ganze Reihe, langsam zurück | Nummern leuchten nacheinander | Logo |
+| 1:09–1:13 | ganze Reihe | Nummern leuchten nacheinander | – |
+| 1:13–1:17 | tief und frontal vor dem Platz | Szene etwa halb so hell, die Buchstaben leuchten leicht von innen | Buchstaben ploppen, Kugel hüpft auf den Punkt |
 
 Jede Einstellung wird mit `fit()` aus einem Kasten im Modell berechnet, damit das Wichtige immer zwischen Titel (oben) und Untertitel (unten) liegt.
 
@@ -88,6 +91,9 @@ Stilblock: *Claymation miniature, soft matte plasticine with fingerprints, paste
 
 ## G. Animations- und Kameraanweisungen
 
+- Lesbarkeit (Korrektur 21.11.2026): oben und unten liegt ein dunkler Verlauf, unter den Untertiteln ein weicher dunkler Schein, damit Titel, Zahlen und Untertitel nie auf der bunten Stadt oder dem hellen Platz stehen.
+- Münzen machen nur einen flachen Hüpfer, wenn ihr Weg an keiner Figur vorbeiführt; hoch fliegen sie nur, wenn sie über eine Figur müssen.
+
 - Eine durchgehende Kamerafahrt mit weicher, monotoner Interpolation, keine Schnitte.
 - Münzen fliegen mit gleichmäßiger Geschwindigkeit, die weitesten zuerst, damit keine Münze eine andere einholt. Vor der Landung liegen sie flach und fallen senkrecht auf ihren Platz.
 - Nichts ploppt ohne Grund: Gegenstände erscheinen mit kurzem Federn genau auf dem gesprochenen Wort und verschwinden erst, wenn die Kamera weiterfährt.
@@ -95,7 +101,7 @@ Stilblock: *Claymation miniature, soft matte plasticine with fingerprints, paste
 
 ## H. Übergänge und Sounddesign
 
-Musik „Radar Focus“ (Blue Saga, Epidemic Sound) wie gewohnt, Sub-Bass abgesenkt, 22 dB unter der Stimme im Bereich über 250 Hz, sanftes Ducking. Effekte nur an Schlüsselstellen: ein Pop beim Hüpfen der roten Figur, zweimal Münzstapel-Klimpern beim großen Münzstrom, leiser für die mittleren Stapel, drei einzelne Münzen für die ärmere Hälfte, ein Schimmer beim Aufleuchten der Münzen und der leeren Plätze, Klicks bei den großen Zahlen, Pops für Fähnchen und Gegenstände, ein Holzklopfen bei den Schildern, ein dumpfes Klopfen beim Kredit-Block, Münzen beim Mietfluss, ein warmer Glockenton beim Erbe-Stapel und die gelieferten Swooshes bei den Kamerafahrten. Gemischt mit `python3 audio_knete.py`, Lautheit −15 LUFS, Spitzen −1,5 dBTP. IDs in `SOUNDS.md`.
+Musik „Radar Focus“ (Blue Saga, Epidemic Sound) wie gewohnt, Sub-Bass abgesenkt, 22 dB unter der Stimme im Bereich über 250 Hz, sanftes Ducking. Effekte nur an Schlüsselstellen: ein Pop beim Hüpfen der roten Figur, zweimal Münzstapel-Klimpern beim großen Münzstrom, leiser für die mittleren Stapel, drei einzelne Münzen für die ärmere Hälfte, ein Schimmer beim Aufleuchten der Münzen und der leeren Plätze, Klicks bei den großen Zahlen, Pops für Fähnchen und Gegenstände, ein Holzklopfen bei den Schildern, ein dumpfes Klopfen beim Kredit-Block, Münzen beim Mietfluss, ein warmer Glockenton beim Erbe-Stapel und die gelieferten Swooshes bei den Kamerafahrten. Gemischt mit `python3 audio_knete.py`, In der Outro drei leise Plopps für die Buchstaben, ein Swoosh für den Sprung und Plopp plus Glockenton, wenn der Punkt landet. Lautheit −15 LUFS, Spitzen −1,5 dBTP. IDs in `SOUNDS.md`.
 
 ## I. TikTok-Titel, Beschreibung und Hashtags
 

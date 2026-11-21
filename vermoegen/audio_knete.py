@@ -6,7 +6,7 @@
 import numpy as np, subprocess, sys, json
 from scipy.io import wavfile
 from scipy.signal import butter, sosfilt
-SR = 48000; VO = 0.15; OUT = 73.45; END_V = 76.4; END = END_V + VO; N = int(SR * END)
+SR = 48000; VO = 0.15; OUT = 73.45; END_V = 77.2; END = END_V + VO; N = int(SR * END)
 t = np.arange(N) / SR
 def lp(x, f, o=2): return sosfilt(butter(o, f, 'low', fs=SR, output='sos'), x)
 def hp(x, f, o=2): return sosfilt(butter(o, f, 'high', fs=SR, output='sos'), x)
@@ -86,9 +86,11 @@ whoosh(66.2, 0.14, 1)
 # ---------------------------------------------------------------- which figure are you? the tiles light up one by one
 whoosh(68.6, 0.14, 0)
 add(cut(sz('shimmer'), 0.0, 1.4, 0.003, 0.5), 69.9, 0.07)
-# ---------------------------------------------------------------- end card: the red „function.“
-add(rate(cut(sz('glock'), 0.0, 1.8, 0.002, 0.7), 2 ** (-3 / 12)), 73.9, 0.09)
-pop(74.35, 0.1)
+# ---------------------------------------------------------------- outro: red clay letters pop up, the red figure squashes into a ball and hops onto the dot
+whoosh(73.6, 0.14, 1)
+pop(73.95, 0.1, 0.85); pop(74.2, 0.08, 0.95); pop(74.45, 0.08, 1.05)            # three soft plops for the letters, not one per letter
+whoosh(74.85, 0.12, 0)                                                              # the hop
+pop(75.45, 0.13, 0.9); add(rate(cut(sz('glock'), 0.0, 1.8, 0.002, 0.7), 2 ** (-3 / 12)), 75.47, 0.09)
 fx *= np.clip((END - t) / 0.25, 0, 1)
 
 # ---------------------------------------------------------------- voice (natural tempo) + gentle ducking, music like the Merz video

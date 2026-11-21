@@ -6,10 +6,12 @@
 import * as THREE from 'three';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+import {TTFLoader} from 'three/addons/loaders/TTFLoader.js';
+import {FontLoader} from 'three/addons/loaders/FontLoader.js';
 import {clamp, lerp, ease, eo, ei, eio, ebk, win, rng} from './util.js';
 
 await Promise.all(['400 40px Poppins', '500 40px Poppins', '600 40px Poppins', '800 90px "Inter Tight"'].map(f => document.fonts.load(f)));
-const W = 1080, H = 1920, VO = 0.15, OUT0 = 73.45, END_V = 76.4, RED = 0xE01E2B;
+const W = 1080, H = 1920, VO = 0.15, OUT0 = 73.45, END_V = 77.2, RED = 0xE01E2B;
 const R = rng(23);
 
 // ------------------------------------------------------------------ renderer and scene (dark violet room like the style test, model floats in it)
@@ -173,7 +175,7 @@ const COINS = [];   // {m, start:[x,y,z], segs:[{t0, dur, col, slot, apex}], pop
 const HOPS = [[8, 17], [8, 16], [7, 11], [7, 10], [6, 7], [5, 4]];
 HOPS.forEach(([col, slot], j) => {const c = COINS.find(o => o.segs[0].col === col && o.segs[0].slot === slot); c.segs.push({t0: 27.3 + j * 0.16, dur: 0.75, col: 9, slot: 54 + j});});
 const GHOST_T = 24.4;
-const ghostM = new THREE.MeshStandardMaterial({color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.35, transparent: true, opacity: 0.5, roughness: 0.6, depthWrite: false});
+const ghostM = new THREE.MeshStandardMaterial({color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.7, transparent: true, opacity: 0.6, roughness: 0.6, depthWrite: false});
 const GHOSTS = Array.from({length: 6}, (_, j) => {const m = new THREE.Mesh(coinGeo, ghostM.clone()); const p = slotPos(9, 54 + j); m.position.set(p[0], p[1], p[2]); W0.add(m); return m;});
 // rent: one coin pops up above each renter (figures 1–6) and flies to the owner, the red figure
 const RENT_T = 54.0;
@@ -199,8 +201,11 @@ function flyPos(a, b, apex, u, lat = 0) {
 function restCount(col, t) {let n = 0; for (const c of COINS) {const r = restOf(c, t); if (r && r.col === col) n++;} if (t >= GIFT_T1 && col === 9) n += GIFT_N; return n;}
 function restOf(c, t) {let r = null; for (const s of c.segs) if (t >= s.t0 + s.dur) r = s; return r;}
 // apex of each flight: high enough over the column it lands on and over everything it passes
-for (const c of COINS) {let prev = c.start; c.segs.forEach((s, j) => {const b = slotPos(s.col, s.slot); const over = s.col === 9 ? CH * (s.slot + 1) : Math.max(0.62, CH * (s.slot + 1));
-  s.a = prev; s.b = b; s.apex = Math.max(Math.max(prev[1], over) + (s.col === 9 ? 0.6 : 0.42) + (j > 0 ? 0.12 : 0), FIG_TOP + 0.4) + (s.up || 0); prev = b;});}
+// a coin only needs to clear the figures' heads if its path passes close to one; otherwise it makes a low hop
+const nearFig = (a, b) => {for (let i = 0; i < 10; i++) {const px = XF(i) - a[0], pz = ZF - a[2], dx = b[0] - a[0], dz = b[2] - a[2], L2 = dx * dx + dz * dz || 1; const u = clamp((px * dx + pz * dz) / L2, 0, 1);
+  if (Math.hypot(a[0] + dx * u - XF(i), a[2] + dz * u - ZF) < FIG_R + CR + 0.03) return true;} return false;};
+for (const c of COINS) {let prev = c.start; c.segs.forEach((s, j) => {const b = slotPos(s.col, s.slot); const over = CH * (s.slot + 1);
+  s.a = prev; s.b = b; s.apex = Math.max(Math.max(prev[1], over) + (s.col === 9 ? 0.45 : 0.3) + (j > 0 ? 0.12 : 0), nearFig(prev, b) ? FIG_TOP + 0.4 : 0) + (s.up || 0); prev = b;});}
 function coinAt(c, t) {
   // returns {p:[x,y,z], rx, vis, sc}
   if (c.popT !== undefined && t < c.segs[0].t0) {const p = clamp((t - c.popT) / 0.28, 0, 1); return {p: c.start, rx: 0, vis: p > 0, sc: Math.max(1e-3, ebk(p, 2))};}
@@ -237,6 +242,21 @@ prop(G => {const dt = tex(256, 128, (g, w, h) => {g.fillStyle = '#6d6f80'; g.fil
   const gm = clay(0x6d6f80); add(G, rbox(0.27, 0.13, 0.14, 0.025), [gm, gm, gm, gm, new THREE.MeshStandardMaterial({map: dt, roughness: 0.9, bumpMap: clayBump, bumpScale: 0.8}), gm], 0, 0.065, 0);}, 2.04, 42.42);
 const PROPS_OUT = 43.5;
 
+// ------------------------------------------------------------------ outro: the logo as red clay letters on the plaza, the red figure hops forward and becomes the dot
+const FONT = new FontLoader().parse(new TTFLoader().parse(await (await fetch('node_modules/@fontsource/poppins/files/poppins-latin-500-normal.woff')).arrayBuffer()));
+const LZ = 1.3, LSIZE = 0.72, LOGO = [], LOGO_T0 = 73.95;
+let LX0 = 0, LX1 = 0; const DOT = {x: 0, r: 0};
+{const sc = LSIZE / FONT.data.resolution; let x = 0; const parts = [];
+  for (const ch of 'function') {const shapes = FONT.generateShapes(ch, LSIZE);
+    const geo = new THREE.ExtrudeGeometry(shapes, {depth: 0.08, bevelEnabled: true, bevelThickness: 0.022, bevelSize: 0.012, bevelSegments: 4, curveSegments: 10});
+    geo.computeBoundingBox(); const bb = geo.boundingBox, cx = (bb.min.x + bb.max.x) / 2; geo.translate(-cx, 0.013, -0.04); parts.push({geo, x: x + cx}); x += FONT.data.glyphs[ch].ha * sc - 0.041 * LSIZE;}
+  const dg = new THREE.ShapeGeometry(FONT.generateShapes('.', LSIZE)); dg.computeBoundingBox(); const db = dg.boundingBox;
+  const dotX = x + (db.min.x + db.max.x) / 2; DOT.r = (db.max.x - db.min.x) / 2; const total = dotX + DOT.r; LX0 = 0.12 - total / 2; LX1 = LX0 + total; DOT.x = LX0 + dotX;
+  const mat = clay(RED, {bumpScale: 1.3, emissive: RED, emissiveIntensity: 0.22});
+  for (const p of parts) {const m = new THREE.Mesh(p.geo, mat); m.castShadow = m.receiveShadow = true; m.position.set(LX0 + p.x, 0, LZ); m.visible = false; W0.add(m); LOGO.push(m);}}
+const BALL = add(W0, new THREE.SphereGeometry(1, 32, 24), clay(RED, {bumpScale: 1.3, emissive: RED, emissiveIntensity: 0.22})); BALL.visible = false;
+const BALL_T = {squash: 74.55, morph: 74.75, fly: 74.85, land: 75.45};
+
 // ------------------------------------------------------------------ light: soft warm key with shadows, violet rim, a focus light that follows the camera target
 const hemi = new THREE.HemisphereLight(0xffe8f0, 0x6a5a80, 0.85); scene.add(hemi);
 const key = new THREE.DirectionalLight(0xffeedd, 2.0); key.position.set(-4, 8, 6); key.target.position.set(0, 0, -0.6); key.castShadow = true; key.shadow.mapSize.set(4096, 4096); key.shadow.radius = 5;
@@ -269,8 +289,9 @@ const KEYS = [
   [45.0, fit([-0.65, 0.95, 0, 1.15, 0.0, 1.15], -2, 22)], [47.4, fit([-0.65, 0.95, 0, 1.15, 0.0, 1.15], -2, 22, 26, 0.98)],
   [49.3, fit([-1.85, 0.45, 0, 1.3, -2.1, 1.0], -4, 24)], [53.0, fit([-1.85, 0.45, 0, 1.3, -2.1, 1.0], -3, 24, 26, 0.98)],
   [54.3, fit(ROW, 0, 25, 24)], [56.8, fit(ROW, 0.5, 25, 24, 0.98)],
-  [58.8, fit([1.35, 2.25, 0.35, 2.75, 0.3, 0.6], 10, 20)], [62.2, fit([1.35, 2.25, 0.35, 2.75, 0.3, 0.6], 10, 20, 26, 0.98)], [66.4, fit([0.4, 2.2, 0, 2.75, 0.0, 1.0], 4, 22)],
-  [69.2, fit(ROW, 0, 25, 24)], [73.3, fit(ROW, 0, 25, 24, 0.99)], [END_V, fit(ROW, 0, 26, 24, 0.92)]];
+  [58.8, fit([1.2, 2.25, 0.35, 2.75, 0.0, 0.6], -8, 20)], [62.2, fit([1.2, 2.25, 0.35, 2.75, 0.0, 0.6], -8, 20, 26, 0.98)], [66.4, fit([0.4, 2.2, 0, 2.75, 0.0, 1.0], -2, 22)],
+  [69.2, fit(ROW, 0, 25, 24)], [73.3, fit(ROW, 0, 25, 24, 0.99)],
+  [74.5, fit([LX0 - 0.08, LX1 + 0.08, 0, 0.62, LZ - 0.1, LZ + 0.1], 0, 7, 26, 1.0)], [END_V, fit([LX0 - 0.08, LX1 + 0.08, 0, 0.62, LZ - 0.1, LZ + 0.1], 0, 7, 26, 0.94)]];
 const KT = KEYS.map(k => k[0]), KV = KEYS.map(k => k[1]);
 const KM = [0, 1, 2, 3, 4, 5, 6].map(j => {const n = KT.length, d = [], tg = new Array(n).fill(0); for (let i = 0; i < n - 1; i++) d.push((KV[i + 1][j] - KV[i][j]) / (KT[i + 1] - KT[i]));
   for (let i = 1; i < n - 1; i++) {if (d[i - 1] * d[i] <= 0) continue; const h0 = KT[i] - KT[i - 1], h1 = KT[i + 1] - KT[i], w1 = 2 * h1 + h0, w2 = h1 + 2 * h0; tg[i] = (w1 + w2) / (w1 / d[i - 1] + w2 / d[i]);} return tg;});
@@ -292,7 +313,7 @@ const SUBS = [[0.13, 2.98, 'Die reichsten zehn Prozent besitzen mehr als die Hä
   [43.56, 47.47, 'Die Hälfte der Haushalte hat dagegen weniger als 103.000 Euro.'], [47.5, 50.68, 'Ein großer Grund: Mehr als die Hälfte wohnt zur Miete,'], [50.7, 53.38, 'so viele wie in keinem anderen Land der EU.'],
   [53.4, 56.92, 'Und die Miete fließt jeden Monat an die, denen die Häuser gehören.'], [57.05, 60.34, 'Dazu wird viel Vermögen nicht verdient, sondern vererbt.'], [60.5, 63.74, 'Allein 2024 wurden über 113 Milliarden Euro'],
   [63.76, 66.22, 'vererbt und verschenkt.'], [66.4, 68.95, 'Und das ist nur der Teil, den das Finanzamt erfasst.'], [69.1, 71.05, 'Und du? Welche Figur bist du?'], [71.35, 73.3, 'Schreib deine Nummer in die Kommentare.']];
-const NUMS = [[2.0, 6.05, 'COUNT', 'besitzen die reichsten 10 % der Haushalte'], [7.8, 10.25, '2–3 %', 'besitzt die ärmere Hälfte zusammen'],
+const NUMS = [[1.85, 6.05, 'COUNT', 'besitzen die reichsten 10 % der Haushalte'], [7.8, 10.25, '2–3 %', 'besitzt die ärmere Hälfte zusammen'],
   [27.84, 30.35, '≈ 60 %', 'mit den Superreichen, die in Umfragen fehlen'], [35.92, 39.15, '780.000 €', 'Vermögen pro Haushalt: ab hier gehört man zu den reichsten 10 %'],
   [45.9, 47.5, '< 103.000 €', 'hat die Hälfte der Haushalte (Median)'], [50.08, 53.4, '58 %', 'der Haushalte wohnen zur Miete, mehr als in jedem anderen EU-Land'],
   [62.88, 66.3, '113 Mrd. €', 'wurden 2024 vererbt und verschenkt']];
@@ -342,10 +363,7 @@ function overlay(t) {
 }
 
 // ------------------------------------------------------------------ outro (Wunsch des Nutzers beim 2027-Video): das rote „function.“ zwei Sekunden mittig auf dunklem Grund
-function drawEnd(t) {endc.clearRect(0, 0, W, H); const f = eio((t - OUT0) / 0.7); fadeEl.style.opacity = (0.94 * f).toFixed(3); if (t < OUT0 + 0.35) return;
-  endc.save(); endc.font = '500 170px Poppins'; endc.letterSpacing = '-7px'; const txt = 'function.', wT = endc.measureText(txt).width; let x = (W - wT) / 2; endc.fillStyle = '#E01E2B'; endc.textBaseline = 'alphabetic';
-  for (let i = 0; i < txt.length; i++) {const ch = txt[i], wc = endc.measureText(ch).width; const u = eo((t - OUT0 - 0.4 - i * 0.055) / 0.5); if (u > 0) {endc.globalAlpha = u; endc.filter = `blur(${(1 - u) * 10}px)`; endc.fillText(ch, x, 1010 + (1 - u) * 34);} x += wc - 7;}
-  endc.restore();}
+function drawEnd(t) {fadeEl.style.opacity = '0';}
 
 // ------------------------------------------------------------------ per-frame state
 function setTime(t) {
@@ -364,7 +382,7 @@ function setTime(t) {
   // coins
   coinSideM.emissiveIntensity = coinTopM.emissiveIntensity = 0.35 * win(t, 11.5, 12.7, 0.4);
   for (const c of COINS) {const s = coinAt(c, t); c.m.visible = s.vis; c.m.position.set(s.p[0], s.p[1], s.p[2]); c.m.rotation.set(s.rx, c.ry, 0); const sy = s.sy || 1; c.m.scale.set(s.sc, s.sc * sy, s.sc);}
-  GHOSTS.forEach((g, j) => {const land = 27.3 + j * 0.16 + 0.75; const a = clamp((t - GHOST_T - j * 0.06) / 0.3, 0, 1) * clamp((land - t) / 0.08, 0, 1); g.visible = a > 0.001; g.material.opacity = (0.42 + 0.18 * Math.sin(t * 6 + j)) * a;});
+  GHOSTS.forEach((g, j) => {const land = 27.3 + j * 0.16 + 0.75; const a = clamp((t - GHOST_T - j * 0.06) / 0.3, 0, 1) * clamp((land - t) / 0.08, 0, 1); g.visible = a > 0.001; g.material.opacity = (0.55 + 0.2 * Math.sin(t * 6 + j)) * a;});
   {const top = CH * 66; const u = clamp((t - GIFT_T0) / (GIFT_T1 - GIFT_T0), 0, 1); GIFT.visible = t >= GIFT_T0; const y = lerp(top + 3.4, top, eo(u)); GIFT.position.set(COLX(9), y, COLZ);
     const l = t - GIFT_T1; GIFT.scale.set(1, l > 0 && l < 0.2 ? 1 - 0.1 * Math.sin(Math.PI * l / 0.2) : 1, 1); GIFT.rotation.y = 0.6 * (1 - eo(u));}
   // signs and dashed lines
@@ -379,6 +397,17 @@ function setTime(t) {
   for (const r of BLD) if (r.G.userData.puffs) for (const pf of r.G.userData.puffs) {const ph = (t * 0.22 + pf.k / 3) % 1; pf.p.position.set(pf.x + 0.06 * ph, pf.y + 0.4 * ph, -0.15 - 0.03 * ph); pf.p.scale.setScalar(Math.max(1e-3, (0.55 + 0.7 * ph) * Math.sin(Math.PI * Math.min(1, ph * 1.15))));}
   TOWN.ticker.offset.x = t * 0.03;
   TREES.forEach((T, i) => {T.rotation.z = 0.025 * Math.sin(t * 0.9 + i);});
+  // outro: lights go down except on the logo, the clay letters pop up one by one, the red figure squashes into a ball that hops onto the dot
+  {const o = eio((t - OUT0) / 0.7); key.intensity *= 1 - 0.55 * o; hemi.intensity *= 1 - 0.6 * o; scene.environmentIntensity *= 1 - 0.6 * o; rim.intensity = 0.7 * (1 - 0.5 * o); focus.intensity *= 1 - o;
+    LOGO.forEach((m, i) => {const p = clamp((t - LOGO_T0 - i * 0.07) / 0.36, 0, 1); m.visible = p > 0; const sy = Math.max(1e-3, ebk(p, 2.2)); m.scale.set(1 + 0.25 * (1 - p) * p * 4, sy, 1);});
+    const F = FIG[9]; const q = clamp((t - BALL_T.squash) / (BALL_T.morph - BALL_T.squash), 0, 1), mo = clamp((t - BALL_T.morph) / 0.15, 0, 1);
+    if (t >= BALL_T.squash) {const k = 1 - mo; F.B.scale.set((1 + 0.15 * ease(q)) * k + 1e-3, (1 - 0.25 * ease(q)) * k + 1e-3, (1 + 0.15 * ease(q)) * k + 1e-3); F.B.position.y = 0.3 * mo; F.G.visible = mo < 1;}
+    else F.G.visible = true;
+    BALL.visible = t >= BALL_T.morph; if (BALL.visible) {const u = clamp((t - BALL_T.fly) / (BALL_T.land - BALL_T.fly), 0, 1), r0 = 0.1, r = lerp(r0, DOT.r, ease(u));
+      const a = [XF(9), 0.3, ZF], b = [DOT.x, DOT.r * 0.92, LZ]; const y = lerp(a[1], b[1], u) + 0.55 * Math.sin(Math.PI * u);
+      BALL.position.set(lerp(a[0], b[0], ease(u)), t < BALL_T.fly ? 0.3 : y, lerp(a[2], b[2], ease(u))); const l = t - BALL_T.land;
+      const sq = l > 0 && l < 0.24 ? 1 - 0.35 * Math.sin(Math.PI * l / 0.24) * Math.exp(-l * 4) : 1; const g = t < BALL_T.fly ? r0 * eo(mo) : r;
+      BALL.scale.set(g * (2 - sq), g * sq * 0.92, g * (2 - sq)); if (l > 0) BALL.position.y = DOT.r * 0.92 * sq; BALL.rotation.set(u * 6, u * 2, 0);}}
   overlay(t); drawEnd(t);
 }
 
