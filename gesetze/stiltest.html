@@ -28,14 +28,14 @@ import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 await Promise.all(['500 40px Poppins', '800 96px "Inter Tight"'].map(f => document.fonts.load(f)));
 const FONT = new FontLoader().parse(new TTFLoader().parse(await (await fetch('node_modules/@fontsource/inter-tight/files/inter-tight-latin-800-normal.woff')).arrayBuffer()));
 const Q = new URLSearchParams(location.search), S = +(Q.get('s') || 1);
-const CLAY = S === 1, NIGHT = S === 2, PAPER = S === 3, POD = S === 4;
-const NAMES = ['', 'Knete-Demo', 'Nacht-Modell (Kanal-Klassiker)', 'Pop-up-Gesetzbuch', 'Countdown-Podest'];
+const CLAY = S === 1, NIGHT = S === 2, PAPER = S === 3, POD4 = S === 4, MOD = S === 5 || S === 6, POD = POD4 || MOD;
+const NAMES = ['', 'Knete-Demo', 'Nacht-Modell (Kanal-Klassiker)', 'Pop-up-Gesetzbuch', 'Countdown-Podest', 'Countdown-Podest modern · Violett', 'Countdown-Podest modern · Himmelblau'];
 const W = 1080, H = 1920, RED = 0xE01E2B;
-const renderer = new THREE.WebGLRenderer({antialias: true, preserveDrawingBuffer: true}); renderer.setSize(W, H); renderer.setPixelRatio(1);
-renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = [1, 1.0, 1.05, 1.0, 1.05][S];
+const renderer = new THREE.WebGLRenderer({antialias: true, preserveDrawingBuffer: true, alpha: true}); renderer.setSize(W, H); renderer.setPixelRatio(1);
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = [1, 1.0, 1.05, 1.0, 1.05, 1.0, 1.0][S];
 renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 const scene = new THREE.Scene(); scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
-scene.environmentIntensity = [0, 0.4, 0.14, 0.3, 0.3][S];
+scene.environmentIntensity = [0, 0.4, 0.14, 0.3, 0.3, 0.4, 0.42][S];
 const rng = (s => () => (s = (s * 16807) % 2147483647) / 2147483647)(7);
 const tex = (w, h, draw) => {const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;};
 const css = c => '#' + new THREE.Color(c).getHexString();
@@ -51,7 +51,7 @@ clayBump.wrapS = clayBump.wrapT = THREE.RepeatWrapping; clayBump.colorSpace = TH
 function M(c, o = {}) {
   if (CLAY) return new THREE.MeshStandardMaterial({color: c, roughness: 0.92, bumpMap: clayBump, bumpScale: 1.4, ...o});
   if (PAPER) return new THREE.MeshStandardMaterial({color: c, roughness: 1, ...o});
-  if (POD) return new THREE.MeshPhysicalMaterial({color: c, roughness: 0.4, clearcoat: 0.6, clearcoatRoughness: 0.25, ...o});
+  if (POD) return new THREE.MeshPhysicalMaterial({color: c, roughness: MOD ? 0.35 : 0.4, clearcoat: MOD ? 1 : 0.6, clearcoatRoughness: MOD ? 0.15 : 0.25, ...o});
   return new THREE.MeshStandardMaterial({color: c, roughness: 0.75, ...o});
 }
 const P = {
@@ -70,7 +70,7 @@ function paraGeo(size, depth, bevel = true) {
   const g = new TextGeometry('§', {font: FONT, size, depth, curveSegments: 12, bevelEnabled: bevel, bevelThickness: depth * 0.22, bevelSize: size * 0.022, bevelSegments: 3});
   g.computeBoundingBox(); const b = g.boundingBox; g.translate(-(b.min.x + b.max.x) / 2, -b.min.y, -(b.min.z + b.max.z) / 2); return g;}
 function paraMat() {
-  if (NIGHT || POD) return new THREE.MeshPhysicalMaterial({color: RED, emissive: 0xff1626, emissiveIntensity: NIGHT ? 0.12 : 0.3, roughness: 0.3, clearcoat: 0.8});
+  if (NIGHT || POD) return new THREE.MeshPhysicalMaterial({color: RED, emissive: 0xff1626, emissiveIntensity: NIGHT ? 0.12 : MOD ? 0.06 : 0.3, roughness: 0.3, clearcoat: 0.8});
   return M(RED, PAPER ? {} : {roughness: 0.6});}
 
 // ---------------- facade with windows (top row arched like the Reichstag) ----------------
@@ -252,22 +252,38 @@ if (!POD) {
 
 // ---------------- style 4: five pedestals as a countdown staircase ----------------
 if (POD) {
-  const grid = tex(512, 512, (g, w, h) => {g.fillStyle = '#0c0b13'; g.fillRect(0, 0, w, h); g.strokeStyle = 'rgba(160,140,255,0.16)'; g.lineWidth = 2; for (let i = 0; i <= 4; i++) {g.beginPath(); g.moveTo(i * w / 4, 0); g.lineTo(i * w / 4, h); g.moveTo(0, i * h / 4); g.lineTo(w, i * h / 4); g.stroke();}});
-  grid.wrapS = grid.wrapT = THREE.RepeatWrapping; grid.repeat.set(20, 20);
-  add(scene, new THREE.PlaneGeometry(40, 40).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({map: grid, roughness: 0.6, metalness: 0.2}), 0, 0, 0, false);
-  scene.fog = new THREE.Fog(0x07070b, 17, 27);
-  const LAB = ['WEHRDIENST', 'AGRARDIESEL', 'HEIZUNGSGESETZ', 'CORONA-REGELN', 'HARTZ IV'], PW = 0.74;
-  const pedC = 0x1a1824, pm = M(pedC);
+  const LAB = ['WEHRDIENST', 'AGRARDIESEL', 'HEIZUNGSGESETZ', 'CORONA-REGELN', 'HARTZ IV'], PW = MOD ? 0.76 : 0.74;
   const tops = [];
-  for (let i = 0; i < 5; i++) {
-    const x = -1.5 + i * 0.75, z = 0.66 - i * 0.33, h = 0.44 + i * 0.2; tops.push([x, h, z]);
-    const ch = Math.round(256 * h / PW), fs = Math.min(118, ch * 0.5);
-    const ft = tex(256, ch, (g, w, hh) => {g.fillStyle = css(pedC); g.fillRect(0, 0, w, hh); g.fillStyle = '#ffffff'; g.textAlign = 'center';
-      g.font = `800 ${fs}px "Inter Tight"`; g.fillText(String(5 - i), w / 2, 22 + fs * 0.86); g.font = '500 19px Poppins'; g.fillStyle = 'rgba(255,255,255,0.8)'; g.fillText(LAB[i], w / 2, 22 + fs * 0.86 + 36);});
-    const fm = M(0xffffff, {map: ft});
-    add(scene, box(PW, h, PW, 0.03), [pm, pm, pm, pm, fm, pm], x, h / 2, z);
-    add(scene, box(PW - 0.06, 0.012, PW - 0.06, 0.004), M(0x24212f), x, h + 0.006, z);
-    add(scene, new THREE.BoxGeometry(PW - 0.04, 0.006, 0.006), new THREE.MeshBasicMaterial({color: 0x9f8cff, toneMapped: false}), x, h - 0.012, z + PW / 2 + 0.002, false);}
+  const PM = S === 5 ? {ped: [0x6fe3c4, 0x6cc0ff, 0xffd45e, 0xc9b8ff, 0xffffff], num: Array(5).fill(0x2a2350), pill: Array(5).fill(0x2a2350), pillTxt: '#ffffff', disc: 0xa493ff, shadow: 0x24166e,
+      conf: [0x6fe3c4, 0x6cc0ff, 0xffd45e, 0xffffff, 0xc9b8ff, 0xffb3e6], blob: [0xffd45e, 0x6fe3c4, 0xffb3e6]}
+    : {ped: Array(5).fill(0xffffff), num: [0x22b38c, 0x2f8fe0, 0xf0a81e, 0x8a6cf0, 0x23234a], pill: [0x22b38c, 0x2f8fe0, 0xf0a81e, 0x8a6cf0, 0x23234a], pillTxt: '#ffffff', disc: 0xf2f7ff, shadow: 0x123a8a,
+      conf: [0xffd45e, 0x6fe3c4, 0xffffff, 0xc9b8ff, 0x2f8fe0, 0xffb3e6], blob: [0xffd45e, 0xffffff, 0x6fe3c4]};
+  if (MOD) {   // bright modern studio: soft shadows on an invisible floor, a round platform and pastel podiums
+    add(scene, new THREE.PlaneGeometry(40, 40).rotateX(-Math.PI / 2), new THREE.ShadowMaterial({color: PM.shadow, opacity: 0.42}), 0, 0, 0, false).castShadow = false;
+    for (let i = 0; i < 5; i++) {
+      const x = -1.5 + i * 0.75, z = 0.62 - i * 0.31, h = 0.5 + i * 0.2; tops.push([x, h, z]);
+      add(scene, new RoundedBoxGeometry(PW, h, PW, 6, 0.11), M(PM.ped[i]), x, h / 2, z);
+      const ng = new TextGeometry(String(5 - i), {font: FONT, size: 0.23, depth: 0.03, curveSegments: 10, bevelEnabled: true, bevelThickness: 0.008, bevelSize: 0.005, bevelSegments: 2});
+      ng.computeBoundingBox(); const nb = ng.boundingBox; ng.translate(-(nb.min.x + nb.max.x) / 2, -nb.min.y, 0);
+      add(scene, ng, M(PM.num[i]), x, h - 0.27, z + PW / 2 - 0.004);
+      const pt = tex(512, 96, (g, w, hh) => {g.fillStyle = css(PM.pill[i]); g.fillRect(0, 0, w, hh); g.fillStyle = PM.pillTxt; g.font = `600 ${LAB[i].length > 12 ? 40 : 46}px Poppins`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(LAB[i], w / 2, hh / 2 + 3);});
+      const pm2 = M(PM.pill[i]); add(scene, new RoundedBoxGeometry(0.52, 0.098, 0.016, 4, 0.044), [pm2, pm2, pm2, pm2, M(0xffffff, {map: pt, clearcoat: 0.3}), pm2], x, h - 0.37, z + PW / 2 + 0.002);}
+  } else {
+    const grid = tex(512, 512, (g, w, h) => {g.fillStyle = '#0c0b13'; g.fillRect(0, 0, w, h); g.strokeStyle = 'rgba(160,140,255,0.16)'; g.lineWidth = 2; for (let i = 0; i <= 4; i++) {g.beginPath(); g.moveTo(i * w / 4, 0); g.lineTo(i * w / 4, h); g.moveTo(0, i * h / 4); g.lineTo(w, i * h / 4); g.stroke();}});
+    grid.wrapS = grid.wrapT = THREE.RepeatWrapping; grid.repeat.set(20, 20);
+    add(scene, new THREE.PlaneGeometry(40, 40).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({map: grid, roughness: 0.6, metalness: 0.2}), 0, 0, 0, false);
+    scene.fog = new THREE.Fog(0x07070b, 17, 27);
+    const pedC = 0x1a1824, pm = M(pedC);
+    for (let i = 0; i < 5; i++) {
+      const x = -1.5 + i * 0.75, z = 0.66 - i * 0.33, h = 0.44 + i * 0.2; tops.push([x, h, z]);
+      const ch = Math.round(256 * h / PW), fs = Math.min(118, ch * 0.5);
+      const ft = tex(256, ch, (g, w, hh) => {g.fillStyle = css(pedC); g.fillRect(0, 0, w, hh); g.fillStyle = '#ffffff'; g.textAlign = 'center';
+        g.font = `800 ${fs}px "Inter Tight"`; g.fillText(String(5 - i), w / 2, 22 + fs * 0.86); g.font = '500 19px Poppins'; g.fillStyle = 'rgba(255,255,255,0.8)'; g.fillText(LAB[i], w / 2, 22 + fs * 0.86 + 36);});
+      const fm = M(0xffffff, {map: ft});
+      add(scene, box(PW, h, PW, 0.03), [pm, pm, pm, pm, fm, pm], x, h / 2, z);
+      add(scene, box(PW - 0.06, 0.012, PW - 0.06, 0.004), M(0x24212f), x, h + 0.006, z);
+      add(scene, new THREE.BoxGeometry(PW - 0.04, 0.006, 0.006), new THREE.MeshBasicMaterial({color: 0x9f8cff, toneMapped: false}), x, h - 0.012, z + PW / 2 + 0.002, false);}
+  }
   // 5: Bundeswehr helmet with Flecktarn camouflage and chin strap
   {const [x, h, z] = tops[0], G = new THREE.Group(); G.position.set(x, h + 0.012, z); G.rotation.y = 0.35; G.scale.setScalar(1.25); scene.add(G);
     const fleck = tex(512, 256, (g, w, hh) => {g.fillStyle = '#7d8656'; g.fillRect(0, 0, w, hh); for (const [c, n, r] of [['#4f5a33', 160, 9], ['#6b5a3a', 120, 8], ['#2a2a22', 140, 5], ['#9aa06a', 80, 7]])
@@ -278,7 +294,7 @@ if (POD) {
     const strap = add(G, new THREE.TorusGeometry(0.13, 0.007, 6, 28, Math.PI), M(0x2b2b26), 0, 0.028, 0.04); strap.rotation.x = Math.PI / 2; strap.rotation.z = Math.PI; strap.scale.set(1.3, 1, 1);
     add(G, box(0.03, 0.012, 0.02, 0.004), M(0x8a8a80, {metalness: 0.7, roughness: 0.35}), 0, 0.03, 0.17);}
   // 4: tractor
-  {const [x, h, z] = tops[1]; tractor(scene, x, z, 0x3f8a3c, 1.65, -0.55).position.y = h + 0.012;}
+  {const [x, h, z] = tops[1]; tractor(scene, x, z, MOD ? 0x46b04a : 0x3f8a3c, 1.65, -0.55).position.y = h + 0.012;}
   // 3: radiator with thermostat
   {const [x, h, z] = tops[2], G = new THREE.Group(); G.position.set(x, h + 0.012, z); G.rotation.y = 0.32; G.scale.setScalar(1.15); scene.add(G);
     const wm = M(0xe9e9e4, {roughness: 0.35});
@@ -306,36 +322,53 @@ if (POD) {
       g.font = '500 20px Poppins'; g.fillStyle = 'rgba(40,40,50,0.7)'; g.fillText('Jobcenter', 26, 136);
       g.strokeStyle = 'rgba(40,40,50,0.55)'; g.lineWidth = 2; for (let y = 170; y < hh - 30; y += 38) {g.strokeRect(26, y, 20, 20); g.fillStyle = 'rgba(40,40,50,0.3)'; g.fillRect(60, y + 7, 130 + ((y * 7) % 140), 7);}});
     const B = new THREE.Group(); B.position.set(0, 0.0, -0.05); B.rotation.x = -0.32; G.add(B);
-    add(B, box(0.36, 0.48, 0.016, 0.01), M(0x8a6a48, {roughness: 0.6}), 0, 0.24, 0);
+    add(B, box(0.36, 0.48, 0.016, 0.01), M(MOD ? 0xd9a86c : 0x8a6a48, {roughness: 0.6}), 0, 0.24, 0);
     add(B, new THREE.BoxGeometry(0.31, 0.41, 0.003), [M(0xf7f6f1), M(0xf7f6f1), M(0xf7f6f1), M(0xf7f6f1), M(0xc9c9c6, {map: form, roughness: 0.9, clearcoat: 0}), M(0xf7f6f1)], 0, 0.225, 0.0095);
     add(B, box(0.14, 0.04, 0.03, 0.008), M(0xb8b8bc, {metalness: 0.85, roughness: 0.3}), 0, 0.455, 0.012);
-    const leg = add(G, new THREE.BoxGeometry(0.02, 0.4, 0.012), M(0x6a5038), 0, 0.19, -0.2); leg.rotation.x = 0.42;
+    const leg = add(G, new THREE.BoxGeometry(0.02, 0.4, 0.012), M(MOD ? 0xb98a54 : 0x6a5038), 0, 0.19, -0.2); leg.rotation.x = 0.42;
     const pen = add(G, new THREE.CylinderGeometry(0.008, 0.008, 0.24, 12).rotateZ(Math.PI / 2), M(0x23232b), 0.05, 0.008, 0.2); pen.rotation.y = 0.5;
     const para = add(scene, paraGeo(0.46, 0.1), paraMat(), x + 0.02, h + 0.66, z + 0.02); para.rotation.y = az0 * 0.6;
-    const l = new THREE.PointLight(0xff2030, 1.4, 1.4, 1.8); l.position.set(x, h + 0.8, z + 0.3); scene.add(l);}
+    const l = new THREE.PointLight(0xff2030, MOD ? 0.8 : 1.4, 1.4, 1.8); l.position.set(x, h + 0.8, z + 0.3); scene.add(l);
+    if (MOD) {const st = tex(128, 128, (g, w, hh) => {const gr = g.createRadialGradient(w / 2, hh / 2, 0, w / 2, hh / 2, w / 2); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.25, 'rgba(255,255,255,0.6)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+        g.fillStyle = gr; g.beginPath(); g.moveTo(w / 2, 0); g.quadraticCurveTo(w / 2, hh / 2, w, hh / 2); g.quadraticCurveTo(w / 2, hh / 2, w / 2, hh); g.quadraticCurveTo(w / 2, hh / 2, 0, hh / 2); g.quadraticCurveTo(w / 2, hh / 2, w / 2, 0); g.fill();});
+      for (const [dx, dy, sc] of [[-0.34, 0.95, 0.16], [0.3, 0.42, 0.12], [0.36, 0.98, 0.09], [-0.3, 0.45, 0.08]]) {const sp = new THREE.Sprite(new THREE.SpriteMaterial({map: st, transparent: true, depthWrite: false})); sp.position.set(x + dx, h + dy, z + 0.1); sp.scale.setScalar(sc); scene.add(sp);}}}
+  if (MOD) {   // confetti and a few floating shapes, never red (red stays the paragraph sign)
+    const shapes = [new RoundedBoxGeometry(0.07, 0.03, 0.008, 2, 0.004), new THREE.SphereGeometry(0.022, 14, 10), new THREE.TorusGeometry(0.028, 0.008, 8, 20)];
+    let n = 0, tries = 0; const para = tops[4];
+    while (n < 46 && tries++ < 4000) {const x = -2.2 + rng() * 4.4, y = 0.15 + rng() * 2.05, z = -1.8 + rng() * 2.6;
+      if (tops.some(([px, h, pz]) => Math.abs(x - px) < PW / 2 + 0.2 && Math.abs(z - pz) < PW / 2 + 0.25 && y < h + 0.8)) continue;
+      if (Math.hypot(x - para[0], y - (para[1] + 0.85), z - para[2]) < 0.6) continue;
+      if (z > 0.2 && Math.abs(x) < 1.95) continue;
+      const m = add(scene, shapes[n % 3], M(PM.conf[n % PM.conf.length]), x, y, z, false); m.rotation.set(rng() * 6, rng() * 6, rng() * 6); m.castShadow = false; n++;}
+    for (const [x, y, z, r, c] of [[-1.3, 1.6, -2.6, 0.2, 0], [0.25, 2.0, -2.9, 0.18, 1], [1.95, 0.45, -1.7, 0.14, 2], [-1.55, 0.95, -1.9, 0.12, 1]]) {const m = add(scene, new THREE.SphereGeometry(r, 40, 24), M(PM.blob[c]), x, y, z, false); m.castShadow = false;}
+    const ring = add(scene, new THREE.TorusGeometry(0.2, 0.045, 20, 60), M(PM.blob[2]), -0.95, 2.05, -2.9, false); ring.rotation.set(1.0, 0.4, 0); ring.castShadow = false;}
 }
 
 // ---------------- light and camera ----------------
-const tgt = POD ? new THREE.Vector3(-0.12, 0.95, 0) : new THREE.Vector3(0, PAPER ? 0.5 : 0.32, -0.15);
-const d = +(Q.get('d') ?? [0, 14, 14, 14.4, 15.4][S]), el = (+(Q.get('el') ?? [0, 36, 36, 39, 17][S])) * Math.PI / 180, oy = +(Q.get('oy') ?? [0, -20, -20, -10, -110][S]);
+const tgt = MOD ? new THREE.Vector3(-0.1, 1.05, 0) : POD ? new THREE.Vector3(-0.12, 0.95, 0) : new THREE.Vector3(0, PAPER ? 0.5 : 0.32, -0.15);
+const d = +(Q.get('d') ?? [0, 14, 14, 14.4, 15.4, 16.2, 16.2][S]), el = (+(Q.get('el') ?? [0, 36, 36, 39, 17, 17, 17][S])) * Math.PI / 180, oy = +(Q.get('oy') ?? [0, -20, -20, -10, -110, -100, -100][S]);
 const cam = new THREE.PerspectiveCamera(26, W / H, 0.05, 80);
 cam.position.set(tgt.x + d * Math.cos(el) * Math.sin(az0), tgt.y + d * Math.sin(el), tgt.z + d * Math.cos(el) * Math.cos(az0)); cam.lookAt(tgt); cam.setViewOffset(W, H, 0, oy, W, H); cam.updateProjectionMatrix();
-const sun = new THREE.DirectionalLight([0, 0xffeedd, 0xa8c4ff, 0xfff1dc, 0xfff4ec][S], [0, 1.9, 0.9, 2.3, 1.3][S]);
-if (NIGHT) sun.position.set(5, 5, 1.5); else sun.position.set(-4, 7, 4);
-sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.radius = 6; Object.assign(sun.shadow.camera, {left: -4, right: 4, top: 4, bottom: -4}); sun.shadow.bias = -0.0005; scene.add(sun);
-scene.add(new THREE.HemisphereLight([0, 0xffe8f0, 0x5a6a90, 0xfff2e0, 0x8a7cff][S], [0, 0x3a2a50, 0x0b0a10, 0x1a120c, 0x07070b][S], [0, 0.75, 0.32, 0.45, 0.35][S]));
-if (!PAPER) {const rim = new THREE.DirectionalLight(0x8a78ff, POD ? 1.4 : 0.8); rim.position.set(POD ? -4 : 4, 3, -3); scene.add(rim); const rr = new THREE.DirectionalLight(0xff3344, POD ? 0.6 : 0.4); rr.position.set(3, 2, -4); scene.add(rr);}
+const sun = new THREE.DirectionalLight([0, 0xffeedd, 0xa8c4ff, 0xfff1dc, 0xfff4ec, 0xfff6ee, 0xfff8f0][S], [0, 1.9, 0.9, 2.3, 1.3, 1.7, 1.8][S]);
+if (NIGHT) sun.position.set(5, 5, 1.5); else if (MOD) sun.position.set(-3, 6.5, 5); else sun.position.set(-4, 7, 4);
+sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.radius = MOD ? 10 : 6; Object.assign(sun.shadow.camera, {left: -4, right: 4, top: 4, bottom: -4}); sun.shadow.bias = -0.0005; scene.add(sun);
+scene.add(new THREE.HemisphereLight([0, 0xffe8f0, 0x5a6a90, 0xfff2e0, 0x8a7cff, 0xffffff, 0xffffff][S], [0, 0x3a2a50, 0x0b0a10, 0x1a120c, 0x07070b, 0x6a56e0, 0x5a9ae8][S], [0, 0.75, 0.32, 0.45, 0.35, 0.75, 0.75][S]));
+if (MOD) {const f = new THREE.DirectionalLight(S === 5 ? 0xe8e0ff : 0xe6f2ff, 0.7); f.position.set(4, 2.5, 3); scene.add(f);}
+if (!PAPER && !MOD) {const rim = new THREE.DirectionalLight(0x8a78ff, POD ? 1.4 : 0.8); rim.position.set(POD ? -4 : 4, 3, -3); scene.add(rim); const rr = new THREE.DirectionalLight(0xff3344, POD ? 0.6 : 0.4); rr.position.set(3, 2, -4); scene.add(rr);}
 if (NIGHT) {const warm = new THREE.SpotLight(0xffe2b8, 6, 9, 0.45, 0.7, 1.2); warm.position.set(-1.2, 4.2, 2.6); warm.target.position.set(0, 0.3, -0.2); scene.add(warm, warm.target);}
-if (POD) {const key = new THREE.SpotLight(0xffffff, 11, 14, 0.5, 0.8, 1.3); key.position.set(-2.5, 6, 5); key.target.position.set(0, 0.6, 0); key.castShadow = true; scene.add(key, key.target);}
-scene.background = new THREE.Color([0, 0x150f26, 0x0a0a0e, 0x0d0a08, 0x07070b][S]);
-if (NIGHT || POD) {const comp = new EffectComposer(renderer); comp.addPass(new RenderPass(scene, cam)); comp.addPass(new UnrealBloomPass(new THREE.Vector2(W, H), NIGHT ? 0.5 : 0.45, 0.5, NIGHT ? 0.86 : 0.9)); comp.addPass(new OutputPass()); comp.render();}
+if (POD4) {const key = new THREE.SpotLight(0xffffff, 11, 14, 0.5, 0.8, 1.3); key.position.set(-2.5, 6, 5); key.target.position.set(0, 0.6, 0); key.castShadow = true; scene.add(key, key.target);}
+if (MOD) {scene.background = null; renderer.setClearColor(0x000000, 0);} else scene.background = new THREE.Color([0, 0x150f26, 0x0a0a0e, 0x0d0a08, 0x07070b][S]);
+if (NIGHT || POD4) {const comp = new EffectComposer(renderer); comp.addPass(new RenderPass(scene, cam)); comp.addPass(new UnrealBloomPass(new THREE.Vector2(W, H), NIGHT ? 0.5 : 0.45, 0.5, NIGHT ? 0.86 : 0.9)); comp.addPass(new OutputPass()); comp.render();}
 else renderer.render(scene, cam);
 
 // ---------------- composite: title, style name and logo ----------------
 const out = document.getElementById('out').getContext('2d');
+if (MOD) {const bg = out.createRadialGradient(W / 2, 1120, 80, W / 2, 1120, 1250); const c = S === 5 ? ['#9a88ff', '#5b45d8', '#21175a'] : ['#bfe6ff', '#4f9ff0', '#163f98'];
+  bg.addColorStop(0, c[0]); bg.addColorStop(0.5, c[1]); bg.addColorStop(1, c[2]); out.fillStyle = bg; out.fillRect(0, 0, W, H);}
 out.drawImage(renderer.domElement, 0, 0);
 if (PAPER) {const v = out.createRadialGradient(W / 2, H * 0.56, 300, W / 2, H * 0.56, 1150); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(5,4,3,0.75)'); out.fillStyle = v; out.fillRect(0, 0, W, H);}
-{const g = out.createLinearGradient(0, 0, 0, 640); g.addColorStop(0, 'rgba(7,7,11,.85)'); g.addColorStop(0.7, 'rgba(7,7,11,.5)'); g.addColorStop(1, 'rgba(7,7,11,0)'); out.fillStyle = g; out.fillRect(0, 0, W, 640);
+if (MOD) {const g2 = out.createLinearGradient(0, H - 520, 0, H); const c = S === 5 ? '16,10,52' : '8,30,92'; g2.addColorStop(0, `rgba(${c},0)`); g2.addColorStop(0.55, `rgba(${c},0.6)`); g2.addColorStop(1, `rgba(${c},0.92)`); out.fillStyle = g2; out.fillRect(0, H - 520, W, 520);}
+if (!MOD) {const g = out.createLinearGradient(0, 0, 0, 640); g.addColorStop(0, 'rgba(7,7,11,.85)'); g.addColorStop(0.7, 'rgba(7,7,11,.5)'); g.addColorStop(1, 'rgba(7,7,11,0)'); out.fillStyle = g; out.fillRect(0, 0, W, 640);
  const g2 = out.createLinearGradient(0, H - 480, 0, H); g2.addColorStop(0, 'rgba(7,7,11,0)'); g2.addColorStop(1, 'rgba(7,7,11,.88)'); out.fillStyle = g2; out.fillRect(0, H - 480, W, 480);}
 out.fillStyle = '#fff'; out.font = '800 76px "Inter Tight"'; out.letterSpacing = '-1.8px'; out.shadowColor = 'rgba(0,0,0,.45)'; out.shadowBlur = 18;
 ['Diese 5 Gesetze haben', 'Deutschland richtig', 'wütend gemacht'].forEach((t, i) => out.fillText(t, 78, 300 + i * 82)); out.letterSpacing = '0px'; out.shadowBlur = 0;
