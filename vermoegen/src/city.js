@@ -103,7 +103,8 @@ export function building(par, o) {
     const g = new THREE.ExtrudeGeometry(r, {depth: o.d + 0.05, bevelEnabled: false}); g.translate(0, 0, -(o.d + 0.05) / 2);
     add(B, g, new THREE.MeshStandardMaterial({color: o.roof ?? PAL.roofs[Math.floor(R() * PAL.roofs.length)], roughness: .6, ...clip}), 0, o.h, 0); top = o.h + o.w * 0.38;
     if (R() < 0.6) add(B, new THREE.BoxGeometry(0.05, 0.12, 0.05), M(0x8a5a48, clip), o.w * 0.22, o.h + o.w * 0.25, -o.d * 0.15);}
-  else {add(B, rbox(o.w + 0.03, 0.04, o.d + 0.03, 0.012), new THREE.MeshStandardMaterial({color: 0xd8d2c6, roughness: .7, ...clip}), 0, o.h + 0.02, 0); top = o.h + 0.04;
+  else {const rc = o.roofCol ?? [0x8f949e, 0x9a7a66, 0x7d8a76, 0xb08870, 0x8a8aa6, 0xa39a8a][Math.floor(R() * 6)];
+    add(B, rbox(o.w + 0.03, 0.04, o.d + 0.03, 0.012), new THREE.MeshStandardMaterial({color: rc, roughness: .75, ...clip}), 0, o.h + 0.02, 0); top = o.h + 0.04;
     // roof details: AC units, a water tank or a roof garden
     if (o.kind !== 'glass' && o.w > 0.35) {const k = Math.floor(R() * 3); if (k === 0) for (let i = 0; i < 2; i++) add(B, rbox(0.08, 0.05, 0.08, 0.01), M(0xbfc4c8, clip), (i - 0.5) * 0.14, o.h + 0.065, -o.d * 0.15);
       else if (k === 1) add(B, new THREE.CylinderGeometry(0.05, 0.05, 0.1, 14), M(0x9aa3ad, clip), o.w * 0.2, o.h + 0.09, 0);

@@ -106,8 +106,8 @@ B('fabB', {x: -2.05, z: -2.95, w: 1.1, d: 1.0, h: 0.52, col: 0xc9b49a, own: 1, c
 const chimneys = []; for (const [x, z, h] of [[-3.95, -3.35, 0.95], [-3.6, -3.35, 0.8]]) chimneys.push(add(recs.fabA.B, new THREE.CylinderGeometry(0.06, 0.08, h, 14), new THREE.MeshStandardMaterial({color: 0x8a6a5a, roughness: .7, clippingPlanes: [ground]}), x + 3.55, h / 2, z + 3.0));
 for (let i = 0; i < 4; i++) {const s = new THREE.Shape(); s.moveTo(0, 0); s.lineTo(0.28, 0); s.lineTo(0, 0.16); s.closePath(); const g = new THREE.ExtrudeGeometry(s, {depth: 0.8, bevelEnabled: false}); g.translate(0, 0, -0.4);
   add(recs.fabA.B, g, new THREE.MeshStandardMaterial({color: 0x9aa7b3, roughness: .5, clippingPlanes: [ground]}), -0.55 + i * 0.3, 0.64, 0.15);}
-B('aptN1', {x: -1.2, z: -3.25, w: 0.62, d: 0.9, h: 1.05, c: 1, own: 1, balc: 1});
-B('aptN2', {x: -0.55, z: -2.65, w: 0.5, d: 0.62, h: 0.85, c: 9, own: 1, balc: 1});
+B('aptN1', {x: -1.2, z: -3.25, w: 0.62, d: 0.9, h: 1.05, c: 1, own: 1, balc: 1, fs: 1.8});
+B('aptN2', {x: -0.55, z: -2.65, w: 0.5, d: 0.62, h: 0.85, c: 9, own: 1, balc: 1, fs: 1.8});
 // north-east: stock exchange (Aktien) with a ticker and two office towers
 B('boerse', {x: 1.25, z: -3.05, w: 1.5, d: 1.0, h: 0.72, col: 0xeee8da, own: 1, clip: 1, kind: 'block'});
 {const G = recs.boerse.B; for (let i = 0; i < 6; i++) add(G, new THREE.CylinderGeometry(0.035, 0.04, 0.5, 14), new THREE.MeshStandardMaterial({color: 0xf6f1e6, roughness: .6, clippingPlanes: [ground]}), -0.6 + i * 0.24, 0.27, 0.54);
@@ -123,9 +123,12 @@ B('towerB', {x: 3.85, z: -2.85, w: 0.6, d: 0.62, h: 1.7, kind: 'glass', tint: '#
 B(null, {x: 3.85, z: -3.65, w: 0.55, d: 0.42, h: 0.6, c: 4, kind: 'shop'});
 // east: a courtyard of apartment houses (tenants); the courtyard is closed by the landlord's office (owned, becomes money)
 const doors = [];
-for (const [i, x] of [2.95, 3.42, 3.89].entries()) for (const s of [-1, 1]) {const r = B(`apt${s < 0 ? 'N' : 'S'}${i}`, {x, z: s * 0.75, w: 0.44, d: 0.8, h: 0.75 + ((i + (s > 0)) % 3) * 0.18, c: [0, 2, 4, 7, 8, 10][i * 2 + (s > 0)], balc: 1, ry: s < 0 ? 0 : Math.PI, own: 1});
+for (const [i, x] of [2.95, 3.42, 3.89].entries()) for (const s of [-1, 1]) {const r = B(`apt${s < 0 ? 'N' : 'S'}${i}`, {x, z: s * 0.75, w: 0.44, d: 0.8, h: 0.55 + ((i + (s > 0)) % 3) * 0.12, c: [0, 2, 4, 7, 8, 10][i * 2 + (s > 0)], balc: 1, ry: s < 0 ? 0 : Math.PI, own: 1, fs: 1.4});
   doors.push({x, z: s * 0.36, s, rec: r});}
-B('landlord', {x: 4.36, z: 0, w: 1.1, d: 0.36, h: 0.9, col: 0xd8cbb8, own: 1, clip: 1, ry: -Math.PI / 2, fs: 1.3});
+B('landlord', {x: 4.36, z: 0, w: 1.1, d: 0.36, h: 0.6, col: 0xd8cbb8, own: 1, clip: 1, ry: -Math.PI / 2, fs: 0.9, fx: 0.42});
+// cobblestones in the courtyard
+{const ct = tex('court', 256, 256, (g, w, h) => {g.fillStyle = '#9a8f80'; g.fillRect(0, 0, w, h); const r = rng(6); for (let y = 0; y < h; y += 16) for (let x = (y / 16) % 2 ? 8 : 0; x < w; x += 16) {g.fillStyle = ['#b8ab98', '#a89a86', '#c4b8a4', '#ad9f8b'][Math.floor(r() * 4)]; g.beginPath(); g.roundRect(x + 1, y + 1, 14, 14, 4); g.fill();}});
+ ct.wrapS = ct.wrapT = THREE.RepeatWrapping; ct.repeat.set(6, 3); add(W0, new THREE.PlaneGeometry(1.52, 0.7).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({map: ct, roughness: .9}), 3.41, 0.016, 0, false);}
 for (const [x, z] of [[2.95, -1.36], [3.6, -1.36], [4.25, -1.36], [2.95, 1.36], [3.6, 1.36], [4.25, 1.36]]) tree(W0, x, z, 0.9);
 // west: school, shops, a small church, parking
 B(null, {x: -3.9, z: -1.2, w: 1.0, d: 0.5, h: 0.55, c: 2}); B(null, {x: -3.05, z: -1.2, w: 0.5, d: 0.5, h: 0.75, c: 5, kind: 'shop'}); B(null, {x: -3.9, z: -0.56, w: 0.9, d: 0.44, h: 0.4, c: 6, kind: 'shop'});
@@ -244,15 +247,15 @@ for (const r of owned) {r.flag.visible = false; const wp = new THREE.Vector3(); 
 owned.sort((a, b) => a.d - b.d);
 const VILLAS = [recs.villa, recs.villa2].map(r => {const F = flagMesh(1.3); F.position.set(0, r.top, 0); r.G.add(F); F.visible = false; return F;});
 // buildings that turn into money towers (companies, shares, the landlord's office)
-const CONV = ['fabA', 'fabB', 'boerse', 'towerA', 'towerB', 'landlord'].map((k, i) => {const r = recs[k]; const o = r.o; const th = k === 'landlord' ? 0.8 : Math.max(o.h * 1.5, o.h + 0.5);
+const CONV = ['fabA', 'fabB', 'boerse', 'towerA', 'towerB', 'landlord'].map((k, i) => {const r = recs[k]; const o = r.o; const th = k === 'landlord' ? 0.55 : Math.max(o.h * 1.5, o.h + 0.5);
   const mt = moneyTower(W0, o.x, o.z, o.w * 0.92, o.d * 0.92, th, o.ry || 0); mt.G.position.y = -th; return {k, r, mt, th, t0: 22.95 + i * 0.27};});
 const landlordConv = CONV.find(c => c.k === 'landlord');
 for (const r of FILLOWN) {const o = r.o; const th = o.h * 1.45 + 0.25; const mt = moneyTower(W0, o.x, o.z, o.w * 0.92, o.d * 0.92, th, o.ry || 0); mt.G.position.y = -th;
   CONV.push({k: 'fill', r, mt, th, t0: 22.95 + clamp((Math.hypot(o.x, o.z) - 5) / 9, 0, 1) * 1.5 + R() * 0.2});}
 
 // ------------------------------------------------------------------ rent: coins at the doors of the tenants, rolling to the landlord's money tower
-const doorPiles = doors.map(d => {const c = coinPile(W0, d.x + 0.12, d.z + d.s * 0.04, 2, 0.7); c.visible = false; return c;});
-const ROLL = doors.map((d, i) => ({d, t0: 46.75 + i * 0.32, coin: (() => {const c = add(W0, new THREE.CylinderGeometry(0.05, 0.05, 0.016, 22).rotateX(Math.PI / 2), [GOLD, GOLDTOP, GOLDTOP], 0, 0, 0); c.visible = false; return c;})()}));
+const doorPiles = doors.map(d => {const c = coinPile(W0, d.x + 0.12, d.z + d.s * 0.02, 2, 0.95); c.visible = false; return c;});
+const ROLL = doors.map((d, i) => ({d, t0: 46.75 + i * 0.32, coin: (() => {const c = add(W0, new THREE.CylinderGeometry(0.065, 0.065, 0.02, 24).rotateX(Math.PI / 2), [GOLD, GOLDTOP, GOLDTOP], 0, 0, 0); c.visible = false; return c;})()}));
 const rollPath = d => {const zc = d.s * 0.09; return [[d.x + 0.12, d.z - d.s * 0.06], [d.x + 0.12, zc], [4.1, zc]];};
 
 // ------------------------------------------------------------------ light and time of day
@@ -272,7 +275,7 @@ const KEYS = [
   [14.6, C(0.2, 0.6, -1.4, 3.6, -16, 46)], [16.6, C(-2.5, 0.4, -2.9, 2.2, -14, 36)], [17.5, C(-0.9, 0.45, -2.9, 2.1, -10, 35)], [18.4, C(1.2, 0.45, -2.9, 2.1, -6, 33)],
   [19.6, C(0.3, 0.6, -4.4, 2.2, -10, 36)], [21.0, C(-1.2, 0.85, -7.3, 1.45, -16, 30)], [22.6, C(-0.3, 0.5, -3.1, 4.6, -14, 54)], [24.9, C(0.1, 0.5, -2.9, 4.9, -16, 56)],
   [26.6, C(-0.9, 0.4, 1.8, 2.6, -20, 42)], [28.2, C(-1.12, 0.45, 3.1, 1.3, -16, 25)], [31.7, C(-1.08, 0.48, 3.1, 1.22, -13, 23)], [35.9, C(-1.02, 0.5, 3.08, 1.25, -10, 23)],
-  [37.4, C(1.8, 0.4, 1.6, 2.6, 30, 48)], [38.9, C(3.2, 0.1, 0.0, 1.45, 76, 68)], [43.6, C(3.2, 0.1, 0.0, 1.4, 80, 67)], [46.6, C(3.25, 0.12, 0.0, 1.45, 84, 67)], [49.5, C(3.3, 0.25, -0.2, 1.7, 80, 62)],
+  [37.4, C(1.8, 0.4, 1.6, 2.6, 30, 48)], [38.9, C(3.15, 0.15, 0.0, 1.15, 80, 41)], [43.6, C(3.2, 0.15, 0.0, 1.1, 83, 40)], [46.6, C(3.25, 0.15, 0.0, 1.12, 86, 40)], [49.5, C(3.3, 0.3, -0.1, 1.45, 82, 44)],
   [50.9, C(1.2, 0.8, -3.4, 3.6, 30, 48)], [52.1, C(-1.36, 0.76, -6.98, 0.75, -12, 22)], [56.4, C(-1.32, 0.76, -7.0, 0.7, -4, 21)], [61.0, C(-1.1, 0.82, -6.85, 1.2, 6, 27)],
   [63.6, C(0.0, 0.6, -1.6, 4.0, -8, 48)], [66.6, C(0.4, 0.8, 0.0, 5.0, -14, 54)], [70.0, C(0.6, 1.2, 0.1, 5.6, -16, 58)]];
 const KT = KEYS.map(k => k[0]), KV = KEYS.map(k => k[1]);
@@ -387,10 +390,10 @@ function setTime(t) {
     c.position.set(lerp(a[0], b[0], p), lerp(a[1], b[1], p) + Math.sin(p * Math.PI) * 0.25, lerp(a[2], b[2], p)); c.rotation.x = p * 6;});
   pig.rotation.z = -0.35 * win(t, 32.5, 33.1, 0.15); chart.scale.setScalar(1 + 0.12 * win(t, 33.5, 34.3, 0.2));
   // rent: coin piles at the doors, coins roll to the landlord's tower
-  doorPiles.forEach((c, i) => {const p = clamp((t - 37.9 - i * 0.1) / 0.35, 0, 1); c.visible = p > 0; c.scale.setScalar(0.7 * Math.max(1e-3, ebk(p, 2)));});
+  doorPiles.forEach((c, i) => {const p = clamp((t - 37.9 - i * 0.1) / 0.35, 0, 1); c.visible = p > 0; c.scale.setScalar(0.95 * Math.max(1e-3, ebk(p, 2)));});
   for (const r of ROLL) {const P = rollPath(r.d); const L1 = Math.abs(P[1][1] - P[0][1]), L2 = Math.abs(P[2][0] - P[1][0]); const dist = (t - r.t0) * 0.55; r.coin.visible = dist > 0 && dist < L1 + L2;
     if (!r.coin.visible) continue; let x, z, dir; if (dist < L1) {x = P[0][0]; z = lerp(P[0][1], P[1][1], dist / L1); dir = Math.PI / 2;} else {x = lerp(P[1][0], P[2][0], (dist - L1) / L2); z = P[1][1]; dir = 0;}
-    r.coin.position.set(x, 0.065, z); r.coin.rotation.set(0, dir, 0); r.coin.rotateZ(-dist / 0.05);}
+    r.coin.position.set(x, 0.083, z); r.coin.rotation.set(0, dir, 0); r.coin.rotateZ(-dist / 0.065);}
   // inheritance: the old person hands the stack with the red ribbon to the young one
   {const u = eio((t - 52.2) / 0.8); const a = [HILL.x - 0.27, HILL.y + 0.13, HILL.z + 0.62], b = [HILL.x - 0.03, HILL.y + 0.13, HILL.z + 0.62]; gift.position.set(lerp(a[0], b[0], u), lerp(a[1], b[1], u) + Math.sin(u * Math.PI) * 0.04, lerp(a[2], b[2], u));
    OLD.arms.forEach(m => m.rotation.x = -1.1 * (1 - u * 0.8)); YOUNG.arms.forEach(m => m.rotation.x = -1.1 * clamp((t - 51.6) / 0.5, 0, 1));}
