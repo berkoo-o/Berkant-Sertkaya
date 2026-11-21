@@ -356,7 +356,7 @@ function paraState(v) {
   if (v < 1.2) {p.y += 2.5; s = 0.0001;}
   else if (v < 2.0) {const u = seg(v, 1.2, 2.0); p.y += 1.4 * (1 - eo(u)) ; ry += (1 - eo(u)) * Math.PI * 2; s = Math.max(0.0001, eo(seg(v, 1.2, 1.5)));}
   let at = 4;
-  for (const [t0, a, b] of HOPS) {if (v >= t0 + HOPD) at = b; else if (v >= t0) {const u = seg(v, t0, t0 + HOPD), e = eio(u); p = HOV[a].clone().lerp(HOV[b], e); p.y += Math.sin(Math.PI * u) * (0.55 + Math.abs(HOV[b].y - HOV[a].y) * 0.5); ry = AZ0 * 0.6 + e * Math.PI * 2; at = -1; break;} else break;}
+  for (const [t0, a, b] of HOPS) {if (v >= t0 + HOPD) at = b; else if (v >= t0) {const u = seg(v, t0, t0 + HOPD), e = eio(u); p = HOV[a].clone().lerp(HOV[b], e); p.y += Math.sin(Math.PI * u) * (0.32 + Math.abs(HOV[b].y - HOV[a].y) * 0.5); ry = AZ0 * 0.6 + e * Math.PI * 2; at = -1; break;} else break;}
   if (at >= 0 && v >= 2.0) {p = HOV[at].clone(); p.y += 0.025 * Math.sin(v * 2.2); ry = AZ0 * 0.6 + 0.12 * Math.sin(v * 0.9);}
   // place 3: the sign slams down on the radiator (the court stops the vote)
   if (v >= 31.15 && v < 32.35) {const base = HOV[2].clone(), top = PH(2) + 0.425;
