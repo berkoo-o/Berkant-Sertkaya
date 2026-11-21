@@ -1,0 +1,5 @@
+.hyperframes/
+renders/hook_silent.mp4
+gen/mix_test.flac
+gen/timing.json
+node_modules/

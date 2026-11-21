@@ -1,0 +1,822 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter Tight"; font-weight: 800; src: url("assets/fonts/InterTight-800.woff2") format("woff2"); }
+    @font-face { font-family: "PoppinsM"; font-weight: 500; src: url("assets/fonts/Poppins-500.woff2") format("woff2"); }
+    #root { position: absolute; inset: 0; overflow: hidden; background: #07070B; font-family: "PoppinsM", Poppins, sans-serif; color: #fff; }
+    #hook-bg { position: absolute; inset: 0; background:
+        radial-gradient(900px 700px at 12% 18%, rgba(118, 70, 210, 0.30), transparent 70%),
+        radial-gradient(800px 600px at 88% 62%, rgba(224, 30, 43, 0.16), transparent 70%),
+        radial-gradient(1200px 500px at 50% 78%, rgba(255, 255, 255, 0.05), transparent 70%); }
+    #hook-floor { position: absolute; left: -400px; right: -400px; top: 1270px; height: 900px; opacity: 0.35;
+      background-image: linear-gradient(rgba(255,255,255,0.10) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.10) 1px, transparent 1px);
+      background-size: 60px 60px; transform-origin: 50% 0; transform: perspective(700px) rotateX(62deg);
+      -webkit-mask-image: linear-gradient(#000, transparent 75%); mask-image: linear-gradient(#000, transparent 75%); }
+    #hook-stage { position: absolute; inset: 0; }
+    #hook-ground { position: absolute; left: 50px; width: 880px; top: 1270px; height: 2px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28) 12%, rgba(255,255,255,0.28) 88%, transparent); }
+    #hook-tray { position: absolute; left: 66px; top: 596px; width: 570px; height: 330px; border-radius: 26px; border: 2px solid rgba(255,255,255,0.10); background: rgba(255,255,255,0.025); }
+    #hook-traycap { position: absolute; left: 66px; top: 494px; width: 760px; font-size: 29px; line-height: 1.25; color: rgba(255,255,255,0.72); }
+    #hook-traycap b { color: #F2C24E; font-weight: 500; }
+    .coin { position: absolute; left: 0; top: 0; width: 52px; height: 22px; border-radius: 50%;
+      background: linear-gradient(160deg, #FFEDB0 0%, #F4C752 38%, #E0A632 70%, #C38619 100%);
+      box-shadow: 0 6px 0 #8A5B0E, 0 9px 12px rgba(0,0,0,0.45), inset 0 0 0 2px rgba(255,240,190,0.35); }
+    .fig { position: absolute; left: 0; top: 0; width: 58px; height: 169px; z-index: 1000; }
+    .fig .skin { fill: #E9D2BE; } .fig .leg { fill: #3A3D52; } .fig .shirt { fill: #CFCAD9; }
+    .pill { position: absolute; left: 0; top: 0; z-index: 2000; padding: 8px 26px 10px; border-radius: 40px; background: rgba(255,255,255,0.96); color: #15161C; font: 800 38px/1.1 "Inter Tight"; white-space: nowrap; box-shadow: 0 10px 30px rgba(0,0,0,0.45); }
+    #hook-labrich { color: #E01E2B; }
+    #hook-bracket { position: absolute; left: 0; top: 0; overflow: visible; }
+    .ttl { position: absolute; left: 80px; top: 236px; width: 900px; font: 800 86px/1.04 "Inter Tight"; letter-spacing: -1.5px; }
+    .num { position: absolute; left: 80px; top: 214px; width: 900px; }
+    .num .big { font: 800 170px/1 "Inter Tight"; letter-spacing: -4px; font-variant-numeric: tabular-nums; }
+    .num .line { margin-top: 8px; font-size: 34px; color: rgba(255,255,255,0.86); }
+    .sub { position: absolute; left: 90px; width: 900px; top: 1436px; text-align: center; font-size: 44px; line-height: 1.28; text-shadow: 0 2px 14px rgba(0,0,0,0.85); }
+    #hook-src { position: absolute; left: 80px; top: 1676px; width: 900px; font-size: 22px; line-height: 1.35; color: rgba(255,255,255,0.62); }
+    #hook-logo { position: absolute; left: 76px; top: 1722px; font: 500 64px/1 "PoppinsM"; color: #E01E2B; letter-spacing: -2px; }
+  </style>
+  <div id="root" data-composition-id="hook" data-width="1080" data-height="1920">
+    <div id="hook-bg"></div>
+    <div id="hook-floor" data-layout-ignore></div>
+    <div id="hook-stage">
+      <div id="hook-traycap">100 Münzen = <b>alles</b>, was den Haushalten in Deutschland gehört.<br>1 Figur = 10 % der Haushalte</div>
+      <div id="hook-tray"></div>
+      <div id="hook-ground"></div>
+      <div id="hook-figs">
+    <div id="fig0" class="fig"><svg width="58" height="169" viewBox="0 0 48 140"><ellipse cx="24" cy="137" rx="20" ry="4" fill="rgba(0,0,0,.45)"/>
+<circle cx="24" cy="17" r="15" class="skin"/><rect x="6" y="36" width="36" height="56" rx="14" class="shirt base"/><rect x="10" y="78" width="12" height="58" rx="6" class="leg"/><rect x="26" y="78" width="12" height="58" rx="6" class="leg"/></svg></div>
+    <div id="fig1" class="fig"><svg width="58" height="169" viewBox="0 0 48 140"><ellipse cx="24" cy="137" rx="20" ry="4" fill="rgba(0,0,0,.45)"/>
+<circle cx="24" cy="17" r="15" class="skin"/><rect x="6" y="36" width="36" height="56" rx="14" class="shirt base"/><rect x="10" y="78" width="12" height="58" rx="6" class="leg"/><rect x="26" y="78" width="12" height="58" rx="6" class="leg"/></svg></div>
+    <div id="fig2" class="fig"><svg width="58" height="169" viewBox="0 0 48 140"><ellipse cx="24" cy="137" rx="20" ry="4" fill="rgba(0,0,0,.45)"/>
+<circle cx="24" cy="17" r="15" class="skin"/><rect x="6" y="36" width="36" height="56" rx="14" class="shirt base"/><rect x="10" y="78" width="12" height="58" rx="6" class="leg"/><rect x="26" y="78" width="12" height="58" rx="6" class="leg"/></svg></div>
+    <div id="fig3" class="fig"><svg width="58" height="169" viewBox="0 0 48 140"><ellipse cx="24" cy="137" rx="20" ry="4" fill="rgba(0,0,0,.45)"/>
+<circle cx="24" cy="17" r="15" class="skin"/><rect x="6" y="36" width="36" height="56" rx="14" class="shirt base"/><rect x="10" y="78" width="12" height="58" rx="6" class="leg"/><rect x="26" y="78" width="12" height="58" rx="6" class="leg"/></svg></div>
+    <div id="fig4" class="fig"><svg width="58" height="169" viewBox="0 0 48 140"><ellipse cx="24" cy="137" rx="20" ry="4" fill="rgba(0,0,0,.45)"/>
+<circle cx="24" cy="17" r="15" class="skin"/><rect x="6" y="36" width="36" height="56" rx="14" class="shirt base"/><rect x="10" y="78" width="12" height="58" rx="6" class="leg"/><rect x="26" y="78" width="12" height="58" rx="6" class="leg"/></svg></div>
+    <div id="fig5" class="fig dim"><svg width="58" height="169" viewBox="0 0 48 140"><ellipse cx="24" cy="137" rx="20" ry="4" fill="rgba(0,0,0,.45)"/>
+<circle cx="24" cy="17" r="15" class="skin"/><rect x="6" y="36" width="36" height="56" rx="14" class="shirt base"/><rect x="10" y="78" width="12" height="58" rx="6" class="leg"/><rect x="26" y="78" width="12" height="58" rx="6" class="leg"/></svg></div>
+    <div id="fig6" class="fig dim"><svg width="58" height="169" viewBox="0 0 48 140"><ellipse cx="24" cy="137" rx="20" ry="4" fill="rgba(0,0,0,.45)"/>
+<circle cx="24" cy="17" r="15" class="skin"/><rect x="6" y="36" width="36" height="56" rx="14" class="shirt base"/><rect x="10" y="78" width="12" height="58" rx="6" class="leg"/><rect x="26" y="78" width="12" height="58" rx="6" class="leg"/></svg></div>
+    <div id="fig7" class="fig dim"><svg width="58" height="169" viewBox="0 0 48 140"><ellipse cx="24" cy="137" rx="20" ry="4" fill="rgba(0,0,0,.45)"/>
+<circle cx="24" cy="17" r="15" class="skin"/><rect x="6" y="36" width="36" height="56" rx="14" class="shirt base"/><rect x="10" y="78" width="12" height="58" rx="6" class="leg"/><rect x="26" y="78" width="12" height="58" rx="6" class="leg"/></svg></div>
+    <div id="fig8" class="fig dim"><svg width="58" height="169" viewBox="0 0 48 140"><ellipse cx="24" cy="137" rx="20" ry="4" fill="rgba(0,0,0,.45)"/>
+<circle cx="24" cy="17" r="15" class="skin"/><rect x="6" y="36" width="36" height="56" rx="14" class="shirt base"/><rect x="10" y="78" width="12" height="58" rx="6" class="leg"/><rect x="26" y="78" width="12" height="58" rx="6" class="leg"/></svg></div>
+    <div id="fig9" class="fig dim"><svg width="58" height="169" viewBox="0 0 48 140"><ellipse cx="24" cy="137" rx="20" ry="4" fill="rgba(0,0,0,.45)"/>
+<circle cx="24" cy="17" r="15" class="skin"/><rect x="6" y="36" width="36" height="56" rx="14" class="shirt red"/><rect x="10" y="78" width="12" height="58" rx="6" class="leg"/><rect x="26" y="78" width="12" height="58" rx="6" class="leg"/></svg></div>
+      </div>
+      <div id="hook-coins">
+    <div id="coin0" class="coin dim"></div>
+    <div id="coin1" class="coin dim"></div>
+    <div id="coin2" class="coin dim"></div>
+    <div id="coin3" class="coin dim"></div>
+    <div id="coin4" class="coin dim"></div>
+    <div id="coin5" class="coin dim"></div>
+    <div id="coin6" class="coin dim"></div>
+    <div id="coin7" class="coin dim"></div>
+    <div id="coin8" class="coin dim"></div>
+    <div id="coin9" class="coin dim"></div>
+    <div id="coin10" class="coin dim"></div>
+    <div id="coin11" class="coin dim"></div>
+    <div id="coin12" class="coin dim"></div>
+    <div id="coin13" class="coin dim"></div>
+    <div id="coin14" class="coin dim"></div>
+    <div id="coin15" class="coin dim"></div>
+    <div id="coin16" class="coin dim"></div>
+    <div id="coin17" class="coin dim"></div>
+    <div id="coin18" class="coin dim"></div>
+    <div id="coin19" class="coin dim"></div>
+    <div id="coin20" class="coin dim"></div>
+    <div id="coin21" class="coin dim"></div>
+    <div id="coin22" class="coin dim"></div>
+    <div id="coin23" class="coin dim"></div>
+    <div id="coin24" class="coin dim"></div>
+    <div id="coin25" class="coin dim"></div>
+    <div id="coin26" class="coin dim"></div>
+    <div id="coin27" class="coin dim"></div>
+    <div id="coin28" class="coin dim"></div>
+    <div id="coin29" class="coin dim"></div>
+    <div id="coin30" class="coin dim"></div>
+    <div id="coin31" class="coin dim"></div>
+    <div id="coin32" class="coin dim"></div>
+    <div id="coin33" class="coin dim"></div>
+    <div id="coin34" class="coin dim"></div>
+    <div id="coin35" class="coin dim"></div>
+    <div id="coin36" class="coin dim"></div>
+    <div id="coin37" class="coin dim"></div>
+    <div id="coin38" class="coin dim"></div>
+    <div id="coin39" class="coin dim"></div>
+    <div id="coin40" class="coin dim"></div>
+    <div id="coin41" class="coin dim"></div>
+    <div id="coin42" class="coin dim"></div>
+    <div id="coin43" class="coin dim"></div>
+    <div id="coin44" class="coin dim"></div>
+    <div id="coin45" class="coin dim"></div>
+    <div id="coin46" class="coin dim"></div>
+    <div id="coin47" class="coin dim"></div>
+    <div id="coin48" class="coin dim"></div>
+    <div id="coin49" class="coin dim"></div>
+    <div id="coin50" class="coin dim"></div>
+    <div id="coin51" class="coin dim"></div>
+    <div id="coin52" class="coin dim"></div>
+    <div id="coin53" class="coin dim"></div>
+    <div id="coin54" class="coin dim"></div>
+    <div id="coin55" class="coin dim"></div>
+    <div id="coin56" class="coin dim"></div>
+    <div id="coin57" class="coin dim"></div>
+    <div id="coin58" class="coin dim"></div>
+    <div id="coin59" class="coin dim"></div>
+    <div id="coin60" class="coin dim"></div>
+    <div id="coin61" class="coin dim"></div>
+    <div id="coin62" class="coin dim"></div>
+    <div id="coin63" class="coin dim"></div>
+    <div id="coin64" class="coin dim"></div>
+    <div id="coin65" class="coin dim"></div>
+    <div id="coin66" class="coin dim"></div>
+    <div id="coin67" class="coin dim"></div>
+    <div id="coin68" class="coin dim"></div>
+    <div id="coin69" class="coin dim"></div>
+    <div id="coin70" class="coin dim"></div>
+    <div id="coin71" class="coin dim"></div>
+    <div id="coin72" class="coin dim"></div>
+    <div id="coin73" class="coin dim"></div>
+    <div id="coin74" class="coin dim"></div>
+    <div id="coin75" class="coin dim"></div>
+    <div id="coin76" class="coin dim"></div>
+    <div id="coin77" class="coin dim"></div>
+    <div id="coin78" class="coin dim"></div>
+    <div id="coin79" class="coin dim"></div>
+    <div id="coin80" class="coin dim"></div>
+    <div id="coin81" class="coin dim"></div>
+    <div id="coin82" class="coin dim"></div>
+    <div id="coin83" class="coin dim"></div>
+    <div id="coin84" class="coin dim"></div>
+    <div id="coin85" class="coin dim"></div>
+    <div id="coin86" class="coin dim"></div>
+    <div id="coin87" class="coin dim"></div>
+    <div id="coin88" class="coin dim"></div>
+    <div id="coin89" class="coin dim"></div>
+    <div id="coin90" class="coin dim"></div>
+    <div id="coin91" class="coin dim"></div>
+    <div id="coin92" class="coin dim"></div>
+    <div id="coin93" class="coin dim"></div>
+    <div id="coin94" class="coin dim"></div>
+    <div id="coin95" class="coin dim"></div>
+    <div id="coin96" class="coin dim"></div>
+    <div id="coin97" class="coin"></div>
+    <div id="coin98" class="coin"></div>
+    <div id="coin99" class="coin"></div>
+      </div>
+      <svg id="hook-bracket" width="1080" height="1920"><path id="hook-brpath" d="M 76 1294 L 76 1306 L 468 1306 L 468 1294" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div id="hook-labpoor" class="pill">Ärmere Hälfte</div>
+      <div id="hook-labrich" class="pill">Reichste 10 %</div>
+    </div>
+    <div id="hook-t1" class="ttl clip" data-start="0" data-duration="2.1"><span class="w">Wem</span> <span class="w">gehört</span> <span class="w">eigentlich</span> <span class="w">Deutschland?</span></div>
+    <div id="hook-n1" class="num clip" data-start="2.05" data-duration="4.25"><div id="hook-n1big" class="big">0 %</div><div class="line">besitzen die reichsten 10 % der Haushalte</div></div>
+    <div id="hook-t2" class="ttl clip" data-start="6.3" data-duration="1.67"><span class="w">Und</span> <span class="w">die</span> <span class="w">ärmere</span> <span class="w">Hälfte?</span></div>
+    <div id="hook-n2" class="num clip" data-start="7.97" data-duration="3.03"><div class="big">2–3 %</div><div class="line">besitzt die ärmere Hälfte zusammen</div></div>
+    <div id="hook-s1" class="sub clip" data-start="0.28" data-duration="2.92">Die reichsten zehn Prozent besitzen mehr als die Hälfte</div>
+    <div id="hook-s2" class="sub clip" data-start="3.2" data-duration="2.9">von allem, was den Haushalten in Deutschland gehört.</div>
+    <div id="hook-s3" class="sub clip" data-start="6.35" data-duration="1.45">Und die ärmere Hälfte?</div>
+    <div id="hook-s4" class="sub clip" data-start="7.95" data-duration="3.05">Zusammen nur zwei bis drei Prozent.</div>
+    <div id="hook-src" data-layout-ignore>Quelle: Deutsche Bundesbank, Vermögensbefragung 2023 · Stand 20.11.2026 · Modell vereinfacht</div>
+    <div id="hook-logo">function.</div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    const GROUND = 1270, STEP = 11;
+    // labels and bracket start positions
+    gsap.set("#hook-labrich", { x: 690, y: 1318, opacity: 0 });   // labels sit under the figures like the axis of a bar chart, never in the way of the coins
+    gsap.set("#hook-labpoor", { x: 272 - 128, y: 1318, opacity: 0 });
+    gsap.set("#hook-brpath", { strokeDasharray: 760, strokeDashoffset: 760 });
+    gsap.set("#coin0", {x: 564, y: 629, zIndex: 10});
+    tl.set("#coin0", {zIndex: 600 + 0}, 1.600);
+    tl.fromTo("#coin0", {x: 564}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 1.600);
+    tl.fromTo("#coin0", {y: 629}, {y: 589, duration: 0.260, ease: "power2.out"}, 1.600);
+    tl.fromTo("#coin0", {y: 589}, {y: 1259, duration: 0.360, ease: "power2.in", immediateRender: false}, 1.860);
+    tl.set("#coin0", {zIndex: 100}, 2.220);
+    gsap.set("#coin1", {x: 564, y: 659, zIndex: 11});
+    tl.set("#coin1", {zIndex: 600 + 1}, 1.628);
+    tl.fromTo("#coin1", {x: 564}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 1.628);
+    tl.fromTo("#coin1", {y: 659}, {y: 619, duration: 0.260, ease: "power2.out"}, 1.628);
+    tl.fromTo("#coin1", {y: 619}, {y: 1248, duration: 0.360, ease: "power2.in", immediateRender: false}, 1.888);
+    tl.set("#coin1", {zIndex: 101}, 2.248);
+    gsap.set("#coin2", {x: 564, y: 689, zIndex: 12});
+    tl.set("#coin2", {zIndex: 600 + 2}, 1.656);
+    tl.fromTo("#coin2", {x: 564}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 1.656);
+    tl.fromTo("#coin2", {y: 689}, {y: 649, duration: 0.260, ease: "power2.out"}, 1.656);
+    tl.fromTo("#coin2", {y: 649}, {y: 1237, duration: 0.360, ease: "power2.in", immediateRender: false}, 1.916);
+    tl.set("#coin2", {zIndex: 102}, 2.276);
+    gsap.set("#coin3", {x: 564, y: 719, zIndex: 13});
+    tl.set("#coin3", {zIndex: 600 + 3}, 1.684);
+    tl.fromTo("#coin3", {x: 564}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 1.684);
+    tl.fromTo("#coin3", {y: 719}, {y: 679, duration: 0.260, ease: "power2.out"}, 1.684);
+    tl.fromTo("#coin3", {y: 679}, {y: 1226, duration: 0.360, ease: "power2.in", immediateRender: false}, 1.944);
+    tl.set("#coin3", {zIndex: 103}, 2.304);
+    gsap.set("#coin4", {x: 564, y: 749, zIndex: 14});
+    tl.set("#coin4", {zIndex: 600 + 4}, 1.712);
+    tl.fromTo("#coin4", {x: 564}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 1.712);
+    tl.fromTo("#coin4", {y: 749}, {y: 709, duration: 0.260, ease: "power2.out"}, 1.712);
+    tl.fromTo("#coin4", {y: 709}, {y: 1215, duration: 0.360, ease: "power2.in", immediateRender: false}, 1.972);
+    tl.set("#coin4", {zIndex: 104}, 2.332);
+    gsap.set("#coin5", {x: 564, y: 779, zIndex: 15});
+    tl.set("#coin5", {zIndex: 600 + 5}, 1.740);
+    tl.fromTo("#coin5", {x: 564}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 1.740);
+    tl.fromTo("#coin5", {y: 779}, {y: 739, duration: 0.260, ease: "power2.out"}, 1.740);
+    tl.fromTo("#coin5", {y: 739}, {y: 1204, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.000);
+    tl.set("#coin5", {zIndex: 105}, 2.360);
+    gsap.set("#coin6", {x: 564, y: 809, zIndex: 16});
+    tl.set("#coin6", {zIndex: 600 + 6}, 1.768);
+    tl.fromTo("#coin6", {x: 564}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 1.768);
+    tl.fromTo("#coin6", {y: 809}, {y: 769, duration: 0.260, ease: "power2.out"}, 1.768);
+    tl.fromTo("#coin6", {y: 769}, {y: 1193, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.028);
+    tl.set("#coin6", {zIndex: 106}, 2.388);
+    gsap.set("#coin7", {x: 564, y: 839, zIndex: 17});
+    tl.set("#coin7", {zIndex: 600 + 7}, 1.796);
+    tl.fromTo("#coin7", {x: 564}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 1.796);
+    tl.fromTo("#coin7", {y: 839}, {y: 799, duration: 0.260, ease: "power2.out"}, 1.796);
+    tl.fromTo("#coin7", {y: 799}, {y: 1182, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.056);
+    tl.set("#coin7", {zIndex: 107}, 2.416);
+    gsap.set("#coin8", {x: 564, y: 869, zIndex: 18});
+    tl.set("#coin8", {zIndex: 600 + 8}, 1.824);
+    tl.fromTo("#coin8", {x: 564}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 1.824);
+    tl.fromTo("#coin8", {y: 869}, {y: 829, duration: 0.260, ease: "power2.out"}, 1.824);
+    tl.fromTo("#coin8", {y: 829}, {y: 1171, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.084);
+    tl.set("#coin8", {zIndex: 108}, 2.444);
+    gsap.set("#coin9", {x: 564, y: 899, zIndex: 19});
+    tl.set("#coin9", {zIndex: 600 + 9}, 1.852);
+    tl.fromTo("#coin9", {x: 564}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 1.852);
+    tl.fromTo("#coin9", {y: 899}, {y: 859, duration: 0.260, ease: "power2.out"}, 1.852);
+    tl.fromTo("#coin9", {y: 859}, {y: 1160, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.112);
+    tl.set("#coin9", {zIndex: 109}, 2.472);
+    gsap.set("#coin10", {x: 510, y: 629, zIndex: 10});
+    tl.set("#coin10", {zIndex: 600 + 10}, 1.880);
+    tl.fromTo("#coin10", {x: 510}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 1.880);
+    tl.fromTo("#coin10", {y: 629}, {y: 589, duration: 0.260, ease: "power2.out"}, 1.880);
+    tl.fromTo("#coin10", {y: 589}, {y: 1149, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.140);
+    tl.set("#coin10", {zIndex: 110}, 2.500);
+    gsap.set("#coin11", {x: 510, y: 659, zIndex: 11});
+    tl.set("#coin11", {zIndex: 600 + 11}, 1.908);
+    tl.fromTo("#coin11", {x: 510}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 1.908);
+    tl.fromTo("#coin11", {y: 659}, {y: 619, duration: 0.260, ease: "power2.out"}, 1.908);
+    tl.fromTo("#coin11", {y: 619}, {y: 1138, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.168);
+    tl.set("#coin11", {zIndex: 111}, 2.528);
+    gsap.set("#coin12", {x: 510, y: 689, zIndex: 12});
+    tl.set("#coin12", {zIndex: 600 + 12}, 1.936);
+    tl.fromTo("#coin12", {x: 510}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 1.936);
+    tl.fromTo("#coin12", {y: 689}, {y: 649, duration: 0.260, ease: "power2.out"}, 1.936);
+    tl.fromTo("#coin12", {y: 649}, {y: 1127, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.196);
+    tl.set("#coin12", {zIndex: 112}, 2.556);
+    gsap.set("#coin13", {x: 510, y: 719, zIndex: 13});
+    tl.set("#coin13", {zIndex: 600 + 13}, 1.964);
+    tl.fromTo("#coin13", {x: 510}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 1.964);
+    tl.fromTo("#coin13", {y: 719}, {y: 679, duration: 0.260, ease: "power2.out"}, 1.964);
+    tl.fromTo("#coin13", {y: 679}, {y: 1116, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.224);
+    tl.set("#coin13", {zIndex: 113}, 2.584);
+    gsap.set("#coin14", {x: 510, y: 749, zIndex: 14});
+    tl.set("#coin14", {zIndex: 600 + 14}, 1.992);
+    tl.fromTo("#coin14", {x: 510}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 1.992);
+    tl.fromTo("#coin14", {y: 749}, {y: 709, duration: 0.260, ease: "power2.out"}, 1.992);
+    tl.fromTo("#coin14", {y: 709}, {y: 1105, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.252);
+    tl.set("#coin14", {zIndex: 114}, 2.612);
+    gsap.set("#coin15", {x: 510, y: 779, zIndex: 15});
+    tl.set("#coin15", {zIndex: 600 + 15}, 2.020);
+    tl.fromTo("#coin15", {x: 510}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.020);
+    tl.fromTo("#coin15", {y: 779}, {y: 739, duration: 0.260, ease: "power2.out"}, 2.020);
+    tl.fromTo("#coin15", {y: 739}, {y: 1094, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.280);
+    tl.set("#coin15", {zIndex: 115}, 2.640);
+    gsap.set("#coin16", {x: 510, y: 809, zIndex: 16});
+    tl.set("#coin16", {zIndex: 600 + 16}, 2.048);
+    tl.fromTo("#coin16", {x: 510}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.048);
+    tl.fromTo("#coin16", {y: 809}, {y: 769, duration: 0.260, ease: "power2.out"}, 2.048);
+    tl.fromTo("#coin16", {y: 769}, {y: 1083, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.308);
+    tl.set("#coin16", {zIndex: 116}, 2.668);
+    gsap.set("#coin17", {x: 510, y: 839, zIndex: 17});
+    tl.set("#coin17", {zIndex: 600 + 17}, 2.076);
+    tl.fromTo("#coin17", {x: 510}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.076);
+    tl.fromTo("#coin17", {y: 839}, {y: 799, duration: 0.260, ease: "power2.out"}, 2.076);
+    tl.fromTo("#coin17", {y: 799}, {y: 1072, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.336);
+    tl.set("#coin17", {zIndex: 117}, 2.696);
+    gsap.set("#coin18", {x: 510, y: 869, zIndex: 18});
+    tl.set("#coin18", {zIndex: 600 + 18}, 2.104);
+    tl.fromTo("#coin18", {x: 510}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.104);
+    tl.fromTo("#coin18", {y: 869}, {y: 829, duration: 0.260, ease: "power2.out"}, 2.104);
+    tl.fromTo("#coin18", {y: 829}, {y: 1061, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.364);
+    tl.set("#coin18", {zIndex: 118}, 2.724);
+    gsap.set("#coin19", {x: 510, y: 899, zIndex: 19});
+    tl.set("#coin19", {zIndex: 600 + 19}, 2.132);
+    tl.fromTo("#coin19", {x: 510}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.132);
+    tl.fromTo("#coin19", {y: 899}, {y: 859, duration: 0.260, ease: "power2.out"}, 2.132);
+    tl.fromTo("#coin19", {y: 859}, {y: 1050, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.392);
+    tl.set("#coin19", {zIndex: 119}, 2.752);
+    gsap.set("#coin20", {x: 456, y: 629, zIndex: 10});
+    tl.set("#coin20", {zIndex: 600 + 20}, 2.160);
+    tl.fromTo("#coin20", {x: 456}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.160);
+    tl.fromTo("#coin20", {y: 629}, {y: 589, duration: 0.260, ease: "power2.out"}, 2.160);
+    tl.fromTo("#coin20", {y: 589}, {y: 1039, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.420);
+    tl.set("#coin20", {zIndex: 120}, 2.780);
+    gsap.set("#coin21", {x: 456, y: 659, zIndex: 11});
+    tl.set("#coin21", {zIndex: 600 + 21}, 2.188);
+    tl.fromTo("#coin21", {x: 456}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.188);
+    tl.fromTo("#coin21", {y: 659}, {y: 619, duration: 0.260, ease: "power2.out"}, 2.188);
+    tl.fromTo("#coin21", {y: 619}, {y: 1028, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.448);
+    tl.set("#coin21", {zIndex: 121}, 2.808);
+    gsap.set("#coin22", {x: 456, y: 689, zIndex: 12});
+    tl.set("#coin22", {zIndex: 600 + 22}, 2.216);
+    tl.fromTo("#coin22", {x: 456}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.216);
+    tl.fromTo("#coin22", {y: 689}, {y: 649, duration: 0.260, ease: "power2.out"}, 2.216);
+    tl.fromTo("#coin22", {y: 649}, {y: 1017, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.476);
+    tl.set("#coin22", {zIndex: 122}, 2.836);
+    gsap.set("#coin23", {x: 456, y: 719, zIndex: 13});
+    tl.set("#coin23", {zIndex: 600 + 23}, 2.244);
+    tl.fromTo("#coin23", {x: 456}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.244);
+    tl.fromTo("#coin23", {y: 719}, {y: 679, duration: 0.260, ease: "power2.out"}, 2.244);
+    tl.fromTo("#coin23", {y: 679}, {y: 1006, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.504);
+    tl.set("#coin23", {zIndex: 123}, 2.864);
+    gsap.set("#coin24", {x: 456, y: 749, zIndex: 14});
+    tl.set("#coin24", {zIndex: 600 + 24}, 2.272);
+    tl.fromTo("#coin24", {x: 456}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.272);
+    tl.fromTo("#coin24", {y: 749}, {y: 709, duration: 0.260, ease: "power2.out"}, 2.272);
+    tl.fromTo("#coin24", {y: 709}, {y: 995, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.532);
+    tl.set("#coin24", {zIndex: 124}, 2.892);
+    gsap.set("#coin25", {x: 456, y: 779, zIndex: 15});
+    tl.set("#coin25", {zIndex: 600 + 25}, 2.300);
+    tl.fromTo("#coin25", {x: 456}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.300);
+    tl.fromTo("#coin25", {y: 779}, {y: 739, duration: 0.260, ease: "power2.out"}, 2.300);
+    tl.fromTo("#coin25", {y: 739}, {y: 984, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.560);
+    tl.set("#coin25", {zIndex: 125}, 2.920);
+    gsap.set("#coin26", {x: 456, y: 809, zIndex: 16});
+    tl.set("#coin26", {zIndex: 600 + 26}, 2.328);
+    tl.fromTo("#coin26", {x: 456}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.328);
+    tl.fromTo("#coin26", {y: 809}, {y: 769, duration: 0.260, ease: "power2.out"}, 2.328);
+    tl.fromTo("#coin26", {y: 769}, {y: 973, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.588);
+    tl.set("#coin26", {zIndex: 126}, 2.948);
+    gsap.set("#coin27", {x: 456, y: 839, zIndex: 17});
+    tl.set("#coin27", {zIndex: 600 + 27}, 2.356);
+    tl.fromTo("#coin27", {x: 456}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.356);
+    tl.fromTo("#coin27", {y: 839}, {y: 799, duration: 0.260, ease: "power2.out"}, 2.356);
+    tl.fromTo("#coin27", {y: 799}, {y: 962, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.616);
+    tl.set("#coin27", {zIndex: 127}, 2.976);
+    gsap.set("#coin28", {x: 456, y: 869, zIndex: 18});
+    tl.set("#coin28", {zIndex: 600 + 28}, 2.384);
+    tl.fromTo("#coin28", {x: 456}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.384);
+    tl.fromTo("#coin28", {y: 869}, {y: 829, duration: 0.260, ease: "power2.out"}, 2.384);
+    tl.fromTo("#coin28", {y: 829}, {y: 951, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.644);
+    tl.set("#coin28", {zIndex: 128}, 3.004);
+    gsap.set("#coin29", {x: 456, y: 899, zIndex: 19});
+    tl.set("#coin29", {zIndex: 600 + 29}, 2.412);
+    tl.fromTo("#coin29", {x: 456}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.412);
+    tl.fromTo("#coin29", {y: 899}, {y: 859, duration: 0.260, ease: "power2.out"}, 2.412);
+    tl.fromTo("#coin29", {y: 859}, {y: 940, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.672);
+    tl.set("#coin29", {zIndex: 129}, 3.032);
+    gsap.set("#coin30", {x: 402, y: 629, zIndex: 10});
+    tl.set("#coin30", {zIndex: 600 + 30}, 2.440);
+    tl.fromTo("#coin30", {x: 402}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.440);
+    tl.fromTo("#coin30", {y: 629}, {y: 589, duration: 0.260, ease: "power2.out"}, 2.440);
+    tl.fromTo("#coin30", {y: 589}, {y: 929, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.700);
+    tl.set("#coin30", {zIndex: 130}, 3.060);
+    gsap.set("#coin31", {x: 402, y: 659, zIndex: 11});
+    tl.set("#coin31", {zIndex: 600 + 31}, 2.468);
+    tl.fromTo("#coin31", {x: 402}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.468);
+    tl.fromTo("#coin31", {y: 659}, {y: 619, duration: 0.260, ease: "power2.out"}, 2.468);
+    tl.fromTo("#coin31", {y: 619}, {y: 918, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.728);
+    tl.set("#coin31", {zIndex: 131}, 3.088);
+    gsap.set("#coin32", {x: 402, y: 689, zIndex: 12});
+    tl.set("#coin32", {zIndex: 600 + 32}, 2.496);
+    tl.fromTo("#coin32", {x: 402}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.496);
+    tl.fromTo("#coin32", {y: 689}, {y: 649, duration: 0.260, ease: "power2.out"}, 2.496);
+    tl.fromTo("#coin32", {y: 649}, {y: 907, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.756);
+    tl.set("#coin32", {zIndex: 132}, 3.116);
+    gsap.set("#coin33", {x: 402, y: 719, zIndex: 13});
+    tl.set("#coin33", {zIndex: 600 + 33}, 2.524);
+    tl.fromTo("#coin33", {x: 402}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.524);
+    tl.fromTo("#coin33", {y: 719}, {y: 679, duration: 0.260, ease: "power2.out"}, 2.524);
+    tl.fromTo("#coin33", {y: 679}, {y: 896, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.784);
+    tl.set("#coin33", {zIndex: 133}, 3.144);
+    gsap.set("#coin34", {x: 402, y: 749, zIndex: 14});
+    tl.set("#coin34", {zIndex: 600 + 34}, 2.552);
+    tl.fromTo("#coin34", {x: 402}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.552);
+    tl.fromTo("#coin34", {y: 749}, {y: 709, duration: 0.260, ease: "power2.out"}, 2.552);
+    tl.fromTo("#coin34", {y: 709}, {y: 885, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.812);
+    tl.set("#coin34", {zIndex: 134}, 3.172);
+    gsap.set("#coin35", {x: 402, y: 779, zIndex: 15});
+    tl.set("#coin35", {zIndex: 600 + 35}, 2.580);
+    tl.fromTo("#coin35", {x: 402}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.580);
+    tl.fromTo("#coin35", {y: 779}, {y: 739, duration: 0.260, ease: "power2.out"}, 2.580);
+    tl.fromTo("#coin35", {y: 739}, {y: 874, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.840);
+    tl.set("#coin35", {zIndex: 135}, 3.200);
+    gsap.set("#coin36", {x: 402, y: 809, zIndex: 16});
+    tl.set("#coin36", {zIndex: 600 + 36}, 2.608);
+    tl.fromTo("#coin36", {x: 402}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.608);
+    tl.fromTo("#coin36", {y: 809}, {y: 769, duration: 0.260, ease: "power2.out"}, 2.608);
+    tl.fromTo("#coin36", {y: 769}, {y: 863, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.868);
+    tl.set("#coin36", {zIndex: 136}, 3.228);
+    gsap.set("#coin37", {x: 402, y: 839, zIndex: 17});
+    tl.set("#coin37", {zIndex: 600 + 37}, 2.636);
+    tl.fromTo("#coin37", {x: 402}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.636);
+    tl.fromTo("#coin37", {y: 839}, {y: 799, duration: 0.260, ease: "power2.out"}, 2.636);
+    tl.fromTo("#coin37", {y: 799}, {y: 852, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.896);
+    tl.set("#coin37", {zIndex: 137}, 3.256);
+    gsap.set("#coin38", {x: 402, y: 869, zIndex: 18});
+    tl.set("#coin38", {zIndex: 600 + 38}, 2.664);
+    tl.fromTo("#coin38", {x: 402}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.664);
+    tl.fromTo("#coin38", {y: 869}, {y: 801, duration: 0.260, ease: "power2.out"}, 2.664);
+    tl.fromTo("#coin38", {y: 801}, {y: 841, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.924);
+    tl.set("#coin38", {zIndex: 138}, 3.284);
+    gsap.set("#coin39", {x: 402, y: 899, zIndex: 19});
+    tl.set("#coin39", {zIndex: 600 + 39}, 2.692);
+    tl.fromTo("#coin39", {x: 402}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.692);
+    tl.fromTo("#coin39", {y: 899}, {y: 790, duration: 0.260, ease: "power2.out"}, 2.692);
+    tl.fromTo("#coin39", {y: 790}, {y: 830, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.952);
+    tl.set("#coin39", {zIndex: 139}, 3.312);
+    gsap.set("#coin40", {x: 348, y: 629, zIndex: 10});
+    tl.set("#coin40", {zIndex: 600 + 40}, 2.720);
+    tl.fromTo("#coin40", {x: 348}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.720);
+    tl.fromTo("#coin40", {y: 629}, {y: 589, duration: 0.260, ease: "power2.out"}, 2.720);
+    tl.fromTo("#coin40", {y: 589}, {y: 819, duration: 0.360, ease: "power2.in", immediateRender: false}, 2.980);
+    tl.set("#coin40", {zIndex: 140}, 3.340);
+    gsap.set("#coin41", {x: 348, y: 659, zIndex: 11});
+    tl.set("#coin41", {zIndex: 600 + 41}, 2.748);
+    tl.fromTo("#coin41", {x: 348}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.748);
+    tl.fromTo("#coin41", {y: 659}, {y: 619, duration: 0.260, ease: "power2.out"}, 2.748);
+    tl.fromTo("#coin41", {y: 619}, {y: 808, duration: 0.360, ease: "power2.in", immediateRender: false}, 3.008);
+    tl.set("#coin41", {zIndex: 141}, 3.368);
+    gsap.set("#coin42", {x: 348, y: 689, zIndex: 12});
+    tl.set("#coin42", {zIndex: 600 + 42}, 2.776);
+    tl.fromTo("#coin42", {x: 348}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.776);
+    tl.fromTo("#coin42", {y: 689}, {y: 649, duration: 0.260, ease: "power2.out"}, 2.776);
+    tl.fromTo("#coin42", {y: 649}, {y: 797, duration: 0.360, ease: "power2.in", immediateRender: false}, 3.036);
+    tl.set("#coin42", {zIndex: 142}, 3.396);
+    gsap.set("#coin43", {x: 348, y: 719, zIndex: 13});
+    tl.set("#coin43", {zIndex: 600 + 43}, 2.804);
+    tl.fromTo("#coin43", {x: 348}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.804);
+    tl.fromTo("#coin43", {y: 719}, {y: 679, duration: 0.260, ease: "power2.out"}, 2.804);
+    tl.fromTo("#coin43", {y: 679}, {y: 786, duration: 0.360, ease: "power2.in", immediateRender: false}, 3.064);
+    tl.set("#coin43", {zIndex: 143}, 3.424);
+    gsap.set("#coin44", {x: 348, y: 749, zIndex: 14});
+    tl.set("#coin44", {zIndex: 600 + 44}, 2.832);
+    tl.fromTo("#coin44", {x: 348}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.832);
+    tl.fromTo("#coin44", {y: 749}, {y: 709, duration: 0.260, ease: "power2.out"}, 2.832);
+    tl.fromTo("#coin44", {y: 709}, {y: 775, duration: 0.360, ease: "power2.in", immediateRender: false}, 3.092);
+    tl.set("#coin44", {zIndex: 144}, 3.452);
+    gsap.set("#coin45", {x: 348, y: 779, zIndex: 15});
+    tl.set("#coin45", {zIndex: 600 + 45}, 2.860);
+    tl.fromTo("#coin45", {x: 348}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.860);
+    tl.fromTo("#coin45", {y: 779}, {y: 724, duration: 0.260, ease: "power2.out"}, 2.860);
+    tl.fromTo("#coin45", {y: 724}, {y: 764, duration: 0.360, ease: "power2.in", immediateRender: false}, 3.120);
+    tl.set("#coin45", {zIndex: 145}, 3.480);
+    gsap.set("#coin46", {x: 348, y: 809, zIndex: 16});
+    tl.set("#coin46", {zIndex: 600 + 46}, 2.888);
+    tl.fromTo("#coin46", {x: 348}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.888);
+    tl.fromTo("#coin46", {y: 809}, {y: 713, duration: 0.260, ease: "power2.out"}, 2.888);
+    tl.fromTo("#coin46", {y: 713}, {y: 753, duration: 0.360, ease: "power2.in", immediateRender: false}, 3.148);
+    tl.set("#coin46", {zIndex: 146}, 3.508);
+    gsap.set("#coin47", {x: 348, y: 839, zIndex: 17});
+    tl.set("#coin47", {zIndex: 600 + 47}, 2.916);
+    tl.fromTo("#coin47", {x: 348}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.916);
+    tl.fromTo("#coin47", {y: 839}, {y: 702, duration: 0.260, ease: "power2.out"}, 2.916);
+    tl.fromTo("#coin47", {y: 702}, {y: 742, duration: 0.360, ease: "power2.in", immediateRender: false}, 3.176);
+    tl.set("#coin47", {zIndex: 147}, 3.536);
+    gsap.set("#coin48", {x: 348, y: 869, zIndex: 18});
+    tl.set("#coin48", {zIndex: 600 + 48}, 2.944);
+    tl.fromTo("#coin48", {x: 348}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.944);
+    tl.fromTo("#coin48", {y: 869}, {y: 691, duration: 0.260, ease: "power2.out"}, 2.944);
+    tl.fromTo("#coin48", {y: 691}, {y: 731, duration: 0.360, ease: "power2.in", immediateRender: false}, 3.204);
+    tl.set("#coin48", {zIndex: 148}, 3.564);
+    gsap.set("#coin49", {x: 348, y: 899, zIndex: 19});
+    tl.set("#coin49", {zIndex: 600 + 49}, 2.972);
+    tl.fromTo("#coin49", {x: 348}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 2.972);
+    tl.fromTo("#coin49", {y: 899}, {y: 680, duration: 0.260, ease: "power2.out"}, 2.972);
+    tl.fromTo("#coin49", {y: 680}, {y: 720, duration: 0.360, ease: "power2.in", immediateRender: false}, 3.232);
+    tl.set("#coin49", {zIndex: 149}, 3.592);
+    gsap.set("#coin50", {x: 294, y: 629, zIndex: 10});
+    tl.set("#coin50", {zIndex: 600 + 50}, 3.000);
+    tl.fromTo("#coin50", {x: 294}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 3.000);
+    tl.fromTo("#coin50", {y: 629}, {y: 589, duration: 0.260, ease: "power2.out"}, 3.000);
+    tl.fromTo("#coin50", {y: 589}, {y: 709, duration: 0.360, ease: "power2.in", immediateRender: false}, 3.260);
+    tl.set("#coin50", {zIndex: 150}, 3.620);
+    gsap.set("#coin51", {x: 294, y: 659, zIndex: 11});
+    tl.set("#coin51", {zIndex: 600 + 51}, 3.028);
+    tl.fromTo("#coin51", {x: 294}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 3.028);
+    tl.fromTo("#coin51", {y: 659}, {y: 619, duration: 0.260, ease: "power2.out"}, 3.028);
+    tl.fromTo("#coin51", {y: 619}, {y: 698, duration: 0.360, ease: "power2.in", immediateRender: false}, 3.288);
+    tl.set("#coin51", {zIndex: 151}, 3.648);
+    gsap.set("#coin52", {x: 294, y: 689, zIndex: 12});
+    tl.set("#coin52", {zIndex: 600 + 52}, 3.056);
+    tl.fromTo("#coin52", {x: 294}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 3.056);
+    tl.fromTo("#coin52", {y: 689}, {y: 647, duration: 0.260, ease: "power2.out"}, 3.056);
+    tl.fromTo("#coin52", {y: 647}, {y: 687, duration: 0.360, ease: "power2.in", immediateRender: false}, 3.316);
+    tl.set("#coin52", {zIndex: 152}, 3.676);
+    gsap.set("#coin53", {x: 294, y: 719, zIndex: 13});
+    tl.set("#coin53", {zIndex: 600 + 53}, 3.084);
+    tl.fromTo("#coin53", {x: 294}, {x: 868, duration: 0.384, ease: "power2.inOut"}, 3.084);
+    tl.fromTo("#coin53", {y: 719}, {y: 636, duration: 0.260, ease: "power2.out"}, 3.084);
+    tl.fromTo("#coin53", {y: 636}, {y: 676, duration: 0.360, ease: "power2.in", immediateRender: false}, 3.344);
+    tl.set("#coin53", {zIndex: 153}, 3.704);
+    gsap.set("#coin54", {x: 294, y: 749, zIndex: 14});
+    tl.set("#coin54", {zIndex: 600 + 54}, 3.500);
+    tl.fromTo("#coin54", {x: 294}, {x: 524, duration: 0.384, ease: "power2.inOut"}, 3.500);
+    tl.fromTo("#coin54", {y: 749}, {y: 709, duration: 0.260, ease: "power2.out"}, 3.500);
+    tl.fromTo("#coin54", {y: 709}, {y: 1259, duration: 0.360, ease: "power2.in", immediateRender: false}, 3.760);
+    tl.set("#coin54", {zIndex: 100}, 4.120);
+    gsap.set("#coin55", {x: 294, y: 779, zIndex: 15});
+    tl.set("#coin55", {zIndex: 600 + 55}, 3.530);
+    tl.fromTo("#coin55", {x: 294}, {x: 524, duration: 0.384, ease: "power2.inOut"}, 3.530);
+    tl.fromTo("#coin55", {y: 779}, {y: 739, duration: 0.260, ease: "power2.out"}, 3.530);
+    tl.fromTo("#coin55", {y: 739}, {y: 1248, duration: 0.360, ease: "power2.in", immediateRender: false}, 3.790);
+    tl.set("#coin55", {zIndex: 101}, 4.150);
+    gsap.set("#coin56", {x: 294, y: 809, zIndex: 16});
+    tl.set("#coin56", {zIndex: 600 + 56}, 3.560);
+    tl.fromTo("#coin56", {x: 294}, {x: 524, duration: 0.384, ease: "power2.inOut"}, 3.560);
+    tl.fromTo("#coin56", {y: 809}, {y: 769, duration: 0.260, ease: "power2.out"}, 3.560);
+    tl.fromTo("#coin56", {y: 769}, {y: 1237, duration: 0.360, ease: "power2.in", immediateRender: false}, 3.820);
+    tl.set("#coin56", {zIndex: 102}, 4.180);
+    gsap.set("#coin57", {x: 294, y: 839, zIndex: 17});
+    tl.set("#coin57", {zIndex: 600 + 57}, 3.590);
+    tl.fromTo("#coin57", {x: 294}, {x: 524, duration: 0.384, ease: "power2.inOut"}, 3.590);
+    tl.fromTo("#coin57", {y: 839}, {y: 799, duration: 0.260, ease: "power2.out"}, 3.590);
+    tl.fromTo("#coin57", {y: 799}, {y: 1226, duration: 0.360, ease: "power2.in", immediateRender: false}, 3.850);
+    tl.set("#coin57", {zIndex: 103}, 4.210);
+    gsap.set("#coin58", {x: 294, y: 869, zIndex: 18});
+    tl.set("#coin58", {zIndex: 600 + 58}, 3.620);
+    tl.fromTo("#coin58", {x: 294}, {x: 524, duration: 0.384, ease: "power2.inOut"}, 3.620);
+    tl.fromTo("#coin58", {y: 869}, {y: 829, duration: 0.260, ease: "power2.out"}, 3.620);
+    tl.fromTo("#coin58", {y: 829}, {y: 1215, duration: 0.360, ease: "power2.in", immediateRender: false}, 3.880);
+    tl.set("#coin58", {zIndex: 104}, 4.240);
+    gsap.set("#coin59", {x: 294, y: 899, zIndex: 19});
+    tl.set("#coin59", {zIndex: 600 + 59}, 3.650);
+    tl.fromTo("#coin59", {x: 294}, {x: 610, duration: 0.384, ease: "power2.inOut"}, 3.650);
+    tl.fromTo("#coin59", {y: 899}, {y: 859, duration: 0.260, ease: "power2.out"}, 3.650);
+    tl.fromTo("#coin59", {y: 859}, {y: 1259, duration: 0.360, ease: "power2.in", immediateRender: false}, 3.910);
+    tl.set("#coin59", {zIndex: 100}, 4.270);
+    gsap.set("#coin60", {x: 240, y: 629, zIndex: 10});
+    tl.set("#coin60", {zIndex: 600 + 60}, 3.680);
+    tl.fromTo("#coin60", {x: 240}, {x: 610, duration: 0.384, ease: "power2.inOut"}, 3.680);
+    tl.fromTo("#coin60", {y: 629}, {y: 589, duration: 0.260, ease: "power2.out"}, 3.680);
+    tl.fromTo("#coin60", {y: 589}, {y: 1248, duration: 0.360, ease: "power2.in", immediateRender: false}, 3.940);
+    tl.set("#coin60", {zIndex: 101}, 4.300);
+    gsap.set("#coin61", {x: 240, y: 659, zIndex: 11});
+    tl.set("#coin61", {zIndex: 600 + 61}, 3.710);
+    tl.fromTo("#coin61", {x: 240}, {x: 610, duration: 0.384, ease: "power2.inOut"}, 3.710);
+    tl.fromTo("#coin61", {y: 659}, {y: 619, duration: 0.260, ease: "power2.out"}, 3.710);
+    tl.fromTo("#coin61", {y: 619}, {y: 1237, duration: 0.360, ease: "power2.in", immediateRender: false}, 3.970);
+    tl.set("#coin61", {zIndex: 102}, 4.330);
+    gsap.set("#coin62", {x: 240, y: 689, zIndex: 12});
+    tl.set("#coin62", {zIndex: 600 + 62}, 3.740);
+    tl.fromTo("#coin62", {x: 240}, {x: 610, duration: 0.384, ease: "power2.inOut"}, 3.740);
+    tl.fromTo("#coin62", {y: 689}, {y: 649, duration: 0.260, ease: "power2.out"}, 3.740);
+    tl.fromTo("#coin62", {y: 649}, {y: 1226, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.000);
+    tl.set("#coin62", {zIndex: 103}, 4.360);
+    gsap.set("#coin63", {x: 240, y: 719, zIndex: 13});
+    tl.set("#coin63", {zIndex: 600 + 63}, 3.770);
+    tl.fromTo("#coin63", {x: 240}, {x: 610, duration: 0.384, ease: "power2.inOut"}, 3.770);
+    tl.fromTo("#coin63", {y: 719}, {y: 679, duration: 0.260, ease: "power2.out"}, 3.770);
+    tl.fromTo("#coin63", {y: 679}, {y: 1215, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.030);
+    tl.set("#coin63", {zIndex: 104}, 4.390);
+    gsap.set("#coin64", {x: 240, y: 749, zIndex: 14});
+    tl.set("#coin64", {zIndex: 600 + 64}, 3.800);
+    tl.fromTo("#coin64", {x: 240}, {x: 610, duration: 0.384, ease: "power2.inOut"}, 3.800);
+    tl.fromTo("#coin64", {y: 749}, {y: 709, duration: 0.260, ease: "power2.out"}, 3.800);
+    tl.fromTo("#coin64", {y: 709}, {y: 1204, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.060);
+    tl.set("#coin64", {zIndex: 105}, 4.420);
+    gsap.set("#coin65", {x: 240, y: 779, zIndex: 15});
+    tl.set("#coin65", {zIndex: 600 + 65}, 3.830);
+    tl.fromTo("#coin65", {x: 240}, {x: 610, duration: 0.384, ease: "power2.inOut"}, 3.830);
+    tl.fromTo("#coin65", {y: 779}, {y: 739, duration: 0.260, ease: "power2.out"}, 3.830);
+    tl.fromTo("#coin65", {y: 739}, {y: 1193, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.090);
+    tl.set("#coin65", {zIndex: 106}, 4.450);
+    gsap.set("#coin66", {x: 240, y: 809, zIndex: 16});
+    tl.set("#coin66", {zIndex: 600 + 66}, 3.860);
+    tl.fromTo("#coin66", {x: 240}, {x: 610, duration: 0.384, ease: "power2.inOut"}, 3.860);
+    tl.fromTo("#coin66", {y: 809}, {y: 769, duration: 0.260, ease: "power2.out"}, 3.860);
+    tl.fromTo("#coin66", {y: 769}, {y: 1182, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.120);
+    tl.set("#coin66", {zIndex: 107}, 4.480);
+    gsap.set("#coin67", {x: 240, y: 839, zIndex: 17});
+    tl.set("#coin67", {zIndex: 600 + 67}, 3.890);
+    tl.fromTo("#coin67", {x: 240}, {x: 696, duration: 0.384, ease: "power2.inOut"}, 3.890);
+    tl.fromTo("#coin67", {y: 839}, {y: 799, duration: 0.260, ease: "power2.out"}, 3.890);
+    tl.fromTo("#coin67", {y: 799}, {y: 1259, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.150);
+    tl.set("#coin67", {zIndex: 100}, 4.510);
+    gsap.set("#coin68", {x: 240, y: 869, zIndex: 18});
+    tl.set("#coin68", {zIndex: 600 + 68}, 3.920);
+    tl.fromTo("#coin68", {x: 240}, {x: 696, duration: 0.384, ease: "power2.inOut"}, 3.920);
+    tl.fromTo("#coin68", {y: 869}, {y: 829, duration: 0.260, ease: "power2.out"}, 3.920);
+    tl.fromTo("#coin68", {y: 829}, {y: 1248, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.180);
+    tl.set("#coin68", {zIndex: 101}, 4.540);
+    gsap.set("#coin69", {x: 240, y: 899, zIndex: 19});
+    tl.set("#coin69", {zIndex: 600 + 69}, 3.950);
+    tl.fromTo("#coin69", {x: 240}, {x: 696, duration: 0.384, ease: "power2.inOut"}, 3.950);
+    tl.fromTo("#coin69", {y: 899}, {y: 859, duration: 0.260, ease: "power2.out"}, 3.950);
+    tl.fromTo("#coin69", {y: 859}, {y: 1237, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.210);
+    tl.set("#coin69", {zIndex: 102}, 4.570);
+    gsap.set("#coin70", {x: 186, y: 629, zIndex: 10});
+    tl.set("#coin70", {zIndex: 600 + 70}, 3.980);
+    tl.fromTo("#coin70", {x: 186}, {x: 696, duration: 0.384, ease: "power2.inOut"}, 3.980);
+    tl.fromTo("#coin70", {y: 629}, {y: 589, duration: 0.260, ease: "power2.out"}, 3.980);
+    tl.fromTo("#coin70", {y: 589}, {y: 1226, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.240);
+    tl.set("#coin70", {zIndex: 103}, 4.600);
+    gsap.set("#coin71", {x: 186, y: 659, zIndex: 11});
+    tl.set("#coin71", {zIndex: 600 + 71}, 4.010);
+    tl.fromTo("#coin71", {x: 186}, {x: 696, duration: 0.384, ease: "power2.inOut"}, 4.010);
+    tl.fromTo("#coin71", {y: 659}, {y: 619, duration: 0.260, ease: "power2.out"}, 4.010);
+    tl.fromTo("#coin71", {y: 619}, {y: 1215, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.270);
+    tl.set("#coin71", {zIndex: 104}, 4.630);
+    gsap.set("#coin72", {x: 186, y: 689, zIndex: 12});
+    tl.set("#coin72", {zIndex: 600 + 72}, 4.040);
+    tl.fromTo("#coin72", {x: 186}, {x: 696, duration: 0.384, ease: "power2.inOut"}, 4.040);
+    tl.fromTo("#coin72", {y: 689}, {y: 649, duration: 0.260, ease: "power2.out"}, 4.040);
+    tl.fromTo("#coin72", {y: 649}, {y: 1204, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.300);
+    tl.set("#coin72", {zIndex: 105}, 4.660);
+    gsap.set("#coin73", {x: 186, y: 719, zIndex: 13});
+    tl.set("#coin73", {zIndex: 600 + 73}, 4.070);
+    tl.fromTo("#coin73", {x: 186}, {x: 696, duration: 0.384, ease: "power2.inOut"}, 4.070);
+    tl.fromTo("#coin73", {y: 719}, {y: 679, duration: 0.260, ease: "power2.out"}, 4.070);
+    tl.fromTo("#coin73", {y: 679}, {y: 1193, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.330);
+    tl.set("#coin73", {zIndex: 106}, 4.690);
+    gsap.set("#coin74", {x: 186, y: 749, zIndex: 14});
+    tl.set("#coin74", {zIndex: 600 + 74}, 4.100);
+    tl.fromTo("#coin74", {x: 186}, {x: 696, duration: 0.384, ease: "power2.inOut"}, 4.100);
+    tl.fromTo("#coin74", {y: 749}, {y: 709, duration: 0.260, ease: "power2.out"}, 4.100);
+    tl.fromTo("#coin74", {y: 709}, {y: 1182, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.360);
+    tl.set("#coin74", {zIndex: 107}, 4.720);
+    gsap.set("#coin75", {x: 186, y: 779, zIndex: 15});
+    tl.set("#coin75", {zIndex: 600 + 75}, 4.130);
+    tl.fromTo("#coin75", {x: 186}, {x: 696, duration: 0.384, ease: "power2.inOut"}, 4.130);
+    tl.fromTo("#coin75", {y: 779}, {y: 739, duration: 0.260, ease: "power2.out"}, 4.130);
+    tl.fromTo("#coin75", {y: 739}, {y: 1171, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.390);
+    tl.set("#coin75", {zIndex: 108}, 4.750);
+    gsap.set("#coin76", {x: 186, y: 809, zIndex: 16});
+    tl.set("#coin76", {zIndex: 600 + 76}, 4.160);
+    tl.fromTo("#coin76", {x: 186}, {x: 696, duration: 0.384, ease: "power2.inOut"}, 4.160);
+    tl.fromTo("#coin76", {y: 809}, {y: 769, duration: 0.260, ease: "power2.out"}, 4.160);
+    tl.fromTo("#coin76", {y: 769}, {y: 1160, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.420);
+    tl.set("#coin76", {zIndex: 109}, 4.780);
+    gsap.set("#coin77", {x: 186, y: 839, zIndex: 17});
+    tl.set("#coin77", {zIndex: 600 + 77}, 4.190);
+    tl.fromTo("#coin77", {x: 186}, {x: 696, duration: 0.384, ease: "power2.inOut"}, 4.190);
+    tl.fromTo("#coin77", {y: 839}, {y: 799, duration: 0.260, ease: "power2.out"}, 4.190);
+    tl.fromTo("#coin77", {y: 799}, {y: 1149, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.450);
+    tl.set("#coin77", {zIndex: 110}, 4.810);
+    gsap.set("#coin78", {x: 186, y: 869, zIndex: 18});
+    tl.set("#coin78", {zIndex: 600 + 78}, 4.220);
+    tl.fromTo("#coin78", {x: 186}, {x: 696, duration: 0.384, ease: "power2.inOut"}, 4.220);
+    tl.fromTo("#coin78", {y: 869}, {y: 829, duration: 0.260, ease: "power2.out"}, 4.220);
+    tl.fromTo("#coin78", {y: 829}, {y: 1138, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.480);
+    tl.set("#coin78", {zIndex: 111}, 4.840);
+    gsap.set("#coin79", {x: 186, y: 899, zIndex: 19});
+    tl.set("#coin79", {zIndex: 600 + 79}, 4.250);
+    tl.fromTo("#coin79", {x: 186}, {x: 782, duration: 0.384, ease: "power2.inOut"}, 4.250);
+    tl.fromTo("#coin79", {y: 899}, {y: 859, duration: 0.260, ease: "power2.out"}, 4.250);
+    tl.fromTo("#coin79", {y: 859}, {y: 1259, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.510);
+    tl.set("#coin79", {zIndex: 100}, 4.870);
+    gsap.set("#coin80", {x: 132, y: 629, zIndex: 10});
+    tl.set("#coin80", {zIndex: 600 + 80}, 4.280);
+    tl.fromTo("#coin80", {x: 132}, {x: 782, duration: 0.384, ease: "power2.inOut"}, 4.280);
+    tl.fromTo("#coin80", {y: 629}, {y: 589, duration: 0.260, ease: "power2.out"}, 4.280);
+    tl.fromTo("#coin80", {y: 589}, {y: 1248, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.540);
+    tl.set("#coin80", {zIndex: 101}, 4.900);
+    gsap.set("#coin81", {x: 132, y: 659, zIndex: 11});
+    tl.set("#coin81", {zIndex: 600 + 81}, 4.310);
+    tl.fromTo("#coin81", {x: 132}, {x: 782, duration: 0.384, ease: "power2.inOut"}, 4.310);
+    tl.fromTo("#coin81", {y: 659}, {y: 619, duration: 0.260, ease: "power2.out"}, 4.310);
+    tl.fromTo("#coin81", {y: 619}, {y: 1237, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.570);
+    tl.set("#coin81", {zIndex: 102}, 4.930);
+    gsap.set("#coin82", {x: 132, y: 689, zIndex: 12});
+    tl.set("#coin82", {zIndex: 600 + 82}, 4.340);
+    tl.fromTo("#coin82", {x: 132}, {x: 782, duration: 0.384, ease: "power2.inOut"}, 4.340);
+    tl.fromTo("#coin82", {y: 689}, {y: 649, duration: 0.260, ease: "power2.out"}, 4.340);
+    tl.fromTo("#coin82", {y: 649}, {y: 1226, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.600);
+    tl.set("#coin82", {zIndex: 103}, 4.960);
+    gsap.set("#coin83", {x: 132, y: 719, zIndex: 13});
+    tl.set("#coin83", {zIndex: 600 + 83}, 4.370);
+    tl.fromTo("#coin83", {x: 132}, {x: 782, duration: 0.384, ease: "power2.inOut"}, 4.370);
+    tl.fromTo("#coin83", {y: 719}, {y: 679, duration: 0.260, ease: "power2.out"}, 4.370);
+    tl.fromTo("#coin83", {y: 679}, {y: 1215, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.630);
+    tl.set("#coin83", {zIndex: 104}, 4.990);
+    gsap.set("#coin84", {x: 132, y: 749, zIndex: 14});
+    tl.set("#coin84", {zIndex: 600 + 84}, 4.400);
+    tl.fromTo("#coin84", {x: 132}, {x: 782, duration: 0.384, ease: "power2.inOut"}, 4.400);
+    tl.fromTo("#coin84", {y: 749}, {y: 709, duration: 0.260, ease: "power2.out"}, 4.400);
+    tl.fromTo("#coin84", {y: 709}, {y: 1204, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.660);
+    tl.set("#coin84", {zIndex: 105}, 5.020);
+    gsap.set("#coin85", {x: 132, y: 779, zIndex: 15});
+    tl.set("#coin85", {zIndex: 600 + 85}, 4.430);
+    tl.fromTo("#coin85", {x: 132}, {x: 782, duration: 0.384, ease: "power2.inOut"}, 4.430);
+    tl.fromTo("#coin85", {y: 779}, {y: 739, duration: 0.260, ease: "power2.out"}, 4.430);
+    tl.fromTo("#coin85", {y: 739}, {y: 1193, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.690);
+    tl.set("#coin85", {zIndex: 106}, 5.050);
+    gsap.set("#coin86", {x: 132, y: 809, zIndex: 16});
+    tl.set("#coin86", {zIndex: 600 + 86}, 4.460);
+    tl.fromTo("#coin86", {x: 132}, {x: 782, duration: 0.384, ease: "power2.inOut"}, 4.460);
+    tl.fromTo("#coin86", {y: 809}, {y: 769, duration: 0.260, ease: "power2.out"}, 4.460);
+    tl.fromTo("#coin86", {y: 769}, {y: 1182, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.720);
+    tl.set("#coin86", {zIndex: 107}, 5.080);
+    gsap.set("#coin87", {x: 132, y: 839, zIndex: 17});
+    tl.set("#coin87", {zIndex: 600 + 87}, 4.490);
+    tl.fromTo("#coin87", {x: 132}, {x: 782, duration: 0.384, ease: "power2.inOut"}, 4.490);
+    tl.fromTo("#coin87", {y: 839}, {y: 799, duration: 0.260, ease: "power2.out"}, 4.490);
+    tl.fromTo("#coin87", {y: 799}, {y: 1171, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.750);
+    tl.set("#coin87", {zIndex: 108}, 5.110);
+    gsap.set("#coin88", {x: 132, y: 869, zIndex: 18});
+    tl.set("#coin88", {zIndex: 600 + 88}, 4.520);
+    tl.fromTo("#coin88", {x: 132}, {x: 782, duration: 0.384, ease: "power2.inOut"}, 4.520);
+    tl.fromTo("#coin88", {y: 869}, {y: 829, duration: 0.260, ease: "power2.out"}, 4.520);
+    tl.fromTo("#coin88", {y: 829}, {y: 1160, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.780);
+    tl.set("#coin88", {zIndex: 109}, 5.140);
+    gsap.set("#coin89", {x: 132, y: 899, zIndex: 19});
+    tl.set("#coin89", {zIndex: 600 + 89}, 4.550);
+    tl.fromTo("#coin89", {x: 132}, {x: 782, duration: 0.384, ease: "power2.inOut"}, 4.550);
+    tl.fromTo("#coin89", {y: 899}, {y: 859, duration: 0.260, ease: "power2.out"}, 4.550);
+    tl.fromTo("#coin89", {y: 859}, {y: 1149, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.810);
+    tl.set("#coin89", {zIndex: 110}, 5.170);
+    gsap.set("#coin90", {x: 78, y: 629, zIndex: 10});
+    tl.set("#coin90", {zIndex: 600 + 90}, 4.580);
+    tl.fromTo("#coin90", {x: 78}, {x: 782, duration: 0.384, ease: "power2.inOut"}, 4.580);
+    tl.fromTo("#coin90", {y: 629}, {y: 589, duration: 0.260, ease: "power2.out"}, 4.580);
+    tl.fromTo("#coin90", {y: 589}, {y: 1138, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.840);
+    tl.set("#coin90", {zIndex: 111}, 5.200);
+    gsap.set("#coin91", {x: 78, y: 659, zIndex: 11});
+    tl.set("#coin91", {zIndex: 600 + 91}, 4.610);
+    tl.fromTo("#coin91", {x: 78}, {x: 782, duration: 0.384, ease: "power2.inOut"}, 4.610);
+    tl.fromTo("#coin91", {y: 659}, {y: 619, duration: 0.260, ease: "power2.out"}, 4.610);
+    tl.fromTo("#coin91", {y: 619}, {y: 1127, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.870);
+    tl.set("#coin91", {zIndex: 112}, 5.230);
+    gsap.set("#coin92", {x: 78, y: 689, zIndex: 12});
+    tl.set("#coin92", {zIndex: 600 + 92}, 4.640);
+    tl.fromTo("#coin92", {x: 78}, {x: 782, duration: 0.384, ease: "power2.inOut"}, 4.640);
+    tl.fromTo("#coin92", {y: 689}, {y: 649, duration: 0.260, ease: "power2.out"}, 4.640);
+    tl.fromTo("#coin92", {y: 649}, {y: 1116, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.900);
+    tl.set("#coin92", {zIndex: 113}, 5.260);
+    gsap.set("#coin93", {x: 78, y: 719, zIndex: 13});
+    tl.set("#coin93", {zIndex: 600 + 93}, 4.670);
+    tl.fromTo("#coin93", {x: 78}, {x: 782, duration: 0.384, ease: "power2.inOut"}, 4.670);
+    tl.fromTo("#coin93", {y: 719}, {y: 679, duration: 0.260, ease: "power2.out"}, 4.670);
+    tl.fromTo("#coin93", {y: 679}, {y: 1105, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.930);
+    tl.set("#coin93", {zIndex: 114}, 5.290);
+    gsap.set("#coin94", {x: 78, y: 749, zIndex: 14});
+    tl.set("#coin94", {zIndex: 600 + 94}, 4.700);
+    tl.fromTo("#coin94", {x: 78}, {x: 782, duration: 0.384, ease: "power2.inOut"}, 4.700);
+    tl.fromTo("#coin94", {y: 749}, {y: 709, duration: 0.260, ease: "power2.out"}, 4.700);
+    tl.fromTo("#coin94", {y: 709}, {y: 1094, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.960);
+    tl.set("#coin94", {zIndex: 115}, 5.320);
+    gsap.set("#coin95", {x: 78, y: 779, zIndex: 15});
+    tl.set("#coin95", {zIndex: 600 + 95}, 4.730);
+    tl.fromTo("#coin95", {x: 78}, {x: 782, duration: 0.384, ease: "power2.inOut"}, 4.730);
+    tl.fromTo("#coin95", {y: 779}, {y: 739, duration: 0.260, ease: "power2.out"}, 4.730);
+    tl.fromTo("#coin95", {y: 739}, {y: 1083, duration: 0.360, ease: "power2.in", immediateRender: false}, 4.990);
+    tl.set("#coin95", {zIndex: 116}, 5.350);
+    gsap.set("#coin96", {x: 78, y: 809, zIndex: 16});
+    tl.set("#coin96", {zIndex: 600 + 96}, 4.760);
+    tl.fromTo("#coin96", {x: 78}, {x: 782, duration: 0.384, ease: "power2.inOut"}, 4.760);
+    tl.fromTo("#coin96", {y: 809}, {y: 769, duration: 0.260, ease: "power2.out"}, 4.760);
+    tl.fromTo("#coin96", {y: 769}, {y: 1072, duration: 0.360, ease: "power2.in", immediateRender: false}, 5.020);
+    tl.set("#coin96", {zIndex: 117}, 5.380);
+    gsap.set("#coin97", {x: 78, y: 899, zIndex: 19});
+    tl.set("#coin97", {zIndex: 600 + 97}, 8.300);
+    tl.fromTo("#coin97", {x: 78}, {x: 206, duration: 0.384, ease: "power2.inOut"}, 8.300);
+    tl.fromTo("#coin97", {y: 899}, {y: 859, duration: 0.260, ease: "power2.out"}, 8.300);
+    tl.fromTo("#coin97", {y: 859}, {y: 1265, duration: 0.360, ease: "power2.in", immediateRender: false}, 8.560);
+    tl.set("#coin97", {zIndex: 900}, 8.920);
+    gsap.set("#coin98", {x: 78, y: 869, zIndex: 18});
+    tl.set("#coin98", {zIndex: 600 + 98}, 8.420);
+    tl.fromTo("#coin98", {x: 78}, {x: 246, duration: 0.384, ease: "power2.inOut"}, 8.420);
+    tl.fromTo("#coin98", {y: 869}, {y: 829, duration: 0.260, ease: "power2.out"}, 8.420);
+    tl.fromTo("#coin98", {y: 829}, {y: 1256, duration: 0.360, ease: "power2.in", immediateRender: false}, 8.680);
+    tl.set("#coin98", {zIndex: 901}, 9.040);
+    gsap.set("#coin99", {x: 78, y: 839, zIndex: 17});
+    tl.set("#coin99", {zIndex: 600 + 99}, 8.540);
+    tl.fromTo("#coin99", {x: 78}, {x: 286, duration: 0.384, ease: "power2.inOut"}, 8.540);
+    tl.fromTo("#coin99", {y: 839}, {y: 799, duration: 0.260, ease: "power2.out"}, 8.540);
+    tl.fromTo("#coin99", {y: 799}, {y: 1265, duration: 0.360, ease: "power2.in", immediateRender: false}, 8.800);
+    tl.set("#coin99", {zIndex: 902}, 9.160);
+    gsap.set("#fig0", {x: 71, y: 1101});
+    gsap.set("#fig1", {x: 157, y: 1101});
+    gsap.set("#fig2", {x: 243, y: 1101});
+    gsap.set("#fig3", {x: 329, y: 1101});
+    gsap.set("#fig4", {x: 415, y: 1101});
+    gsap.set("#fig5", {x: 501, y: 1101});
+    gsap.set("#fig6", {x: 587, y: 1101});
+    gsap.set("#fig7", {x: 673, y: 1101});
+    gsap.set("#fig8", {x: 759, y: 1101});
+    gsap.set("#fig9", {x: 845, y: 1101});
+    // the richest figure turns red when Tom names it
+    tl.fromTo("#fig9 .shirt", { fill: "#CFCAD9" }, { fill: "#E01E2B", duration: 0.3, ease: "power2.out" }, 0.47);
+    tl.fromTo("#hook-labrich", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 0.62);
+    // title: word by word in, blur out before the number
+    tl.fromTo("#hook-t1 .w", { opacity: 1, filter: "blur(0px)" }, { opacity: 0, filter: "blur(8px)", duration: 0.15, stagger: 0.03, ease: "power2.in" }, 1.78);
+    // 54 %: counts with the landed coins
+    const c1 = { v: 0 };
+    tl.fromTo("#hook-n1", { opacity: 0, filter: "blur(10px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.18, ease: "power4.out" }, 2.05);
+    tl.fromTo(c1, { v: 0 }, { v: 54, duration: 1.584, ease: "none", onUpdate: () => { document.querySelector("#hook-n1big").textContent = Math.round(c1.v) + " %"; } }, 2.170);
+    tl.to("#hook-n1", { opacity: 0, filter: "blur(8px)", duration: 0.15, ease: "power2.in" }, 6.13);
+    // the poorer half: everyone else steps back, the camera leans in, bracket and label
+    tl.fromTo("#hook-t2 .w", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.13, stagger: 0.067, ease: "power4.out" }, 6.32);
+    tl.fromTo(".dim", { opacity: 1 }, { opacity: 0.26, duration: 0.45, ease: "power2.inOut" }, 6.35);
+    tl.fromTo("#hook-stage", { scale: 1, transformOrigin: "300px 1150px" }, { scale: 1.1, duration: 0.9, ease: "power2.inOut" }, 6.35);
+    tl.fromTo("#hook-brpath", { strokeDashoffset: 760 }, { strokeDashoffset: 0, duration: 0.4, ease: "power2.out" }, 6.5);
+    tl.fromTo("#hook-labpoor", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 6.62);
+    tl.to("#hook-t2 .w", { opacity: 0, filter: "blur(8px)", duration: 0.13, stagger: 0.02, ease: "power2.in" }, 7.76);
+    tl.fromTo("#hook-n2", { opacity: 0, filter: "blur(10px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.18, ease: "power4.out" }, 7.97);
+    // the empty tray leaves once the last coins are gone, then everything comes back for the comparison
+    tl.fromTo(["#hook-tray", "#hook-traycap"], { opacity: 1 }, { opacity: 0, duration: 0.35, ease: "power2.in" }, 9.2);
+    tl.to(".dim", { opacity: 1, duration: 0.5, ease: "power2.inOut" }, 9.75);
+    tl.to("#hook-stage", { scale: 1, duration: 0.9, ease: "power2.inOut" }, 9.7);
+    window.__timelines["hook"] = tl;
+  </script>
+</template>

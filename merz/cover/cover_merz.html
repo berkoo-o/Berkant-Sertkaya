@@ -1,0 +1,179 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#07070B}
+canvas{position:absolute;left:0;top:0}
+</style></head><body>
+<canvas id="bg" width="1080" height="1920"></canvas>
+<canvas id="fg" width="1080" height="1920"></canvas>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+// function. – Cover „Ist Friedrich Merz Deutschlands unbeliebtester Bundeskanzler?“, clean (nur Motiv), Licht und Hintergrund wie rundfunk/cover/cover_turm.html.
+// ?v=1  der aufgeschnittene Reichstag: Glaskuppel mit Rampen und Spiegelkegel, Plenarsaal mit blauen Sitzreihen, Adler, Rednerpult mit roter Redezeit-Lampe
+// ?v=2  das Rednerpult mit Merz dahinter auf einer Platte mit 100 Lichtern, nur 10 leuchten (10 % zufrieden), die rote Redezeit-Lampe als roter Faden
+// ?v=3  die gläserne Kuppel allein, darunter der Plenarsaal im Kreis, in der Mitte das Pult mit der roten Lampe
+import * as THREE from 'three';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
+const W=1080,H=1920;const Q=new URLSearchParams(location.search);const V=+(Q.get('v')||1);
+const bg=document.getElementById('bg').getContext('2d'),fg=document.getElementById('fg').getContext('2d');
+const DEF={1:{cy:1250,el:26,ry:-0.55,s:0.82},2:{cy:1460,el:17,ry:-0.38,s:1.04},3:{cy:1300,el:20,ry:-0.3,s:1.08}}[V];
+const CX=+(Q.get('cx')||(V===1?585:V===2?575:540)),CY=+(Q.get('cy')||DEF.cy);
+// ---------- background (same recipe as the other clean covers) ----------
+{bg.fillStyle='#07070B';bg.fillRect(0,0,W,H);
+ const blob=(x,y,r,c)=>{const g=bg.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,c);g.addColorStop(1,'rgba(0,0,0,0)');bg.fillStyle=g;bg.fillRect(0,0,W,H);};
+ blob(430,900,800,'rgba(96,78,255,0.32)');blob(860,1450,620,'rgba(224,30,43,0.20)');blob(120,1700,500,'rgba(60,40,200,0.16)');
+ bg.save();bg.strokeStyle='rgba(170,160,255,0.10)';bg.lineWidth=1.5;const hz=1330;
+ for(let i=-14;i<=14;i++){bg.beginPath();bg.moveTo(CX+i*26,hz);bg.lineTo(CX+i*190,H);bg.stroke();}
+ for(let k=0;k<9;k++){const y=hz+Math.pow(k/8,2.1)*(H-hz);bg.beginPath();bg.moveTo(0,y);bg.lineTo(W,y);bg.stroke();}
+ const f=bg.createLinearGradient(0,hz-10,0,hz+170);f.addColorStop(0,'#07070B');f.addColorStop(1,'rgba(7,7,11,0)');bg.fillStyle=f;bg.fillRect(0,hz-12,W,190);
+ const f2=bg.createLinearGradient(0,1740,0,H);f2.addColorStop(0,'rgba(7,7,11,0)');f2.addColorStop(1,'rgba(7,7,11,.95)');bg.fillStyle=f2;bg.fillRect(0,1740,W,180);bg.restore();
+ bg.save();bg.translate(CX,CY+150);bg.scale(1,0.24);const g=bg.createRadialGradient(0,0,0,0,0,560);g.addColorStop(0,'rgba(224,30,43,0.55)');g.addColorStop(.55,'rgba(224,30,43,0.16)');g.addColorStop(1,'rgba(224,30,43,0)');bg.fillStyle=g;bg.beginPath();bg.arc(0,0,560,0,7);bg.fill();bg.restore();
+ const v=bg.createLinearGradient(0,0,0,600);v.addColorStop(0,'rgba(7,7,11,.4)');v.addColorStop(1,'rgba(7,7,11,0)');bg.fillStyle=v;bg.fillRect(0,0,W,600);}
+// ---------- 3D ----------
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});
+renderer.setSize(W,H);renderer.setPixelRatio(1);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.setClearColor(0x000000,0);
+renderer.domElement.style.position='absolute';document.body.insertBefore(renderer.domElement,document.getElementById('fg'));
+const scene=new THREE.Scene();const pm=new THREE.PMREMGenerator(renderer);scene.environment=pm.fromScene(new RoomEnvironment(),0.04).texture;scene.environmentIntensity=0.4;
+const D=10.2,el=+(Q.get('el')||DEF.el)*Math.PI/180;const cam=new THREE.PerspectiveCamera(30,W/H,0.1,100);
+cam.position.set(0,D*Math.sin(el),D*Math.cos(el));cam.lookAt(0,0,0);cam.updateMatrixWorld();
+scene.add(new THREE.HemisphereLight(0xcfd4ff,0x14080c,0.5));
+const key=new THREE.DirectionalLight(0xfff1e4,2.3);key.position.set(-2.5,7,5);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.radius=14;
+Object.assign(key.shadow.camera,{left:-4,right:4,top:6,bottom:-4});scene.add(key);
+const rim=new THREE.DirectionalLight(0xff3344,2.4);rim.position.set(4,2.5,-3);scene.add(rim);
+const rim2=new THREE.DirectionalLight(0x8a78ff,1.4);rim2.position.set(-4,2,-2);scene.add(rim2);
+const M=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:.45,metalness:.15,...o});
+const root=new THREE.Group();root.scale.setScalar(+(Q.get('s')||DEF.s));scene.add(root);
+const obj=new THREE.Group();obj.rotation.y=+(Q.get('ry')||DEF.ry);root.add(obj);
+const BODY=M(0xdedaff,{roughness:.5}),STONE=M(0xb9b0d6,{roughness:.75}),VIO=M(0x5257b8),PAN=M(0x24205e,{roughness:.35}),LIL=M(0xa48cff,{roughness:.3}),DARK=M(0x0c0a26,{roughness:.25});
+const LIGHT=M(0xece6ff,{roughness:.6}),METAL=M(0xc9c2ff,{metalness:.6,roughness:.25}),NAVY=M(0x2b2778),SEAT=M(0x4a58d8,{roughness:.45}),WOOD=M(0x3a2f6e,{roughness:.5});
+const REDM=new THREE.MeshBasicMaterial({color:0xff2a3a,toneMapped:false});
+const add=(par,geo,m,x=0,y=0,z=0)=>{const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;par.add(o);return o;};
+const RB=(par,w,h,d,m,x,y,z,r=0.02)=>add(par,new RoundedBoxGeometry(w,h,d,3,r),m,x,y,z);
+const glass=(par,g,x,y,z,op=.14)=>{const sh=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:0x8f86ff,transparent:true,opacity:op,roughness:.1,depthWrite:false,side:THREE.DoubleSide,emissive:0x4a40c0,emissiveIntensity:.25}));sh.position.set(x,y,z);sh.renderOrder=5;par.add(sh);return sh;};
+const rod=(par,a,b,r,m)=>{const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b);const len=A.distanceTo(B);const g=new THREE.CylinderGeometry(r,r,len,10);g.translate(0,len/2,0);g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),B.clone().sub(A).normalize()));const o=new THREE.Mesh(g,m);o.position.copy(A);o.castShadow=true;par.add(o);return o;};
+const canvasTex=(w,h,draw)=>{const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t;};
+// federal eagle (same drawing as in the video model), grey on transparent
+const eagleTex=canvasTex(512,512,(g,w,h)=>{g.clearRect(0,0,w,h);const cx=256,lerp=(a,b,u)=>a+(b-a)*u;g.fillStyle='#b9bccb';
+  for(const s of [-1,1]){g.beginPath();g.moveTo(cx+s*40,170);g.quadraticCurveTo(cx+s*120,70,cx+s*236,112);const tips=6;
+    for(let i=0;i<tips;i++){const u=i/(tips-1);const tx=cx+s*lerp(238,92,u),ty=lerp(150,338,u);const nx=cx+s*lerp(214,84,u+0.5/(tips-1)),ny=lerp(140,318,u+0.5/(tips-1));
+      g.quadraticCurveTo(tx+s*10,ty-6,tx,ty+14);if(i<tips-1)g.lineTo(nx,ny);}
+    g.lineTo(cx+s*50,300);g.closePath();g.fill();}
+  g.beginPath();g.ellipse(cx,248,64,98,0,0,7);g.fill();g.beginPath();g.arc(cx+6,126,40,0,7);g.fill();
+  g.beginPath();g.moveTo(cx-24,112);g.quadraticCurveTo(cx-74,112,cx-70,140);g.lineTo(cx-56,134);g.lineTo(cx-30,146);g.closePath();g.fill();
+  g.beginPath();g.moveTo(cx-46,330);g.lineTo(cx+46,330);g.lineTo(cx+74,410);for(let i=0;i<5;i++){const x0=cx+74-i*29.6;g.quadraticCurveTo(x0-15,428,x0-29.6,410);}g.closePath();g.fill();});
+const eagle=(par,sz,x,y,z,ry=0,c=0xffffff)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(sz,sz),new THREE.MeshStandardMaterial({map:eagleTex,color:c,transparent:true,roughness:.6,emissive:0x9a9cc0,emissiveIntensity:.25}));m.position.set(x,y,z);m.rotation.y=ry;par.add(m);return m;};
+// small stylised chancellor figure (dark blue suit, grey hair, glasses), as in the video
+function figure(par,x,y,z,sc,ry=0,hands=0){const G=new THREE.Group();G.position.set(x,y,z);G.scale.setScalar(sc);G.rotation.y=ry;par.add(G);
+  const suit=M(0x27355a,{roughness:.7}),skin=M(0xd9a88c,{roughness:.6}),hair=M(0x9e9d99,{roughness:.85}),shirt=M(0xf4f4f2),tie=M(0x2e4c9a,{roughness:.5}),dk=M(0x1a1b22,{roughness:.4});
+  for(const s of [-1,1])add(G,new THREE.CylinderGeometry(0.03,0.026,0.28,10),suit,s*0.034,0.14,0);
+  {const g=new THREE.CylinderGeometry(0.078,0.062,0.2,20);g.scale(1,1,0.62);add(G,g,suit,0,0.37,0);}
+  add(G,new THREE.CapsuleGeometry(0.034,0.1,6,12).rotateZ(Math.PI/2),suit,0,0.468,0);
+  {const v=new THREE.Shape();v.moveTo(-0.017,0);v.lineTo(0.017,0);v.lineTo(0,-0.07);v.closePath();add(G,new THREE.ShapeGeometry(v),shirt,0,0.48,0.049);}{const t=new THREE.Shape();t.moveTo(-0.006,0);t.lineTo(0.006,0);t.lineTo(0.009,-0.05);t.lineTo(0,-0.062);t.lineTo(-0.009,-0.05);t.closePath();add(G,new THREE.ShapeGeometry(t),M(0x24418f,{roughness:.5}),0,0.476,0.0505);}
+  add(G,new THREE.CylinderGeometry(0.02,0.022,0.04,12),skin,0,0.505,0);
+  // arms reach forward to the lectern top
+  for(const s of [-1,1]){const A=new THREE.Group();A.position.set(s*0.088,0.46,0.0);G.add(A);const up=add(A,new THREE.CylinderGeometry(0.021,0.018,0.13,8),suit,0,-0.06,0);
+    A.rotation.set(hands?-0.75:0,0,s*0.12);const F=new THREE.Group();F.position.set(0,-0.125,0);A.add(F);F.rotation.x=hands?-0.9:0;add(F,new THREE.CylinderGeometry(0.018,0.016,0.12,8),suit,0,-0.06,0);add(F,new THREE.SphereGeometry(0.017,10,8),skin,0,-0.125,0);}
+  // head: face, ears, glasses, nose, grey hair with a side part and high forehead
+  const Hd=new THREE.Group();Hd.position.set(0,0.565,0);G.add(Hd);
+  {const g=new THREE.SphereGeometry(0.05,24,18);g.scale(0.92,1.12,0.95);add(Hd,g,skin);}
+  for(const s of [-1,1]){add(Hd,new THREE.SphereGeometry(0.012,10,8),skin,s*0.046,0,0).scale.set(0.5,1,0.8);
+    add(Hd,new THREE.SphereGeometry(0.0055,8,6),dk,s*0.017,0.008,0.044);add(Hd,new THREE.TorusGeometry(0.012,0.0009,6,18),M(0xb8b8c0,{metalness:.7,roughness:.25,transparent:true,opacity:.7}),s*0.017,0.008,0.047);}
+  add(Hd,new THREE.BoxGeometry(0.012,0.002,0.002),M(0x9a9aa2,{metalness:.6}),0,0.009,0.048);
+  {const n=add(Hd,new THREE.ConeGeometry(0.008,0.02,8),skin,0,-0.006,0.05);n.rotation.x=Math.PI/2;}
+  add(Hd,new THREE.BoxGeometry(0.022,0.003,0.004),M(0xa8706a),0,-0.03,0.044);
+  {const g=new THREE.SphereGeometry(0.053,24,14,0,Math.PI*2,0,Math.PI*0.42);g.scale(0.95,1.0,1.0);const h=add(Hd,g,hair,0,0.012,-0.008);h.rotation.x=-0.25;}
+  for(const s of [-1,1]){const g=new THREE.SphereGeometry(0.022,14,10);g.scale(0.45,0.8,1.2);add(Hd,g,hair,s*0.043,0.012,-0.016);}
+  return G;}
+// the red thread: the red speaking-time lamp on the lectern
+function lectern(par,x,z,sc){const L=new THREE.Group();L.position.set(x,0,z);L.scale.setScalar(sc);par.add(L);
+  RB(L,0.36,0.5,0.24,WOOD,0,0.25,0,0.02);RB(L,0.4,0.035,0.3,PAN,0,0.51,-0.01,0.01).rotation.x=0.18;
+  eagle(L,0.2,0,0.3,0.121);
+  for(const s of [-1,1]){rod(L,[s*0.08,0.52,0.06],[s*0.05,0.66,0.13],0.006,METAL);add(L,new THREE.SphereGeometry(0.014,10,8),DARK,s*0.05,0.665,0.135);}
+  RB(L,0.11,0.06,0.06,DARK,0.12,0.56,0.08,0.008);
+  add(L,new THREE.SphereGeometry(0.03,20,14),REDM,0.12,0.6,0.08);const p=new THREE.PointLight(0xff2030,2.4,1.8,2);p.position.set(0.12,0.66,0.2);L.add(p);
+  for(let i=0;i<3;i++){const s=add(L,new THREE.BoxGeometry(0.1,0.002,0.13),LIGHT,-0.06+i*0.012,0.535+i*0.002,-0.01);s.rotation.set(0.18,0.08*i,0);}
+  return L;}
+
+if(V===1){
+  // ---------------- the Reichstag cut open like a dollhouse ----------------
+  const R=obj;const WW=2.3,DD=1.55,HH=0.62,T=0.07;
+  RB(R,WW+0.5,0.1,DD+0.5,PAN,0,0.05,0,0.03);
+  {const ed=new THREE.Mesh(new THREE.TorusGeometry(1,0.008,6,96),new THREE.MeshBasicMaterial({color:0xb8a8ff,toneMapped:false}));ed.scale.set((WW+0.5)/2*1.0,(DD+0.5)/2,1);ed.rotation.x=Math.PI/2;ed.position.y=0.1;}
+  const y0=0.1;
+  // floor of the hall, walls (front cut away to a low parapet), cut faces bright
+  RB(R,WW,0.04,DD,NAVY,0,y0+0.02,0,0.01);
+  RB(R,WW,HH,T,STONE,0,y0+HH/2,-DD/2+T/2,0.01);
+  for(const s of [-1,1])RB(R,T,HH,DD,STONE,s*(WW/2-T/2),y0+HH/2,0,0.01);
+  RB(R,WW,0.12,T,STONE,0,y0+0.06,DD/2-T/2,0.01);
+  // window rows on the side and back walls (warm lit) and cornice
+  const WIN=new THREE.MeshBasicMaterial({color:0xffd9a0,toneMapped:false});
+  for(let i=0;i<9;i++)for(let k=0;k<2;k++){const x=-WW/2+0.3+i*(WW-0.6)/8;add(R,new THREE.PlaneGeometry(0.07,0.12),WIN,x,y0+0.2+k*0.24,-DD/2-0.001).rotation.y=Math.PI;}
+  for(const s of [-1,1])for(let i=0;i<6;i++)for(let k=0;k<2;k++){const z=-DD/2+0.3+i*(DD-0.6)/5;const w=add(R,new THREE.PlaneGeometry(0.07,0.12),WIN,s*(WW/2+0.001),y0+0.2+k*0.24,z);w.rotation.y=s*Math.PI/2;}
+  for(const s of [-1,1])RB(R,T+0.04,0.04,DD+0.04,LIGHT,s*(WW/2-T/2),y0+HH+0.02,0,0.01);RB(R,WW+0.04,0.04,T+0.04,LIGHT,0,y0+HH+0.02,-DD/2+T/2,0.01);
+  // four corner towers
+  for(const sx of [-1,1])for(const sz of [-1,1]){const tx=sx*(WW/2+0.02),tz=sz*(DD/2+0.02);RB(R,0.38,HH+0.22,0.38,STONE,tx,y0+(HH+0.22)/2,tz,0.02);RB(R,0.42,0.05,0.42,LIGHT,tx,y0+HH+0.245,tz,0.015);
+    for(let k=0;k<3;k++)add(R,new THREE.PlaneGeometry(0.06,0.11),WIN,tx,y0+0.18+k*0.22,tz+sz*0.191).rotation.y=sz>0?0:Math.PI;}
+  // plenary: blue seat rows in arcs facing the eagle wall, presidium, government bench, lectern with red lamp, the chancellor at the lectern
+  const C=new THREE.Vector3(0,y0+0.04,-DD/2+0.28);
+  for(let r=0;r<6;r++){const rad=0.42+r*0.12,n=12+r*3;for(let i=0;i<n;i++){const a=-1.15+2.3*i/(n-1);const x=C.x+Math.sin(a)*rad,z=C.z+Math.cos(a)*rad;if(z>DD/2-0.12)continue;
+    const s=RB(R,0.055,0.04+r*0.012,0.05,SEAT,x,C.y+0.02+r*0.006,z,0.008);s.rotation.y=a;}}
+  RB(R,0.7,0.12,0.12,LIGHT,0,y0+0.1,-DD/2+0.14,0.01);
+  eagle(R,0.46,0,y0+0.4,-DD/2+T+0.002,0,0x3a3f5c);
+  lectern(R,0,-DD/2+0.33,0.42);
+  figure(R,0,y0+0.04,-DD/2+0.25,0.42,0);
+  // glass roof over the hall and the dome: drum, glass hemisphere with ribs, two spiral ramps, the mirror cone
+  glass(R,new THREE.BoxGeometry(WW-0.14,0.02,DD-0.14),0,y0+HH+0.01,0,.1);
+  const DY=y0+HH+0.04,DR=0.5;
+  add(R,new THREE.CylinderGeometry(DR+0.04,DR+0.06,0.08,48),LIGHT,0,DY+0.04,0);
+  glass(R,new THREE.SphereGeometry(DR,48,24,0,Math.PI*2,0,Math.PI/2),0,DY+0.08,0,.16);
+  for(let i=0;i<24;i++){const a=i/24*Math.PI*2;const pts=[];for(let k=0;k<=12;k++){const b=k/12*Math.PI/2;pts.push(new THREE.Vector3(Math.cos(a)*Math.cos(b)*DR,DY+0.08+Math.sin(b)*DR,Math.sin(a)*Math.cos(b)*DR));}
+    add(R,new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),24,0.006,6),LIL);}
+  for(const r of [0.25,0.42])add(R,new THREE.TorusGeometry(Math.sqrt(DR*DR-r*r)*0+0.0+DR*Math.cos(Math.asin(r/DR)),0.006,6,64).rotateX(Math.PI/2),LIL,0,DY+0.08+r,0);
+  for(const ph of [0,Math.PI]){const pts=[];for(let k=0;k<=80;k++){const u=k/80,a=ph+u*Math.PI*3,y=DY+0.1+u*0.36,rr=(DR-0.05)*Math.cos(Math.asin(Math.min(0.95,(y-DY-0.08)/DR)));pts.push(new THREE.Vector3(Math.cos(a)*rr,y,Math.sin(a)*rr));}
+    add(R,new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),160,0.014,8),M(0xf0ecff,{roughness:.4}));}
+  add(R,new THREE.CylinderGeometry(0.17,0.03,0.62,24),METAL,0,DY+0.06,0);
+  add(R,new THREE.CylinderGeometry(0.1,0.1,0.03,32),LIGHT,0,DY+0.58,0);
+  {const p=new THREE.PointLight(0x9a8cff,1.0,2.2,2);p.position.set(0.4,DY+0.3,0.6);R.add(p);const p2=new THREE.PointLight(0xfff0d8,0.9,1.6,2);p2.position.set(0,y0+0.5,0.2);R.add(p2);}
+  // flagpoles with dark flags on the front towers
+  for(const sx of [-1,1]){const tx=sx*(WW/2+0.02),tz=DD/2+0.02;rod(R,[tx,y0+HH+0.27,tz],[tx,y0+HH+0.75,tz],0.008,METAL);RB(R,0.2,0.12,0.008,VIO,tx+sx*0.1,y0+HH+0.66,tz,0.004);}
+}
+if(V===2){
+  // ---------------- the lectern on a plate with 100 lights, only 10 are lit ----------------
+  const O=obj;RB(O,2.2,0.12,2.2,PAN,0,0.06,0,0.04);
+  const LED_ON=new THREE.MeshBasicMaterial({color:0xffe2a6,toneMapped:false}),LED_OFF=M(0x3a3570,{roughness:.3,metalness:.3});
+  const on=new Set([12,27,33,48,51,66,74,85,89,97]);
+  for(let i=0;i<10;i++)for(let k=0;k<10;k++){const idx=i*10+k,x=-0.9+k*0.2,z=-0.9+i*0.2;const isOn=on.has(idx);
+    add(O,new THREE.CylinderGeometry(0.045,0.05,0.03,20),M(0x1b1840,{roughness:.4}),x,0.135,z);
+    add(O,new THREE.SphereGeometry(0.038,16,10,0,Math.PI*2,0,Math.PI/2),isOn?LED_ON:LED_OFF,x,0.15,z);
+    if(isOn){const p=new THREE.PointLight(0xffc878,0.35,0.6,2);p.position.set(x,0.3,z);O.add(p);}}
+  const L=lectern(O,0,0.1,2.3);L.position.y=0.12;
+  // the chancellor stands behind the lectern, a little to the left of the red lamp, hands on the slanted top
+  figure(O,-0.07,0.12,-0.56,3.1,0.1,1);
+  glass(O,new THREE.BoxGeometry(2.2,0.02,2.2),0,0.125,0,.05);
+}
+if(V===3){
+  // ---------------- the glass dome alone, plenary in a ring underneath ----------------
+  const O=obj;const DR=1.05;
+  add(O,new THREE.CylinderGeometry(DR+0.25,DR+0.3,0.14,64),PAN,0,0.07,0);
+  add(O,new THREE.CylinderGeometry(DR+0.08,DR+0.1,0.12,64),LIGHT,0,0.2,0);
+  const y0=0.26;add(O,new THREE.CylinderGeometry(DR,DR,0.02,64),NAVY,0,y0,0);
+  for(let r=0;r<5;r++){const rad=0.38+r*0.13,n=14+r*4;for(let i=0;i<n;i++){const a=-1.2+2.4*i/(n-1);const s=RB(O,0.07,0.05+r*0.012,0.06,SEAT,Math.sin(a)*rad,y0+0.03+r*0.008,Math.cos(a)*rad-0.25,0.01);s.rotation.y=a;}}
+  eagle(O,0.5,0,y0+0.3,-0.75);lectern(O,0,-0.28,0.5);figure(O,0,y0,-0.36,0.42,0);
+  glass(O,new THREE.SphereGeometry(DR,56,28,0,Math.PI*2,0,Math.PI/2),0,y0,0,.15);
+  for(let i=0;i<28;i++){const a=i/28*Math.PI*2;const pts=[];for(let k=0;k<=14;k++){const b=k/14*Math.PI/2;pts.push(new THREE.Vector3(Math.cos(a)*Math.cos(b)*DR,y0+Math.sin(b)*DR,Math.sin(a)*Math.cos(b)*DR));}add(O,new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),24,0.008,6),LIL);}
+  for(const h of [0.3,0.6,0.85])add(O,new THREE.TorusGeometry(DR*Math.cos(Math.asin(h/DR)),0.008,6,72).rotateX(Math.PI/2),LIL,0,y0+h,0);
+  for(const ph of [0,Math.PI]){const pts=[];for(let k=0;k<=100;k++){const u=k/100,a=ph+u*Math.PI*3.2,y=y0+0.62+u*0.3,rr=(DR-0.06)*Math.cos(Math.asin(Math.min(0.97,(y-y0)/DR)));pts.push(new THREE.Vector3(Math.cos(a)*rr,y,Math.sin(a)*rr));}
+    add(O,new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),200,0.02,8),M(0xf0ecff,{roughness:.4}));}
+  add(O,new THREE.CylinderGeometry(0.32,0.05,0.75,28),METAL,0,y0+0.62,0);
+  add(O,new THREE.CylinderGeometry(0.2,0.2,0.04,32),LIGHT,0,y0+DR-0.02,0);
+  {const p=new THREE.PointLight(0x9a8cff,1.2,3,2);p.position.set(0.6,y0+0.6,0.8);O.add(p);const p2=new THREE.PointLight(0xfff0d8,0.9,1.6,2);p2.position.set(0,y0+0.4,0.4);O.add(p2);}
+}
+
+const shp=new THREE.Mesh(new THREE.PlaneGeometry(14,14),new THREE.ShadowMaterial({opacity:.5}));shp.rotation.x=-Math.PI/2;shp.receiveShadow=true;scene.add(shp);
+const o=new THREE.Vector3(0,0,0).project(cam);cam.setViewOffset(W,H,(o.x+1)/2*W-CX,(1-o.y)/2*H-CY,W,H);cam.updateProjectionMatrix();
+renderer.render(scene,cam);
+fg.save();fg.globalCompositeOperation='lighter';fg.filter='blur(22px) brightness(1.1)';fg.globalAlpha=.26;fg.drawImage(renderer.domElement,0,0);fg.restore();
+window.ready=true;
+</script></body></html>

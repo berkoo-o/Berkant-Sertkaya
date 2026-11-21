@@ -1,0 +1,15 @@
+function. – „Wohin geht dein Rundfunkbeitrag?“ – Fassung A2, ca. 26 Sekunden plus Logo
+Stand: 17.11.2026 – Stimme: ElevenLabs „Tom Magic“ (eleven_v4), Pausen gekürzt, Tempo 1,1 (rundfunk/voice25/voice.mp3)
+
+Sprechertext:
+„18 Euro 36 zahlt jeder Haushalt in Deutschland, jeden Monat. Egal, ob du ARD und ZDF überhaupt einschaltest. Das sind zusammen mehr als 8,7 Milliarden Euro im Jahr. Aber wohin geht das Geld? Fast 13 Euro an die ARD, knapp 5 ans ZDF, der Rest an Deutschlandradio und die Medienaufsicht. Und ab 2027 empfiehlt die Finanzkommission sogar 18 Euro 64. Abschaffen, senken oder so lassen? Schreib's in die Kommentare.“
+
+Warum das Diskussionen auslöst: Der Text nennt zuerst die Pflicht für alle („egal, ob du einschaltest“), dann die große Jahressumme und zum Schluss die geplante Erhöhung. Die Schlussfrage gibt drei klare Antworten vor, sodass man nur ein Wort kommentieren muss und sich die Lager sofort gegenseitig antworten.
+
+Zahlen im Bild:
+18,36 € pro Haushalt und Monat → 8,7 Mrd. € im Jahr (Beitragserträge 2025: rund 8,72 Mrd. €) → 12,78 € ARD · 4,69 € ZDF · 0,54 € Deutschlandradio · 0,35 € Landesmedienanstalten → 18,64 € (KEF-Empfehlung ab 2027)
+Quellzeile: Beitragsservice (Jahresbericht 2025), § 9 RFinStV, KEF · Stand 17.11.2026 · Modell vereinfacht
+
+Hintergrund, nicht im Text: Der Beitrag ist seit August 2021 unverändert. Die Länder haben die frühere KEF-Empfehlung (18,94 €) nicht umgesetzt, ARD und ZDF klagen, das Bundesverfassungsgericht hat am 23.06.2026 verhandelt, ein Urteil steht noch aus.
+
+Idee für den angepinnten Kommentar: „Abschaffen 🔴, senken 🟡 oder so lassen 🟢? Antworte nur mit der Farbe.“

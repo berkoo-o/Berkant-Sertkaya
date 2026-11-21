@@ -1,0 +1,32 @@
+function. – „Das Paket“ – Skriptentwurf (~60 s, ca. 145 Wörter)
+Stand: 14.11.2026 – Stimme: ElevenLabs „Rupert“
+
+[1] Hook (0–5 s) – Heldenpaket mit rotem Klebeband auf Rollenband
+„Rund zwölf Millionen Pakete werden in Deutschland verschickt – jeden Tag. Aber wie findet deins den Weg?“
+Zahl: 12 Mio. – Pakete pro Tag in Deutschland
+
+[2] Abholung & Nachtfahrt (5–12 s) – Transporter, Lkw mit Wechselbrücke, Nachtautobahn
+„Erst holt ein Transporter es ab. Nachts bringt ein Lkw es ins Paketzentrum – allein DHL hat davon 38.“
+
+[3] Entladen & Scanner (12–22 s) – Teleskopband im Anhänger, Scanner-Tunnel mit roten Laserlinien
+„Ein Band zieht die Pakete aus dem Anhänger. Ein Scanner liest den Barcode von allen Seiten. Niemand muss die Adresse lesen.“
+Zahl: 360°
+
+[4] Sorter (22–36 s) – graue Kippschalen fahren im Kreis, Schale kippt an Rutsche 42
+„Dann geht es auf den Sorter: Jedes Paket fährt auf einer eigenen Schale. An der richtigen Rutsche kippt sie – und das Paket rutscht zu seinem Ziel.“
+
+[5] Tempo (36–42 s) – Totale der Anlage, viele Schalen gleichzeitig
+„Im Paketzentrum Aschheim schafft die Anlage bis zu 72.000 Pakete pro Stunde. Das sind zwanzig pro Sekunde.“
+Zahl: 72.000
+
+[6] Zustellbasis & Haustür (42–54 s) – zweiter Lkw, Zustellbasis, Zustellfahrzeug, Haustür
+„Ein zweiter Lkw bringt es zur Zustellbasis in deiner Nähe. Dort wird es nach Tour sortiert – und landet wenig später vor deiner Tür.“
+
+[7] Schluss (54–60 s) – Heldenpaket vor der Tür, Kamera fährt zurück
+„4,37 Milliarden Sendungen im Jahr. Und jede folgt nur einem Code.“
+Zahl: 4,37 Mrd.
+
+Quellen:
+- KEP-Studie 2026 (BPEX): 4,37 Mrd. Sendungen 2025 (≈ 12 Mio./Tag), via logistik-heute.de
+- DHL Group / verkehrsrundschau.de: Paketzentrum Aschheim bis 72.000 Sendungen/Std.
+- DHL Group, Datenblatt Köln-Eifeltor (09/2026): 38 Paketzentren in Deutschland

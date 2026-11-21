@@ -1,0 +1,19 @@
+{
+  "page": "modell.html",
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "jobs": [
+    {
+      "name": "Wem_gehoert_Deutschland",
+      "query": "",
+      "frames": 2105,
+      "audio": [
+        {"file": "mix_music.flac", "suffix": "_mit_Musik"},
+        {"file": "mix_fx.flac", "suffix": "_nur_Effekte"}
+      ]
+    }
+  ],
+  "title": "Wem gehört eigentlich Deutschland? (Stadt aus Geld, One Take)",
+  "upload": ["_mit_Musik"]
+}

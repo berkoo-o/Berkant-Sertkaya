@@ -1,0 +1,142 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#07070B}
+canvas{position:absolute;left:0;top:0}
+</style></head><body>
+<canvas id="bg" width="1080" height="1920"></canvas>
+<canvas id="fg" width="1080" height="1920"></canvas>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+// function. – Cover „Wohin geht dein Rundfunkbeitrag?“, clean (nur Motiv), im Stil der Cover von Geldautomat und Strom:
+// ein kompakter Fernseher mit gläsernem Gehäuse und Testbild; innen Bildröhre mit Ablenkspule, Platine, Lautsprecher und eine gläserne Münzschale.
+// Oben steckt eine Euro-Münze im Schlitz, eine rote Rutsche führt das Geld nach unten in die Schale (der rote Faden). Daneben lehnt ein Brief ohne Aufschrift.
+import * as THREE from 'three';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
+const W=1080,H=1920;const Q=new URLSearchParams(location.search);
+const bg=document.getElementById('bg').getContext('2d'),fg=document.getElementById('fg').getContext('2d');
+const CX=+(Q.get('cx')||575),CY=+(Q.get('cy')||1460);
+// ---------- background (same recipe as geldautomat/cover_atm_modern.html?mode=clean) ----------
+{bg.fillStyle='#07070B';bg.fillRect(0,0,W,H);
+ const blob=(x,y,r,c)=>{const g=bg.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,c);g.addColorStop(1,'rgba(0,0,0,0)');bg.fillStyle=g;bg.fillRect(0,0,W,H);};
+ blob(430,900,800,'rgba(96,78,255,0.32)');blob(860,1450,620,'rgba(224,30,43,0.20)');blob(120,1700,500,'rgba(60,40,200,0.16)');
+ bg.save();bg.strokeStyle='rgba(170,160,255,0.10)';bg.lineWidth=1.5;const hz=1330;
+ for(let i=-14;i<=14;i++){bg.beginPath();bg.moveTo(CX+i*26,hz);bg.lineTo(CX+i*190,H);bg.stroke();}
+ for(let k=0;k<9;k++){const y=hz+Math.pow(k/8,2.1)*(H-hz);bg.beginPath();bg.moveTo(0,y);bg.lineTo(W,y);bg.stroke();}
+ const f=bg.createLinearGradient(0,hz-10,0,hz+170);f.addColorStop(0,'#07070B');f.addColorStop(1,'rgba(7,7,11,0)');bg.fillStyle=f;bg.fillRect(0,hz-12,W,190);
+ const f2=bg.createLinearGradient(0,1740,0,H);f2.addColorStop(0,'rgba(7,7,11,0)');f2.addColorStop(1,'rgba(7,7,11,.95)');bg.fillStyle=f2;bg.fillRect(0,1740,W,180);bg.restore();
+ bg.save();bg.translate(CX,CY+10);bg.scale(1,0.24);const g=bg.createRadialGradient(0,0,0,0,0,520);g.addColorStop(0,'rgba(224,30,43,0.55)');g.addColorStop(.55,'rgba(224,30,43,0.16)');g.addColorStop(1,'rgba(224,30,43,0)');bg.fillStyle=g;bg.beginPath();bg.arc(0,0,520,0,7);bg.fill();bg.restore();
+ const v=bg.createLinearGradient(0,0,0,600);v.addColorStop(0,'rgba(7,7,11,.4)');v.addColorStop(1,'rgba(7,7,11,0)');bg.fillStyle=v;bg.fillRect(0,0,W,600);}
+// ---------- 3D ----------
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});
+renderer.setSize(W,H);renderer.setPixelRatio(1);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.setClearColor(0x000000,0);
+renderer.domElement.style.position='absolute';document.body.insertBefore(renderer.domElement,document.getElementById('fg'));
+const scene=new THREE.Scene();const pm=new THREE.PMREMGenerator(renderer);scene.environment=pm.fromScene(new RoomEnvironment(),0.04).texture;scene.environmentIntensity=0.4;
+const D=10.2,el=+(Q.get('el')||22)*Math.PI/180;const cam=new THREE.PerspectiveCamera(30,W/H,0.1,100);
+cam.position.set(0,D*Math.sin(el),D*Math.cos(el));cam.lookAt(0,0,0);cam.updateMatrixWorld();
+scene.add(new THREE.HemisphereLight(0xcfd4ff,0x14080c,0.5));
+const key=new THREE.DirectionalLight(0xfff1e4,2.3);key.position.set(-2.5,7,5);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.radius=14;
+Object.assign(key.shadow.camera,{left:-4,right:4,top:6,bottom:-4});scene.add(key);
+const rim=new THREE.DirectionalLight(0xff3344,2.4);rim.position.set(4,2.5,-3);scene.add(rim);
+const rim2=new THREE.DirectionalLight(0x8a78ff,1.4);rim2.position.set(-4,2,-2);scene.add(rim2);
+const M=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:.45,metalness:.15,...o});
+const root=new THREE.Group();root.scale.setScalar(+(Q.get('s')||1.3));scene.add(root);
+const tv=new THREE.Group();tv.rotation.y=+(Q.get('ry')||-0.9);root.add(tv);
+const BODY=M(0xdedaff,{roughness:.5}),VIO=M(0x5257b8),PAN=M(0x24205e,{roughness:.35}),LIL=M(0xa48cff,{roughness:.3}),DARK=M(0x0c0a26,{roughness:.25});
+const LIGHT=M(0xece6ff,{roughness:.6}),METAL=M(0xc9c2ff,{metalness:.6,roughness:.25}),NAVY=M(0x2b2778),NODE=M(0x15123a);
+const REDM=new THREE.MeshBasicMaterial({color:0xff2a3a,toneMapped:false});const REDS=M(0xE01E2B,{emissive:0x5a0810,emissiveIntensity:.6,roughness:.35});
+const add=(par,geo,m,x=0,y=0,z=0)=>{const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;par.add(o);return o;};
+const RB=(par,w,h,d,m,x,y,z,r=0.02)=>add(par,new RoundedBoxGeometry(w,h,d,3,r),m,x,y,z);
+const glass=(par,g,x,y,z,op=.14)=>{const sh=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:0x8f86ff,transparent:true,opacity:op,roughness:.1,depthWrite:false,side:THREE.DoubleSide,emissive:0x4a40c0,emissiveIntensity:.25}));sh.position.set(x,y,z);sh.renderOrder=5;par.add(sh);return sh;};
+const edges=(par,g,x,y,z,th=1)=>{const ed=new THREE.LineSegments(new THREE.EdgesGeometry(g,th),new THREE.LineBasicMaterial({color:0xcfc8ff,transparent:true,opacity:.95}));ed.position.set(x,y,z);ed.renderOrder=6;par.add(ed);return ed;};
+const rod=(par,a,b,r,m)=>{const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b);const len=A.distanceTo(B);const g=new THREE.CylinderGeometry(r,r,len,10);g.translate(0,len/2,0);g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),B.clone().sub(A).normalize()));const o=new THREE.Mesh(g,m);o.position.copy(A);o.castShadow=true;par.add(o);return o;};
+const cylZ=(par,r,len,m,x,y,z,seg=28)=>add(par,new THREE.CylinderGeometry(r,r,len,seg).rotateX(Math.PI/2),m,x,y,z);
+const canvasTex=(w,h,draw)=>{const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t;};
+// euro coin: gold ring, silver core, bevelled edge
+const CR=0.085;const ringG=(()=>{const sh=new THREE.Shape();sh.absarc(0,0,CR,0,Math.PI*2,false);const h=new THREE.Path();h.absarc(0,0,CR*0.7,0,Math.PI*2,true);sh.holes.push(h);const g=new THREE.ExtrudeGeometry(sh,{depth:0.012,bevelEnabled:true,bevelThickness:0.003,bevelSize:0.003,bevelSegments:2,curveSegments:32});g.translate(0,0,-0.006);return g;})();
+const coreG=new THREE.CylinderGeometry(CR*0.7,CR*0.7,0.015,32).rotateX(Math.PI/2);
+const GOLD=M(0xe2bb5e,{metalness:.85,roughness:.26,emissive:0x3a2606,emissiveIntensity:.4}),SILV=M(0xe6e8ee,{metalness:.85,roughness:.24});
+const coin=(par,x,y,z,rx,ry,rz=0)=>{const G=new THREE.Group();G.position.set(x,y,z);G.rotation.set(rx,ry,rz);par.add(G);add(G,ringG,GOLD);add(G,coreG,SILV);return G;};
+
+// ---------- cabinet: four slim legs, base plate, glass case with bright edges, solid front bezel ----------
+const BW=1.5,BH=1.0,BD=0.86,BY=0.32;const CYM=BY+BH/2;
+for(const sx of [-1,1])for(const sz of [-1,1])rod(tv,[sx*0.62,0,sz*0.3],[sx*0.58,BY,sz*0.28],0.024,LIL);
+for(const sx of [-1,1])for(const sz of [-1,1])add(tv,new THREE.CylinderGeometry(0.035,0.035,0.016,16),DARK,sx*0.62,0.008,sz*0.3);
+RB(tv,BW+0.04,0.05,BD+0.04,VIO,0,BY-0.01,0,0.018);
+{const g=new THREE.BoxGeometry(BW,BH,BD);glass(tv,g,0,CYM+0.015,0,.12);edges(tv,g,0,CYM+0.015,0);}
+// front bezel with a rounded screen opening on the left and a control panel on the right
+const SX=-0.17,SW=1.02,SH=0.76;
+{const rr=(s,w,h,r,x,y)=>{s.moveTo(x-w/2+r,y-h/2);s.lineTo(x+w/2-r,y-h/2);s.absarc(x+w/2-r,y-h/2+r,r,-Math.PI/2,0);s.lineTo(x+w/2,y+h/2-r);s.absarc(x+w/2-r,y+h/2-r,r,0,Math.PI/2);s.lineTo(x-w/2+r,y+h/2);s.absarc(x-w/2+r,y+h/2-r,r,Math.PI/2,Math.PI);s.lineTo(x-w/2,y-h/2+r);s.absarc(x-w/2+r,y-h/2+r,r,Math.PI,1.5*Math.PI);return s;};
+ const s=rr(new THREE.Shape(),BW+0.02,BH+0.02,0.07,0,0);s.holes.push(rr(new THREE.Path(),SW,SH,0.12,SX,0));
+ const g=new THREE.ExtrudeGeometry(s,{depth:0.06,bevelEnabled:true,bevelThickness:0.012,bevelSize:0.012,bevelSegments:3,curveSegments:16});add(tv,g,BODY,0,CYM+0.015,BD/2-0.03);}
+// screen: slightly curved picture tube front with a test card (colour bars, no text)
+{const tex=canvasTex(640,480,(g,w,h)=>{const cols=['#d9d6f0','#e8d36a','#6fd3e0','#6fd38a','#c66ad8','#e0414f','#5a63e0'];const bw=w/7;cols.forEach((c,i)=>{g.fillStyle=c;g.fillRect(i*bw,0,bw+1,h*0.66);});
+   const rev=['#5a63e0','#15123a','#c66ad8','#15123a','#6fd3e0','#15123a','#d9d6f0'];rev.forEach((c,i)=>{g.fillStyle=c;g.fillRect(i*bw,h*0.66,bw+1,h*0.09);});
+   const gr=g.createLinearGradient(0,0,w,0);gr.addColorStop(0,'#1a1450');gr.addColorStop(1,'#6a52ff');g.fillStyle=gr;g.fillRect(0,h*0.75,w*0.62,h*0.25);g.fillStyle='#f4f2ff';g.fillRect(w*0.62,h*0.75,w*0.13,h*0.25);g.fillStyle='#0c0a26';g.fillRect(w*0.75,h*0.75,w*0.25,h*0.25);
+   const v=g.createRadialGradient(w/2,h/2,h*0.2,w/2,h/2,w*0.62);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(10,8,30,0.55)');g.fillStyle=v;g.fillRect(0,0,w,h);
+   g.fillStyle='rgba(255,255,255,0.05)';for(let y=0;y<h;y+=4)g.fillRect(0,y,w,1.5);});
+ const sg=new THREE.SphereGeometry(2.4,48,32,-SW/2/2.4,SW/2.4,Math.PI/2-SH/2/2.4,SH/2.4);sg.rotateY(Math.PI/2);
+ // map the sphere patch onto the full texture
+ const p=sg.attributes.position,uv=sg.attributes.uv;for(let i=0;i<p.count;i++){uv.setXY(i,(p.getX(i)/SW)+0.5,(p.getY(i)/SH)+0.5);}uv.needsUpdate=true;
+ const scr=new THREE.Mesh(sg,new THREE.MeshBasicMaterial({map:tex,toneMapped:false,color:new THREE.Color(0.92,0.92,0.92)}));scr.position.set(SX,CYM+0.015,BD/2-2.4-0.005);tv.add(scr);
+ const pl=new THREE.PointLight(0x9a8cff,1.6,2.2,2);pl.position.set(SX,CYM,BD/2+0.5);tv.add(pl);}
+// control panel: speaker grille, two knobs, red standby light
+{const px=0.53,pz=BD/2+0.035;RB(tv,0.28,0.34,0.012,PAN,px,CYM+0.2,pz,0.03);for(let i=0;i<7;i++)RB(tv,0.22,0.012,0.008,LIL,px,CYM+0.075+i*0.042,pz+0.008,0.003);
+ for(const [y,a] of [[CYM-0.08,0.6],[CYM-0.25,-0.9]]){cylZ(tv,0.065,0.05,LIGHT,px,y,pz+0.02,32);cylZ(tv,0.05,0.02,LIL,px,y,pz+0.05,32);const t=RB(tv,0.012,0.045,0.012,PAN,px+Math.sin(a)*0.025,y+Math.cos(a)*0.025,pz+0.062,0.004);t.rotation.z=-a;}
+ add(tv,new THREE.SphereGeometry(0.018,14,10),REDM,px+0.1,CYM-0.4,pz+0.012);const pr=new THREE.PointLight(0xff2030,0.5,0.6,2);pr.position.set(px+0.1,CYM-0.35,pz+0.15);tv.add(pr);}
+// ---------- inside: picture tube with deflection coil, circuit board, speaker, coin tray ----------
+{const fun=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.42,0.42,40,1,true),M(0x2b2778,{roughness:.2,metalness:.3,side:THREE.DoubleSide,transparent:true,opacity:.92}));fun.rotation.x=-Math.PI/2;fun.position.set(SX,CYM+0.015,0.06);tv.add(fun);
+ cylZ(tv,0.07,0.22,NAVY,SX,CYM+0.015,-0.25,24);cylZ(tv,0.05,0.06,LIL,SX,CYM+0.015,-0.38,20);for(let i=0;i<3;i++)rod(tv,[SX-0.025+i*0.025,CYM+0.015,-0.41],[SX-0.025+i*0.025,CYM+0.015,-0.43],0.006,METAL);
+ const cu=M(0xf0a058,{metalness:.7,roughness:.3,emissive:0xb04a10,emissiveIntensity:.9});for(let i=0;i<4;i++)add(tv,new THREE.TorusGeometry(0.095,0.02,10,36),cu,SX,CYM+0.015,-0.13-i*0.045);
+ const pc=new THREE.PointLight(0xff7a30,0.6,0.8,2);pc.position.set(SX+0.2,CYM+0.15,-0.2);tv.add(pc);}
+// circuit board on the floor of the case: chips, capacitors, a small transformer, glowing traces
+{const by=BY+0.03;RB(tv,1.34,0.022,0.74,PAN,0,by,0,0.008);
+ const tr=canvasTex(512,288,(g,w,h)=>{g.clearRect(0,0,w,h);g.strokeStyle='rgba(164,140,255,0.85)';g.lineWidth=3;let s=7;const r=()=>(s=(s*16807)%2147483647)/2147483647;for(let i=0;i<26;i++){let x=r()*w,y=r()*h;g.beginPath();g.moveTo(x,y);for(let k=0;k<3;k++){if(k%2)y+=(r()-0.5)*120;else x+=(r()-0.5)*160;g.lineTo(x,y);}g.stroke();g.fillStyle='rgba(200,190,255,.9)';g.beginPath();g.arc(x,y,4,0,7);g.fill();}});
+ const tp=new THREE.Mesh(new THREE.PlaneGeometry(1.3,0.7),new THREE.MeshBasicMaterial({map:tr,transparent:true,toneMapped:false,color:new THREE.Color(0.8,0.75,1)}));tp.rotation.x=-Math.PI/2;tp.position.set(0,by+0.012,0);tv.add(tp);
+ for(const [x,z,w,d] of [[-0.45,-0.2,0.14,0.1],[-0.25,-0.28,0.09,0.09],[0.12,-0.25,0.16,0.08],[-0.52,0.12,0.1,0.14]])RB(tv,w,0.03,d,NODE,x,by+0.025,z,0.006);
+ for(const [x,z,r,h,c] of [[0.0,-0.3,0.028,0.09,LIGHT],[0.05,-0.3,0.022,0.07,LIGHT],[-0.62,-0.25,0.03,0.11,M(0xf2c230,{emissive:0xf2c230,emissiveIntensity:.2})],[-0.35,0.2,0.025,0.08,M(0xf2c230,{emissive:0xf2c230,emissiveIntensity:.2})],[0.2,-0.12,0.02,0.06,LIGHT]])add(tv,new THREE.CylinderGeometry(r,r,h,16),c,x,by+0.011+h/2,z);
+ RB(tv,0.13,0.1,0.11,VIO,0.3,by+0.06,-0.26,0.012);for(let i=0;i<4;i++)RB(tv,0.142,0.012,0.12,LIL,0.3,by+0.03+i*0.025,-0.26,0.003);}
+// main board on the back wall: glowing traces, chips, a heat sink with fins, capacitors, two cables to the picture tube
+{const z0=-BD/2+0.05;RB(tv,1.24,0.74,0.02,PAN,0.02,BY+0.5,z0,0.01);
+ const tr=canvasTex(620,370,(g,w,h)=>{g.clearRect(0,0,w,h);g.strokeStyle='rgba(164,140,255,0.9)';g.lineWidth=3;let s=23;const r=()=>(s=(s*16807)%2147483647)/2147483647;for(let i=0;i<34;i++){let x=r()*w,y=r()*h;g.beginPath();g.moveTo(x,y);for(let k=0;k<3;k++){if(k%2)y+=(r()-0.5)*140;else x+=(r()-0.5)*200;g.lineTo(x,y);}g.stroke();g.fillStyle='rgba(210,200,255,.95)';g.beginPath();g.arc(x,y,4.5,0,7);g.fill();}});
+ const tp=new THREE.Mesh(new THREE.PlaneGeometry(1.2,0.7),new THREE.MeshBasicMaterial({map:tr,transparent:true,toneMapped:false,color:new THREE.Color(0.85,0.8,1)}));tp.position.set(0.02,BY+0.5,z0+0.012);tv.add(tp);
+ for(const [x,y,w,h] of [[-0.35,BY+0.62,0.16,0.12],[0.05,BY+0.72,0.12,0.1],[0.32,BY+0.4,0.14,0.14],[-0.1,BY+0.3,0.1,0.08]])RB(tv,w,h,0.03,NODE,x,y,z0+0.025,0.006);
+ RB(tv,0.2,0.16,0.03,VIO,0.42,BY+0.7,z0+0.03,0.01);for(let i=0;i<7;i++)RB(tv,0.012,0.16,0.06,LIL,0.34+i*0.027,BY+0.7,z0+0.06,0.003);
+ for(const [x,y,r,l,c] of [[0.18,BY+0.55,0.028,0.09,LIGHT],[0.22,BY+0.55,0.022,0.07,LIGHT],[0.55,BY+0.45,0.03,0.1,M(0xf2c230,{emissive:0xf2c230,emissiveIntensity:.2})],[-0.5,BY+0.4,0.025,0.08,M(0xf2c230,{emissive:0xf2c230,emissiveIntensity:.2})]])cylZ(tv,r,l,c,x,y,z0+0.01+l/2,16);
+ const cab=(pts,c)=>{const t=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(p=>new THREE.Vector3(...p))),60,0.012,8),c);t.castShadow=true;tv.add(t);};
+ cab([[0.05,BY+0.72,z0+0.03],[0.0,BY+0.85,z0+0.15],[SX+0.05,CYM+0.12,-0.3]],LIL);cab([[-0.35,BY+0.62,z0+0.03],[-0.3,BY+0.75,z0+0.12],[SX-0.04,CYM+0.1,-0.32]],VIO);
+ const pb=new THREE.PointLight(0x9a8cff,0.7,1.0,2);pb.position.set(0.3,BY+0.6,-0.1);tv.add(pb);}
+// speaker behind the grille
+{cylZ(tv,0.11,0.06,NAVY,0.53,CYM+0.2,BD/2-0.09,32);cylZ(tv,0.05,0.07,LIL,0.53,CYM+0.2,BD/2-0.14,24);}
+// coin tray (glass) at the back right, half full of euro coins
+const TX=0.42,TZ=-0.14,TY=BY+0.05;
+{const g=new THREE.BoxGeometry(0.44,0.2,0.36);glass(tv,g,TX,TY+0.1,TZ,.16);edges(tv,g,TX,TY+0.1,TZ);RB(tv,0.46,0.02,0.38,VIO,TX,TY,TZ,0.006);
+ let s=11;const r=()=>(s=(s*16807)%2147483647)/2147483647;for(let i=0;i<34;i++){const lay=Math.floor(i/11);const u=r(),v=r();coin(tv,TX+(u-0.5)*0.3,TY+0.025+lay*0.02+(1-Math.abs(u-0.5)*2)*0.03+r()*0.008,TZ+(v-0.5)*0.24,-Math.PI/2+(r()-0.5)*0.45,(r()-0.5)*0.35,r()*6.28);}
+ for(let i=0;i<9;i++)coin(tv,0.22+(r()-0.5)*0.008,BY+0.06+i*0.019,0.2+(r()-0.5)*0.008,-Math.PI/2,0,r()*6.28);
+ const p=new THREE.PointLight(0xffc26a,0.7,0.7,2);p.position.set(TX,TY+0.3,TZ+0.1);tv.add(p);}
+// ---------- the red thread: coin slot on the roof, a red chute down into the tray, one coin on its way ----------
+const SLX=0.42,SLZ=0.0,top=BY+BH+0.02;
+{RB(tv,0.3,0.035,0.16,PAN,SLX,top+0.005,SLZ,0.012);RB(tv,0.22,0.02,0.04,DARK,SLX,top+0.025,SLZ,0.006);
+ for(const s of [-1,1])RB(tv,0.24,0.012,0.012,REDS,SLX,top+0.03,SLZ+s*0.026,0.004);for(const s of [-1,1])RB(tv,0.012,0.012,0.064,REDS,SLX+s*0.116,top+0.03,SLZ,0.004);
+ coin(tv,SLX,top+0.075,SLZ,0,Math.PI/2,0);
+ const chute=(pts,r)=>{const t=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(p=>new THREE.Vector3(...p)),false,'catmullrom',0.3),120,r,14),new THREE.MeshStandardMaterial({color:0xff2a3a,transparent:true,opacity:.42,roughness:.15,emissive:0xff2030,emissiveIntensity:.8,depthWrite:false,side:THREE.DoubleSide}));t.renderOrder=7;tv.add(t);};
+ const P=[[SLX,top-0.02,SLZ],[SLX,top-0.2,SLZ+0.02],[SLX-0.05,CYM+0.05,SLZ+0.06],[SLX-0.02,CYM-0.15,SLZ-0.02],[TX,TY+0.28,TZ+0.02]];chute(P,0.055);
+ const thin=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(P.map(p=>new THREE.Vector3(...p)),false,'catmullrom',0.3),120,0.012,10),REDM);thin.renderOrder=8;tv.add(thin);
+ coin(tv,SLX-0.045,CYM+0.02,SLZ+0.05,0.3,Math.PI/2-0.3,0.2);
+ const p=new THREE.PointLight(0xff2030,1.6,1.4,2);p.position.set(SLX,CYM+0.2,SLZ+0.35);tv.add(p);const p2=new THREE.PointLight(0xff2030,1.0,0.9,2);p2.position.set(SLX,top+0.25,SLZ);tv.add(p2);}
+// rabbit-ear antenna
+{const ax=-0.4,az=-0.12;RB(tv,0.2,0.05,0.12,PAN,ax,top+0.015,az,0.02);add(tv,new THREE.SphereGeometry(0.035,16,12),LIL,ax,top+0.05,az);
+ for(const [dx,dz] of [[-0.42,-0.1],[0.3,-0.18]]){const e=[ax+dx,top+0.62,az+dz];rod(tv,[ax,top+0.05,az],e,0.008,METAL);add(tv,new THREE.SphereGeometry(0.02,12,10),LIGHT,...e);}}
+// ---------- the letter (no writing): leaning against the front leg, with a small red seal ----------
+{const lg=new THREE.Group();lg.position.set(-0.55,0,0.72);lg.rotation.set(0,0.62,0);tv.add(lg);const inner=new THREE.Group();inner.rotation.x=-0.3;lg.add(inner);
+ RB(inner,0.56,0.36,0.014,LIGHT,0,0.19,0,0.01);RB(inner,0.24,0.1,0.004,M(0xb9b0ff,{roughness:.5}),-0.08,0.17,0.009,0.004);
+ for(let i=0;i<2;i++)RB(inner,0.15-i*0.04,0.012,0.003,PAN,-0.12+i*0.0,0.19-i*0.03,0.012,0.002);
+ add(inner,new THREE.CylinderGeometry(0.035,0.035,0.01,24).rotateX(Math.PI/2),REDS,0.18,0.28,0.01);}
+const shp=new THREE.Mesh(new THREE.PlaneGeometry(14,14),new THREE.ShadowMaterial({opacity:.5}));shp.rotation.x=-Math.PI/2;shp.receiveShadow=true;scene.add(shp);
+const o=new THREE.Vector3(0,0,0).project(cam);cam.setViewOffset(W,H,(o.x+1)/2*W-CX,(1-o.y)/2*H-CY,W,H);cam.updateProjectionMatrix();
+renderer.render(scene,cam);
+fg.save();fg.globalCompositeOperation='lighter';fg.filter='blur(22px) brightness(1.1)';fg.globalAlpha=.26;fg.drawImage(renderer.domElement,0,0);fg.restore();
+window.ready=true;
+</script></body></html>

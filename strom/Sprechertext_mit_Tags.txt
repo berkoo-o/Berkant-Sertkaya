@@ -1,0 +1,25 @@
+function. – „Wie kommt der Strom in deine Steckdose?“ – Sprechertext für ElevenLabs „Tom Magic“ (eleven_v4, Audio-Tags)
+Stand: 15.11.2026 – komplett ins Textfeld kopieren
+
+[calm][curious] Stecker rein, Licht an. [short pause] [intrigued] Aber woher kommt dieser Strom eigentlich?
+
+[matter-of-fact] Immer öfter von hier: Rund neunundzwanzigtausend Windräder stehen in Deutschland an Land. [short pause] Wind ist unsere wichtigste Stromquelle.
+
+[explaining] Der Wind dreht den Rotor, [short pause] ein Generator macht daraus Strom. [short pause] Ein Transformator im Turm erhöht die Spannung.
+
+[calm] Im Umspannwerk geht es auf bis zu dreihundertachtzigtausend Volt. [short pause] [explaining] So geht auf langen Strecken weniger Energie verloren.
+
+[matter-of-fact] Das Stromnetz ist fast zwei Millionen Kilometer lang. [short pause] [slightly amused] Fast fünfzigmal um die Erde.
+
+[calm] Vor deiner Stadt wird die Spannung Stufe für Stufe gesenkt. [short pause] Das letzte Trafohäuschen steht oft direkt in deiner Straße. [short pause] Aus der Steckdose kommen dann zweihundertdreißig Volt.
+
+[long pause] [intrigued] Übrigens: Die Elektronen reisen gar nicht vom Windrad zu dir. [short pause] [slightly amused] Sie zittern nur fünfzigmal pro Sekunde hin und her. [short pause] [warm] Die Energie kommt trotzdem sofort an.
+
+[curious] Und die roten Lichter? [short pause] [softly] Seit zweitausendfünfundzwanzig sollen Windräder nachts nur noch blinken, wenn ein Flugzeug in der Nähe ist.
+
+
+Einstellungen:
+- Stability: „Natural“
+- Sprache: Deutsch
+- Ziel: ca. 56–58 Sekunden (danach kommen noch ~3 Sekunden Outro)
+- Als eine durchgehende MP3 exportieren und hochladen

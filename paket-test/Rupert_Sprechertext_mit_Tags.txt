@@ -1,0 +1,57 @@
+function. – „Das Paket“ – Sprechertext für ElevenLabs „Rupert“
+Stand: 14.11.2026
+
+=====================================================================
+VERSION A – Modell „Eleven v3“ (Audio-Tags in eckigen Klammern)
+Einfach komplett in das Textfeld kopieren.
+=====================================================================
+
+[calm][curious] Rund zwölf Millionen Pakete werden in Deutschland verschickt … [short pause] jeden Tag. [intrigued] Aber wie findet deins den Weg?
+
+[calm] Erst holt ein Transporter es ab. [short pause] Nachts bringt ein Lkw es ins Paketzentrum – [matter-of-fact] allein DHL hat davon achtunddreißig.
+
+[calm] Ein Band zieht die Pakete aus dem Anhänger. [short pause] Ein Scanner liest den Barcode von allen Seiten. [slightly impressed] Niemand muss die Adresse lesen.
+
+[explaining] Dann geht es auf den Sorter: [short pause] Jedes Paket fährt auf einer eigenen Schale. [building tension] An der richtigen Rutsche kippt sie … [satisfied] und das Paket rutscht zu seinem Ziel.
+
+[impressed] Im Paketzentrum Aschheim schafft die Anlage bis zu zweiundsiebzigtausend Pakete pro Stunde. [short pause] [emphasis] Das sind zwanzig … pro Sekunde.
+
+[calm] Ein zweiter Lkw bringt es zur Zustellbasis in deiner Nähe. [short pause] Dort wird es nach Tour sortiert – [warm] und landet wenig später vor deiner Tür.
+
+[long pause] [thoughtful] Vier Komma drei sieben Milliarden Sendungen im Jahr. [short pause] [softly] Und jede folgt nur einem Code.
+
+
+Einstellungen (v3):
+- Stability: „Natural“ (nicht „Creative“ – sonst übertreibt er die Tags)
+- Sprache: Deutsch
+- Wenn ein Tag zu stark wirkt: einfach löschen, der Rest bleibt gleich.
+
+
+=====================================================================
+VERSION B – Modell „Multilingual v2“ (Pausen als Break-Tags)
+Falls v3 nicht verfügbar ist oder komisch klingt.
+=====================================================================
+
+Rund zwölf Millionen Pakete werden in Deutschland verschickt <break time="0.3s" /> jeden Tag. <break time="0.4s" /> Aber wie findet deins den Weg?
+<break time="0.6s" />
+Erst holt ein Transporter es ab. <break time="0.3s" /> Nachts bringt ein Lkw es ins Paketzentrum – allein DHL hat davon achtunddreißig.
+<break time="0.6s" />
+Ein Band zieht die Pakete aus dem Anhänger. <break time="0.3s" /> Ein Scanner liest den Barcode von allen Seiten. <break time="0.3s" /> Niemand muss die Adresse lesen.
+<break time="0.6s" />
+Dann geht es auf den Sorter: <break time="0.3s" /> Jedes Paket fährt auf einer eigenen Schale. <break time="0.3s" /> An der richtigen Rutsche kippt sie <break time="0.4s" /> und das Paket rutscht zu seinem Ziel.
+<break time="0.6s" />
+Im Paketzentrum Aschheim schafft die Anlage bis zu zweiundsiebzigtausend Pakete pro Stunde. <break time="0.4s" /> Das sind zwanzig <break time="0.3s" /> pro Sekunde.
+<break time="0.6s" />
+Ein zweiter Lkw bringt es zur Zustellbasis in deiner Nähe. <break time="0.3s" /> Dort wird es nach Tour sortiert <break time="0.3s" /> und landet wenig später vor deiner Tür.
+<break time="0.8s" />
+Vier Komma drei sieben Milliarden Sendungen im Jahr. <break time="0.4s" /> Und jede folgt nur einem Code.
+
+Einstellungen (v2):
+- Stability ~45 %, Similarity ~80 %, Style ~15 %, Speaker Boost an
+- Speed 1,0 (Ziel: ca. 58–62 Sekunden Gesamtlänge)
+
+
+Hinweise:
+- Zahlen sind ausgeschrieben, damit Rupert sie sicher richtig ausspricht.
+- Ton insgesamt: ruhig, neugierig, erklärend – kein Werbe- oder Nachrichtensprecher-Ton.
+- Bitte als eine durchgehende MP3 exportieren und hochladen.

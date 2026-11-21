@@ -1,0 +1,104 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#07070B}
+canvas{position:absolute;left:0;top:0}
+</style></head><body>
+<canvas id="bg" width="1080" height="1920"></canvas>
+<canvas id="fg" width="1080" height="1920"></canvas>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+// function. – Cover-Variante „Wohin geht dein Rundfunkbeitrag?“ (Sparschwein im Schnitt voller Euro-Münzen, mit Antenne), clean (nur Motiv), im Stil der Cover von Geldautomat und Strom.
+// Kopf und Licht wie cover_rundfunk.html:
+// ein kompakter Fernseher mit gläsernem Gehäuse und Testbild; innen Bildröhre mit Ablenkspule, Platine, Lautsprecher und eine gläserne Münzschale.
+// Oben steckt eine Euro-Münze im Schlitz, eine rote Rutsche führt das Geld nach unten in die Schale (der rote Faden). Daneben lehnt ein Brief ohne Aufschrift.
+import * as THREE from 'three';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
+const W=1080,H=1920;const Q=new URLSearchParams(location.search);
+const bg=document.getElementById('bg').getContext('2d'),fg=document.getElementById('fg').getContext('2d');
+const CX=+(Q.get('cx')||575),CY=+(Q.get('cy')||1460);
+// ---------- background (same recipe as geldautomat/cover_atm_modern.html?mode=clean) ----------
+{bg.fillStyle='#07070B';bg.fillRect(0,0,W,H);
+ const blob=(x,y,r,c)=>{const g=bg.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,c);g.addColorStop(1,'rgba(0,0,0,0)');bg.fillStyle=g;bg.fillRect(0,0,W,H);};
+ blob(430,900,800,'rgba(96,78,255,0.32)');blob(860,1450,620,'rgba(224,30,43,0.20)');blob(120,1700,500,'rgba(60,40,200,0.16)');
+ bg.save();bg.strokeStyle='rgba(170,160,255,0.10)';bg.lineWidth=1.5;const hz=1330;
+ for(let i=-14;i<=14;i++){bg.beginPath();bg.moveTo(CX+i*26,hz);bg.lineTo(CX+i*190,H);bg.stroke();}
+ for(let k=0;k<9;k++){const y=hz+Math.pow(k/8,2.1)*(H-hz);bg.beginPath();bg.moveTo(0,y);bg.lineTo(W,y);bg.stroke();}
+ const f=bg.createLinearGradient(0,hz-10,0,hz+170);f.addColorStop(0,'#07070B');f.addColorStop(1,'rgba(7,7,11,0)');bg.fillStyle=f;bg.fillRect(0,hz-12,W,190);
+ const f2=bg.createLinearGradient(0,1740,0,H);f2.addColorStop(0,'rgba(7,7,11,0)');f2.addColorStop(1,'rgba(7,7,11,.95)');bg.fillStyle=f2;bg.fillRect(0,1740,W,180);bg.restore();
+ bg.save();bg.translate(CX,CY+10);bg.scale(1,0.24);const g=bg.createRadialGradient(0,0,0,0,0,520);g.addColorStop(0,'rgba(224,30,43,0.55)');g.addColorStop(.55,'rgba(224,30,43,0.16)');g.addColorStop(1,'rgba(224,30,43,0)');bg.fillStyle=g;bg.beginPath();bg.arc(0,0,520,0,7);bg.fill();bg.restore();
+ const v=bg.createLinearGradient(0,0,0,600);v.addColorStop(0,'rgba(7,7,11,.4)');v.addColorStop(1,'rgba(7,7,11,0)');bg.fillStyle=v;bg.fillRect(0,0,W,600);}
+// ---------- 3D ----------
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});
+renderer.setSize(W,H);renderer.setPixelRatio(1);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.setClearColor(0x000000,0);
+renderer.domElement.style.position='absolute';document.body.insertBefore(renderer.domElement,document.getElementById('fg'));
+const scene=new THREE.Scene();const pm=new THREE.PMREMGenerator(renderer);scene.environment=pm.fromScene(new RoomEnvironment(),0.04).texture;scene.environmentIntensity=0.4;
+const D=10.2,el=+(Q.get('el')||22)*Math.PI/180;const cam=new THREE.PerspectiveCamera(30,W/H,0.1,100);
+cam.position.set(0,D*Math.sin(el),D*Math.cos(el));cam.lookAt(0,0,0);cam.updateMatrixWorld();
+scene.add(new THREE.HemisphereLight(0xcfd4ff,0x14080c,0.5));
+const key=new THREE.DirectionalLight(0xfff1e4,2.3);key.position.set(-2.5,7,5);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.radius=14;
+Object.assign(key.shadow.camera,{left:-4,right:4,top:6,bottom:-4});scene.add(key);
+const rim=new THREE.DirectionalLight(0xff3344,2.4);rim.position.set(4,2.5,-3);scene.add(rim);
+const rim2=new THREE.DirectionalLight(0x8a78ff,1.4);rim2.position.set(-4,2,-2);scene.add(rim2);
+const M=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:.45,metalness:.15,...o});
+const root=new THREE.Group();root.scale.setScalar(+(Q.get('s')||1.3));scene.add(root);
+const tv=new THREE.Group();tv.rotation.y=+(Q.get('ry')||-0.9);root.add(tv);
+const BODY=M(0xdedaff,{roughness:.5}),VIO=M(0x5257b8),PAN=M(0x24205e,{roughness:.35}),LIL=M(0xa48cff,{roughness:.3}),DARK=M(0x0c0a26,{roughness:.25});
+const LIGHT=M(0xece6ff,{roughness:.6}),METAL=M(0xc9c2ff,{metalness:.6,roughness:.25}),NAVY=M(0x2b2778),NODE=M(0x15123a);
+const REDM=new THREE.MeshBasicMaterial({color:0xff2a3a,toneMapped:false});const REDS=M(0xE01E2B,{emissive:0x5a0810,emissiveIntensity:.6,roughness:.35});
+const add=(par,geo,m,x=0,y=0,z=0)=>{const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;par.add(o);return o;};
+const RB=(par,w,h,d,m,x,y,z,r=0.02)=>add(par,new RoundedBoxGeometry(w,h,d,3,r),m,x,y,z);
+const glass=(par,g,x,y,z,op=.14)=>{const sh=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:0x8f86ff,transparent:true,opacity:op,roughness:.1,depthWrite:false,side:THREE.DoubleSide,emissive:0x4a40c0,emissiveIntensity:.25}));sh.position.set(x,y,z);sh.renderOrder=5;par.add(sh);return sh;};
+const edges=(par,g,x,y,z,th=1)=>{const ed=new THREE.LineSegments(new THREE.EdgesGeometry(g,th),new THREE.LineBasicMaterial({color:0xcfc8ff,transparent:true,opacity:.95}));ed.position.set(x,y,z);ed.renderOrder=6;par.add(ed);return ed;};
+const rod=(par,a,b,r,m)=>{const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b);const len=A.distanceTo(B);const g=new THREE.CylinderGeometry(r,r,len,10);g.translate(0,len/2,0);g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),B.clone().sub(A).normalize()));const o=new THREE.Mesh(g,m);o.position.copy(A);o.castShadow=true;par.add(o);return o;};
+const cylZ=(par,r,len,m,x,y,z,seg=28)=>add(par,new THREE.CylinderGeometry(r,r,len,seg).rotateX(Math.PI/2),m,x,y,z);
+const canvasTex=(w,h,draw)=>{const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t;};
+// euro coin: gold ring, silver core, bevelled edge
+const CR=0.085;const ringG=(()=>{const sh=new THREE.Shape();sh.absarc(0,0,CR,0,Math.PI*2,false);const h=new THREE.Path();h.absarc(0,0,CR*0.7,0,Math.PI*2,true);sh.holes.push(h);const g=new THREE.ExtrudeGeometry(sh,{depth:0.012,bevelEnabled:true,bevelThickness:0.003,bevelSize:0.003,bevelSegments:2,curveSegments:32});g.translate(0,0,-0.006);return g;})();
+const coreG=new THREE.CylinderGeometry(CR*0.7,CR*0.7,0.015,32).rotateX(Math.PI/2);
+const GOLD=M(0xe2bb5e,{metalness:.85,roughness:.26,emissive:0x3a2606,emissiveIntensity:.4}),SILV=M(0xe6e8ee,{metalness:.85,roughness:.24});
+const coin=(par,x,y,z,rx,ry,rz=0)=>{const G=new THREE.Group();G.position.set(x,y,z);G.rotation.set(rx,ry,rz);par.add(G);add(G,ringG,GOLD);add(G,coreG,SILV);return G;};
+
+// ---------- motif: a piggy bank in cutaway. The front of the body is cut open (glass cover over the cut), inside it is full of euro coins.
+// A coin is dropping into the red slot on the back, rabbit-ear antenna behind the slot (it is a "broadcasting" piggy bank), snout, ears, eyes, curly tail, four legs.
+renderer.localClippingEnabled=true;const P=tv;
+const PIG=M(0xe6ddff,{roughness:.45}),PINK=M(0xc9b6ff,{roughness:.4}),INNER=M(0x2b2778,{roughness:.6,side:THREE.BackSide});
+const RX=0.78,RY=0.6,RZ=0.6,CY0=0.72,CUT=0.18;// body ellipsoid, cut plane at local z = CUT (front part removed)
+const clip=new THREE.Plane(new THREE.Vector3(0,0,-1),CUT);// keeps z <= CUT (in world space, updated below)
+const body=new THREE.Mesh(new THREE.SphereGeometry(1,64,48),new THREE.MeshStandardMaterial({color:0xe6ddff,roughness:.45,metalness:.1,clippingPlanes:[clip],clipShadows:true}));body.scale.set(RX,RY,RZ);body.position.y=CY0;body.castShadow=true;P.add(body);
+const inner=new THREE.Mesh(new THREE.SphereGeometry(0.975,64,48),new THREE.MeshStandardMaterial({color:0x34307a,roughness:.6,side:THREE.BackSide,clippingPlanes:[clip]}));inner.scale.set(RX,RY,RZ);inner.position.y=CY0;P.add(inner);
+// cut edge: a bright ellipse ring, and a faint glass cover over the opening
+{const k=Math.sqrt(1-(CUT/RZ)**2);const ex=RX*k,ey=RY*k;const pts=[];for(let i=0;i<=96;i++){const a=i/96*6.283;pts.push(new THREE.Vector3(Math.cos(a)*ex,CY0+Math.sin(a)*ey,CUT));}
+ add(P,new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts,true),160,0.014,8,true),M(0xcfc8ff,{emissive:0x8a7cff,emissiveIntensity:.5}));
+ const cap=new THREE.Mesh(new THREE.CircleGeometry(1,64),new THREE.MeshStandardMaterial({color:0x8f86ff,transparent:true,opacity:.1,roughness:.1,depthWrite:false,emissive:0x4a40c0,emissiveIntensity:.25}));cap.scale.set(ex,ey,1);cap.position.set(0,CY0,CUT+0.002);cap.renderOrder=5;P.add(cap);}
+// inside: euro coins filling the lower half, a few tumbling in the middle
+{let s=9;const r=()=>(s=(s*16807)%2147483647)/2147483647;let n=0;
+ for(let lay=0;lay<7;lay++){const y=CY0-RY*0.86+lay*0.045;const k=Math.sqrt(Math.max(0,1-((y-CY0)/RY)**2))*0.9;for(let i=0;i<22;i++){const u=(r()-0.5)*2,v=r();const x=u*RX*k*0.92,z=CUT-0.04-v*RZ*k*1.5;if(z<-RZ*k*0.95)continue;coin(P,x,y+r()*0.02,z,-Math.PI/2+(r()-0.5)*0.6,(r()-0.5)*0.5,r()*6.28);n++;}}
+ for(const [x,y,z,a] of [[0.12,CY0+0.12,-0.05,0.6],[-0.2,CY0+0.02,0.0,-0.8],[0.32,CY0-0.02,-0.1,1.4]])coin(P,x,y,z,a,0.9,0.3);
+ const p=new THREE.PointLight(0xffc26a,1.2,1.2,2);p.position.set(0,CY0+0.1,CUT+0.25);P.add(p);}
+// slot on the back with a red rim and a coin dropping in
+{const y=CY0+RY;RB(P,0.36,0.04,0.12,PINK,0,y-0.01,-0.08,0.02);RB(P,0.26,0.03,0.035,DARK,0,y+0.005,-0.08,0.008);
+ for(const s of [-1,1])RB(P,0.3,0.014,0.014,REDS,0,y+0.015,-0.08+s*0.027,0.005);for(const s of [-1,1])RB(P,0.014,0.014,0.068,REDS,s*0.145,y+0.015,-0.08,0.005);
+ coin(P,0,y+0.13,-0.08,0,Math.PI/2,0);const t=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([new THREE.Vector3(0,y+0.02,-0.08),new THREE.Vector3(0.02,y-0.2,-0.04),new THREE.Vector3(-0.05,CY0+0.15,0.0),new THREE.Vector3(0.0,CY0-0.1,0.05)]),60,0.01,8),REDM);t.renderOrder=7;P.add(t);
+ const p=new THREE.PointLight(0xff2030,1.6,1.2,2);p.position.set(0,y+0.3,0.1);P.add(p);}
+// rabbit-ear antenna behind the slot
+{const ax=-0.36,ay=CY0+RY*0.86,az=-0.2;add(P,new THREE.SphereGeometry(0.05,16,12),LIL,ax,ay,az);for(const [dx,dz] of [[-0.32,-0.12],[0.22,-0.22]]){const e=[ax+dx,ay+0.58,az+dz];rod(P,[ax,ay,az],e,0.008,METAL);add(P,new THREE.SphereGeometry(0.02,12,10),LIGHT,...e);}}
+// snout, nostrils, eyes, ears
+{const sx=RX+0.02;cylZ(P,0.2,0.16,PINK,0,0,0).removeFromParent();const sn=add(P,new THREE.CylinderGeometry(0.2,0.22,0.16,40).rotateZ(Math.PI/2),PINK,sx,CY0+0.02,0.02);
+ add(P,new THREE.CylinderGeometry(0.2,0.2,0.01,40).rotateZ(Math.PI/2),M(0xb39eff),sx+0.083,CY0+0.02,0.02);for(const s of [-1,1])add(P,new THREE.CylinderGeometry(0.032,0.032,0.02,20).rotateZ(Math.PI/2),DARK,sx+0.086,CY0+0.02,0.02+s*0.07);
+ for(const s of [-1,1]){add(P,new THREE.SphereGeometry(0.045,16,12),DARK,RX*0.84,CY0+0.2,s*0.13-0.03);add(P,new THREE.SphereGeometry(0.014,8,6),new THREE.MeshBasicMaterial({color:0xffffff}),RX*0.84+0.035,CY0+0.22,s*0.13-0.02);}
+ for(const s of [-1,1]){const e=add(P,new THREE.ConeGeometry(0.12,0.2,4),PINK,RX*0.5,CY0+RY*0.86,s*0.13-0.03);e.rotation.set(s*0.35,0.78,-0.35);}}
+// legs and curly tail
+for(const [x,z] of [[0.42,0.26],[0.42,-0.26],[-0.42,0.26],[-0.42,-0.26]]){add(P,new THREE.CylinderGeometry(0.1,0.11,0.24,24),PINK,x,0.12,z);add(P,new THREE.CylinderGeometry(0.11,0.11,0.03,24),DARK,x,0.015,z);}
+{const pts=[];for(let i=0;i<=40;i++){const u=i/40,a=u*Math.PI*3.2;pts.push(new THREE.Vector3(-RX-0.02-u*0.14,CY0+0.12+Math.sin(a)*0.06,Math.cos(a)*0.06));}add(P,new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),80,0.02,8),PINK);}
+// keep the clip plane in the pig's frame (tv is rotated and the root is scaled)
+scene.updateMatrixWorld(true);{const n=new THREE.Vector3(0,0,-1).transformDirection(P.matrixWorld);const p0=new THREE.Vector3(0,CY0,CUT).applyMatrix4(P.matrixWorld);clip.setFromNormalAndCoplanarPoint(n,p0);}
+
+const shp=new THREE.Mesh(new THREE.PlaneGeometry(14,14),new THREE.ShadowMaterial({opacity:.5}));shp.rotation.x=-Math.PI/2;shp.receiveShadow=true;scene.add(shp);
+const o=new THREE.Vector3(0,0,0).project(cam);cam.setViewOffset(W,H,(o.x+1)/2*W-CX,(1-o.y)/2*H-CY,W,H);cam.updateProjectionMatrix();
+renderer.render(scene,cam);
+fg.save();fg.globalCompositeOperation='lighter';fg.filter='blur(22px) brightness(1.1)';fg.globalAlpha=.26;fg.drawImage(renderer.domElement,0,0);fg.restore();
+window.ready=true;
+</script></body></html>

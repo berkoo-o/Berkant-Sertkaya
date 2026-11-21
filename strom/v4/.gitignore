@@ -1,0 +1,11 @@
+node_modules/
+fr/
+stills/
+sfx/
+*.raw
+*.wav
+voice.mp3
+video.mp4
+render_main.log
+package-lock.json
+outro.html

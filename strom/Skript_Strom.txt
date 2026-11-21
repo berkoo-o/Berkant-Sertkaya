@@ -1,0 +1,45 @@
+function. – „Wie kommt der Strom in deine Steckdose?“ – Skriptentwurf (~60 s, ca. 140 Wörter)
+Stand: 15.11.2026 – Stimme: ElevenLabs „Tom Magic“ (v4) – Look: Nacht-Diorama (Mini-Stadt + Windpark auf dunkler Bühne)
+Roter Faden: das rote Warnlicht auf der Gondel des Helden-Windrads (+ roter Energie-Impuls in den Leitungen)
+
+[1] Hook – Nacht-Stadt als Diorama, ein Stecker geht in die Steckdose, ein Fenster leuchtet warm auf. Kamera fliegt aus dem Fenster über die Stadt zum Windpark am Horizont (rote Lichter blinken).
+„Stecker rein, Licht an. Aber woher kommt dieser Strom eigentlich?“
+
+[2] Windpark auf einem Hügel, viele kleine Windräder, rote Warnlichter.
+„Immer öfter von hier: Rund 29.000 Windräder stehen in Deutschland an Land. Wind ist unsere wichtigste Stromquelle.“
+Zahl: 29.000
+
+[3] Gondel wird durchsichtig: Rotor → Getriebe → Generator, Kabel den Turm hinunter → Transformator am Turmfuß.
+„Der Wind dreht den Rotor, ein Generator macht daraus Strom. Ein Transformator im Turm erhöht die Spannung.“
+
+[4] Umspannwerk mit Trafos und Isolatoren, dann große Strommasten; roter Impuls läuft über die Leiterseile.
+„Im Umspannwerk geht es auf bis zu 380.000 Volt. So geht auf langen Strecken weniger Energie verloren.“
+Zahl: 380.000 V
+
+[5] Kamera hoch: Deutschlandkarte, Netz-Linien leuchten auf, dann kleine Weltkugel mit Linie, die sich ~50x herumwickelt.
+„Das Stromnetz ist fast zwei Millionen Kilometer lang. Fast fünfzigmal um die Erde.“
+Zahl: 1,9 Mio. km
+
+[6] Stadtrand-Umspannwerk → Straße wird durchsichtig, Kabel unter dem Asphalt → kleines Trafohäuschen → Hauswand → Steckdose.
+„Vor deiner Stadt wird die Spannung Stufe für Stufe gesenkt. Das letzte Trafohäuschen steht oft direkt in deiner Straße. Aus der Steckdose kommen dann 230 Volt.“
+Zahl: 230 V
+
+[7] Makro in das Kupferkabel: Elektronen zittern auf der Stelle hin und her, eine Welle läuft trotzdem in Sekundenbruchteilen durch.
+„Übrigens: Die Elektronen reisen gar nicht vom Windrad zu dir. Sie zittern nur fünfzigmal pro Sekunde hin und her. Die Energie kommt trotzdem sofort an.“
+Zahl: 50 Hz
+
+[8] Zurück zum Windpark bei Nacht. Ein kleines Flugzeug nähert sich, erst dann gehen die roten Lichter an.
+„Und die roten Lichter? Seit 2025 sollen Windräder nachts nur noch blinken, wenn ein Flugzeug in der Nähe ist.“
+
+[9] Outro: LED-Leuchtschrift (Stadt wird dunkel, „function“ schaltet sich als rote LED-Schrift ein, das Warnlicht des vorderen Windrads wird der Punkt)
+
+Hinweis zu v4 (16.11.2026): Der Sprechertext ist unverändert. Im Bild gibt es kein Flugzeug mehr, die Warnlichter gehen aus und wieder an. Szene [7] zeigt die Elektronen als Nahaufnahme im Kabel vor dem Haus, danach laufen drei schnelle rote Wellen über die ganze Strecke.
+
+Quellen:
+- ZDF / Verbände (BWE, VDMA): rund 29.000 Windräder an Land (Mitte 2025: 28.925); 2025 kamen 958 neue dazu
+- BDEW/ZSW (12/2025), Umweltbundesamt (AGEE-Stat): Erneuerbare ~56 % des Stromverbrauchs 2025, Windkraft größte Quelle (~136 TWh)
+- EnBW, Lehrunterlagen Windenergie: Generator ~690 V, Turm-Trafo auf 20–30 kV, Umspannwerk 110/380 kV
+- BDEW-Zeitreihe Stromnetze: ~1,84 Mio. km (2017), neuere BDEW-Angabe ~1,94 Mio. km → „fast zwei Millionen“
+- Physik-Lehrbuch: Driftgeschwindigkeit in Kupfer ~0,5 mm/s, bei 50 Hz Wechselstrom nur Schwingen um die Ruhelage
+- BMWK / § 9 Abs. 8 EEG: bedarfsgesteuerte Nachtkennzeichnung Pflicht seit 1.1.2025 (Umsetzung hinkt, viele blinken noch) → deshalb „sollen“
+- Hinweis: Fachagentur Wind und Solar und wind-energie.de konnte ich nicht direkt öffnen – Bestandszahl Ende 2025 dort noch gegenprüfen.

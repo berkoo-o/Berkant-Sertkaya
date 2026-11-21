@@ -1,0 +1,79 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Poppins;font-weight:500;src:url(node_modules/@fontsource/poppins/files/poppins-latin-500-normal.woff2)}
+@font-face{font-family:Poppins;font-weight:600;src:url(node_modules/@fontsource/poppins/files/poppins-latin-600-normal.woff2)}
+@font-face{font-family:Poppins;font-weight:700;src:url(node_modules/@fontsource/poppins/files/poppins-latin-700-normal.woff2)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#0A0B0E}
+canvas{position:absolute;left:0;top:0}
+</style></head><body>
+<canvas id="bg" width="1080" height="1920"></canvas>
+<canvas id="fg" width="1080" height="1920"></canvas>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+// function. cover template — measured 1:1 from the BER cover (IMG_6433.png)
+//  title line 1: white, left x=82, ascender top y=338, baseline y=441 (Poppins Bold)
+//  title line 2: red #E01E2B, cap top y=506, baseline y=639 (Poppins Bold)
+//  red bar: x 80–240, y 706–714, rounded
+//  ring: bright red ellipse centre (540,1248) outer rx 474.5 ry 100, 7 px + glow; dark red outer ring rx 524 ry 112.5 (#6E0F16)
+//  logo: "function." Poppins Medium, centred, x 311–765, f-top 1548, baseline 1641
+import * as THREE from 'three';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+await Promise.all(['500 100px Poppins','700 100px Poppins','600 30px Poppins'].map(f=>document.fonts.load(f)));
+const W=1080,H=1920,RED='#E01E2B';
+const P=new URLSearchParams(location.search);const L1=P.get('l1')||'Der',L2=P.get('l2')||'Strom';
+const bg=document.getElementById('bg').getContext('2d'),fg=document.getElementById('fg').getContext('2d');
+// background: radial gradient + fine stars
+{const g=bg.createRadialGradient(540,1000,0,540,1000,1250);g.addColorStop(0,'#1A1D23');g.addColorStop(1,'#0A0B0E');bg.fillStyle=g;bg.fillRect(0,0,W,H);
+ let s=11;const r=()=>(s=(s*16807)%2147483647)/2147483647;for(let i=0;i<90;i++){const x=r()*W,y=r()*H;bg.globalAlpha=.18+r()*.4;bg.fillStyle='#9AA0AA';bg.beginPath();bg.arc(x,y,r()<.15?2.2:1.4,0,7);bg.fill();}bg.globalAlpha=1;}
+// ring (lying ellipse on the ground)
+const CX=540,CY=1248;
+{bg.save();const g=bg.createRadialGradient(CX,CY,0,CX,CY,474);g.addColorStop(0,'rgba(224,30,43,0.10)');g.addColorStop(.7,'rgba(224,30,43,0.06)');g.addColorStop(1,'rgba(224,30,43,0.16)');
+ bg.setTransform(1,0,0,100/474,0,CY-CY*100/474);bg.fillStyle=g;bg.beginPath();bg.arc(CX,CY,471,0,7);bg.fill();bg.restore();
+ bg.save();bg.strokeStyle='#6E0F16';bg.lineWidth=2;bg.beginPath();bg.ellipse(CX,CY,523,111.5,0,0,7);bg.stroke();bg.restore();
+ bg.save();bg.shadowColor='rgba(224,30,43,0.9)';bg.shadowBlur=28;bg.strokeStyle=RED;bg.lineWidth=7;bg.beginPath();bg.ellipse(CX,CY,471,96.5,0,0,7);bg.stroke();bg.stroke();bg.restore();}
+
+// 3D parcel standing on the ring plane
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});
+renderer.setSize(W,H);renderer.setPixelRatio(1);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.domElement.style.position='absolute';document.body.insertBefore(renderer.domElement,document.getElementById('fg'));
+const scene=new THREE.Scene();const pm=new THREE.PMREMGenerator(renderer);scene.environment=pm.fromScene(new RoomEnvironment(),0.04).texture;scene.environmentIntensity=0.5;
+// camera elevation ~12° (ring ratio 100/474)
+const D=10.2,el=14*Math.PI/180,az=0.0;const cam=new THREE.PerspectiveCamera(30,W/H,0.1,100);
+cam.position.set(D*Math.cos(el)*Math.sin(az),D*Math.sin(el),D*Math.cos(el)*Math.cos(az));cam.lookAt(0,0,0);cam.updateMatrixWorld();
+scene.add(new THREE.HemisphereLight(0xdfe8ff,0x1a0a0a,0.6));
+const key=new THREE.DirectionalLight(0xfff4e6,2.6);key.position.set(-3,5,4);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.radius=6;scene.add(key);
+const rim=new THREE.DirectionalLight(0xff4050,1.4);rim.position.set(3,1.5,-3);scene.add(rim);
+function canvasTex(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t;}
+const M=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:.5,metalness:.1,...o});
+const gp=new THREE.Group();scene.add(gp);gp.rotation.y=-0.35;gp.scale.setScalar(0.44);
+const WM=M(0xe4e7ec,{roughness:.45});const TH=2.2;
+const tw=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.1,TH,40),WM);tw.position.y=TH/2;tw.castShadow=true;gp.add(tw);
+const base=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.17,0.06,32),M(0x8a8a86));base.position.y=0.03;gp.add(base);
+const nac=new THREE.Mesh(new THREE.CapsuleGeometry(0.085,0.36,8,24).rotateX(Math.PI/2),WM);nac.position.set(0,TH+0.07,-0.08);nac.castShadow=true;gp.add(nac);
+const rot=new THREE.Group();rot.position.set(0,TH+0.07,0.21);gp.add(rot);const sp=new THREE.Mesh(new THREE.SphereGeometry(0.085,32,20),WM);sp.scale.set(1,1,1.4);rot.add(sp);
+const s=new THREE.Shape();const L=1.12;s.moveTo(-0.028,0);s.lineTo(0.028,0);s.bezierCurveTo(0.075,0.09,0.062,0.18,0.055,0.24);s.lineTo(0.014,L);s.lineTo(-0.005,L);s.lineTo(-0.036,0.22);s.bezierCurveTo(-0.05,0.13,-0.044,0.06,-0.028,0);
+const bg_=new THREE.ExtrudeGeometry(s,{depth:0.016,bevelEnabled:true,bevelThickness:0.005,bevelSize:0.005,bevelSegments:2});bg_.translate(0,0.04,-0.008);
+for(let i=0;i<3;i++){const b=new THREE.Mesh(bg_,WM);b.rotation.z=i*Math.PI*2/3+0.25;b.castShadow=true;rot.add(b);}
+const lamp=new THREE.Mesh(new THREE.CylinderGeometry(0.02,0.02,0.035,16),new THREE.MeshBasicMaterial({color:new THREE.Color(0xE01E2B).multiplyScalar(1.6)}));lamp.position.set(0,TH+0.18,-0.26);gp.add(lamp);
+const pl=new THREE.PointLight(0xff2030,1.2,1.2,2);pl.position.set(0,TH+0.22,-0.26);gp.add(pl);
+const sh=new THREE.Mesh(new THREE.PlaneGeometry(10,10),new THREE.ShadowMaterial({opacity:.5}));sh.rotation.x=-Math.PI/2;sh.receiveShadow=true;scene.add(sh);
+// put ground origin exactly on the ring centre (540,1248)
+const o=new THREE.Vector3(0,0,0).project(cam);const ox=(o.x+1)/2*W,oy=(1-o.y)/2*H;cam.setViewOffset(W,H,ox-CX,oy-CY,W,H);
+renderer.render(scene,cam);
+{const v=new THREE.Vector3(0,TH+0.18,-0.26);gp.localToWorld(v);v.project(cam);const lx=(v.x+1)/2*W,ly=(1-v.y)/2*H;const g=fg.createRadialGradient(lx,ly,0,lx,ly,60);g.addColorStop(0,'rgba(255,90,100,0.95)');g.addColorStop(.25,'rgba(224,30,43,0.55)');g.addColorStop(1,'rgba(224,30,43,0)');fg.fillStyle=g;fg.beginPath();fg.arc(lx,ly,60,0,7);fg.fill();}
+
+// title + bar + logo, sizes calibrated to the measured template glyph heights
+function calib(weight,ch,target,useCap){fg.font=`${weight} 100px Poppins`;const m=fg.measureText(ch);return 100*target/m.actualBoundingBoxAscent;}
+const s1=calib(700,'l',441-338)*0.951,s2_=calib(700,'B',639-506)*1.015;
+fg.fillStyle='#FFFFFF';fg.font=`700 ${s1}px Poppins`;{const m=fg.measureText(L1);fg.fillText(L1,82-m.actualBoundingBoxLeft*-1+0,441);}
+fg.fillStyle=RED;fg.font=`700 ${s2_}px Poppins`;{let m=fg.measureText(L2);let z=s2_;if(m.width>900){z=s2_*900/m.width;fg.font=`700 ${z}px Poppins`;m=fg.measureText(L2);}fg.fillText(L2,82+m.actualBoundingBoxLeft,639);}
+fg.fillStyle=RED;fg.beginPath();fg.roundRect(80,706,160,8,4);fg.fill();
+// logo: Poppins 500, size from f-height (1641-1548), tracking solved so total ink width = 454 px, centred
+{const sz=calib(500,'f',1641-1548);fg.font=`500 ${sz}px Poppins`;const s='function.';const ws=[...s].map(c=>fg.measureText(c).width);
+ const mF=fg.measureText('f'),mD=fg.measureText('.');const base=ws.reduce((a,b)=>a+b,0);
+ const ink0=base-ws[8]+(mD.actualBoundingBoxRight)+(mF.actualBoundingBoxLeft);const tr=(454-ink0)/8;
+ let x=311+mF.actualBoundingBoxLeft;fg.fillStyle=RED;[...s].forEach((c,i)=>{fg.fillText(c,x,1641);x+=ws[i]+tr;});}
+window.ready=true;
+</script></body></html>
