@@ -72,18 +72,20 @@ for (let i = 0; i < 10; i++) {const p = person(PLAZA, {k: 2.1, shirt: decShirts[
 // two plates on the front of the podium: the poorer half and the richest tenth
 for (const [txt, x, w, col] of [['Die ärmere Hälfte', (DX(0) + DX(4)) / 2, 1.42, '#3a3d48'], ['Die reichsten 10 %', DX(9), 0.42, '#E01E2B']]) {
   const tg = tex('plate' + txt, Math.round(w * 600), 64, (g, ww, h) => {g.fillStyle = '#f7f3ea'; g.fillRect(0, 0, ww, h); g.fillStyle = col; g.font = `700 ${txt.length > 17 ? 34 : 40}px Poppins`; g.textAlign = 'center'; g.fillText(txt, ww / 2, 46);});
-  const pl = new THREE.Mesh(new THREE.PlaneGeometry(w, 0.1), new THREE.MeshStandardMaterial({map: tg, roughness: .6})); pl.position.set(x, 0.031, 0.152); pl.rotation.x = -0.35; PLAZA.add(pl);}
+  const pl = new THREE.Mesh(new THREE.PlaneGeometry(w, 0.1), new THREE.MeshStandardMaterial({map: tg, roughness: .6})); pl.position.set(x, 0.047, 0.168); pl.rotation.x = -0.35; PLAZA.add(pl);}
 // what each tenth owns: coin piles for the poorer half, money stacks for the rest, a huge tower for the richest tenth (54 %)
 const STK = [0, 0, 0, 0, 0, 0.24, 0.42, 0.66, 1.08, 3.24];
 const piles = [], stacks = [];
 for (let i = 0; i < 10; i++) {if (i < 5) {const c = coinPile(PLAZA, DX(i), 0.34, 2 + (i % 2), 0.9); c.visible = false; piles.push(c);}
-  else {const w = i === 9 ? 0.26 : 0.2, d = i === 9 ? 0.2 : 0.16; const s = moneyTower(PLAZA, DX(i), 0.36, w, d, STK[i]); s.G.position.y = -STK[i]; stacks.push({...s, i, h: STK[i]});}}
-const bigLabel = (txt, col, w) => {const t = tex('big' + txt, Math.round(w * 400), 96, (g, ww, h) => {g.fillStyle = 'rgba(255,255,255,0.96)'; g.beginPath(); g.roundRect(4, 6, ww - 8, h - 12, 40); g.fill();
+  else {const w = i === 9 ? 0.26 : 0.2, d = i === 9 ? 0.2 : 0.16; const s = moneyTower(PLAZA, DX(i), -0.02, w, d, STK[i]); s.G.position.y = -STK[i]; stacks.push({...s, i, h: STK[i]});}}   // each figure stands on its own money (Wunsch: Unterschied Arm und Reich klar sehen)
+const bigLabel = (txt, col) => {const g0 = document.createElement('canvas').getContext('2d'); g0.font = '800 54px "Inter Tight"'; const cw = Math.ceil(g0.measureText(txt).width) + 76;   // the pill hugs the text, so it never sticks out of the frame
+  const t = tex('big' + txt, cw, 96, (g, ww, h) => {g.fillStyle = 'rgba(255,255,255,0.96)'; g.beginPath(); g.roundRect(4, 6, ww - 8, h - 12, 40); g.fill();
   g.fillStyle = col; g.font = '800 54px "Inter Tight"'; g.textAlign = 'center'; g.fillText(txt, ww / 2, 67);});
-  const sp = new THREE.Sprite(new THREE.SpriteMaterial({map: t, toneMapped: false, depthTest: false, transparent: true})); sp.scale.set(w * 0.92, 0.22, 1); sp.renderOrder = 11; PLAZA.add(sp); return sp;};
-const LAB_POOR = bigLabel('Ärmere Hälfte', '#1b1d24', 1.6), LAB_RICH = bigLabel('Reichste 10 %', '#E01E2B', 1.6);
-LAB_POOR.position.set((DX(0) + DX(4)) / 2, 0.68, -0.02); LAB_RICH.position.set(DX(9) - 0.45, 0.95, -0.02);
-const towerFlag = flagMesh(1.6); towerFlag.position.set(DX(9), 3.24, 0.36); PLAZA.add(towerFlag); towerFlag.visible = false;
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({map: t, toneMapped: false, depthTest: false, transparent: true})); sp.scale.set(0.22 * cw / 96, 0.22, 1); sp.userData.sx = 0.22 * cw / 96; sp.renderOrder = 11; PLAZA.add(sp); return sp;};
+const LAB_POOR = bigLabel('Ärmere Hälfte', '#1b1d24'), LAB_RICH = bigLabel('Reichste 10 %', '#E01E2B');
+// the poor label sits a little right of centre, so the pill keeps clear of the left edge in the close-up; the rich label rides above the red figure
+LAB_POOR.position.set((DX(0) + DX(4)) / 2 + 0.17, 0.68, -0.02); LAB_RICH.position.set(DX(9), 0.95, -0.02);
+const towerFlag = flagMesh(1.6); towerFlag.position.set(DX(9) + 0.1, 3.24, -0.09); PLAZA.add(towerFlag); towerFlag.visible = false;
 // fountain, market stalls, spectators, trees around the plaza
 {add(PLAZA, new THREE.CylinderGeometry(0.34, 0.37, 0.07, 32), M(0xe9e3d6), 0, 0.035, -0.75); add(PLAZA, new THREE.CylinderGeometry(0.3, 0.3, 0.02, 32), M(0x6fb8e0, {roughness: .15, metalness: .1}), 0, 0.072, -0.75);
  add(PLAZA, new THREE.CylinderGeometry(0.03, 0.05, 0.18, 12), M(0xe9e3d6), 0, 0.12, -0.75);}
@@ -160,7 +162,7 @@ const debt = new THREE.Group(); debt.position.set(STX, 0.88, STZ); W0.add(debt);
 const lineG = new THREE.Group(); lineG.position.set(STX, LINE, STZ); W0.add(lineG); lineG.visible = false;
 {const dm = new THREE.MeshBasicMaterial({color: 0xffffff, transparent: true, opacity: 0.95, toneMapped: false}); for (let i = 0; i < 8; i++) for (const z of [-0.13, 0.13]) add(lineG, new THREE.BoxGeometry(0.06, 0.016, 0.016), dm, -0.32 + i * 0.09, 0, z, false);
  const t = tex('top10', 256, 80, (g, w, h) => {g.fillStyle = 'rgba(255,255,255,0.95)'; g.beginPath(); g.roundRect(4, 8, w - 8, h - 16, 26); g.fill(); g.fillStyle = '#1b1d24'; g.font = '700 40px Poppins'; g.textAlign = 'center'; g.fillText('Top 10 %', w / 2, 54);});
- const sp = new THREE.Sprite(new THREE.SpriteMaterial({map: t, toneMapped: false, depthTest: false})); sp.scale.set(0.3, 0.094, 1); sp.position.set(0.0, 0.12, 0.13); lineG.add(sp);}
+ const sp = new THREE.Sprite(new THREE.SpriteMaterial({map: t, toneMapped: false, depthTest: false, transparent: true})); sp.scale.set(0.3, 0.094, 1); sp.position.set(0.0, 0.12, 0.13); lineG.add(sp); lineG.userData.fade = [dm, sp.material];}
 const label = (txt, col = '#1b1d24') => {const t = tex('lab' + txt, 320, 80, (g, w, h) => {g.fillStyle = 'rgba(255,255,255,0.95)'; g.beginPath(); g.roundRect(4, 8, w - 8, h - 16, 26); g.fill(); g.fillStyle = col; g.font = '700 38px Poppins'; g.textAlign = 'center'; g.fillText(txt, w / 2, 53);});
   const sp = new THREE.Sprite(new THREE.SpriteMaterial({map: t, toneMapped: false, depthTest: false, transparent: true})); sp.scale.set(0.36, 0.09, 1); sp.renderOrder = 10; W0.add(sp); return sp;};
 const labs = [label('Haus'), label('Erspartes'), label('Aktien'), label('− Schulden', '#5a5f6c')];
@@ -274,8 +276,8 @@ function night(t) {return clamp(0.3 * eio((t - 38) / 6) + 0.25 * eio((t - 49) / 
 // ------------------------------------------------------------------ camera (voice time): target x,y,z, half frame height, azimuth, elevation
 const C = (x, y, z, s, az, el, fov = 24) => [x, y, z, Math.log(s), az, el, fov];
 const KEYS = [   // calm and clear (Wunsch des Nutzers: „zu hektisch“, „Unterschied Arm und Reich deutlicher“): the hook is the comparison on the square
-  [0.0, C(0.25, 0.32, 0.2, 1.9, -10, 22)], [2.8, C(0.55, 1.15, 0.2, 2.9, -11, 22)], [5.6, C(0.35, 0.9, 0.25, 2.7, -8, 24)],
-  [7.6, C(-0.5, 0.3, 0.3, 1.6, -6, 24)], [10.2, C(-0.4, 0.32, 0.3, 1.55, -5, 24)],
+  [0.0, C(0.25, 0.32, 0.2, 1.9, -10, 22)], [2.8, C(1.05, 2.3, 0.0, 5.0, -12, 18)], [5.2, C(0.95, 2.2, 0.05, 4.9, -10, 19)],
+  [7.8, C(-0.5, 0.3, 0.3, 1.6, -6, 24)], [10.2, C(-0.4, 0.32, 0.3, 1.55, -5, 24)],
   [14.4, C(0.0, 0.5, -1.6, 4.4, -12, 48)], [16.4, C(-0.4, 0.5, -2.6, 4.4, -10, 47)], [18.8, C(-0.6, 0.5, -3.0, 4.4, -8, 46)], [22.0, C(-0.8, 0.6, -5.0, 4.6, -10, 42)], [25.0, C(-0.3, 0.5, -3.4, 5.0, -12, 50)],
   [27.0, C(-0.6, 0.45, 0.2, 4.6, -14, 50)], [29.0, C(-1.1, 0.48, 3.1, 1.35, -14, 26)], [32.0, C(-1.06, 0.5, 3.1, 1.25, -12, 24)], [36.0, C(-1.02, 0.52, 3.08, 1.28, -10, 24)],
   [38.0, C(1.0, 0.4, 1.6, 3.4, 30, 50)], [40.0, C(3.25, 0.15, 0.0, 1.25, 60, 55)], [44.0, C(3.28, 0.15, 0.0, 1.2, 63, 54)], [47.5, C(3.3, 0.15, 0.0, 1.22, 65, 54)], [50.0, C(3.3, 0.3, -0.1, 1.5, 62, 54)],
@@ -373,10 +375,12 @@ function setTime(t) {
   // the plaza: coin piles (2–3 %) and growing stacks, the huge tower of the richest tenth
   piles.forEach((c, i) => {const p = clamp((t - 7.95 - i * 0.14) / 0.4, 0, 1); c.visible = p > 0; c.scale.setScalar(0.9 * Math.max(1e-3, ebk(p, 2)));});
   stacks.forEach(s => {const t0 = s.i < 9 ? 3.1 + (s.i - 5) * 0.25 : 0.55, dur = s.i < 9 ? 0.7 : 2.3; const p = clamp((t - t0) / dur, 0, 1); const steps = s.i === 9 ? 12 : 3; const q = s.i === 9 ? (Math.floor(p * steps) + ease((p * steps) % 1)) / steps : eio(p);
-    s.G.position.y = -s.h * (1 - Math.min(1, q));});
+    s.G.position.y = -s.h * (1 - Math.min(1, q)); DEC[s.i].G.position.y = Math.max(0.06, s.h * Math.min(1, q));});   // the figure rides up on its stack
+  // the two big labels grow with the shot, so they stay readable on the phone in the wide view of the whole tower
+  {const lk = Math.max(1, size / 2.3); for (const L of [LAB_RICH, LAB_POOR]) L.scale.set(L.userData.sx * lk, 0.22 * lk, 1); LAB_RICH.position.y = DEC[9].G.position.y + 0.45 + 0.13 * lk;}
   {const p = clamp((t - 14.65) / 0.45, 0, 1); towerFlag.visible = p > 0 && t < O.t0; towerFlag.scale.setScalar(Math.max(1e-3, ebk(p, 2.2) * 1.6)); waveFlag(towerFlag, t, 1.4);}
   DEC.forEach((p, i) => {p.G.rotation.y = 0.05 * Math.sin(t * 0.6 + i); });
-  {const a = Math.min(clamp((t - 1.0) / 0.4, 0, 1), clamp((10.6 - t) / 0.5, 0, 1)); LAB_RICH.visible = a > 0; LAB_RICH.material.opacity = a;
+  {const a = Math.min(clamp((t - 1.0) / 0.4, 0, 1), clamp((6.35 - t) / 0.4, 0, 1)); LAB_RICH.visible = a > 0; LAB_RICH.material.opacity = a;   // the richest label leaves before the camera turns to the poorer half
    const b = Math.min(clamp((t - 6.3) / 0.4, 0, 1), clamp((10.6 - t) / 0.5, 0, 1)); LAB_POOR.visible = b > 0; LAB_POOR.material.opacity = b;}
   // conversions: buildings sink, money towers grow; the flag rides on whichever top is higher
   for (const c of CONV) {const s = eio((t - c.t0) / 0.9), r = eio((t - c.t0 - 0.45) / 0.9); const o = c.r.o; c.r.B.position.y = -(o.h + 0.6) * s; c.r.B.visible = s < 0.999;
@@ -385,12 +389,12 @@ function setTime(t) {
     const top = Math.max(c.r.top - (o.h + 0.6) * s, (c.th + extra) * r); c.r.flag.position.y = Math.max(0.02, top);}
   chimneys.forEach(ch => ch.visible = t < 23.6);
   // the household's stack: house, savings, shares, minus the loan
-  lineG.visible = t > 28.4; lineG.scale.x = eio((t - 28.4) / 0.6) + 1e-3;
+  {const f = 1 - eio((t - 36.3) / 0.5); lineG.visible = t > 28.4 && f > 0.001; lineG.scale.x = eio((t - 28.4) / 0.6) + 1e-3; lineG.userData.fade[0].opacity = 0.95 * f; lineG.userData.fade[1].opacity = f;}   // line and labels leave before the camera turns away
   const lt = [32.16, 32.66, 33.55];
-  layers.forEach((L, i) => {const p = clamp((t - lt[i]) / 0.4, 0, 1); L.g.visible = p > 0; L.g.scale.y = Math.max(1e-3, ebk(p, 1.6)); const sp = labs[i]; sp.visible = p > 0 && t < 38.0; sp.material.opacity = Math.min(p, clamp((38.0 - t) / 0.4, 0, 1));
+  layers.forEach((L, i) => {const p = clamp((t - lt[i]) / 0.4, 0, 1); L.g.visible = p > 0; L.g.scale.y = Math.max(1e-3, ebk(p, 1.6)); const sp = labs[i]; sp.visible = p > 0 && t < 36.8; sp.material.opacity = Math.min(p, clamp((36.8 - t) / 0.5, 0, 1));
     sp.position.set(STX - 0.34, L.y0 + L.h / 2, STZ + 0.12);});
   {const p = clamp((t - 33.9) / 0.4, 0, 1), go = eio((t - 35.25) / 0.75); debt.visible = p > 0 && go < 1; debt.scale.y = Math.max(1e-3, ebk(p, 1.6)); debt.position.set(STX + 0.9 * go, 0.88 + 0.08 * p + 0.5 * go, STZ - 0.3 * go); debt.rotation.z = -0.6 * go;
-   const sp = labs[3]; sp.visible = p > 0 && t < 38.0; sp.material.opacity = Math.min(p, 1 - go * 0.6, clamp((38 - t) / 0.4, 0, 1)); sp.position.set(STX - 0.34 + 0.9 * go, 0.93 + 0.5 * go, STZ + 0.12);}
+   const sp = labs[3]; sp.material.opacity = Math.min(p, clamp(1 - 1.5 * go, 0, 1)); sp.visible = sp.material.opacity > 0.001; sp.position.set(STX - 0.34 + 0.9 * go, 0.93 + 0.5 * go, STZ + 0.12);}
   pigCoins.forEach((c, i) => {const p = clamp((t - 32.62 - i * 0.12) / 0.45, 0, 1); c.visible = p > 0 && p < 1; const a = [pig.position.x, 0.14, pig.position.z], b = [STX, 0.5 + i * 0.04, STZ];
     c.position.set(lerp(a[0], b[0], p), lerp(a[1], b[1], p) + Math.sin(p * Math.PI) * 0.25, lerp(a[2], b[2], p)); c.rotation.x = p * 6;});
   pig.rotation.z = -0.35 * win(t, 32.5, 33.1, 0.15); chart.scale.setScalar(1 + 0.12 * win(t, 33.5, 34.3, 0.2));
