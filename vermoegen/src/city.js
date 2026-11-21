@@ -82,7 +82,7 @@ export function flagMesh(sc = 1) {   // the red thread: a small red flag
   const m = add(cloth, g, new THREE.MeshStandardMaterial({color: RED, roughness: .55, side: THREE.DoubleSide, emissive: RED, emissiveIntensity: 0.12}));
   F.userData = {cloth: m, base: g.attributes.position.array.slice()}; return F;}
 export function waveFlag(F, t, k = 1) {const m = F.userData.cloth, p = m.geometry.attributes.position, b = F.userData.base;
-  for (let i = 0; i < p.count; i++) {const x = b[i * 3]; p.array[i * 3 + 2] = b[i * 3 + 2] + Math.sin(t * 5.2 + x * 30 + F.id) * 0.014 * (x / 0.17) * k;} p.needsUpdate = true;}
+  for (let i = 0; i < p.count; i++) {const x = b[i * 3]; p.array[i * 3 + 2] = b[i * 3 + 2] + Math.sin(t * 3.4 + x * 26 + F.id) * 0.009 * (x / 0.17) * k;} p.needsUpdate = true;}
 
 // a box building with window texture on all four sides; kind: 'block' | 'house' | 'tower' | 'shop' | 'glass'
 export function building(par, o) {

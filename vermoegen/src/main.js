@@ -76,8 +76,13 @@ for (const [txt, x, w, col] of [['Die ärmere Hälfte', (DX(0) + DX(4)) / 2, 1.4
 // what each tenth owns: coin piles for the poorer half, money stacks for the rest, a huge tower for the richest tenth (54 %)
 const STK = [0, 0, 0, 0, 0, 0.24, 0.42, 0.66, 1.08, 3.24];
 const piles = [], stacks = [];
-for (let i = 0; i < 10; i++) {if (i < 5) {const c = coinPile(PLAZA, DX(i), 0.34, 2 + (i % 2), 0.55); c.visible = false; piles.push(c);}
+for (let i = 0; i < 10; i++) {if (i < 5) {const c = coinPile(PLAZA, DX(i), 0.34, 2 + (i % 2), 0.9); c.visible = false; piles.push(c);}
   else {const w = i === 9 ? 0.26 : 0.2, d = i === 9 ? 0.2 : 0.16; const s = moneyTower(PLAZA, DX(i), 0.36, w, d, STK[i]); s.G.position.y = -STK[i]; stacks.push({...s, i, h: STK[i]});}}
+const bigLabel = (txt, col, w) => {const t = tex('big' + txt, Math.round(w * 400), 96, (g, ww, h) => {g.fillStyle = 'rgba(255,255,255,0.96)'; g.beginPath(); g.roundRect(4, 6, ww - 8, h - 12, 40); g.fill();
+  g.fillStyle = col; g.font = '800 54px "Inter Tight"'; g.textAlign = 'center'; g.fillText(txt, ww / 2, 67);});
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({map: t, toneMapped: false, depthTest: false, transparent: true})); sp.scale.set(w * 0.92, 0.22, 1); sp.renderOrder = 11; PLAZA.add(sp); return sp;};
+const LAB_POOR = bigLabel('Ärmere Hälfte', '#1b1d24', 1.6), LAB_RICH = bigLabel('Reichste 10 %', '#E01E2B', 1.6);
+LAB_POOR.position.set((DX(0) + DX(4)) / 2, 0.68, -0.02); LAB_RICH.position.set(DX(9) - 0.45, 0.95, -0.02);
 const towerFlag = flagMesh(1.6); towerFlag.position.set(DX(9), 3.24, 0.36); PLAZA.add(towerFlag); towerFlag.visible = false;
 // fountain, market stalls, spectators, trees around the plaza
 {add(PLAZA, new THREE.CylinderGeometry(0.34, 0.37, 0.07, 32), M(0xe9e3d6), 0, 0.035, -0.75); add(PLAZA, new THREE.CylinderGeometry(0.3, 0.3, 0.02, 32), M(0x6fb8e0, {roughness: .15, metalness: .1}), 0, 0.072, -0.75);
@@ -214,7 +219,7 @@ const water = add(W0, new THREE.PlaneGeometry(40, RIV.z1 - RIV.z0).rotateX(-Math
 for (const z of [RIV.z0, RIV.z1]) add(W0, new THREE.BoxGeometry(40, 0.06, 0.08), M(0xb8b0a0), 0, 0.0, z, false);
 add(W0, new THREE.BoxGeometry(40, 0.05, RIV.z1 - RIV.z0), M(0x2f5a78), 0, -0.05, (RIV.z0 + RIV.z1) / 2, false);
 {const br = new THREE.Group(); br.position.set(-0.6, 0, (RIV.z0 + RIV.z1) / 2); W0.add(br); add(br, rbox(0.42, 0.04, 1.3, 0.01), M(0xd8d0c0), 0, 0.08, 0); for (const s of [-1, 1]) add(br, new THREE.BoxGeometry(0.02, 0.06, 1.3), M(0x9a9590), s * 0.2, 0.13, 0);}
-const boats = [[-9, 0.11, 0x2f6db5, 5.9], [8, -0.09, 0xf2b33c, 6.3]].map(([x0, v, c, z]) => {const G = new THREE.Group(); W0.add(G); add(G, rbox(0.42, 0.07, 0.14, 0.03), M(0xf6f3ec), 0, 0.0, 0); add(G, rbox(0.18, 0.07, 0.1, 0.02), M(c), -0.05, 0.07, 0); return {G, x0, v, z};});
+const boats = [[-6, 0.05, 0x2f6db5, 5.9], [5, -0.04, 0xf2b33c, 6.3]].map(([x0, v, c, z]) => {const G = new THREE.Group(); W0.add(G); add(G, rbox(0.42, 0.07, 0.14, 0.03), M(0xf6f3ec), 0, 0.0, 0); add(G, rbox(0.18, 0.07, 0.1, 0.02), M(c), -0.05, 0.07, 0); return {G, x0, v, z};});
 
 // ------------------------------------------------------------------ the rest of the town around ring B (static, fills the picture)
 const inHill = (x, z) => Math.hypot(x - HILL.x, z - HILL.z) < 2.9; const FILLOWN = [];
@@ -235,12 +240,12 @@ for (const [L, off] of [[rrLoop(RA.hx, RA.hz, RA.r), ROAD / 2 + 0.025], [rrLoop(
 const LANES = [];   // {L, v, s0[], objs[]}
 function lane(hx, hz, r, off, dir, v, kinds, spacing) {const L = rrLoop(hx + off, hz + off, r + off, dir); const n = Math.floor(L.len / spacing); const objs = [];
   for (let i = 0; i < n; i++) {const k = kinds[i % kinds.length]; const o = k === 'bike' ? bike(W0) : car(W0, k); objs.push({...o, s0: i * L.len / n + R() * 0.1});} LANES.push({L, v, objs}); return LANES[LANES.length - 1];}
-lane(RA.hx, RA.hz, RA.r, 0.1, 1, 0.42, ['car'], 1.45); lane(RA.hx, RA.hz, RA.r, -0.1, -1, 0.42, ['car'], 1.6);
-lane(RB.hx, RB.hz, RB.r, 0.12, 1, 0.46, ['car', 'car', 'bus', 'car'], 1.6); lane(RB.hx, RB.hz, RB.r, -0.12, -1, 0.46, ['car', 'bus', 'car', 'car'], 1.7);
-lane(RB.hx, RB.hz, RB.r, 0.24, 1, 0.22, ['bike'], 2.2); lane(RB.hx, RB.hz, RB.r, -0.24, -1, 0.22, ['bike'], 2.4);
+lane(RA.hx, RA.hz, RA.r, 0.1, 1, 0.26, ['car'], 2.7); lane(RA.hx, RA.hz, RA.r, -0.1, -1, 0.26, ['car'], 3.0);
+lane(RB.hx, RB.hz, RB.r, 0.12, 1, 0.28, ['car', 'bus', 'car'], 3.0); lane(RB.hx, RB.hz, RB.r, -0.12, -1, 0.28, ['car', 'car', 'bus'], 3.2);
+lane(RB.hx, RB.hz, RB.r, 0.24, 1, 0.13, ['bike'], 4.5); lane(RB.hx, RB.hz, RB.r, -0.24, -1, 0.13, ['bike'], 5.0);
 const WALKERS = [];   // {loop, s0, v, p}
 for (const [k, b] of blockList) for (const [off, dir, sp] of [[0.07, 1, 0.72], [0.15, -1, 0.9]]) {const L = blockLoop(b, off, dir); const n = Math.floor(L.len / sp);
-  for (let i = 0; i < n; i++) {if (R() < 0.25) continue; const p = person(W0, {}); WALKERS.push({L, s0: i * L.len / n, v: 0.13, p, block: k});}}
+  for (let i = 0; i < n; i++) {if (R() < 0.55) continue; const p = person(W0, {}); WALKERS.push({L, s0: i * L.len / n, v: 0.085, p, block: k});}}
 
 // ------------------------------------------------------------------ flags: every owned thing; pop-up order by distance from the centre
 for (const r of owned) {r.flag.visible = false; const wp = new THREE.Vector3(); r.G.getWorldPosition(wp); r.d = Math.hypot(wp.x, wp.z);}
@@ -268,23 +273,21 @@ function night(t) {return clamp(0.3 * eio((t - 38) / 6) + 0.25 * eio((t - 49) / 
 
 // ------------------------------------------------------------------ camera (voice time): target x,y,z, half frame height, azimuth, elevation
 const C = (x, y, z, s, az, el, fov = 24) => [x, y, z, Math.log(s), az, el, fov];
-const KEYS = [
-  [0.0, C(0.2, 0.4, -2.5, 4.2, -22, 52)], [3.2, C(0.15, 0.4, -2.2, 3.9, -18, 50)], [5.9, C(0.1, 0.3, -0.6, 3.3, -12, 44)],
-  [7.6, C(0.0, 0.28, 0.3, 2.35, -6, 27)], [9.9, C(0.1, 0.28, 0.32, 2.2, -5, 25)],
-  [11.2, C(1.0, 1.1, 0.35, 1.35, -14, 16)], [12.6, C(1.15, 2.7, 0.3, 1.6, -18, 24)],
-  [14.6, C(0.2, 0.6, -1.4, 3.6, -16, 46)], [16.6, C(-2.5, 0.4, -2.9, 2.2, -14, 36)], [17.5, C(-0.9, 0.45, -2.9, 2.1, -10, 35)], [18.4, C(1.2, 0.45, -2.9, 2.1, -6, 33)],
-  [19.6, C(0.3, 0.6, -4.4, 2.2, -10, 36)], [21.0, C(-1.2, 0.85, -7.3, 1.45, -16, 30)], [22.6, C(-0.3, 0.5, -3.1, 4.6, -14, 54)], [24.9, C(0.1, 0.5, -2.9, 4.9, -16, 56)],
-  [26.6, C(-0.9, 0.4, 1.8, 2.6, -20, 42)], [28.2, C(-1.12, 0.45, 3.1, 1.3, -16, 25)], [31.7, C(-1.08, 0.48, 3.1, 1.22, -13, 23)], [35.9, C(-1.02, 0.5, 3.08, 1.25, -10, 23)],
-  [37.4, C(1.8, 0.4, 1.6, 2.6, 30, 48)], [38.9, C(3.15, 0.15, 0.0, 1.15, 80, 41)], [43.6, C(3.2, 0.15, 0.0, 1.1, 83, 40)], [46.6, C(3.25, 0.15, 0.0, 1.12, 86, 40)], [49.5, C(3.3, 0.3, -0.1, 1.45, 82, 44)],
-  [50.9, C(1.2, 0.8, -3.4, 3.6, 30, 48)], [52.1, C(-1.36, 0.76, -6.98, 0.75, -12, 22)], [56.4, C(-1.32, 0.76, -7.0, 0.7, -4, 21)], [61.0, C(-1.1, 0.82, -6.85, 1.2, 6, 27)],
-  [63.6, C(0.0, 0.6, -1.6, 4.0, -8, 48)], [66.6, C(0.4, 0.8, 0.0, 5.0, -14, 54)], [70.0, C(0.6, 1.2, 0.1, 5.6, -16, 58)]];
+const KEYS = [   // calm and clear (Wunsch des Nutzers: „zu hektisch“, „Unterschied Arm und Reich deutlicher“): the hook is the comparison on the square
+  [0.0, C(0.25, 0.32, 0.2, 1.9, -10, 22)], [2.8, C(0.55, 1.15, 0.2, 2.9, -11, 22)], [5.6, C(0.35, 0.9, 0.25, 2.7, -8, 24)],
+  [7.6, C(-0.5, 0.3, 0.3, 1.6, -6, 24)], [10.2, C(-0.4, 0.32, 0.3, 1.55, -5, 24)],
+  [14.4, C(0.0, 0.5, -1.6, 4.4, -12, 48)], [16.4, C(-0.4, 0.5, -2.6, 4.4, -10, 47)], [18.8, C(-0.6, 0.5, -3.0, 4.4, -8, 46)], [22.0, C(-0.8, 0.6, -5.0, 4.6, -10, 42)], [25.0, C(-0.3, 0.5, -3.4, 5.0, -12, 50)],
+  [27.0, C(-0.6, 0.45, 0.2, 4.6, -14, 50)], [29.0, C(-1.1, 0.48, 3.1, 1.35, -14, 26)], [32.0, C(-1.06, 0.5, 3.1, 1.25, -12, 24)], [36.0, C(-1.02, 0.52, 3.08, 1.28, -10, 24)],
+  [38.0, C(1.0, 0.4, 1.6, 3.4, 30, 50)], [40.0, C(3.25, 0.15, 0.0, 1.25, 60, 55)], [44.0, C(3.28, 0.15, 0.0, 1.2, 63, 54)], [47.5, C(3.3, 0.15, 0.0, 1.22, 65, 54)], [50.0, C(3.3, 0.3, -0.1, 1.5, 62, 54)],
+  [52.0, C(1.0, 0.6, -3.6, 4.2, 28, 50)], [54.0, C(-1.36, 0.76, -6.98, 0.85, -10, 22)], [57.5, C(-1.32, 0.76, -7.0, 0.8, -4, 21)], [61.0, C(-1.1, 0.82, -6.85, 1.3, 4, 27)],
+  [64.0, C(-0.4, 0.6, -2.4, 4.0, -6, 46)], [66.6, C(0.3, 0.8, -0.3, 5.0, -12, 54)], [70.0, C(0.5, 1.1, -0.1, 5.4, -14, 57)]];
 const KT = KEYS.map(k => k[0]), KV = KEYS.map(k => k[1]);
 const KM = [0, 1, 2, 3, 4, 5, 6].map(j => {const n = KT.length, d = [], tg = new Array(n).fill(0); for (let i = 0; i < n - 1; i++) d.push((KV[i + 1][j] - KV[i][j]) / (KT[i + 1] - KT[i]));
   for (let i = 1; i < n - 1; i++) {if (d[i - 1] * d[i] <= 0) continue; const h0 = KT[i] - KT[i - 1], h1 = KT[i + 1] - KT[i], w1 = 2 * h1 + h0, w2 = h1 + 2 * h0; tg[i] = (w1 + w2) / (w1 / d[i - 1] + w2 / d[i]);} return tg;});
 function camAt(t) {let i = 0; while (i < KT.length - 2 && t > KT[i + 1]) i++; const h = KT[i + 1] - KT[i], u = clamp((t - KT[i]) / h, 0, 1), u2 = u * u, u3 = u2 * u;
   const a = 2 * u3 - 3 * u2 + 1, b = u3 - 2 * u2 + u, c = -2 * u3 + 3 * u2, e = u3 - u2; return [0, 1, 2, 3, 4, 5, 6].map(j => a * KV[i][j] + b * h * KM[j][i] + c * KV[i + 1][j] + e * h * KM[j][i + 1]);}
 const CAMT = new THREE.Vector3();
-function setCam(t) {const v = camAt(t), size = Math.exp(v[3]); const az = (v[4] + 0.3 * Math.sin(t * 0.21) + 0.15 * Math.sin(t * 0.47 + 1.3)) * Math.PI / 180, el = (v[5] + 0.15 * Math.sin(t * 0.29 + 0.7)) * Math.PI / 180;
+function setCam(t) {const v = camAt(t), size = Math.exp(v[3]); const az = (v[4] + 0.12 * Math.sin(t * 0.17)) * Math.PI / 180, el = (v[5] + 0.06 * Math.sin(t * 0.23 + 0.7)) * Math.PI / 180;
   CAMT.set(v[0], v[1], v[2]); const dir = new THREE.Vector3(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el));
   cam.fov = v[6]; const d = size / Math.tan(v[6] / 2 * Math.PI / 180); cam.position.copy(CAMT).addScaledVector(dir, d); cam.near = Math.max(0.03, d * 0.06); cam.far = d + 45;
   scene.fog.near = d + 4; scene.fog.far = d + 26; cam.lookAt(CAMT); cam.updateProjectionMatrix(); cam.updateMatrixWorld(); return size;}
@@ -297,10 +300,10 @@ const SUBS = [[0.13, 3.05, 'Die reichsten zehn Prozent besitzen mehr als die Hä
   [36.36, 40.35, 'Die Hälfte der Haushalte hat dagegen weniger als 103.000 Euro.'], [40.38, 43.65, 'Ein großer Grund: Mehr als die Hälfte wohnt zur Miete,'], [43.66, 46.34, 'so viele wie in keinem anderen Land der EU.'],
   [46.35, 49.62, 'Die Miete fließt jeden Monat an die, denen die Häuser gehören.'], [49.86, 53.1, 'Und viel Vermögen wird nicht verdient, sondern vererbt.'], [53.18, 56.36, 'Allein 2024 wurden über 113 Milliarden Euro'],
   [56.38, 58.6, 'vererbt und verschenkt.'], [58.92, 61.45, 'Und das ist nur der Teil, den das Finanzamt erfasst.'], [61.7, 65.0, 'Und du? Glaubst du, du gehörst zu den reichsten zehn Prozent?'], [65.33, 66.72, 'Schreib’s in die Kommentare.']];
-const NUMS = [[7.82, 10.25, '2–3 %', 'besitzt die ärmere Hälfte zusammen'], [12.62, 16.3, '54 %', 'besitzen die reichsten 10 % (Bundesbank, 2023)'], [22.85, 25.1, '≈ 60 %', 'mit den Superreichen'],
+const NUMS = [[2.4, 6.15, '54 %', 'besitzen die reichsten 10 % (Bundesbank, 2023)'], [7.82, 10.25, '2–3 %', 'besitzt die ärmere Hälfte zusammen'], [22.85, 25.1, '≈ 60 %', 'mit den Superreichen'],
   [28.2, 31.7, '780.000 €', 'Vermögen pro Haushalt: ab hier gehörst du zu den reichsten 10 %'], [38.6, 40.4, '103.200 €', 'hat der mittlere Haushalt (Median)'],
   [41.6, 43.7, '58 %', 'der Haushalte wohnen zur Miete (Zensus 2022)'], [56.38, 58.7, '113 Mrd. €', 'vererbt und verschenkt 2024 (vom Finanzamt erfasst)']];
-const TITLES = [[0.0, 6.2, 'Wem gehört eigentlich<br>Deutschland?'], [6.2, 7.82, 'Und die ärmere<br>Hälfte?'], [10.25, 12.62, 'Stell dir eine<br>Stadt vor'], [16.3, 19.26, 'Firmen, Mietshäuser,<br>Aktien'],
+const TITLES = [[0.0, 2.4, 'Wem gehört eigentlich<br>Deutschland?'], [6.15, 7.82, 'Und die ärmere<br>Hälfte?'], [10.25, 14.6, 'Stell dir eine<br>Stadt vor'], [14.6, 16.3, 'Rote Fahne = gehört<br>den reichsten 10 %'], [16.3, 19.26, 'Firmen, Mietshäuser,<br>Aktien'],
   [19.26, 22.85, 'Die Superreichen'], [25.1, 28.2, 'Ab wann gehört<br>man dazu?'], [31.7, 36.3, 'Haus + Erspartes<br>+ Aktien − Schulden'], [36.3, 38.6, 'Und die andere<br>Hälfte?'],
   [43.7, 49.62, 'Die Miete fließt<br>zu den Eigentümern'], [49.62, 56.38, 'Verdient oder<br>vererbt?'], [58.7, 61.6, 'Nur, was das<br>Finanzamt sieht'], [61.6, 66.72, 'Gehörst du<br>dazu?']];
 const SRC = 'Quellen: Deutsche Bundesbank, IW Köln, Statistisches Bundesamt, Eurostat\nStand 20.11.2026 · Modell vereinfacht';
@@ -362,17 +365,19 @@ function setTime(t) {
   // windows light up in the evening (switch to the lit textures once, then fade by emissive)
   const winGlow = 1.1 * clamp((n - 0.18) / 0.25, 0, 1); for (const r of ALLB) for (const m of r.wall) if (m.emissiveMap) m.emissiveIntensity = winGlow;
   // flags: pop up across the town (2.3–4.6 s), villas at 20.0, waving
-  owned.forEach((r, i) => {const ts = 2.3 + i * (2.3 / owned.length); const p = clamp((t - ts) / 0.45, 0, 1); r.flag.visible = p > 0; r.flag.scale.setScalar(Math.max(1e-3, ebk(p, 2.2) * (r.o.fs || 2.3))); waveFlag(r.flag, t);});
+  owned.forEach((r, i) => {const ts = 14.75 + i * (1.5 / owned.length); const p = clamp((t - ts) / 0.45, 0, 1); r.flag.visible = p > 0; r.flag.scale.setScalar(Math.max(1e-3, ebk(p, 2.2) * (r.o.fs || 2.3))); waveFlag(r.flag, t);});
   VILLAS.forEach((F, i) => {const p = clamp((t - 20.0 - i * 0.25) / 0.45, 0, 1); F.visible = p > 0; F.scale.setScalar(Math.max(1e-3, ebk(p, 2.2) * 1.3)); waveFlag(F, t);});
   // highlights: Firmen, Mietshäuser, Aktien
   const hl = (keys, t0) => {const k = win(t, t0, t0 + 1.0, 0.3); for (const key of keys) for (const m of recs[key].wall) {if (m.emissiveMap) m.emissiveIntensity = Math.max(m.emissiveIntensity, 1.4 * k); else {m.emissive = m.emissive || new THREE.Color(); m.emissive.setRGB(0.3 * k, 0.26 * k, 0.16 * k);}}};
   hl(['fabA', 'fabB'], 16.7); hl(['aptN1', 'aptN2'], 17.45); hl(['boerse', 'towerA', 'towerB'], 18.25);
   // the plaza: coin piles (2–3 %) and growing stacks, the huge tower of the richest tenth
-  piles.forEach((c, i) => {const p = clamp((t - 8.3 - i * 0.12) / 0.35, 0, 1); c.visible = p > 0; c.scale.setScalar(0.55 * Math.max(1e-3, ebk(p, 2)));});
-  stacks.forEach(s => {const t0 = s.i < 9 ? 9.2 + (s.i - 5) * 0.22 : 10.45, dur = s.i < 9 ? 0.6 : 1.9; const p = clamp((t - t0) / dur, 0, 1); const steps = s.i === 9 ? 12 : 3; const q = s.i === 9 ? (Math.floor(p * steps) + ease((p * steps) % 1)) / steps : eio(p);
+  piles.forEach((c, i) => {const p = clamp((t - 7.95 - i * 0.14) / 0.4, 0, 1); c.visible = p > 0; c.scale.setScalar(0.9 * Math.max(1e-3, ebk(p, 2)));});
+  stacks.forEach(s => {const t0 = s.i < 9 ? 3.1 + (s.i - 5) * 0.25 : 0.55, dur = s.i < 9 ? 0.7 : 2.3; const p = clamp((t - t0) / dur, 0, 1); const steps = s.i === 9 ? 12 : 3; const q = s.i === 9 ? (Math.floor(p * steps) + ease((p * steps) % 1)) / steps : eio(p);
     s.G.position.y = -s.h * (1 - Math.min(1, q));});
-  {const p = clamp((t - 12.35) / 0.45, 0, 1); towerFlag.visible = p > 0 && t < O.t0; towerFlag.scale.setScalar(Math.max(1e-3, ebk(p, 2.2) * 1.6)); waveFlag(towerFlag, t, 1.4);}
-  DEC.forEach((p, i) => {p.G.rotation.y = 0.06 * Math.sin(t * 0.8 + i); });
+  {const p = clamp((t - 14.65) / 0.45, 0, 1); towerFlag.visible = p > 0 && t < O.t0; towerFlag.scale.setScalar(Math.max(1e-3, ebk(p, 2.2) * 1.6)); waveFlag(towerFlag, t, 1.4);}
+  DEC.forEach((p, i) => {p.G.rotation.y = 0.05 * Math.sin(t * 0.6 + i); });
+  {const a = Math.min(clamp((t - 1.0) / 0.4, 0, 1), clamp((10.6 - t) / 0.5, 0, 1)); LAB_RICH.visible = a > 0; LAB_RICH.material.opacity = a;
+   const b = Math.min(clamp((t - 6.3) / 0.4, 0, 1), clamp((10.6 - t) / 0.5, 0, 1)); LAB_POOR.visible = b > 0; LAB_POOR.material.opacity = b;}
   // conversions: buildings sink, money towers grow; the flag rides on whichever top is higher
   for (const c of CONV) {const s = eio((t - c.t0) / 0.9), r = eio((t - c.t0 - 0.45) / 0.9); const o = c.r.o; c.r.B.position.y = -(o.h + 0.6) * s; c.r.B.visible = s < 0.999;
     c.mt.G.position.y = -c.th * (1 - r); c.mt.G.visible = r > 0.001; const extra = c === landlordConv ? 0.25 * eio((t - 47.2) / 2.4) : 0;
@@ -390,22 +395,22 @@ function setTime(t) {
     c.position.set(lerp(a[0], b[0], p), lerp(a[1], b[1], p) + Math.sin(p * Math.PI) * 0.25, lerp(a[2], b[2], p)); c.rotation.x = p * 6;});
   pig.rotation.z = -0.35 * win(t, 32.5, 33.1, 0.15); chart.scale.setScalar(1 + 0.12 * win(t, 33.5, 34.3, 0.2));
   // rent: coin piles at the doors, coins roll to the landlord's tower
-  doorPiles.forEach((c, i) => {const p = clamp((t - 37.9 - i * 0.1) / 0.35, 0, 1); c.visible = p > 0; c.scale.setScalar(0.95 * Math.max(1e-3, ebk(p, 2)));});
+  doorPiles.forEach((c, i) => {const p = clamp((t - 39.4 - i * 0.12) / 0.4, 0, 1); c.visible = p > 0; c.scale.setScalar(0.95 * Math.max(1e-3, ebk(p, 2)));});
   for (const r of ROLL) {const P = rollPath(r.d); const L1 = Math.abs(P[1][1] - P[0][1]), L2 = Math.abs(P[2][0] - P[1][0]); const dist = (t - r.t0) * 0.55; r.coin.visible = dist > 0 && dist < L1 + L2;
     if (!r.coin.visible) continue; let x, z, dir; if (dist < L1) {x = P[0][0]; z = lerp(P[0][1], P[1][1], dist / L1); dir = Math.PI / 2;} else {x = lerp(P[1][0], P[2][0], (dist - L1) / L2); z = P[1][1]; dir = 0;}
     r.coin.position.set(x, 0.083, z); r.coin.rotation.set(0, dir, 0); r.coin.rotateZ(-dist / 0.065);}
   // inheritance: the old person hands the stack with the red ribbon to the young one
-  {const u = eio((t - 52.2) / 0.8); const a = [HILL.x - 0.27, HILL.y + 0.13, HILL.z + 0.62], b = [HILL.x - 0.03, HILL.y + 0.13, HILL.z + 0.62]; gift.position.set(lerp(a[0], b[0], u), lerp(a[1], b[1], u) + Math.sin(u * Math.PI) * 0.04, lerp(a[2], b[2], u));
-   OLD.arms.forEach(m => m.rotation.x = -1.1 * (1 - u * 0.8)); YOUNG.arms.forEach(m => m.rotation.x = -1.1 * clamp((t - 51.6) / 0.5, 0, 1));}
+  {const u = eio((t - 54.2) / 0.9); const a = [HILL.x - 0.27, HILL.y + 0.13, HILL.z + 0.62], b = [HILL.x - 0.03, HILL.y + 0.13, HILL.z + 0.62]; gift.position.set(lerp(a[0], b[0], u), lerp(a[1], b[1], u) + Math.sin(u * Math.PI) * 0.04, lerp(a[2], b[2], u));
+   OLD.arms.forEach(m => m.rotation.x = -1.1 * (1 - u * 0.8)); YOUNG.arms.forEach(m => m.rotation.x = -1.1 * clamp((t - 53.6) / 0.5, 0, 1));}
   // town life
   for (const L of LANES) for (const o of L.objs) {const [x, z, dx, dz] = L.L.at(o.s0 + L.v * t); o.G.position.set(x, 0.0, z); o.G.rotation.y = Math.atan2(-dz, dx); if (o.hl) o.hl.emissiveIntensity = 0.3 + 2.5 * lampOn; if (o.p) poseWalk(o.p, 1, (o.s0 + L.v * t) * 0.6, t);}
   for (const w of WALKERS) {const s = w.s0 + w.v * t; const [x, z, dx, dz] = w.L.at(s); w.p.G.position.set(x, 0.022, z); w.p.G.rotation.y = Math.atan2(dx, dz); poseWalk(w.p, 1, s, t); w.p.G.position.y += 0.003 * Math.abs(Math.sin(s * 52));}
   statics.forEach(({p}, i) => {p.G.rotation.y += 0.0;});
-  cabins.forEach((c, i) => {const a = i / 12 * Math.PI * 2 + t * 0.12; c.position.set(Math.cos(a) * 0.78, Math.sin(a) * 0.78, 0); c.rotation.z = 0;}); wheel.rotation.z = 0;
-  crane.userData.jib.rotation.y = 0.6 * Math.sin(t * 0.18); heli.userData.rot.rotation.y = t * 0.6;
-  jets.forEach(([j, a], i) => {const ph = (t * 1.6 + i / 6) % 1; j.position.set(Math.cos(a) * (0.05 + 0.2 * ph), 0.12 + 0.28 * ph - 0.32 * ph * ph, -0.75 + Math.sin(a) * (0.05 + 0.2 * ph)); j.material.opacity = 0.8 * (1 - ph);});
+  cabins.forEach((c, i) => {const a = i / 12 * Math.PI * 2 + t * 0.05; c.position.set(Math.cos(a) * 0.78, Math.sin(a) * 0.78, 0); c.rotation.z = 0;}); wheel.rotation.z = 0;
+  crane.userData.jib.rotation.y = 0.4 * Math.sin(t * 0.1); heli.userData.rot.rotation.y = t * 0.4;
+  jets.forEach(([j, a], i) => {const ph = (t * 1.0 + i / 6) % 1; j.position.set(Math.cos(a) * (0.05 + 0.2 * ph), 0.12 + 0.28 * ph - 0.32 * ph * ph, -0.75 + Math.sin(a) * (0.05 + 0.2 * ph)); j.material.opacity = 0.8 * (1 - ph);});
   boats.forEach(b => {b.G.position.set(b.x0 + b.v * t, 0.0, b.z); b.G.rotation.y = b.v > 0 ? 0 : Math.PI;}); waterT.offset.x = t * 0.01;
-  tickT.offset.x = t * 0.08;
+  tickT.offset.x = t * 0.04;
   // tilt-shift: sharper band on close shots, wider blur on overviews
   tilt.forEach((p, i) => {p.uniforms.r.value = 0.49; p.uniforms.band.value = 0.09 + 0.07 * clamp((size - 1) / 3, 0, 1); p.uniforms.amt.value = 3.0 * clamp(0.5 + size / 3.0, 0.55, 1) * (i < 2 ? 1 : 0.8);});
   CANVAS.style.filter = 'saturate(1.35) contrast(1.08)';

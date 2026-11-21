@@ -42,43 +42,42 @@ bed = lp(hp(bk('ambience_city')[:N], 120), 6000); bed = np.pad(bed, (0, N - len(
 bed *= np.clip(t / 0.8, 0, 1) * (1 - 0.35 * np.clip((t - 45) / 10, 0, 1)) * np.clip((END - 0.3 - t) / 1.5, 0, 1)
 amb += 0.17 * bed
 # ---------------------------------------------------------------- hook: red flags pop up across the town (one pop + flutter, not one per flag)
-add(cut(ep('pop'), 0.0, 0.4), 2.3, 0.22); add(cut(bk('cloth_flap'), 2.3, 0.9, 0.02, 0.3), 2.45, 0.22); add(rate(cut(ep('pop'), 0.0, 0.4), 1.15), 3.5, 0.14)
-whoosh(6.75, 0.3, 0)                                                                # dive to the square
-click(7.82, 0.12, 0)                                                                # 2–3 %
-add(cut(rf('coins_drop'), 0.0, 0.9, 0.005, 0.3), 8.3, 0.2)                          # tiny coin piles of the poorer half
-add(lp(cut(bk('money_handling'), 0.3, 0.9, 0.03, 0.3), 7000), 9.2, 0.18)           # the middle stacks
-for k, at in enumerate((10.5, 11.15, 11.8)):                                        # the tower of the richest tenth, bundle by bundle
+# the tower of the richest tenth grows right away, bundle by bundle; the middle stacks follow
+for k, at in enumerate((0.6, 1.35, 2.1)):
     add(rate(cut(bk('money_count'), 0.25, 0.9, 0.01, 0.3), (1.0, 1.05, 0.95)[k]), at, 0.2 - 0.02 * k)
-add(cut(bk('cloth_flap'), 6.1, 0.7, 0.02, 0.3), 12.35, 0.2); add(cut(ep('pop'), 0.0, 0.4), 12.35, 0.12)
-click(12.62, 0.12, 1)                                                               # 54 %
-whoosh(13.6, 0.24, 1)
+click(2.4, 0.12, 1)                                                                 # 54 %
+add(lp(cut(bk('money_handling'), 0.3, 0.9, 0.03, 0.3), 7000), 3.1, 0.16)
+click(7.82, 0.12, 0)                                                                # 2–3 %
+add(cut(rf('coins_drop'), 0.0, 0.9, 0.005, 0.3), 7.95, 0.2)                         # tiny coin piles of the poorer half
+whoosh(11.6, 0.22, 1)                                                               # up from the square over the town
+# the red flags pop up when Tom says „bekommt eine rote Fahne“ (one pop and a flutter, not one per flag)
+add(cut(ep('pop'), 0.0, 0.4), 14.7, 0.2); add(cut(bk('cloth_flap'), 2.3, 0.9, 0.02, 0.3), 14.85, 0.22); add(rate(cut(ep('pop'), 0.0, 0.4), 1.15), 15.6, 0.13)
 for at, i in ((16.7, 0), (17.45, 1), (18.25, 2)): click(at, 0.07, i)               # Firmen, Mietshäuser, Aktien
-whoosh(20.1, 0.24, 0)                                                               # over to the hill
 add(cut(ep('pop'), 0.0, 0.4), 20.0, 0.14); add(cut(bk('cloth_flap'), 2.3, 0.9, 0.02, 0.3), 20.1, 0.16)
 click(22.85, 0.12, 2)                                                               # ≈ 60 %
 # ---------------------------------------------------------------- the owned buildings sink, money towers grow
 add(hp(cut(ep('rumble'), 0.0, 3.2, 0.2, 1.2), 90) , 22.9, 0.16)
 add(lp(cut(bk('money_handling'), 1.7, 1.6, 0.05, 0.5), 7000), 23.5, 0.2)
 # ---------------------------------------------------------------- the family house: house + savings + shares − loan
-whoosh(26.4, 0.24, 1)
+whoosh(27.0, 0.22, 1)
 click(28.2, 0.12, 0); add(cut(sz('shimmer'), 0.0, 1.2, 0.003, 0.5), 28.45, 0.07)   # 780.000 € and the Top-10-% line
 add(lp(cut(bk('money_handling'), 3.85, 0.6, 0.01, 0.2), 6500), 32.16, 0.22)        # Haus
 add(cut(rf('coins_handful'), 0.0, 0.8, 0.005, 0.3), 32.62, 0.2)                     # Erspartes (coins from the piggy bank)
 add(lp(cut(bk('money_handling'), 4.6, 0.6, 0.01, 0.2), 6500), 33.55, 0.2)          # Aktien
 add(cut(sz('rustle_slide'), 0.0, 0.8, 0.01, 0.3), 35.25, 0.18)                      # the loan is taken off
 # ---------------------------------------------------------------- the tenants' courtyard
-whoosh(37.6, 0.26, 0)
-add(cut(rf('coins_drop'), 0.0, 0.7, 0.005, 0.3), 37.9, 0.14)                         # small piles at the doors
+whoosh(38.0, 0.22, 0)
+add(cut(rf('coins_drop'), 0.0, 0.7, 0.005, 0.3), 39.4, 0.14)                         # small piles at the doors
 click(38.6, 0.12, 1); click(41.6, 0.12, 2)                                          # 103.200 €, 58 %
 for k in range(6):                                                                   # coins roll to the landlord's money tower
     add(rate(cut(rf('coin_spin'), 0.0, 1.1, 0.01, 0.3), (1.0, 1.08, 0.94, 1.12, 0.98, 1.04)[k]), 46.8 + k * 0.32, 0.09)
 add(lp(cut(bk('money_handling'), 0.3, 1.2, 0.05, 0.4), 6000), 47.4, 0.12)
 # ---------------------------------------------------------------- the inheritance in front of the villa
-whoosh(50.7, 0.26, 1)
-add(cut(rf('envelope_flap'), 0.0, 0.6, 0.005, 0.2), 52.3, 0.16)
-add(rate(cut(sz('glock'), 0.0, 1.8, 0.002, 0.7), 2 ** (-5 / 12)), 52.95, 0.06)      # a warm tone when the stack changes hands
+whoosh(52.0, 0.22, 1)
+add(cut(rf('envelope_flap'), 0.0, 0.6, 0.005, 0.2), 54.3, 0.16)
+add(rate(cut(sz('glock'), 0.0, 1.8, 0.002, 0.7), 2 ** (-5 / 12)), 55.05, 0.06)      # a warm tone when the stack changes hands
 click(56.38, 0.12, 0)                                                               # 113 Mrd. €
-whoosh(62.3, 0.3, 0)                                                                # up into the overview
+whoosh(62.6, 0.24, 0)                                                                # up into the overview
 # ---------------------------------------------------------------- outro: the flag comes loose and writes the logo, the end becomes the dot
 whoosh(67.05, 0.22, 1)
 add(cut(bk('cloth_flap'), 2.3, 1.2, 0.02, 0.4), 67.6, 0.18)
