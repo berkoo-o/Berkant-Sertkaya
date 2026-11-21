@@ -4,7 +4,7 @@ Stand: 21.11.2026 · Länge 77,4 Sekunden (Stimme 73,2 s, danach rund 4 s Outro)
 
 ## Warum neu
 
-Die Stadt-Fassung war für den Nutzer unverständlich, und sie hatte zu viele Animationsfehler. Deshalb erzählt die Neufassung alles mit einem einzigen, einfachen Bild. Zehn Knetfiguren stehen in einer Reihe, und jede steht für ein Zehntel der Haushalte, von arm (1) nach reich (10). Hundert Münzen sind alles, was die Haushalte besitzen. Die reichste Figur ist rot und trägt einen Zylinder, sie ist der rote Faden. Hinter dem Platz steht eine kleine Knetestadt (Fabrik, Börse, Mietshäuser, Villa), die zeigt, worin das Vermögen steckt. Den Look (Stil 6, Knete) hat der Nutzer am 21.11.2026 gewählt.
+Die Stadt-Fassung war für den Nutzer unverständlich, und sie hatte zu viele Animationsfehler. Deshalb erzählt die Neufassung alles mit einem einzigen, einfachen Bild. Zehn Knetfiguren stehen in einer Reihe, und jede steht für ein Zehntel der Haushalte, von arm (1) nach reich (10). Hundert Münzen sind alles, was die Haushalte besitzen. Die reichste Figur ist rot und trägt einen Zylinder, sie ist der rote Faden. Hinter dem Platz steht eine kleine Knetestadt (Fabrik, Börse, Mietshäuser, Villa), die zeigt, worin das Vermögen steckt. Die Börse steht in der vorderen Häuserreihe, mit Säulen, grüner Kurstafel und dem Schild „BÖRSE“ (Wunsch des Nutzers, 21.11.2026). Den Look (Stil 6, Knete) hat der Nutzer am 21.11.2026 gewählt.
 
 Alle Flugbahnen der Münzen sind so geplant, dass sich nichts berührt. Die Prüfung `CHECK()` in `knete.html` testet für jedes Bild, ob sich Münzen in der Luft berühren, durch Figuren oder Stapel fliegen oder ob ein Stapel Lücken hat. `CHECK_LABELS()` testet, ob ein Schild aus dem Bild ragt oder in die Untertitel rutscht. Beide melden 0 Fehler.
 
@@ -93,6 +93,7 @@ Stilblock: *Claymation miniature, soft matte plasticine with fingerprints, paste
 
 - Lesbarkeit (Korrektur 21.11.2026): oben und unten liegt ein dunkler Verlauf, unter den Untertiteln ein weicher dunkler Schein, damit Titel, Zahlen und Untertitel nie auf der bunten Stadt oder dem hellen Platz stehen.
 - Münzen machen nur einen flachen Hüpfer, wenn ihr Weg an keiner Figur vorbeiführt; hoch fliegen sie nur, wenn sie über eine Figur müssen.
+- Flüssige Münzen (Feedback „unflüssig“, 21.11.2026): kein Überschlag mehr, nur ein leichtes Kippen, das vor dem Fallen wieder flach ist, ein weicher Bogen (oben nach 32 % der Flugzeit, danach immer schneller fallend) und kein Stauchen beim Landen. Der große Strom zur roten Figur fliegt wie eine Kette im gleichen Takt (alle 0,05 s eine Münze), die kleinen Bewegungen starten und enden sanft.
 
 - Eine durchgehende Kamerafahrt mit weicher, monotoner Interpolation, keine Schnitte.
 - Münzen fliegen mit gleichmäßiger Geschwindigkeit, die weitesten zuerst, damit keine Münze eine andere einholt. Vor der Landung liegen sie flach und fallen senkrecht auf ihren Platz.

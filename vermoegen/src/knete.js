@@ -75,6 +75,8 @@ function building(o) {
       const items = ['DAX ▲ 1,2 %', 'AKTIEN ▲ 0,8 %', 'MDAX ▲ 0,5 %', 'DAX ▲ 1,2 %']; let x = 20; for (const s of items) {g.fillStyle = '#7ee08f'; g.fillText(s, x, h / 2 + 2); x += g.measureText(s).width + 60;}});
     tk.wrapS = THREE.RepeatWrapping; tk.repeat.set(0.45, 1); TOWN.ticker = tk;
     add(G, new THREE.PlaneGeometry(o.w * 0.9, 0.09), new THREE.MeshStandardMaterial({map: tk, emissive: 0xffffff, emissiveMap: tk, emissiveIntensity: 0.35, roughness: 0.6}), 0, o.h * 0.78, o.d / 2 + 0.002);
+    const bt = tex(512, 96, (g, w, h) => {g.fillStyle = '#faf6ee'; g.fillRect(0, 0, w, h); g.fillStyle = '#2b2b38'; g.font = '800 70px "Inter Tight"'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('BÖRSE', w / 2, h / 2 + 4);});
+    add(G, new THREE.PlaneGeometry(o.w * 0.62, 0.115), new THREE.MeshStandardMaterial({map: bt, roughness: 0.85}), 0, o.h * 0.64 + 0.001, o.d / 2 + 0.121).castShadow = false;
     top = o.h + 0.2;
   } else {
     add(G, rbox(o.w, o.h, o.d, 0.06), [wm, wm, pm, pm, wm, wm], 0, o.h / 2, 0);
@@ -98,13 +100,13 @@ function building(o) {
 const TOWNLIST = [
   {key: 'fab', t: 'factory', x: -1.75, z: -2.6, w: 1.0, d: 0.7, h: 0.7, col: 0xc4a8f0, flag: 1, fx: 0.31, fz: 0.2},
   {key: 'tower', t: 'tower', x: -0.74, z: -2.62, w: 0.56, d: 0.55, h: 1.8, col: 0x9cc8f2},
-  {key: 'boerse', t: 'boerse', x: 0.29, z: -2.6, w: 1.0, d: 0.62, h: 0.82, flag: 1, fx: 0.29, fz: -0.1},
+  {key: 'a3', t: 'block', x: 0.29, z: -2.62, w: 0.72, d: 0.54, h: 1.05, c: 3, flag: 1},
   {key: 'a1', t: 'block', x: 1.28, z: -2.62, w: 0.82, d: 0.56, h: 1.25, c: 1, flag: 1},
   {t: 'house', x: 2.07, z: -2.6, w: 0.5, d: 0.5, h: 0.44, c: 4},
   {t: 'house', x: -2.09, z: -1.86, w: 0.46, d: 0.46, h: 0.42, c: 5},
   {key: 'a2', t: 'block', x: -1.28, z: -1.88, w: 0.78, d: 0.54, h: 0.95, c: 0, flag: 1},
   {t: 'villa', x: -0.34, z: -1.86, w: 0.7, d: 0.52, h: 0.5, c: 2},
-  {key: 'a3', t: 'block', x: 0.65, z: -1.88, w: 0.72, d: 0.54, h: 1.05, c: 3, flag: 1},
+  {key: 'boerse', t: 'boerse', x: 0.62, z: -1.9, w: 1.0, d: 0.6, h: 0.82, flag: 1, fx: 0.3, fz: -0.12},
   {t: 'house', x: 1.48, z: -1.86, w: 0.44, d: 0.44, h: 0.4, c: 6},
   {t: 'house', x: 2.11, z: -1.86, w: 0.42, d: 0.42, h: 0.38, c: 7}];
 const BLD = TOWNLIST.map(building);
@@ -113,7 +115,11 @@ function tree(x, z, s = 1) {const T = new THREE.Group(); T.position.set(x, 0.01,
   add(T, new THREE.CylinderGeometry(0.02, 0.026, 0.14, 10), clay(0xa0704a), 0, 0.07, 0);
   add(T, new THREE.IcosahedronGeometry(0.15, 2), clay(PAL.tree[Math.floor(R() * 3)]), 0, 0.27, 0); if (R() < 0.5) add(T, new THREE.IcosahedronGeometry(0.1, 2), clay(PAL.tree[Math.floor(R() * 3)]), 0.06, 0.4, 0.02);
   TREES.push(T); return T;}
-for (const [x, z, s] of [[-0.9, -1.72, 0.85], [0.13, -1.7, 0.8], [1.13, -1.68, 0.85], [1.8, -1.7, 0.75], [-2.32, -2.35, 0.85], [-1.17, -2.32, 0.75], [0.86, -2.3, 0.7], [2.36, -2.25, 0.75], [-0.18, -2.95, 0.75], [1.72, -2.95, 0.8]]) tree(x, z, s);
+// trees only where they touch no building (footprint check, the crown is about 0.15 * size wide)
+const TREE_SKIPPED = [];
+for (const [x, z, sz] of [[-0.265, -2.62, 0.8], [-1.135, -2.72, 0.6], [0.76, -2.7, 0.62], [2.4, -2.25, 0.6], [-0.79, -1.82, 0.55], [1.8, -1.95, 0.55], [-2.35, -2.95, 0.55], [1.3, -3.0, 0.5], [-0.3, -3.0, 0.5]]) {
+  const r = 0.155 * sz + 0.02; const hit = TOWNLIST.some(o => Math.abs(x - o.x) < o.w / 2 + r && Math.abs(z - o.z) < o.d / 2 + (o.t === 'boerse' ? 0.2 : 0) + r);
+  if (hit || x - r < PX0 + 0.06 || x + r > PX1 - 0.06 || z - r < PZ0 + 0.06) TREE_SKIPPED.push([x, z]); else tree(x, z, sz);}
 function car(x, z, c, ry = 0) {const C = new THREE.Group(); C.position.set(x, 0.022, z); C.rotation.y = ry; C.scale.setScalar(1.15); W0.add(C); const m = clay(PAL.car[c % PAL.car.length]);
   add(C, rbox(0.34, 0.08, 0.16, 0.035), m, 0, 0.06, 0); add(C, rbox(0.2, 0.07, 0.15, 0.03), m, -0.02, 0.13, 0);
   for (const [wx, wz] of [[-0.11, 0.08], [0.11, 0.08], [-0.11, -0.08], [0.11, -0.08]]) add(C, new THREE.CylinderGeometry(0.03, 0.03, 0.025, 14).rotateX(Math.PI / 2), clay(0x3e3f5a), wx, 0.03, wz);}
@@ -122,7 +128,7 @@ car(-1.6, ZST - 0.07, 0); car(0.95, ZST + 0.07, 1, Math.PI);
 for (const [x, z] of [[-2.3, -0.98], [-2.28, 1.45], [2.3, -0.98], [2.3, 1.45]]) {const b = add(W0, new THREE.IcosahedronGeometry(0.12, 2), clay(PAL.tree[Math.floor(R() * 3)]), x, 0.08, z); b.scale.y = 0.75;}
 
 // ------------------------------------------------------------------ the ten figures: each stands for a tenth of the households, from poor (1) to rich (10, red with top hat)
-const XF = i => -1.67 + i * 0.38, ZF = 0.55, COLX = i => XF(i) + 0.18, COLZ = ZF - 0.13;
+const XF = i => -1.67 + i * 0.38, ZF = 0.55, COLX = i => XF(i) + 0.2, COLZ = ZF - 0.15;
 const SHIRT = [0x5b8ef0, 0xf5c451, 0x58b48c, 0xa47ce0, 0xf3f0ea, 0x4a4d6a, 0xef8fb5, 0xf08a6c, 0x6fd0e0, RED];
 const HAIR = [0x3b2a20, 0xd9a441, 0x2b2b33, 0x8a5a3a, 0x5a3b2a, 0xc9c3b8, 0x3b2a20, 0x6b4a2a, 0x2b2b33];
 const FIG = [];
@@ -162,24 +168,22 @@ const COINS = [];   // {m, start:[x,y,z], segs:[{t0, dur, col, slot, apex}], pop
 {const POOR = [-0.7, -0.3, 0.1].map(x => FIELD.findIndex(p => Math.abs(p[0] - x) < 0.01 && Math.abs(p[2] + 0.12) < 0.01)); const REST = FIELD.filter((p, i) => !POOR.includes(i));
   let idx = 0; const byCol = {}; for (const col of [9, 5, 6, 7, 8]) {byCol[col] = []; for (let s = 0; s < SH0[col]; s++) byCol[col].push(REST[idx++]);}
   for (const col of [5, 6, 7, 8]) byCol[col].sort((a, b) => Math.hypot(a[0] - COLX(col), a[2] - COLZ) - Math.hypot(b[0] - COLX(col), b[2] - COLZ)); [2, 3, 4].forEach((c, k) => byCol[c] = [FIELD[POOR[k]]]);
-  // the richest tenth: 54 coins in one stream (scattered order, so neighbours in the stream come from far apart)
   // farthest coins first at an even speed: every later coin stays behind the one before it, so the stream never touches
   const D = p => Math.hypot(p[0] - COLX(9), p[2] - COLZ); const rich = byCol[9].slice().sort((a, b) => D(b) - D(a));
-  for (let j = 0; j < rich.length; j++) {const p = rich[j]; COINS.push({start: p, segs: [{t0: 1.45 + j * 0.045 + Math.max(0, j - 46) * 0.035, dur: 0.34 + D(p) / 8.5, col: 9, slot: j}]});}
-  // tenths 6–9 in turns, so coins for the same column never follow each other closely
+  for (let j = 0; j < rich.length; j++) {const p = rich[j]; COINS.push({start: p, segs: [{t0: 1.45 + j * 0.05 + Math.max(0, j - 46) * 0.035, dur: 0.38 + D(p) / 8, col: 9, slot: j}]});}
   // each column gets its coins in an even rhythm over the same 1.3 s
-  [5, 6, 7, 8].forEach((col, ci) => byCol[col].forEach((p, k) => COINS.push({start: p, segs: [{t0: 4.0 + ci * 0.017 + k * 0.088, dur: 0.4 + Math.hypot(p[0] - COLX(col), p[2] - COLZ) / 8.5, col, slot: k}]})));
+  [5, 6, 7, 8].forEach((col, ci) => byCol[col].forEach((p, k) => COINS.push({start: p, segs: [{t0: 4.0 + ci * 0.017 + k * 0.088, dur: 0.45 + Math.hypot(p[0] - COLX(col), p[2] - COLZ) / 8, col, slot: k, io: true}]})));
   // the poorer half: one coin each for figures 3, 4 and 5, on „zwei“, „bis“, „drei“
-  [2, 3, 4].forEach((c, k) => COINS.push({start: byCol[c][0], segs: [{t0: 8.22 + k * 0.3, dur: 0.55, col: c, slot: 0}]}));}
+  [2, 3, 4].forEach((c, k) => COINS.push({start: byCol[c][0], segs: [{t0: 8.22 + k * 0.3, dur: 0.55, col: c, slot: 0, io: true}]}));}
 // the super-rich (≈ 60 %): six coins hop from the tops of columns 9, 8, 7, 6 onto the red column; first ghost slots show what is missing
 const HOPS = [[8, 17], [8, 16], [7, 11], [7, 10], [6, 7], [5, 4]];
-HOPS.forEach(([col, slot], j) => {const c = COINS.find(o => o.segs[0].col === col && o.segs[0].slot === slot); c.segs.push({t0: 27.3 + j * 0.16, dur: 0.75, col: 9, slot: 54 + j});});
+HOPS.forEach(([col, slot], j) => {const c = COINS.find(o => o.segs[0].col === col && o.segs[0].slot === slot); c.segs.push({t0: 27.25 + j * 0.21, dur: 0.75, col: 9, slot: 54 + j, io: true});});
 const GHOST_T = 24.4;
 const ghostM = new THREE.MeshStandardMaterial({color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.7, transparent: true, opacity: 0.6, roughness: 0.6, depthWrite: false});
 const GHOSTS = Array.from({length: 6}, (_, j) => {const m = new THREE.Mesh(coinGeo, ghostM.clone()); const p = slotPos(9, 54 + j); m.position.set(p[0], p[1], p[2]); W0.add(m); return m;});
 // rent: one coin pops up above each renter (figures 1–6) and flies to the owner, the red figure
 const RENT_T = 54.0;
-for (let i = 0; i < 6; i++) COINS.push({start: [XF(i), 0.84, ZF], popT: 53.62 + i * 0.1, segs: [{t0: RENT_T + i * 0.2, dur: 0.95, col: 9, slot: 60 + i}]});
+for (let i = 0; i < 6; i++) COINS.push({start: [XF(i), 0.84, ZF], popT: 53.62 + i * 0.1, segs: [{t0: RENT_T + i * 0.2, dur: 0.95, col: 9, slot: 60 + i, io: true}]});
 // inheritance: a stack of eight coins tied with a red ribbon comes down onto the red column
 const GIFT_T0 = 59.3, GIFT_T1 = 60.2, GIFT_N = 8, GIFT_S0 = 66;
 const GIFT = new THREE.Group(); W0.add(GIFT);
@@ -192,11 +196,12 @@ for (const c of COINS) {c.m = mkCoin(); c.ry = R() * 6.28;}
 
 // position of a flying coin: rises mostly straight up, travels, and drops straight down onto its slot (so it never cuts through a figure or a column)
 // lat: sideways bow (neighbours in a stream take different lanes, so they never touch in the air)
-function flyPos(a, b, apex, u, lat = 0) {
-  const hp = ease(clamp(u / 0.75, 0, 1)); const ua = 0.4;
-  const y = u < ua ? lerp(a[1], apex, eo(u / ua)) : lerp(apex, b[1], ((u - ua) / (1 - ua)) ** 2);
-  const dx = b[0] - a[0], dz = b[2] - a[2], L = Math.hypot(dx, dz) || 1, o = lat * Math.sin(Math.PI * hp);
-  return [lerp(a[0], b[0], hp) - dz / L * o, y, lerp(a[2], b[2], hp) + dx / L * o];}
+function flyPos(a, b, apex, u, io = false) {
+  // a lob: up to the top of the arc by 40 % of the flight, then falling faster and faster; sideways it starts quick and slows down,
+  // so the last quarter is a straight drop onto the stack (that keeps a stream of coins from touching)
+  const ua = 0.32, y = u < ua ? lerp(a[1], apex, 1 - (1 - u / ua) ** 2) : lerp(apex, b[1], ((u - ua) / (1 - ua)) ** 2);
+  const v = clamp(u / 0.75, 0, 1), w = io ? ease(v) : 1 - (1 - v) ** 1.6;
+  return [lerp(a[0], b[0], w), y, lerp(a[2], b[2], w)];}
 // top of a column (number of coins resting there) at time t, from the coin schedule
 function restCount(col, t) {let n = 0; for (const c of COINS) {const r = restOf(c, t); if (r && r.col === col) n++;} if (t >= GIFT_T1 && col === 9) n += GIFT_N; return n;}
 function restOf(c, t) {let r = null; for (const s of c.segs) if (t >= s.t0 + s.dur) r = s; return r;}
@@ -204,13 +209,16 @@ function restOf(c, t) {let r = null; for (const s of c.segs) if (t >= s.t0 + s.d
 // a coin only needs to clear the figures' heads if its path passes close to one; otherwise it makes a low hop
 const nearFig = (a, b) => {for (let i = 0; i < 10; i++) {const px = XF(i) - a[0], pz = ZF - a[2], dx = b[0] - a[0], dz = b[2] - a[2], L2 = dx * dx + dz * dz || 1; const u = clamp((px * dx + pz * dz) / L2, 0, 1);
   if (Math.hypot(a[0] + dx * u - XF(i), a[2] + dz * u - ZF) < FIG_R + CR + 0.03) return true;} return false;};
+// within one column every coin gets the same rule for its height, so a later coin is never below an earlier one on the way down
+const NEED = {};
+for (const c of COINS) {let prev = c.start; c.segs.forEach(s => {const b = slotPos(s.col, s.slot); if (nearFig(prev, b)) NEED[s.col] = true; prev = b;});}
 for (const c of COINS) {let prev = c.start; c.segs.forEach((s, j) => {const b = slotPos(s.col, s.slot); const over = CH * (s.slot + 1);
-  s.a = prev; s.b = b; s.apex = Math.max(Math.max(prev[1], over) + (s.col === 9 ? 0.45 : 0.3) + (j > 0 ? 0.12 : 0), nearFig(prev, b) ? FIG_TOP + 0.4 : 0) + (s.up || 0); prev = b;});}
+  s.a = prev; s.b = b; s.apex = Math.max(Math.max(prev[1], over) + (s.col === 9 ? 0.45 : 0.3) + (j > 0 ? 0.12 : 0), NEED[s.col] ? FIG_TOP + 0.4 : 0) + (s.up || 0); prev = b;});}
 function coinAt(c, t) {
   // returns {p:[x,y,z], rx, vis, sc}
   if (c.popT !== undefined && t < c.segs[0].t0) {const p = clamp((t - c.popT) / 0.28, 0, 1); return {p: c.start, rx: 0, vis: p > 0, sc: Math.max(1e-3, ebk(p, 2))};}
-  for (const s of c.segs) {if (t < s.t0) return {p: s.a, rx: 0, vis: true, sc: 1}; if (t < s.t0 + s.dur) {const u = (t - s.t0) / s.dur; return {p: flyPos(s.a, s.b, s.apex, u, s.lat || 0), rx: Math.PI * 2 * ease(clamp(u / 0.6, 0, 1)), vis: true, sc: 1, fly: true};}}
-  const s = c.segs[c.segs.length - 1]; const land = t - (s.t0 + s.dur); const sq = land < 0.14 ? 1 - 0.32 * (1 - land / 0.14) : 1; return {p: s.b, rx: 0, vis: true, sc: 1, sy: sq};}
+  for (const s of c.segs) {if (t < s.t0) return {p: s.a, rx: 0, vis: true, sc: 1}; if (t < s.t0 + s.dur) {const u = (t - s.t0) / s.dur; return {p: flyPos(s.a, s.b, s.apex, u, s.io), rx: 0.45 * Math.sin(Math.PI * clamp(u / 0.55, 0, 1)), vis: true, sc: 1, fly: true};}}
+  const s = c.segs[c.segs.length - 1]; return {p: s.b, rx: 0, vis: true, sc: 1};}
 
 // ------------------------------------------------------------------ signs with the thresholds and a dashed line through the gap between two figures
 const SIGNS = [];
@@ -382,7 +390,7 @@ function setTime(t) {
   // coins
   coinSideM.emissiveIntensity = coinTopM.emissiveIntensity = 0.35 * win(t, 11.5, 12.7, 0.4);
   for (const c of COINS) {const s = coinAt(c, t); c.m.visible = s.vis; c.m.position.set(s.p[0], s.p[1], s.p[2]); c.m.rotation.set(s.rx, c.ry, 0); const sy = s.sy || 1; c.m.scale.set(s.sc, s.sc * sy, s.sc);}
-  GHOSTS.forEach((g, j) => {const land = 27.3 + j * 0.16 + 0.75; const a = clamp((t - GHOST_T - j * 0.06) / 0.3, 0, 1) * clamp((land - t) / 0.08, 0, 1); g.visible = a > 0.001; g.material.opacity = (0.55 + 0.2 * Math.sin(t * 6 + j)) * a;});
+  GHOSTS.forEach((g, j) => {const land = 27.25 + j * 0.21 + 0.75; const a = clamp((t - GHOST_T - j * 0.06) / 0.3, 0, 1) * clamp((land - t) / 0.08, 0, 1); g.visible = a > 0.001; g.material.opacity = (0.55 + 0.2 * Math.sin(t * 6 + j)) * a;});
   {const top = CH * 66; const u = clamp((t - GIFT_T0) / (GIFT_T1 - GIFT_T0), 0, 1); GIFT.visible = t >= GIFT_T0; const y = lerp(top + 3.4, top, eo(u)); GIFT.position.set(COLX(9), y, COLZ);
     const l = t - GIFT_T1; GIFT.scale.set(1, l > 0 && l < 0.2 ? 1 - 0.1 * Math.sin(Math.PI * l / 0.2) : 1, 1); GIFT.rotation.y = 0.6 * (1 - eo(u));}
   // signs and dashed lines
@@ -434,5 +442,5 @@ window.CHECK = (step = 1 / 30) => {const bad = []; let minCC = 9;
   return {n: bad.length, minCC: +minCC.toFixed(3), bad: bad.slice(0, 40)};};
 // labels must stay inside the picture and away from the subtitle band
 window.CHECK_LABELS = (step = 0.1) => {const bad = []; for (let t = 0; t <= OUT0; t += step) {setTime(t); for (const p of PILLS) {if (p[1] < 36 || p[1] + p[3] > W - 36 || p[2] < 470 || p[2] + p[4] > 1400) bad.push([+t.toFixed(1), p[0], Math.round(p[1]), Math.round(p[2])]);}} return {n: bad.length, bad: bad.slice(0, 40)};};
-window.DBGO = {THREE, scene, cam, COINS, FIG, TOWN, coinAt, discHit};
+window.DBGO = {THREE, scene, cam, COINS, FIG, TOWN, coinAt, discHit, TREE_SKIPPED};
 drawAt(0); window.ready = true;
