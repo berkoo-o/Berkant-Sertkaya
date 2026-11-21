@@ -416,7 +416,7 @@ function setT(v) {
 
   // ---- place 2: mask breathes, stairs and barriers, the crowd storms the stairs
   MASKP.scale.y = 1 + 0.12 * Math.sin(v * 3.2) * seg(v, 33.5, 33.9) * (1 - seg(v, 39.9, 40.3));
-  STAIRS.scale.y = Math.max(0.0001, eo(seg(v, 33.55, 34.15)));
+  STAIRS.scale.y = Math.max(0.0001, eo(seg(v, 33.55, 34.15))); STAIRS.visible = v > 33.56;
   BARR.forEach((b, k) => {b.B.scale.setScalar(Math.max(0.0001, pop(v, 34.15 + k * 0.1, 0.35))); b.F.rotation.x = -(Math.PI / 2 - 0.08) * ei(seg(v, 37.28 + k * 0.06, 37.55 + k * 0.06));});
   CORO.forEach((o, n) => {const s = pop(v, 34.95 + n * 0.05, 0.35); o.p.G.scale.setScalar(Math.max(0.0001, s));
     const run = seg(v, 37.45 + o.r * 0.06, 38.55 + o.r * 0.06), e = sm(run); const z = lerp(o.zs, o.zt, e);
@@ -504,5 +504,9 @@ window.TOTAL = Math.round((END_V + VO) * 30);
 window.setT = setT;
 window.renderFrame = f => {setT(f / 30 - VO); renderer.render(scene, cam);};
 window.DBG = {THREE, scene, cam, POD, CROWD, CORO, STUD, CONV, PARA, SOLD, paraState, HOV, PX, PZ, PH, PW, STEP, LOGO, CONF};
+// ?cover=1: clean thumbnail (no text, the whole staircase large in the middle, safe for the 3:4 crop of the profile grid)
+if (new URLSearchParams(location.search).get('cover')) {document.getElementById('ov').style.display = 'none'; document.getElementById('shade').style.display = 'none';
+  const f = fit([...allPts(), ...paraTop(4)], -16, 17, {x0: 70, x1: 1010, y0: 470, y1: 1450}); const v0 = 3.2;
+  window.renderFrame = () => {setT(v0); const A = f[4] * Math.PI / 180, E = f[5] * Math.PI / 180; cam.position.set(f[0] + f[3] * Math.cos(E) * Math.sin(A), f[1] + f[3] * Math.sin(E), f[2] + f[3] * Math.cos(E) * Math.cos(A)); cam.lookAt(f[0], f[1], f[2]); renderer.render(scene, cam);};}
 const q0 = new URLSearchParams(location.search).get('t'); window.renderFrame(Math.round(((q0 != null ? +q0 : 0) + VO) * 30));
 window.ready = true;
