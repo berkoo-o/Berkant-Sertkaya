@@ -25,11 +25,11 @@ Sie sagt in zwei Sekunden, worum es geht (fünf Gesetze, Wut), und verspricht di
 | Zeit | Sprechertext | Bild und Animation | Einblendung |
 |---|---|---|---|
 | 0:00–0:05 | „Diese fünf Gesetze haben Deutschland richtig wütend gemacht. Und Nummer eins hat sogar eine neue Partei hervorgebracht.“ | Das ganze Knetemodell mit dem Reichstag. Fünf Paragrafenzeichen ploppen nacheinander vor dem Reichstag auf, das fünfte ist rot und hüpft auf die Tafel „Platz 5“. | Titel „5 Gesetze, die Deutschland wütend gemacht haben“ |
-| 0:05–0:13 | „Platz fünf: der neue Wehrdienst. Seit 2026 gilt das Gesetz, und im September streikten Zehntausende Schüler in rund hundert Städten.“ | Schulranzen-Figuren mit Schildern „Schulstreik“ ziehen vor dem Reichstag im Kreis. | **5** · „Neuer Wehrdienst · seit 2026“ |
-| 0:13–0:22 | „Platz vier: der Agrardiesel. Weil eine Steuerhilfe für Bauern wegfallen sollte, rollten im Januar 2024 Tausende Traktoren nach Berlin. Die Regierung ruderte teilweise zurück.“ | Eine Kolonne kleiner grüner Knet-Traktoren fährt auf einer Runde um den Platz. | **4** · „Agrardiesel · 2024“ |
+| 0:05–0:13 | „Platz fünf: der neue Wehrdienst. Dagegen streikten im September Zehntausende Schüler in rund hundert Städten.“ | Schulranzen-Figuren mit Schildern „Schulstreik“ ziehen vor dem Reichstag im Kreis. | **5** · „Neuer Wehrdienst · seit 2026“ |
+| 0:13–0:22 | „Platz vier: der Agrardiesel. Weil eine Steuerhilfe für Bauern wegfallen sollte, rollten Tausende Traktoren nach Berlin, und die Regierung ruderte teilweise zurück.“ | Eine Kolonne kleiner grüner Knet-Traktoren fährt auf einer Runde um den Platz. | **4** · „Agrardiesel · 2024“ |
 | 0:22–0:30 | „Platz drei: das Heizungsgesetz. Die Ampel wollte es so schnell beschließen, dass das Bundesverfassungsgericht die Abstimmung kurz vorher stoppte.“ | Ein großer Heizkörper aus Knete, eine Hand im Richtergewand (rote Robe) hebt sich, und ein Stoppschild klappt hoch. | **3** · „Heizungsgesetz · 2023“ |
-| 0:30–0:37 | „Platz zwei: die Corona-Regeln. Monatelang gab es Großdemos, und im August 2020 stürmten Hunderte die Treppe vor dem Reichstag.“ | Kleine Figuren laufen die Reichstagstreppe hoch und werden von Absperrgittern gestoppt. | **2** · „Corona-Regeln · 2020/21“ |
-| 0:37–0:50 | „Platz eins: Hartz IV. Im August 2004 gingen an einem einzigen Tag über zweihunderttausend Menschen auf die Straße. Aus der Wut entstand sogar eine neue Partei, die WASG, aus der später Die Linke wurde.“ | Der ganze Platz füllt sich mit Knetfiguren, ein Zähler zählt bis „200.000“. | **1** · **200.000+** an einem Tag (30.08.2004) |
+| 0:30–0:37 | „Platz zwei: die Corona-Regeln. Monatelang gab es Großdemos, und Hunderte stürmten sogar die Treppe vor dem Reichstag.“ | Kleine Figuren laufen die Reichstagstreppe hoch und werden von Absperrgittern gestoppt. | **2** · „Corona-Regeln · 2020/21“ |
+| 0:37–0:50 | „Platz eins: Hartz IV. An einem einzigen Tag gingen über zweihunderttausend Menschen auf die Straße, und aus der Wut entstand eine neue Partei, aus der später Die Linke wurde.“ | Der ganze Platz füllt sich mit Knetfiguren, ein Zähler zählt bis „200.000“. | **1** · **200.000+** an einem Tag (30.08.2004) |
 | 0:50–0:55 | „Und welches Gesetz fehlt hier? Schreib's in die Kommentare.“ | Die Kamera fährt zurück, alle fünf Szenen sind zu sehen. | „Welches fehlt?“ |
 | 0:55–0:58 | (Outro) | siehe Outro-Ideen | Logo |
 
@@ -37,18 +37,20 @@ Bei der Hand im Richtergewand ist Rot ausnahmsweise die Robe des Bundesverfassun
 
 ## D. Sprechertext für Tom (eleven_v4, Audio-Tags)
 
+Gekürzt auf rund 125 Wörter, damit das Video mit Outro unter einer Minute bleibt. Die Jahreszahlen stehen als Einblendung im Bild.
+
 ```
 [curious] Diese fünf Gesetze haben Deutschland richtig wütend gemacht. [short pause] Und Nummer eins hat sogar eine neue Partei hervorgebracht.
 
-[explaining] Platz fünf: der neue Wehrdienst. Seit zweitausendsechsundzwanzig gilt das Gesetz, und im September streikten Zehntausende Schüler in rund hundert Städten.
+[explaining] Platz fünf: der neue Wehrdienst. Dagegen streikten im September Zehntausende Schüler in rund hundert Städten.
 
-Platz vier: der Agrardiesel. Weil eine Steuerhilfe für Bauern wegfallen sollte, rollten im Januar zweitausendvierundzwanzig Tausende Traktoren nach Berlin. Die Regierung ruderte teilweise zurück.
+Platz vier: der Agrardiesel. Weil eine Steuerhilfe für Bauern wegfallen sollte, rollten Tausende Traktoren nach Berlin, und die Regierung ruderte teilweise zurück.
 
 Platz drei: das Heizungsgesetz. Die Ampel wollte es so schnell beschließen, dass das Bundesverfassungsgericht die Abstimmung kurz vorher stoppte.
 
-Platz zwei: die Corona-Regeln. Monatelang gab es Großdemos, und im August zweitausendzwanzig stürmten Hunderte die Treppe vor dem Reichstag.
+Platz zwei: die Corona-Regeln. Monatelang gab es Großdemos, und Hunderte stürmten sogar die Treppe vor dem Reichstag.
 
-[serious] Platz eins: Hartz vier. Im August zweitausendvier gingen an einem einzigen Tag über zweihunderttausend Menschen auf die Straße. Aus der Wut entstand sogar eine neue Partei, die WASG, aus der später Die Linke wurde.
+[serious] Platz eins: Hartz vier. An einem einzigen Tag gingen über zweihunderttausend Menschen auf die Straße, und aus der Wut entstand eine neue Partei, aus der später Die Linke wurde.
 
 [curious] Und welches Gesetz fehlt hier? [short pause] [warm] Schreib's in die Kommentare.
 ```
