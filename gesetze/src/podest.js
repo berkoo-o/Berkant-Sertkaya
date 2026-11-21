@@ -427,8 +427,8 @@ function setT(v) {
   // ---- outro
   outro(v);}
 
-// Outro (Wunsch des Nutzers, 21.11.2026: „einfach eine 2D-Animation“, dann „ohne den Paragrafen“): The picture fades to a dark
-// violet card, the letters of „function“ fade in one by one from below, then the red dot pops in.
+// Outro (Wunsch des Nutzers, 21.11.2026: „einfach eine 2D-Animation“, „ohne den Paragrafen“, „nur das Bild dunkler“): The picture
+// gets darker (the podiums stay visible), the letters of „function“ fade in one by one from below, then the red dot pops in.
 const endEl = document.getElementById('end'), endG = endEl.getContext('2d');
 const LOGO_FS = 170, LOGO_Y = 1010;
 endG.font = `500 ${LOGO_FS}px Poppins`; endG.letterSpacing = '-7px';
@@ -439,10 +439,11 @@ function outro(v) {
   PARA.castShadow = v < OUT0;
   const u = v - OUT0; endG.clearRect(0, 0, W, H);
   if (u < 0) return;
-  // dark violet card over the 3D picture
+  // darken the 3D picture (Wunsch des Nutzers: „nur das Bild dunkler, man sollte den Hintergrund noch sehen“)
   const f = sm(seg(u, 0, 0.45)); const bg = endG.createRadialGradient(W / 2, 980, 60, W / 2, 980, 1250);
   bg.addColorStop(0, '#2c2178'); bg.addColorStop(0.55, '#1a1250'); bg.addColorStop(1, '#0b0820');
-  endG.globalAlpha = f; endG.fillStyle = bg; endG.fillRect(0, 0, W, H); endG.globalAlpha = 1;
+  endG.globalAlpha = 0.72 * f; endG.fillStyle = bg; endG.fillRect(0, 0, W, H); endG.globalAlpha = 1;   // only darker: the podiums stay visible behind the logo
+  {const g = endG.createRadialGradient(W / 2, LOGO_Y - 55, 40, W / 2, LOGO_Y - 55, 560); g.addColorStop(0, `rgba(12,8,34,${0.4 * f})`); g.addColorStop(1, 'rgba(12,8,34,0)'); endG.fillStyle = g; endG.fillRect(0, 0, W, H);}   // a soft shadow behind the logo so it reads well
   // the red dot pops in after the letters (squash and settle)
   const dp = back(seg(u, 1.28, 1.62)), land = seg(u, 1.28, 1.62), sq = land > 0 && land < 1 ? Math.sin(Math.PI * land) * 0.18 : 0;
   if (dp > 0) {endG.save(); endG.fillStyle = '#E01E2B'; endG.beginPath(); endG.ellipse(DOTX, DOTY, DOTR * dp * (1 + sq), DOTR * dp * (1 - sq), 0, 0, Math.PI * 2); endG.fill(); endG.restore();}
