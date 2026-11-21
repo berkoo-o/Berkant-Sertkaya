@@ -1,0 +1,95 @@
+<template>
+  <style>
+    @font-face { font-family: "Inter Tight"; font-weight: 800; src: url("assets/fonts/InterTight-800.woff2") format("woff2"); }
+    @font-face { font-family: "PoppinsM"; font-weight: 500; src: url("assets/fonts/Poppins-500.woff2") format("woff2"); }
+    #root { position: absolute; inset: 0; overflow: hidden; background: #07070B; font-family: "PoppinsM", Poppins, sans-serif; color: #fff; }
+    #hook-bg { position: absolute; inset: 0; background:
+        radial-gradient(900px 700px at 12% 18%, rgba(118, 70, 210, 0.30), transparent 70%),
+        radial-gradient(800px 600px at 88% 62%, rgba(224, 30, 43, 0.16), transparent 70%),
+        radial-gradient(1200px 500px at 50% 78%, rgba(255, 255, 255, 0.05), transparent 70%); }
+    #hook-floor { position: absolute; left: -400px; right: -400px; top: 1270px; height: 900px; opacity: 0.35;
+      background-image: linear-gradient(rgba(255,255,255,0.10) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.10) 1px, transparent 1px);
+      background-size: 60px 60px; transform-origin: 50% 0; transform: perspective(700px) rotateX(62deg);
+      -webkit-mask-image: linear-gradient(#000, transparent 75%); mask-image: linear-gradient(#000, transparent 75%); }
+    #hook-stage { position: absolute; inset: 0; }
+    #hook-ground { position: absolute; left: 50px; width: 880px; top: 1270px; height: 2px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28) 12%, rgba(255,255,255,0.28) 88%, transparent); }
+    #hook-tray { position: absolute; left: 66px; top: 596px; width: 570px; height: 330px; border-radius: 26px; border: 2px solid rgba(255,255,255,0.10); background: rgba(255,255,255,0.025); }
+    #hook-traycap { position: absolute; left: 66px; top: 494px; width: 760px; font-size: 29px; line-height: 1.25; color: rgba(255,255,255,0.72); }
+    #hook-traycap b { color: #F2C24E; font-weight: 500; }
+    .coin { position: absolute; left: 0; top: 0; width: 52px; height: 22px; border-radius: 50%;
+      background: linear-gradient(160deg, #FFEDB0 0%, #F4C752 38%, #E0A632 70%, #C38619 100%);
+      box-shadow: 0 6px 0 #8A5B0E, 0 9px 12px rgba(0,0,0,0.45), inset 0 0 0 2px rgba(255,240,190,0.35); }
+    .fig { position: absolute; left: 0; top: 0; width: 58px; height: 169px; z-index: 1000; }
+    .fig .skin { fill: #E9D2BE; } .fig .leg { fill: #3A3D52; } .fig .shirt { fill: #CFCAD9; }
+    .pill { position: absolute; left: 0; top: 0; z-index: 2000; padding: 8px 26px 10px; border-radius: 40px; background: rgba(255,255,255,0.96); color: #15161C; font: 800 38px/1.1 "Inter Tight"; white-space: nowrap; box-shadow: 0 10px 30px rgba(0,0,0,0.45); }
+    #hook-labrich { color: #E01E2B; }
+    #hook-bracket { position: absolute; left: 0; top: 0; overflow: visible; }
+    .ttl { position: absolute; left: 80px; top: 236px; width: 900px; font: 800 86px/1.04 "Inter Tight"; letter-spacing: -1.5px; }
+    .num { position: absolute; left: 80px; top: 214px; width: 900px; }
+    .num .big { font: 800 170px/1 "Inter Tight"; letter-spacing: -4px; font-variant-numeric: tabular-nums; }
+    .num .line { margin-top: 8px; font-size: 34px; color: rgba(255,255,255,0.86); }
+    .sub { position: absolute; left: 90px; width: 900px; top: 1436px; text-align: center; font-size: 44px; line-height: 1.28; text-shadow: 0 2px 14px rgba(0,0,0,0.85); }
+    #hook-src { position: absolute; left: 80px; top: 1676px; width: 900px; font-size: 22px; line-height: 1.35; color: rgba(255,255,255,0.62); }
+    #hook-logo { position: absolute; left: 76px; top: 1722px; font: 500 64px/1 "PoppinsM"; color: #E01E2B; letter-spacing: -2px; }
+  </style>
+  <div id="root" data-composition-id="hook" data-width="1080" data-height="1920">
+    <div id="hook-bg"></div>
+    <div id="hook-floor" data-layout-ignore></div>
+    <div id="hook-stage">
+      <div id="hook-traycap">100 Münzen = <b>alles</b>, was den Haushalten in Deutschland gehört.<br>1 Figur = 10 % der Haushalte</div>
+      <div id="hook-tray"></div>
+      <div id="hook-ground"></div>
+      <div id="hook-figs">
+    %%FIGS%%
+      </div>
+      <div id="hook-coins">
+    %%COINS%%
+      </div>
+      <svg id="hook-bracket" width="1080" height="1920"><path id="hook-brpath" d="M 76 1294 L 76 1306 L 468 1306 L 468 1294" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div id="hook-labpoor" class="pill">Ärmere Hälfte</div>
+      <div id="hook-labrich" class="pill">Reichste 10 %</div>
+    </div>
+    <div id="hook-t1" class="ttl clip" data-start="0" data-duration="2.1"><span class="w">Wem</span> <span class="w">gehört</span> <span class="w">eigentlich</span> <span class="w">Deutschland?</span></div>
+    <div id="hook-n1" class="num clip" data-start="2.05" data-duration="4.25"><div id="hook-n1big" class="big">0 %</div><div class="line">besitzen die reichsten 10 % der Haushalte</div></div>
+    <div id="hook-t2" class="ttl clip" data-start="6.3" data-duration="1.67"><span class="w">Und</span> <span class="w">die</span> <span class="w">ärmere</span> <span class="w">Hälfte?</span></div>
+    <div id="hook-n2" class="num clip" data-start="7.97" data-duration="3.03"><div class="big">2–3 %</div><div class="line">besitzt die ärmere Hälfte zusammen</div></div>
+    <div id="hook-s1" class="sub clip" data-start="0.28" data-duration="2.92">Die reichsten zehn Prozent besitzen mehr als die Hälfte</div>
+    <div id="hook-s2" class="sub clip" data-start="3.2" data-duration="2.9">von allem, was den Haushalten in Deutschland gehört.</div>
+    <div id="hook-s3" class="sub clip" data-start="6.35" data-duration="1.45">Und die ärmere Hälfte?</div>
+    <div id="hook-s4" class="sub clip" data-start="7.95" data-duration="3.05">Zusammen nur zwei bis drei Prozent.</div>
+    <div id="hook-src" data-layout-ignore>Quelle: Deutsche Bundesbank, Vermögensbefragung 2023 · Stand 20.11.2026 · Modell vereinfacht</div>
+    <div id="hook-logo">function.</div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    const GROUND = 1270, STEP = 11;
+    // labels and bracket start positions
+    gsap.set("#hook-labrich", { x: 690, y: 1318, opacity: 0 });   // labels sit under the figures like the axis of a bar chart, never in the way of the coins
+    gsap.set("#hook-labpoor", { x: 272 - 128, y: 1318, opacity: 0 });
+    gsap.set("#hook-brpath", { strokeDasharray: 760, strokeDashoffset: 760 });
+    %%JS%%
+    // the richest figure turns red when Tom names it
+    tl.fromTo("#fig9 .shirt", { fill: "#CFCAD9" }, { fill: "#E01E2B", duration: 0.3, ease: "power2.out" }, 0.47);
+    tl.fromTo("#hook-labrich", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 0.62);
+    // title: word by word in, blur out before the number
+    tl.fromTo("#hook-t1 .w", { opacity: 1, filter: "blur(0px)" }, { opacity: 0, filter: "blur(8px)", duration: 0.15, stagger: 0.03, ease: "power2.in" }, 1.78);
+    // 54 %: counts with the landed coins
+    const c1 = { v: 0 };
+    tl.fromTo("#hook-n1", { opacity: 0, filter: "blur(10px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.18, ease: "power4.out" }, 2.05);
+    tl.fromTo(c1, { v: 0 }, { v: 54, duration: %%RD%%, ease: "none", onUpdate: () => { document.querySelector("#hook-n1big").textContent = Math.round(c1.v) + " %"; } }, %%RF%%);
+    tl.to("#hook-n1", { opacity: 0, filter: "blur(8px)", duration: 0.15, ease: "power2.in" }, 6.13);
+    // the poorer half: everyone else steps back, the camera leans in, bracket and label
+    tl.fromTo("#hook-t2 .w", { opacity: 0, filter: "blur(6px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.13, stagger: 0.067, ease: "power4.out" }, 6.32);
+    tl.fromTo(".dim", { opacity: 1 }, { opacity: 0.26, duration: 0.45, ease: "power2.inOut" }, 6.35);
+    tl.fromTo("#hook-stage", { scale: 1, transformOrigin: "300px 1150px" }, { scale: 1.1, duration: 0.9, ease: "power2.inOut" }, 6.35);
+    tl.fromTo("#hook-brpath", { strokeDashoffset: 760 }, { strokeDashoffset: 0, duration: 0.4, ease: "power2.out" }, 6.5);
+    tl.fromTo("#hook-labpoor", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power4.out" }, 6.62);
+    tl.to("#hook-t2 .w", { opacity: 0, filter: "blur(8px)", duration: 0.13, stagger: 0.02, ease: "power2.in" }, 7.76);
+    tl.fromTo("#hook-n2", { opacity: 0, filter: "blur(10px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.18, ease: "power4.out" }, 7.97);
+    // the empty tray leaves once the last coins are gone, then everything comes back for the comparison
+    tl.fromTo(["#hook-tray", "#hook-traycap"], { opacity: 1 }, { opacity: 0, duration: 0.35, ease: "power2.in" }, 9.2);
+    tl.to(".dim", { opacity: 1, duration: 0.5, ease: "power2.inOut" }, 9.75);
+    tl.to("#hook-stage", { scale: 1, duration: 0.9, ease: "power2.inOut" }, 9.7);
+    window.__timelines["hook"] = tl;
+  </script>
+</template>
