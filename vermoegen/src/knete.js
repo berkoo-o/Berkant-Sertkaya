@@ -129,20 +129,77 @@ for (const [x, z] of [[-2.3, -0.98], [-2.28, 1.45], [2.3, -0.98], [2.3, 1.45]]) 
 
 // ------------------------------------------------------------------ the ten figures: each stands for a tenth of the households, from poor (1) to rich (10, red with top hat)
 const XF = i => -1.67 + i * 0.38, ZF = 0.55, COLX = i => XF(i) + 0.2, COLZ = ZF - 0.15;
-const SHIRT = [0x5b8ef0, 0xf5c451, 0x58b48c, 0xa47ce0, 0xf3f0ea, 0x4a4d6a, 0xef8fb5, 0xf08a6c, 0x6fd0e0, RED];
-const HAIR = [0x3b2a20, 0xd9a441, 0x2b2b33, 0x8a5a3a, 0x5a3b2a, 0xc9c3b8, 0x3b2a20, 0x6b4a2a, 0x2b2b33];
-const FIG = [];
-function person(i) {const G = new THREE.Group(); G.position.set(XF(i), 0, ZF); W0.add(G); const B = new THREE.Group(); G.add(B); const k = 3.0, rich = i === 9;
-  const leg = clay(0x3e3f5a), skin = clay(0xf3c9a5), shirt = clay(SHIRT[i], rich ? {bumpScale: 1.6} : {});
+// what each figure wears shows how rich it is (Wunsch des Nutzers, 21.11.2026): 1 almost homeless, then step by step up to 10 in red with gold
+const GOLD = new THREE.MeshStandardMaterial({color: 0xf2c14e, metalness: 0.65, roughness: 0.3, bumpMap: clayBump, bumpScale: 0.4, emissive: 0x7a5200, emissiveIntensity: 0.12});
+const STYLE = [
+  {body: 0x7d7468, leg: 0x4a4540, hair: 0x3b2a20, beanie: 0x5a5f6b, scarf: 0x8a6a5a, patches: [0x9b8a6a, 0x6a7d8a], ground: 'sleepingbag', slouch: 0.05},
+  {body: 0x8c8f86, leg: 0x55524e, hair: 0xd9a441, beanie: 0x6f5a4a, patches: [0x6a7d8a], ground: 'bottles', slouch: 0.04},
+  {body: 0x6f8fb0, leg: 0x3e3f5a, hair: 0x2b2b33, hood: true, cap: 0x3e4a5a},
+  {body: 0x5b8ef0, leg: 0x3e3f5a, hair: 0x8a5a3a, helmet: true, vest: 0xf59a3c},
+  {body: 0xa47ce0, leg: 0x3e3f5a, hair: 0x5a3b2a, backpack: 0x3e4a5a},
+  {body: 0xf3f0ea, leg: 0x34364a, hair: 0xc9c3b8, tie: 0x4a6ad0},
+  {body: 0xef8fb5, leg: 0x34364a, hair: 0x3b2a20, collar: true, watch: 0xc9ccd6},
+  {body: 0x6f6a8a, leg: 0x2b2d3a, hair: 0x6b4a2a, shirt: true, tie: 0x2f8f8a, watch: 0xc9ccd6},
+  {body: 0x2c3550, leg: 0x22242e, hair: 0x2b2b33, shirt: true, tie: 'gold', watch: 'gold', shades: true, briefcase: true},
+  {body: RED, leg: 0x22242e, tophat: true, chain: true, monocle: true, buttons: true, cane: true, watch: 'gold'}];
+const FIG = [], SPARKS = [];
+function person(i) {const G = new THREE.Group(); G.position.set(XF(i), 0, ZF); W0.add(G); const B = new THREE.Group(); G.add(B); const k = 3.0, st = STYLE[i];
+  const mat = c => c === 'gold' ? GOLD : clay(c);
+  const leg = clay(st.leg), skin = clay(0xf3c9a5), body = clay(st.body, i === 9 ? {bumpScale: 1.6} : {});
   for (const sx of [-1, 1]) add(B, new THREE.CylinderGeometry(0.013 * k, 0.012 * k, 0.06 * k, 14), leg, sx * 0.012 * k, 0.03 * k, 0);
-  add(B, new THREE.CapsuleGeometry(0.03 * k, 0.045 * k, 6, 16), shirt, 0, 0.1 * k, 0);
-  for (const sx of [-1, 1]) {const a = add(B, new THREE.CapsuleGeometry(0.0068 * k, 0.03 * k, 4, 10), shirt, sx * 0.0315 * k, 0.098 * k, 0); a.rotation.z = -sx * 0.1;}
+  add(B, new THREE.CapsuleGeometry(0.03 * k, 0.045 * k, 6, 16), body, 0, 0.1 * k, 0);
+  for (const sx of [-1, 1]) {const a = add(B, new THREE.CapsuleGeometry(0.0068 * k, 0.03 * k, 4, 10), body, sx * 0.0315 * k, 0.098 * k, 0); a.rotation.z = -sx * 0.1;}
   add(B, new THREE.SphereGeometry(0.024 * k, 20, 16), skin, 0, 0.165 * k, 0);
   for (const sx of [-1, 1]) add(B, new THREE.SphereGeometry(0.0034 * k, 8, 6), clay(0x22222a, {bumpScale: 0}), sx * 0.0085 * k, 0.168 * k, 0.0215 * k).castShadow = false;
-  if (rich) {add(B, new THREE.CylinderGeometry(0.028 * k, 0.028 * k, 0.004 * k, 20), clay(0x2b2b33), 0, 0.184 * k, 0); add(B, new THREE.CylinderGeometry(0.018 * k, 0.019 * k, 0.03 * k, 18), clay(0x2b2b33), 0, 0.2 * k, 0);}
-  else add(B, new THREE.SphereGeometry(0.0255 * k, 18, 10, 0, Math.PI * 2, 0, Math.PI * 0.42), clay(HAIR[i]), 0, 0.168 * k, -0.002 * k);
+  const front = 0.089;
+  // head: hair, knitted beanie, hard hat or top hat
+  if (st.beanie) {add(B, new THREE.SphereGeometry(0.077, 18, 10, 0, Math.PI * 2, 0, Math.PI * 0.44), clay(st.beanie, {bumpScale: 3}), 0, 0.516, -0.004);
+    const brim = add(B, new THREE.TorusGeometry(0.068, 0.012, 8, 24), clay(st.beanie, {bumpScale: 3}), 0, 0.528, -0.004); brim.rotation.x = Math.PI / 2;}
+  else if (st.helmet) {add(B, new THREE.SphereGeometry(0.08, 18, 10, 0, Math.PI * 2, 0, Math.PI * 0.5), clay(0xf5c451, {roughness: 0.6}), 0, 0.512, 0);
+    add(B, new THREE.CylinderGeometry(0.094, 0.094, 0.008, 24), clay(0xf5c451, {roughness: 0.6}), 0, 0.514, 0.006);}
+  else if (st.tophat) {add(B, new THREE.CylinderGeometry(0.028 * k, 0.028 * k, 0.004 * k, 20), clay(0x2b2b33), 0, 0.184 * k, 0); add(B, new THREE.CylinderGeometry(0.018 * k, 0.019 * k, 0.03 * k, 18), clay(0x2b2b33), 0, 0.2 * k, 0);
+    add(B, new THREE.CylinderGeometry(0.0605, 0.0605, 0.018, 24), GOLD, 0, 0.567, 0);}
+  else if (st.cap) {add(B, new THREE.SphereGeometry(0.0765, 18, 10, 0, Math.PI * 2, 0, Math.PI * 0.44), clay(st.cap), 0, 0.506, -0.002); const br = add(B, rbox(0.07, 0.008, 0.06, 0.004), clay(st.cap), 0.03, 0.535, 0.075); br.rotation.y = -0.6;}
+  else add(B, new THREE.SphereGeometry(0.0255 * k, 18, 10, 0, Math.PI * 2, 0, Math.PI * 0.42), clay(st.hair), 0, 0.168 * k, -0.002 * k);
+  // poor: patches, a scarf, a slight stoop; worker: vest with a light stripe; student: backpack; hoodie: the hood behind the neck
+  (st.patches || []).forEach((c, n) => {const pt = add(B, rbox(0.036, 0.034, 0.008, 0.004), clay(c), n ? -0.035 : 0.03, n ? 0.24 : 0.33, front - 0.004); pt.rotation.z = n ? 0.25 : -0.2;});
+  if (st.scarf) {const sc = add(B, new THREE.TorusGeometry(0.058, 0.02, 10, 22), clay(st.scarf, {bumpScale: 3}), 0, 0.44, 0); sc.rotation.x = Math.PI / 2; add(B, rbox(0.026, 0.085, 0.014, 0.006), clay(st.scarf, {bumpScale: 3}), 0.032, 0.385, 0.078).rotation.z = 0.12;}
+  if (st.vest) {add(B, new THREE.CapsuleGeometry(0.094, 0.075, 6, 16), clay(st.vest), 0, 0.325, 0); add(B, new THREE.CylinderGeometry(0.0955, 0.0955, 0.014, 22), clay(0xe8e8ee, {roughness: 0.5}), 0, 0.3, 0);}
+  if (st.hood) {const h = add(B, new THREE.TorusGeometry(0.052, 0.026, 10, 22), body, 0, 0.44, -0.035); h.rotation.x = Math.PI / 2 - 0.45;}
+  if (st.backpack) {add(B, rbox(0.11, 0.13, 0.055, 0.02), clay(st.backpack), 0, 0.32, -0.112); for (const sx of [-1, 1]) add(B, rbox(0.014, 0.14, 0.01, 0.004), clay(st.backpack), sx * 0.04, 0.33, front - 0.006);}
+  // middle to rich: collar or shirt and tie, watches
+  if (st.collar) for (const sx of [-1, 1]) {const c = add(B, rbox(0.035, 0.02, 0.01, 0.004), clay(0xffffff), sx * 0.02, 0.43, 0.075); c.rotation.z = sx * 0.5;}
+  if (st.shirt) add(B, rbox(0.045, 0.13, 0.01, 0.005), clay(0xf7f5f0), 0, 0.38, front - 0.003);
+  if (st.tie) {add(B, rbox(0.022, 0.1, 0.012, 0.004), mat(st.tie), 0, 0.37, front + 0.002); add(B, rbox(0.026, 0.02, 0.014, 0.005), mat(st.tie), 0, 0.427, front - 0.004);}
+  if (st.watch) {const w = add(B, new THREE.TorusGeometry(0.021, 0.006, 8, 18), mat(st.watch), 0.101, 0.255, 0); w.rotation.x = Math.PI / 2; add(B, new THREE.CylinderGeometry(0.009, 0.009, 0.006, 12).rotateZ(Math.PI / 2), mat(st.watch), 0.122, 0.255, 0.004);}
+  if (st.shades) {for (const sx of [-1, 1]) add(B, rbox(0.032, 0.02, 0.008, 0.005), clay(0x15151c, {roughness: 0.3, bumpScale: 0}), sx * 0.026, 0.505, 0.068); add(B, rbox(0.022, 0.006, 0.006, 0.002), clay(0x15151c, {bumpScale: 0}), 0, 0.509, 0.07);}
+  if (st.briefcase) {const bc = new THREE.Group(); bc.position.set(0.13, 0.165, 0.01); B.add(bc); add(bc, rbox(0.1, 0.075, 0.028, 0.01), clay(0x6b4a2a), 0, 0, 0);
+    const hd = add(bc, new THREE.TorusGeometry(0.016, 0.004, 6, 14, Math.PI), clay(0x3a2a1a), 0, 0.037, 0); hd.rotation.z = 0; add(bc, rbox(0.022, 0.012, 0.008, 0.003), GOLD, 0, 0.02, 0.016);}
+  // the richest: gold chain with a euro medallion, gold buttons, monocle, gold cane, sparkles
+  if (st.chain) {const ch = add(B, new THREE.TorusGeometry(0.056, 0.0075, 8, 28, Math.PI), GOLD, 0, 0.425, 0.084); ch.rotation.z = Math.PI;
+    const md = add(B, new THREE.CylinderGeometry(0.022, 0.022, 0.007, 20).rotateX(Math.PI / 2), GOLD, 0, 0.36, front + 0.006); SPARKS.push({o: B, p: [0, 0.36, front + 0.015], ph: 0.1});}
+  if (st.buttons) for (const y of [0.31, 0.27, 0.23]) add(B, new THREE.SphereGeometry(0.0085, 10, 8), GOLD, 0, y, front + 0.001);
+  if (st.monocle) {const m = add(B, new THREE.TorusGeometry(0.019, 0.004, 8, 18), GOLD, 0.0255, 0.505, 0.071); add(B, new THREE.CylinderGeometry(0.0018, 0.0018, 0.1, 6), GOLD, 0.045, 0.455, 0.074).rotation.z = 0.25;}
+  if (st.cane) {const cn = new THREE.Group(); cn.position.set(-0.128, 0, 0.035); cn.rotation.z = -0.06; B.add(cn); add(cn, new THREE.CylinderGeometry(0.008, 0.008, 0.33, 10), clay(0x23232b), 0, 0.165, 0);
+    add(cn, new THREE.SphereGeometry(0.019, 14, 10), GOLD, 0, 0.335, 0); add(cn, new THREE.CylinderGeometry(0.009, 0.009, 0.02, 10), GOLD, 0, 0.01, 0); SPARKS.push({o: cn, p: [0, 0.345, 0.01], ph: 0.55});}
+  if (st.tophat) SPARKS.push({o: B, p: [0.045, 0.57, 0.04], ph: 0.8});
+  if (st.tie === 'gold') SPARKS.push({o: B, p: [0.122, 0.26, 0.012], ph: 0.3});
+  B.rotation.x = st.slouch || 0;
+  // things on the ground next to the poorest (where the others have their coin stacks)
+  if (st.ground === 'sleepingbag') {const g = new THREE.Group(); g.position.set(XF(i) + 0.2, 0, COLZ + 0.02); g.rotation.y = 0.35; W0.add(g);
+    add(g, new THREE.CylinderGeometry(0.048, 0.048, 0.17, 18).rotateZ(Math.PI / 2), clay(0x5f6f5a, {bumpScale: 2.5}), 0, 0.048, 0);
+    for (const x of [-0.045, 0.045]) {const st2 = add(g, new THREE.TorusGeometry(0.049, 0.006, 6, 18), clay(0x3a3328), x, 0.048, 0); st2.rotation.y = Math.PI / 2;}
+    add(g, rbox(0.12, 0.012, 0.09, 0.004), clay(0xb08a5a), 0.02, 0.006, 0.09).rotation.y = -0.2;}
+  if (st.ground === 'bottles') {const g = new THREE.Group(); g.position.set(XF(i) + 0.2, 0, COLZ + 0.02); g.rotation.y = -0.25; W0.add(g);
+    add(g, rbox(0.1, 0.085, 0.07, 0.015), clay(0x7fa8d8, {roughness: 0.5, bumpScale: 1}), 0, 0.0425, 0);
+    [[-0.025, 0x5f9f6a], [0.005, 0x8a5a30], [0.032, 0x5f9f6a]].forEach(([x, c], n) => {add(g, new THREE.CylinderGeometry(0.011, 0.013, 0.07, 12), clay(c, {roughness: 0.35, bumpScale: 0.5}), x, 0.09 + n * 0.008, 0.005 - n * 0.008);
+      add(g, new THREE.CylinderGeometry(0.006, 0.006, 0.014, 8), clay(0xe8e8ee), x, 0.132 + n * 0.008, 0.005 - n * 0.008);});}
   G.rotation.y = (R() - 0.5) * 0.16; FIG.push({G, B, i}); return G;}
+// little four-point sparkles that light up now and then on the gold
+const sparkT = tex(128, 128, (g, w, h) => {const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, 'rgba(255,250,225,1)'); gr.addColorStop(0.25, 'rgba(255,230,150,0.55)'); gr.addColorStop(1, 'rgba(255,220,120,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, w, h); g.fillStyle = 'rgba(255,252,235,0.95)'; g.beginPath(); g.moveTo(64, 2); g.lineTo(70, 58); g.lineTo(126, 64); g.lineTo(70, 70); g.lineTo(64, 126); g.lineTo(58, 70); g.lineTo(2, 64); g.lineTo(58, 58); g.closePath(); g.fill();});
 for (let i = 0; i < 10; i++) person(i);
+for (const sp of SPARKS) {const m = new THREE.Sprite(new THREE.SpriteMaterial({map: sparkT, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending})); m.position.set(...sp.p); m.scale.setScalar(1e-3); sp.o.add(m); sp.m = m;}
 const FIG_TOP = 0.66, FIG_R = 0.12;
 
 // number tiles in front of the figures (1 = poorest tenth, 10 = richest)
@@ -405,6 +462,7 @@ function setTime(t) {
   for (const r of BLD) if (r.G.userData.puffs) for (const pf of r.G.userData.puffs) {const ph = (t * 0.22 + pf.k / 3) % 1; pf.p.position.set(pf.x + 0.06 * ph, pf.y + 0.4 * ph, -0.15 - 0.03 * ph); pf.p.scale.setScalar(Math.max(1e-3, (0.55 + 0.7 * ph) * Math.sin(Math.PI * Math.min(1, ph * 1.15))));}
   TOWN.ticker.offset.x = t * 0.03;
   TREES.forEach((T, i) => {T.rotation.z = 0.025 * Math.sin(t * 0.9 + i);});
+  for (const sp of SPARKS) {const ph = (t * 0.45 + sp.ph) % 1, a = ph < 0.16 ? Math.sin(Math.PI * ph / 0.16) : 0; sp.m.visible = a > 0.01; sp.m.scale.setScalar(0.075 * a + 1e-3); sp.m.material.rotation = t * 1.5 + sp.ph * 6; sp.m.material.opacity = a;}
   // outro: lights go down except on the logo, the clay letters pop up one by one, the red figure squashes into a ball that hops onto the dot
   {const o = eio((t - OUT0) / 0.7); key.intensity *= 1 - 0.55 * o; hemi.intensity *= 1 - 0.6 * o; scene.environmentIntensity *= 1 - 0.6 * o; rim.intensity = 0.7 * (1 - 0.5 * o); focus.intensity *= 1 - o;
     LOGO.forEach((m, i) => {const p = clamp((t - LOGO_T0 - i * 0.07) / 0.36, 0, 1); m.visible = p > 0; const sy = Math.max(1e-3, ebk(p, 2.2)); m.scale.set(1 + 0.25 * (1 - p) * p * 4, sy, 1);});

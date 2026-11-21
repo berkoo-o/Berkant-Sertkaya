@@ -8,6 +8,10 @@ Die Stadt-Fassung war für den Nutzer unverständlich, und sie hatte zu viele An
 
 Alle Flugbahnen der Münzen sind so geplant, dass sich nichts berührt. Die Prüfung `CHECK()` in `knete.html` testet für jedes Bild, ob sich Münzen in der Luft berühren, durch Figuren oder Stapel fliegen oder ob ein Stapel Lücken hat. `CHECK_LABELS()` testet, ob ein Schild aus dem Bild ragt oder in die Untertitel rutscht. Beide melden 0 Fehler.
 
+## Figuren (Wunsch des Nutzers, 21.11.2026: „dass man sieht, dass die reich sind, und die armen arm“)
+
+Jede Figur zeigt mit kleinen Details, wie reich sie ist. Figur 1 ist fast obdachlos: abgetragener grauer Mantel mit Flicken, Strickmütze, Schal, leicht gebeugt, daneben ein zusammengerollter Schlafsack auf Pappe. Figur 2 trägt eine verwaschene Jacke mit Flicken und eine Mütze, daneben steht eine Tüte mit Pfandflaschen. Figur 3 trägt Kapuzenpulli und Kappe, Figur 4 ist ein Arbeiter mit gelbem Helm und oranger Warnweste, Figur 5 trägt T-Shirt und Rucksack. Figur 6 trägt ein weißes Hemd mit Krawatte, Figur 7 einen Pullover mit Hemdkragen und Armbanduhr, Figur 8 ein Sakko mit Krawatte und Uhr. Figur 9 trägt einen dunklen Anzug mit goldener Krawatte, Sonnenbrille, goldene Uhr und einen Aktenkoffer mit Goldschloss. Figur 10 (rot) hat eine goldene Kette mit Medaillon, goldene Knöpfe, ein Monokel, ein Goldband am Zylinder, eine goldene Uhr und einen schwarzen Gehstock mit Goldknauf, und auf dem Gold blitzt ab und zu ein kleines Funkeln auf. Vergleichsbild: `Figuren_arm_bis_reich.jpg`.
+
 ## A. Drei Hook-Varianten
 
 1. „Die reichsten zehn Prozent besitzen mehr als die Hälfte von allem, was den Haushalten in Deutschland gehört. Und die ärmere Hälfte? Zusammen nur zwei bis drei Prozent.“

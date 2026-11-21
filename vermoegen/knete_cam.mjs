@@ -5,5 +5,5 @@ const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-
 const p=await b.newPage({viewport:{width:1080,height:1920}});
 p.on('pageerror',e=>console.log('ERR',e.message));
 for(const [k,c] of cams.entries()){await p.goto('http://localhost:8780/vermoegen/knete.html?cam='+c);await p.waitForFunction('window.ready===true',null,{timeout:600000});
-  await p.evaluate(tv=>window.setT(+tv),t);await p.screenshot({path:`${out}_${k}.jpg`,type:'jpeg',quality:80});console.log(k,c);}
+  await p.evaluate(tv=>window.setT(+tv),t);if(process.env.CLEAN)await p.evaluate(()=>{for(const id of ['ov','shade','lab'])document.getElementById(id).style.display='none';});await p.screenshot({path:`${out}_${k}.jpg`,type:'jpeg',quality:80});console.log(k,c);}
 await b.close();
