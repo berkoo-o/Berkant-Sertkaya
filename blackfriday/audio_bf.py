@@ -8,7 +8,7 @@ m = Mix(OUT, END_V)
 sz = lambda n: snd('jahr2027/sfx/soundza/' + n + '.48k.wav'); bf = lambda n: snd('blackfriday/sfx/epidemic/' + n + '.48k.wav')
 # hook: the sale sign pops up with a cash register, flips to -8 %
 m.pop(0.25, 0.1, 0.9); m.add(cut(bf('kaching'), 0.0, 1.2, 0.002, 0.3), 0.32, 0.11)
-m.add(cut(sz('card_flip'), 0.0, 0.5, 0.002, 0.1), 4.6, 0.09); m.click(4.8, 0.09, 0)
+m.add(cut(sz('card_flip'), 0.0, 0.5, 0.002, 0.1), 4.55, 0.09); m.click(5.12, 0.08, 0)
 # camera moves between the stations
 for k, c in enumerate((6.1, 11.45, 20.45, 29.5, 32.6)): m.whoosh(c, 0.12 if k < 4 else 0.1, k)
 # big numbers

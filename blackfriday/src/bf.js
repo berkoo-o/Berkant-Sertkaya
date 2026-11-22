@@ -29,11 +29,15 @@ add(A, rbox(0.3, 0.62, 0.03, 0.03), clay(PAL.deep), -0.52, 0.31, -0.02);
   add(aw, rbox(1.55, 0.03, 0.34, 0.012), clay(0xffffff, {map: tex(512, 64, (g, w, h) => {for (let i = 0; i < 8; i++) {g.fillStyle = i % 2 ? '#f3ece0' : '#c4a8f0'; g.fillRect(i * w / 8, 0, w / 8 + 1, h);}})}), 0, 0, 0.17);}
 add(A, rbox(1.1, 0.24, 0.06, 0.04), clay(PAL.cream), 0, 1.2, -0.26);
 decal(A, 1.0, 0.2, tex(800, 160, (g, w, h) => T2(g, '% SALE %', w / 2, h / 2 + 4, '800 110px "Inter Tight"', '#5b4a9a')), 0, 1.2, -0.228);
-const SIGN = grp(A, 0.38, 0, 0.36); add(SIGN, new THREE.CylinderGeometry(0.2, 0.24, 0.07, 32), clay(PAL.cream), 0, 0.035, 0);
-const SIGNR = grp(SIGN, 0, 0.07, 0);
-const S50 = text3d(SIGNR, '-50%', 0.3, 0.1, redClay(0.2)); S50.position.z = 0.055;
-const S8 = text3d(SIGNR, '-8%', 0.3, 0.1, redClay(0.2)); S8.position.z = -0.055; S8.rotation.y = PI;
-const SHOP = [[-0.62, 0.42, 1.25], [-0.3, 0.6, 1.6]].map(([x, z, ry], i) => {const p = person(A, x, z, {body: [PAL.sky, PAL.mint][i], ry, s: 1.0});
+// a flip sign: a cream board between two posts, -50% on the front, -8% on the back; it tips over the horizontal axle,
+// so nothing swings sideways into the shop and both sides are always solid (no switching of visibility)
+const SIGN = grp(A, 0.36, 0, 0.38); add(SIGN, rbox(1.24, 0.06, 0.26, 0.03), clay(PAL.cream), 0, 0.03, 0);
+for (const sx of [-1, 1]) {add(SIGN, rbox(0.05, 0.31, 0.06, 0.02), clay(PAL.deep), sx * 0.565, 0.06 + 0.155, 0); add(SIGN, new THREE.SphereGeometry(0.032, 18, 12), clay(PAL.deep), sx * 0.565, 0.31, 0);}
+const SIGNR = grp(SIGN, 0, 0.31, 0);   // axle height: the board (radius 0.2) never touches the base
+add(SIGNR, rbox(1.02, 0.4, 0.04, 0.02), clay(0xfbf8f1, {bumpScale: 1}), 0, 0, 0);
+const S50 = text3d(SIGNR, '-50%', 0.27, 0.06, redClay(0.2)); S50.position.set(0, -0.153, 0.066);
+const S8 = text3d(SIGNR, '-8%', 0.27, 0.06, redClay(0.2)); S8.rotation.x = PI; S8.position.set(0, 0.153, -0.066);
+const SHOP = [[-0.66, 0.4, 1.25], [-0.36, 0.66, 1.6]].map(([x, z, ry], i) => {const p = person(A, x, z, {body: [PAL.sky, PAL.mint][i], ry, s: 1.0});
   const bag = grp(p.arms[0].userData.hand); add(bag, rbox(0.1, 0.12, 0.045, 0.012), clay([PAL.yellow, PAL.lilac][i]), 0, -0.05, 0); return {p, i};});
 
 // ------------------------------------------------------------------ B: the shelf that fills with 100 products, a magnifier looks along it
@@ -132,13 +136,13 @@ const BUB = grp(S, 0, 1.95, 0.25); {add(BUB, rbox(0.8, 0.5, 0.12, 0.2), clay(0xf
 // ------------------------------------------------------------------ camera
 const wx = (G, x, y, z) => G.localToWorld(V3(x, y, z));
 S.updateMatrixWorld(true);
-const ptsA = [[-0.85, 0, -0.58], [0.85, 0, -0.58], [-0.85, 1.32, -0.58], [0.85, 1.32, -0.58], [-0.85, 0, 0.66], [0.85, 0, 0.66]].map(p => wx(A, ...p));
+const ptsA = [[-0.85, 0, -0.58], [1.02, 0, -0.58], [-0.85, 1.32, -0.58], [1.02, 1.32, -0.58], [-0.85, 0, 0.66], [1.02, 0, 0.66]].map(p => wx(A, ...p));
 const ptsB = [[-0.92, 0, -0.35], [0.92, 0, -0.35], [-0.92, 1.45, -0.35], [0.92, 1.45, -0.35], [-0.92, 0, 0.5], [0.92, 0, 0.5]].map(p => wx(B, ...p));
 const ptsC = [[-1.0, 0.1, 0.45], [1.0, 0.1, 0.45], [-1.0, 0.75, 0.3], [1.0, 0.75, 0.3], [-1.0, 0.5, -0.2], [1.0, 0.5, -0.2]].map(p => wx(C, ...p));
 const ptsD = [[-0.98, 0.38, -0.42], [0.98, 0.38, -0.42], [-0.98, 1.62, -0.42], [0.98, 1.62, -0.42], [-0.9, 0.3, 0.3], [0.9, 0.3, 0.3]].map(p => wx(C, ...p));
 const ptsE = [[-0.9, 0, 0.6], [0.95, 0, 0.6], [-0.9, 0, -0.2], [0.95, 0, -0.2], [-0.9, 1.0, 0], [0.9, 1.72, 0]].map(p => wx(E, ...p));
 const ptsF = [[-0.7, 0, 0.6], [0.8, 0, 0.6], [-0.7, 1.3, -0.2], [0.8, 1.3, -0.2], [0.6, 0, -0.4]].map(p => wx(F, ...p));
-const ptsW = [V3(-5.8, -0.36, 1.45), V3(5.8, -0.36, 1.45), V3(-5.8, 0, -1.45), V3(5.8, 0, -1.45), V3(-4.5, 1.35, -0.8), V3(4.5, 1.3, -0.6), V3(0, 1.65, -0.62), V3(0, 2.3, 0.25)];
+const ptsW = [V3(-5.8, -0.36, 1.45), V3(5.8, -0.36, 1.45), V3(-5.8, 0, -1.45), V3(5.8, 0, -1.45), V3(-4.5, 1.35, -0.8), V3(4.5, 1.3, -0.6), V3(0, 1.65, -0.62), V3(0, 2.62, 0.25)];
 const FA0 = fit(ptsA, -10, 12), FA = fit(ptsA, -14, 14), FB = fit(ptsB, -10, 10), FC = fit(ptsC, -10, 18), FD = fit(ptsD, -8, 8), FE = fit(ptsE, -12, 11), FF = fit(ptsF, -14, 12), FW = fit(ptsW, -46, 24, {y0: 560}), FO = fit(ptsW, -46, 22, {y0: 640, y1: 1300});
 const CAM = [K(0, FA0, 0.98), K(2.4, FA0, 0.9), K(5.6, FA, 0.95), K(6.6, FB), K(11.0, FB, 0.9), K(11.9, FC), K(15.3, FC, 0.92), K(16.2, FD), K(19.8, FD, 0.95),
   K(20.8, FE), K(29.0, FE, 0.9), K(29.9, FF), K(32.1, FF, 0.92), K(33.2, FW), K(OUT0, FW, 0.97), K(OUT0 + 1.0, FO), K(END_V + 1, FO)];
@@ -164,9 +168,9 @@ const overlays = makeOverlays({SUBS, NUMS, TITLES, SRCS, OUT0});
 function setT(v) {
   camAt(v); overlays(v);
   // A: the sign pops up on „Minus“, wobbles, flips to -8% on „acht“
-  {const p = popIn(v, 0.2, 0.45); SIGN.scale.setScalar(Math.max(1e-3, p)); const f = eio(seg(v, 4.62, 5.12)); SIGNR.rotation.y = f * PI + Math.sin(PI * f) * 0.2;
-    SIGNR.rotation.z = Math.sin(v * 3) * 0.02 * (1 - f); SIGNR.position.y = Math.sin(PI * seg(v, 4.62, 5.12)) * 0.12;}
-  S50.visible = SIGNR.rotation.y < PI / 2; S8.visible = !S50.visible;
+  // the board swings gently, tips over on „acht“ (top away from the camera) and settles with a small overshoot
+  {const p = popIn(v, 0.2, 0.45); SIGN.scale.setScalar(Math.max(1e-3, p)); const f = eio(seg(v, 4.55, 5.15)), st = seg(v, 5.15, 5.75);
+    SIGNR.rotation.x = -f * PI + Math.sin(v * 2.6) * 0.05 * (1 - f) + Math.sin(st * PI * 2) * 0.09 * (1 - st);}
   SHOP.forEach(({p, i}) => {p.B.position.y = Math.abs(Math.sin(v * 2.2 + i)) * 0.006; if (i === 0) arm(p, 1, 0.1 + 1.9 * sm(seg(v, 0.5, 0.9)) * (1 - sm(seg(v, 3.4, 3.9))) + 1.9 * sm(seg(v, 4.9, 5.3)) * (1 - sm(seg(v, 6.2, 6.6))));
     p.head.rotation.x = i === 1 ? -0.15 : 0;});
   // B: products appear in a wave on „hundert“, the magnifier slides along
@@ -189,7 +193,7 @@ function setT(v) {
   // the square: shoppers walk round and round
   WALKERS.forEach(({p, ph}) => {const [x, z, h] = loopAt(ph * LOOPL + v * 0.34); p.G.position.set(x, 0, z); p.G.rotation.y = h; walk(p, v * 8 + ph * 7, 0.45);});
   // G: the speech bubble
-  {const p = popIn(v, 33.0, 0.45); BUB.scale.setScalar(Math.max(1e-3, p)); BUB.position.y = 1.35 + Math.sin(v * 2) * 0.03; BUB.visible = p > 0.01;}
+  {const p = popIn(v, 33.0, 0.45); BUB.scale.setScalar(Math.max(1e-3, p)); BUB.position.y = 2.3 + Math.sin(v * 2) * 0.03; BUB.visible = p > 0.01;}
   dimLights(v, OUT0); outro(v, OUT0);}
 
 // collision check: walkers against each other and against the stations

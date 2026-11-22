@@ -34,6 +34,17 @@ const fail = msg => { console.error('\n✖ ' + msg + '\n'); process.exit(1); };
 let [, , folder, task = 'render'] = process.argv;
 if (!folder || folder === 'auto') {
   const a = JSON.parse(fs.readFileSync(path.join(ROOT, 'pc-auftrag.json'), 'utf8'));
+  // mehrere Videos nacheinander: "queue": [ { "folder": "blackfriday" }, { "folder": "brutto", "task": "render" } ]
+  if (Array.isArray(a.queue) && a.queue.length) {
+    console.log(`▶ Aktueller Auftrag: ${a.title || a.queue.map(q => q.folder).join(' + ')}`);
+    let bad = 0;
+    for (const [i, q] of a.queue.entries()) {
+      console.log(`\n━━━ Video ${i + 1} von ${a.queue.length}: ${q.title || q.folder} ━━━`);
+      const r = spawnSync(process.execPath, [fileURLToPath(import.meta.url), q.folder, q.task || 'render'], {cwd: ROOT, stdio: 'inherit'});
+      if (r.status !== 0) { bad++; console.log(`✖ ${q.title || q.folder} hat nicht geklappt, mache mit dem nächsten Video weiter.`); }
+    }
+    process.exit(bad ? 1 : 0);
+  }
   folder = a.folder; task = a.task || 'render';
   console.log(`▶ Aktueller Auftrag: ${a.title || folder + ' / ' + task}`);
 }

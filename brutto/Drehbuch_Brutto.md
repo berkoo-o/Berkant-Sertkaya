@@ -18,9 +18,9 @@ Sie beginnt bei der größeren Zahl, die kaum jemand kennt (was man den Chef wir
 
 | Zeit | Station | Was passiert |
 |---|---|---|
-| 0–8,6 s | A Büro | Chef im Anzug und Mitarbeiter vor dem Firmengebäude, daneben ein Wagen mit dem Geldturm „3.639 €“ (sieben farbige Scheiben, unten rot das Netto). Auf „Konto“ werden alle Scheiben außer der roten durchsichtig, das Schild „netto 2.054 €“ ploppt auf, auf „Wo ist der Rest?“ erscheint ein Fragezeichen. |
+| 0–8,6 s | A Büro | Chef im Anzug und Mitarbeiter vor dem Firmengebäude (Schild „FIRMA“ auf dem Dach), daneben ein Wagen mit dem Geldturm „3.639 €“ (sieben farbige Scheiben, unten rot das Netto). Auf „Konto“ werden alle Scheiben außer der roten durchsichtig, das Schild „netto 2.054 €“ ploppt auf, auf „Wo ist der Rest?“ erscheint ein Fragezeichen. |
 | 8,6–13,0 s | B Lohnzettel | Großer Lohnzettel, die Zeilen „Brutto 3.000 €“, „Steuerklasse I“, „Kinder keine“ erscheinen auf Toms Worte. |
-| 13,0–17,9 s | Wagen rollt | Der Wagen rollt zu fünf Häusern. Die lila Scheibe „+ 639 € Chef“ fliegt zu den vier Sozialversicherungs-Häusern, die kurz hüpfen. |
+| 13,0–17,9 s | Wagen rollt | Der Wagen rollt in die Lücke zwischen den fünf Häusern (Rente, Krankenkasse und Pflege links, Arbeitsagentur und Finanzamt rechts), damit der hohe Geldturm kein Haus verdeckt. Die lila Scheibe „+ 639 € Chef“ fliegt zu den vier Sozialversicherungs-Häusern, die kurz hüpfen. |
 | 17,9–32,0 s | D Häuser | Jede Scheibe fliegt in ihr Haus, sobald Tom sie nennt: Rentenversicherung 279 €, Krankenkasse 262,50 €, Pflegeversicherung 72 €, Arbeitsagentur 39 €, Finanzamt 293 €. Über jedem Haus erscheint der Betrag. Der Mitarbeiter läuft hinter den Häusern zum Wagen. |
 | 32,0–35,2 s | E Netto | Übrig ist nur der rote Netto-Teil „2.054 €“, der Mitarbeiter steht daneben und hebt die Arme. |
 | 35,2–38,8 s | Ganze Platte | Die Kamera zeigt alles, eine Sprechblase mit Fragezeichen ploppt auf. |
@@ -42,7 +42,7 @@ Von deinen dreitausend gehen dann zweihundertneunundsiebzig Euro an die Rentenve
 
 ## E. Szenenplan (Technik)
 
-Three.js im Knete-Look mit dem Baukasten `kit/knete_kit.js`. Seite `brutto/brutto.html`, Code `brutto/src/brutto.js`. Der Geldturm ist maßstabsgetreu (1.000 € = 0,55 Einheiten Höhe), die Scheiben haben die Farben ihrer Häuser. Kollisionsprüfung `node kit/shot.mjs brutto/brutto.html check` ist leer (der Mitarbeiter läuft hinter den Häusern, nicht durch sie hindurch).
+Three.js im Knete-Look mit dem Baukasten `kit/knete_kit.js`. Seite `brutto/brutto.html`, Code `brutto/src/brutto.js`. Der Geldturm ist maßstabsgetreu (1.000 € = 0,55 Einheiten Höhe), die Scheiben haben die Farben ihrer Häuser. Das Schild „FIRMA“ steht auf dem Dach, an der Vorderseite der Häuser sitzen Schild und Tür auf freier Wand, kein Fenster liegt dahinter (Nutzer, 22.11.2026: „Firma steht in den Fenstern drin“). Kollisionsprüfung `node kit/shot.mjs brutto/brutto.html check` ist leer (der Mitarbeiter läuft hinter den Häusern, nicht durch sie hindurch).
 
 ## F. Higgsfield-Prompts
 

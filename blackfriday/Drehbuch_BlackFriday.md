@@ -18,7 +18,7 @@ Sie stellt die große Zahl, die jeder kennt, gegen die echte, kleine Zahl. Das �
 
 | Zeit | Station | Was passiert |
 |---|---|---|
-| 0–5,9 s | A Laden | Laden mit Markise und „SALE“-Schild, davor zwei Kundinnen. Das rote Schild „-50%“ ploppt auf, auf „acht“ dreht es sich zu „-8%“. |
+| 0–5,9 s | A Laden | Laden mit Markise und „SALE“-Schild, davor zwei Kundinnen. Das Klappschild mit dem roten „-50%“ ploppt auf, auf „acht“ kippt die Tafel zwischen ihren zwei Pfosten nach hinten über und zeigt auf der Rückseite „-8%“. |
 | 5,9–11,4 s | B Regal | Ein leeres Regal füllt sich auf „hundert“ mit 100 kleinen Produkten, eine Lupe fährt darüber. |
 | 11,4–20,1 s | C Preisschilder und Kalender | Fünf Produkte auf Sockeln, vier Preisschilder drehen sich auf den niedrigeren Preis. Dann fährt die Kamera hoch zum Kalender „November 2025“: Die Preiskurve zeichnet sich, der Black Friday ist rot markiert, zwei andere Tage sind noch günstiger (grüne Punkte). |
 | 20,1–29,3 s | E Fernseher | Am Fernseher hängt ein rotes „-50%“-Schild. Zuerst wachsen die Säulen „echter Preis 549 €“ und „Black Friday 499 €“, dann die hohe Säule „UVP 999 €“. Ein roter Pfeil zeigt den großen Rabatt von der UVP, dann wird die UVP-Säule durchsichtig, eine Figur schüttelt den Kopf. |
@@ -42,7 +42,7 @@ Schau dir also den Preisverlauf an, bevor du zuschlägst. [curious] Was war dein
 
 ## E. Szenenplan (Technik)
 
-Three.js im Knete-Look, gemeinsamer Baukasten `kit/knete_kit.js` (Materialien, Figuren, Kamera-Fit, Texte, 2D-Outro). Seite `blackfriday/bf.html`, Code `blackfriday/src/bf.js`. Stationen in einer Reihe (x −4,5 / −2,25 / 0 / 2,25 / 4,5), davor ein Gehweg, auf dem fünf Figuren auf einer geschlossenen Runde laufen (nur zwischen B und E, damit niemand vor dem Schild oder dem Handy vorbeiläuft). Kollisionsprüfung `node kit/shot.mjs blackfriday/bf.html check` ist leer. Standbilder: `node kit/shot.mjs blackfriday/bf.html <prefix> t…`, Vorschau: `node kit/preview.mjs blackfriday/bf.html out.mp4`.
+Three.js im Knete-Look, gemeinsamer Baukasten `kit/knete_kit.js` (Materialien, Figuren, Kamera-Fit, Texte, 2D-Outro). Seite `blackfriday/bf.html`, Code `blackfriday/src/bf.js`. Stationen in einer Reihe (x −4,5 / −2,25 / 0 / 2,25 / 4,5), davor ein Gehweg, auf dem fünf Figuren auf einer geschlossenen Runde laufen (nur zwischen B und E, damit niemand vor dem Schild oder dem Handy vorbeiläuft). Das Rabatt-Schild ist eine Klapptafel zwischen zwei Pfosten (vorne „-50%“, hinten „-8%“), die über die waagerechte Achse kippt. Eine erste Fassung mit frei stehenden Buchstaben, die sich um die senkrechte Achse drehten, schwenkte beim Drehen in die Ladenwand und sprang auf halber Drehung von einer Zahl zur anderen; das hatte der Nutzer als Fehler gesehen (22.11.2026). Kollisionsprüfung `node kit/shot.mjs blackfriday/bf.html check` ist leer, Prüfbilder über das ganze Video mit `node kit/sample.mjs blackfriday/bf.html <ordner>`. Standbilder: `node kit/shot.mjs blackfriday/bf.html <prefix> t…`, Vorschau: `node kit/preview.mjs blackfriday/bf.html out.mp4`.
 
 ## F. Higgsfield-Prompts
 

@@ -14,16 +14,22 @@ const S = new THREE.Group(); scene.add(S);
 plinth(S, 9.4, 2.9, [[-1, -1], [1, -1], [-1, 1], [1, 1]]);
 add(S, rbox(9.0, 0.02, 0.5, 0.01), clay(0xe7dccb, {bumpScale: 2}), 0, 0.01, 0.95);
 lightRig(0, 0, 5.4);
-for (const [x, z, s] of [[-4.4, 0.6, 0.7], [-1.82, -0.55, 0.6], [0.4, -0.55, 0.6], [-0.15, 1.05, 0.5]]) tree(S, x, z, s);
+for (const [x, z, s] of [[-4.4, 0.6, 0.7], [-1.82, -0.55, 0.6], [0.22, -0.6, 0.6], [-0.15, 1.05, 0.5]]) tree(S, x, z, s);
 const mat = (par, w, d, c) => add(par, rbox(w, 0.03, d, 0.012), clay(c, {bumpScale: 2.6}), 0, 0.015, 0);
 const label = (par, w, h, lines, x, y, z, o = {}) => {const g = grp(par, x, y, z); add(g, rbox(w, h, 0.03, 0.02), clay(0xfbf8f1), 0, 0, 0);
   decal(g, w - 0.01, h - 0.01, tex(Math.round(w * 1000), Math.round(h * 1000), (c, ww, hh) => {const n = lines.length; lines.forEach(([s, f, col], i) => {c.font = f; T2(c, s, ww / 2, hh * (i + 0.5) / n + 3, fitText(c, s, ww - 24, f.split(' ')[0], +f.split(' ')[1].replace('px', ''), f.split(' ').slice(2).join(' ')), col || '#2b2b38');});}), 0, 0, 0.016, {bump: 0.2}); return g;};
 
 // ------------------------------------------------------------------ A: the office with the boss and the employee
 const A = grp(S, -3.3, 0, -0.25); mat(A, 2.2, 1.3, PAL.lilac);
-{const wt = clay(0xffffff, {map: winTex(hex(PAL.sky), '#5b5a8a', 4, 3)}), pm = clay(PAL.sky); add(A, rbox(1.7, 1.15, 0.45, 0.06), [wt, wt, pm, pm, wt, wt], 0, 0.575, -0.38);
-  add(A, rbox(1.76, 0.06, 0.5, 0.03), clay(0xfaf3e8), 0, 1.18, -0.38); add(A, rbox(0.28, 0.5, 0.03, 0.02), clay(PAL.deep), -0.55, 0.25, -0.15);
-  label(A, 0.7, 0.16, [['FIRMA', '800 110px "Inter Tight"', '#5b4a9a']], 0.35, 1.0, -0.14);
+{const wt = clay(0xffffff, {map: winTex(hex(PAL.sky), '#5b5a8a', 4, 3)}), pm = clay(PAL.sky);
+  // the front has no window where the door is, so the door does not cover half a window
+  const wf = clay(0xffffff, {map: tex(256, 256, (g, w, h) => {g.fillStyle = hex(PAL.sky); g.fillRect(0, 0, w, h); const cw = w / 4, rh = h / 3; g.fillStyle = '#5b5a8a';
+    for (let i = 0; i < 4; i++) for (let k = 0; k < 3; k++) if (!(i === 0 && k === 2)) {g.beginPath(); g.roundRect(i * cw + cw * 0.25, k * rh + rh * 0.22, cw * 0.5, rh * 0.55, 6); g.fill();}})});
+  add(A, rbox(1.7, 1.15, 0.45, 0.06), [wt, wt, pm, pm, wf, wt], 0, 0.575, -0.38);
+  add(A, rbox(1.76, 0.06, 0.5, 0.03), clay(0xfaf3e8), 0, 1.18, -0.38); add(A, rbox(0.24, 0.42, 0.03, 0.02), clay(PAL.deep), -0.6375, 0.21, -0.15);
+  // the company sign stands on the roof on two short legs, above the windows (not in front of them)
+  {const rs = grp(A, 0.3, 1.21, -0.3); for (const sx of [-1, 1]) add(rs, rbox(0.04, 0.1, 0.04, 0.015), clay(0xe7dfd0), sx * 0.26, 0.05, 0);
+    label(rs, 0.74, 0.2, [['FIRMA', '800 120px "Inter Tight"', '#5b4a9a']], 0, 0.19, 0);}
   add(A, rbox(0.62, 0.05, 0.32, 0.02), clay(0xc49a64), -0.45, 0.36, 0.2); for (const sx of [-1, 1]) add(A, rbox(0.04, 0.34, 0.28, 0.01), clay(0xb08a5a), -0.45 + sx * 0.27, 0.17, 0.2);
   add(A, rbox(0.2, 0.012, 0.14, 0.006), clay(PAL.dark), -0.5, 0.39, 0.22); const sc = add(A, rbox(0.2, 0.13, 0.01, 0.006), clay(PAL.dark), -0.5, 0.45, 0.15); sc.rotation.x = -0.3;}
 const CHEF = person(A, -0.05, 0.25, {body: 0x3e3f5a, leg: 0x2b2d3a, tie: PAL.deep, hair: 0x6b4a2a, ry: 0.35, s: 1.08});
@@ -53,15 +59,17 @@ const SLIPL = [['Brutto', '3.000 €'], ['Steuerklasse', 'I'], ['Kinder', 'keine
 decal(SLIP, 0.94, 0.3, tex(960, 300, (g, w, h) => {g.fillStyle = 'rgba(91,74,154,0.12)'; for (let k = 0; k < 4; k++) g.fillRect(50, 30 + k * 66, k % 2 ? 560 : 760, 22);}), 0, -0.4, 0.021, {bump: 0.2});
 
 // ------------------------------------------------------------------ D: five houses where the money goes
-const HX = [1.05, 1.72, 2.39, 3.06, 3.73], HZ = -0.5;
+const HX = [0.68, 1.26, 1.84, 3.72, 4.30], HZ = -0.5;   // the cart stops in the gap at x 2.75, so the tower never hides a house
 const HOUSE = [['rv', 'Renten-\nversicherung', PAL.sky, 0x6f9fd8], ['kv', 'Kranken-\nkasse', PAL.mint, 0x58b48c], ['pv', 'Pflege-\nversicherung', PAL.pink, 0xd77fa3],
   ['av', 'Arbeits-\nagentur', PAL.yellow, 0xd9a03f], ['lohnsteuer', 'Finanz-\namt', 0xb9b4d6, 0x7a72a8]].map(([k, name, c, roof], i) => {
   const G = grp(S, HX[i], 0, HZ); const wt = clay(0xffffff, {map: winTex(hex(c), '#5b5a8a', 2, 2)}), pm = clay(c);
-  add(G, rbox(0.52, 0.55, 0.45, 0.05), [wt, wt, pm, pm, wt, wt], 0, 0.275, 0);
-  const r = new THREE.Shape(); r.moveTo(-0.29, 0); r.lineTo(0.29, 0); r.lineTo(0, 0.2); r.closePath(); const rg = new THREE.ExtrudeGeometry(r, {depth: 0.49, bevelEnabled: true, bevelSize: 0.015, bevelThickness: 0.015, bevelSegments: 2}); rg.translate(0, 0, -0.245);
+  // front: the name sign on a plain wall, the door with one small window on each side (no window behind the sign or the door)
+  const wf = clay(0xffffff, {map: tex(256, 256, (g, w, h) => {g.fillStyle = hex(c); g.fillRect(0, 0, w, h); g.fillStyle = '#5b5a8a'; for (const u of [0.08, 0.71]) {g.beginPath(); g.roundRect(u * w, 0.62 * h, 0.21 * w, 0.24 * h, 6); g.fill();}})});
+  add(G, rbox(0.46, 0.55, 0.45, 0.05), [wt, wt, pm, pm, wf, wt], 0, 0.275, 0);
+  const r = new THREE.Shape(); r.moveTo(-0.26, 0); r.lineTo(0.26, 0); r.lineTo(0, 0.19); r.closePath(); const rg = new THREE.ExtrudeGeometry(r, {depth: 0.49, bevelEnabled: true, bevelSize: 0.015, bevelThickness: 0.015, bevelSegments: 2}); rg.translate(0, 0, -0.245);
   add(G, rg, clay(roof), 0, 0.55, 0); add(G, rbox(0.14, 0.22, 0.02, 0.02), clay(PAL.deep), 0, 0.11, 0.226);
-  const sign = grp(G, 0, 0.42, 0.236); add(sign, rbox(0.5, 0.17, 0.02, 0.02), clay(0xfbf8f1), 0, 0, 0);
-  decal(sign, 0.48, 0.16, tex(480, 160, (g, w, h) => {const L = name.split('\n'); L.forEach((s, j) => T2(g, s, w / 2, h * (j + 0.5) / L.length + 3, fitText(g, s, w - 30, 800, 62), '#2b2b38'));}), 0, 0, 0.011, {bump: 0.2});
+  const sign = grp(G, 0, 0.42, 0.236); add(sign, rbox(0.44, 0.17, 0.02, 0.02), clay(0xfbf8f1), 0, 0, 0);
+  decal(sign, 0.42, 0.16, tex(420, 160, (g, w, h) => {const L = name.split('\n'); L.forEach((s, j) => T2(g, s, w / 2, h * (j + 0.5) / L.length + 3, fitText(g, s, w - 30, 800, 62), '#2b2b38'));}), 0, 0, 0.011, {bump: 0.2});
   const val = label(G, 0.44, 0.16, [[{rv: '279 €', kv: '262,50 €', pv: '72 €', av: '39 €', lohnsteuer: '293 €'}[k], '800 110px "Inter Tight"']], 0, 0.95, 0.05);
   return {k, G, val, x: HX[i]};});
 
@@ -70,10 +78,10 @@ const BUB = grp(S, 0.6, 1.75, 0.2); {add(BUB, rbox(0.8, 0.5, 0.12, 0.2), clay(0x
   decal(BUB, 0.7, 0.42, tex(560, 340, (g, w, h) => {T2(g, '?', w / 2, h / 2 + 10, '800 260px "Inter Tight"', '#5b4a9a');}), 0, 0, 0.061, {bump: 0.2});}
 
 // ------------------------------------------------------------------ timing (voice time)
-const CART_X0 = -2.25, CART_X1 = 2.39, CART_ROLL = [12.95, 14.5];
+const CART_X0 = -2.25, CART_X1 = 2.75, CART_ROLL = [12.95, 14.5];
 const FLY = {rv: [19.55, 20.6], kv: [22.6, 23.6], pv: [24.9, 25.8], av: [26.7, 27.6], lohnsteuer: [30.25, 31.3]};
 const CHEFFLY = [15.0, 16.2];   // the boss's extra part flies to the first four houses
-const EMP_PATH = [[-4.25, 0.15], [-4.42, -0.35], [-4.42, -1.0], [-2.0, -1.08], [0.4, -1.1], [4.18, -1.0], [4.18, 0.3], [3.0, 0.42]], EMP_T = [14.2, 31.6];
+const EMP_PATH = [[-4.25, 0.15], [-4.42, -0.35], [-4.42, -1.0], [-2.0, -1.08], [0.4, -1.1], [3.27, -1.05], [3.27, 0.42]], EMP_T = [14.2, 31.6];
 
 // ------------------------------------------------------------------ camera
 S.updateMatrixWorld(true);
@@ -83,7 +91,7 @@ const ptsA = [...[[-1.1, 0, -0.6], [1.1, 0, -0.6], [-1.1, 1.2, -0.6], [-1.1, 0, 
 const ptsB = [[-0.75, 0, 0.6], [0.75, 0, 0.6], [-0.6, 1.55, -0.1], [0.6, 1.55, -0.1]].map(p => wx(B, ...p));
 const ptsD = [V3(HX[0] - 0.3, 0, HZ - 0.25), V3(HX[4] + 0.3, 0, HZ - 0.25), V3(HX[0] - 0.3, 1.1, HZ), V3(HX[4] + 0.3, 1.1, HZ), V3(CART_X1 - 0.4, 0, 0.7), V3(CART_X1 + 0.4, 0, 0.7), V3(CART_X1, TOP - 0.3, 0.3)];
 const ptsE = [V3(CART_X1 - 0.5, 0, 0.75), V3(3.35, 0, 0.75), V3(CART_X1 - 0.5, 1.4, 0.3), V3(3.35, 1.4, 0.3), V3(CART_X1, 0, -0.2)];
-const ptsW = [V3(-4.7, -0.36, 1.45), V3(4.7, -0.36, 1.45), V3(-4.7, 0, -1.45), V3(4.7, 0, -1.45), V3(-3.3, 1.3, -0.6), V3(2.4, 1.4, -0.5), V3(0.6, 2.1, 0.2)];
+const ptsW = [V3(-4.7, -0.36, 1.45), V3(4.7, -0.36, 1.45), V3(-4.7, 0, -1.45), V3(4.7, 0, -1.45), V3(-3.3, 1.3, -0.6), V3(-3.0, 1.52, -0.55), V3(2.4, 1.4, -0.5), V3(0.6, 2.1, 0.2)];
 const FA0 = fit(ptsA, -8, 12), FA = fit(ptsA, -12, 14), FB = fit(ptsB, -8, 10), FC = fit([...ptsD, V3(CART_X1, TOP + 0.2, 0.3)], -12, 13), FD = fit(ptsD, -10, 12), FE = fit(ptsE, -14, 12),
   FW = fit(ptsW, -34, 28, {y0: 560}), FO = fit(ptsW, -34, 26, {y0: 640, y1: 1300});
 const CAM = [K(0, FA0, 0.98), K(4.3, FA0, 0.93), K(8.2, FA, 0.95), K(9.0, FB), K(12.9, FB, 0.93), K(14.3, FC), K(17.6, FC, 0.96), K(18.6, FD), K(31.4, FD, 0.95),
@@ -130,7 +138,7 @@ function setT(v) {
   CHEFL.scale.setScalar(Math.max(1e-3, popIn(v, 13.4, 0.35)));
   // the boss's part flies to the first four houses, then each slice of your 3.000 € on its word
   const roots = {}; let drop = 0;
-  {const u = seg(v, ...CHEFFLY), c = SLICE.chef; c.g.visible = u < 1; if (u > 0) {const p0 = CART.localToWorld(V3(0, 0.13 + c.y, 0)), p1 = V3(lerp(HX[0], HX[3], 0.5), 0.75, HZ);
+  {const u = seg(v, ...CHEFFLY), c = SLICE.chef; c.g.visible = u < 1; if (u > 0) {const p0 = CART.localToWorld(V3(0, 0.13 + c.y, 0)), p1 = V3(1.55, 0.8, HZ);
       const w = COL.worldToLocal(arcPos(p0, p1, eio(u), 0.6)); c.g.position.copy(w); c.g.scale.setScalar(Math.max(1e-3, 1 - 0.85 * eio(u)));}
     else {c.g.position.set(0, c.y, 0); c.g.scale.setScalar(1);}}
   for (const [k, [a, b]] of Object.entries(FLY)) {const c = SLICE[k], u = seg(v, a, b); c.g.visible = u < 1;
@@ -139,7 +147,7 @@ function setT(v) {
     else {c.g.position.set(0, c.y, 0); c.g.scale.setScalar(1); c.g.rotation.y = 0;}}
   // the houses bounce and show the amount when their slice arrives; the four social houses also bounce when the boss's part arrives
   HOUSE.forEach((h, i) => {const at = FLY[h.k][1], b1 = Math.sin(PI * seg(v, at - 0.05, at + 0.3)) * 0.12, b0 = i < 4 ? Math.sin(PI * seg(v, CHEFFLY[1] - 0.05, CHEFFLY[1] + 0.3)) * 0.08 : 0;
-    h.G.scale.set(1 + b1 * 0.5 + b0 * 0.5, 1 + b1 + b0, 1 + b1 * 0.5 + b0 * 0.5); const p = popIn(v, at, 0.35); h.val.visible = p > 0.01; h.val.scale.setScalar(Math.max(1e-3, p));});
+    h.G.scale.set(1 + b1 * 0.5 + b0 * 0.5, 1 + b1 + b0, 1 + b1 * 0.5 + b0 * 0.5); const p = popIn(v, at, 0.35) * (1 - sm(seg(v, 31.5, 31.9)) * (1 - sm(seg(v, 35.3, 35.7)))); h.val.visible = p > 0.01; h.val.scale.setScalar(Math.max(1e-3, p));});   // amounts hide in the close-up (the frame edge would cut them) and come back for the wide shot
   // the employee walks behind the houses to the cart and takes what is left
   {const u = seg(v, ...EMP_T); if (u <= 0) {EMP.G.position.set(-0.95 + A.position.x, 0, 0.4 + A.position.z); EMP.G.rotation.y = 0.5; still(EMP);}
     else {const [x, z, h] = pathAt(EMP_PATH, sm(u)); EMP.G.position.set(x, 0, z); EMP.G.rotation.y = u < 1 ? h : lerp(h, -1.2, sm(seg(v, EMP_T[1], EMP_T[1] + 0.5))); if (u < 1) walk(EMP, v * 9, 0.5); else still(EMP);}
