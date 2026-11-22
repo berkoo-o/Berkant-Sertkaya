@@ -28,7 +28,7 @@ add(A, rbox(0.3, 0.62, 0.03, 0.03), clay(PAL.deep), -0.52, 0.31, -0.02);
 {const aw = grp(A, 0, 0.84, 0.02); aw.rotation.x = 0.55;
   add(aw, rbox(1.55, 0.03, 0.34, 0.012), clay(0xffffff, {map: tex(512, 64, (g, w, h) => {for (let i = 0; i < 8; i++) {g.fillStyle = i % 2 ? '#f3ece0' : '#c4a8f0'; g.fillRect(i * w / 8, 0, w / 8 + 1, h);}})}), 0, 0, 0.17);}
 add(A, rbox(1.1, 0.24, 0.06, 0.04), clay(PAL.cream), 0, 1.2, -0.26);
-decal(A, 1.0, 0.2, tex(800, 160, (g, w, h) => T2(g, 'SALE  SALE  SALE', w / 2, h / 2 + 4, '800 110px "Inter Tight"', '#5b4a9a')), 0, 1.2, -0.228);
+decal(A, 1.0, 0.2, tex(800, 160, (g, w, h) => T2(g, '% SALE %', w / 2, h / 2 + 4, '800 110px "Inter Tight"', '#5b4a9a')), 0, 1.2, -0.228);
 const SIGN = grp(A, 0.38, 0, 0.36); add(SIGN, new THREE.CylinderGeometry(0.2, 0.24, 0.07, 32), clay(PAL.cream), 0, 0.035, 0);
 const SIGNR = grp(SIGN, 0, 0.07, 0);
 const S50 = text3d(SIGNR, '-50%', 0.3, 0.1, redClay(0.2)); S50.position.z = 0.055;
