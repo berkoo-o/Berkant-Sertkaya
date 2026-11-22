@@ -55,7 +55,8 @@ function person(par, x, z, o = {}) {const G = grp(par, x, o.y || 0, z, o.ry || 0
   const body = clay(o.body ?? BODY[Math.floor(R() * BODY.length)]), leg = clay(o.leg ?? PAL.dark), skin = clay(o.skin ?? 0xf3c9a5);
   for (const sx of [-1, 1]) add(G, new THREE.CylinderGeometry(0.039, 0.036, 0.18, 14), leg, sx * 0.036, 0.09, 0);
   add(G, new THREE.CapsuleGeometry(0.09, 0.135, 6, 16), body, 0, 0.3, 0);
-  for (const sx of [-1, 1]) {const a = add(G, new THREE.CapsuleGeometry(0.0204, 0.09, 4, 10), body, sx * 0.0945, 0.294, 0); a.rotation.z = -sx * 0.1;}
+  for (const sx of [-1, 1]) {if ((o.up || []).includes(sx)) {const a = add(G, new THREE.CapsuleGeometry(0.0204, 0.11, 4, 10), body, sx * 0.105, 0.44, 0.01); a.rotation.z = -sx * 0.28; continue;}
+    const a = add(G, new THREE.CapsuleGeometry(0.0204, 0.09, 4, 10), body, sx * 0.0945, 0.294, 0); a.rotation.z = -sx * 0.1;}
   add(G, new THREE.SphereGeometry(0.072, 20, 16), skin, 0, 0.495, 0);
   for (const sx of [-1, 1]) add(G, new THREE.SphereGeometry(0.0102, 8, 6), clay(0x22222a, {bumpScale: 0}), sx * 0.0255, 0.504, 0.0645).castShadow = false;
   if (o.helmet) {add(G, new THREE.SphereGeometry(0.082, 18, 10, 0, PI * 2, 0, PI * 0.5), clay(o.helmet), 0, 0.51, 0); add(G, new THREE.CylinderGeometry(0.098, 0.098, 0.01, 24), clay(o.helmet), 0, 0.512, 0.004);}
@@ -295,14 +296,14 @@ MOTIFS.jahr2027 = () => {   // tear-off calendar on 1 January 2027, circled with
   VIEW = {az: -0.3, el: 0.36, fov: 24};
 };
 
-function bank(par, x, z) {const B = grp(par, x, 0, z);
+function bank(par, x, z, label = 'B A N K') {const B = grp(par, x, 0, z);
   add(B, rbox(1.9, 0.07, 1.12, 0.03), clay(0xe2d9c8), 0, 0.035, 0); add(B, rbox(1.78, 0.07, 1.0, 0.03), clay(0xece5d8), 0, 0.105, 0);
   add(B, rbox(1.6, 0.95, 0.72, 0.05), clay(0xf1ece2), 0, 0.615, -0.08);
   add(B, rbox(0.3, 0.46, 0.04, 0.03), clay(PAL.deep), 0, 0.37, 0.29);
   for (const sx of [-1, 1]) add(B, rbox(0.24, 0.32, 0.03, 0.03), clay(0x8a7cc0), sx * 0.5, 0.6, 0.285);
   for (let i = 0; i < 6; i++) {const cx = -0.7 + i * 0.28; add(B, new THREE.CylinderGeometry(0.05, 0.056, 0.8, 18), clay(0xfaf6ee), cx, 0.54, 0.42); add(B, rbox(0.14, 0.04, 0.14, 0.012), clay(0xfaf6ee), cx, 0.95, 0.42);}
   add(B, rbox(1.72, 0.14, 0.34, 0.03), clay(0xfaf6ee), 0, 1.04, 0.33);
-  decal(B, 0.7, 0.1, tex(560, 80, (g, w, h) => T2(g, 'B A N K', w / 2, h / 2 + 3, '800 60px "Inter Tight"', '#8a7f70')), 0, 1.04, 0.502);
+  if (label) decal(B, 0.7, 0.1, tex(560, 80, (g, w, h) => T2(g, label, w / 2, h / 2 + 3, '800 60px "Inter Tight"', '#8a7f70')), 0, 1.04, 0.502);
   add(B, rbox(1.64, 0.06, 0.78, 0.03), clay(0xe7dfd0), 0, 1.12, -0.08);
   const sh = new THREE.Shape(); sh.moveTo(-0.86, 0); sh.lineTo(0.86, 0); sh.lineTo(0, 0.34); sh.closePath();
   add(B, new THREE.ExtrudeGeometry(sh, {depth: 0.3, bevelEnabled: true, bevelSize: 0.015, bevelThickness: 0.015, bevelSegments: 2}), clay(0xfaf6ee), 0, 1.11, 0.18);
@@ -344,6 +345,35 @@ MOTIFS.bankrun2 = () => {   // the open vault is almost empty, the queue waits i
   const Qp = [[-0.35, 0.25], [-0.62, 0.38], [-0.9, 0.48], [-1.18, 0.58], [-1.36, 0.85], [-1.08, 0.92], [-0.8, 0.95], [-0.52, 0.98]];
   Qp.forEach(([x, z], i) => person(S, x, z, {ry: face(x, z, 0.2, 0.0) + (R() - 0.5) * 0.6, s: 0.95 + R() * 0.1}));
   VIEW = {az: -0.36, el: 0.36, fov: 24};
+};
+
+MOTIFS.genz = () => {   // Gen-Z-Protest: junge Knetfiguren mit Schildern und Handys vor dem Parlament, vorne das rote Megafon
+  plinth(3.3, 2.35, [[-1, -1], [1, -1]]);
+  const Gv = bank(S, 0, -0.62, 'PARLAMENT');
+  add(Gv, new THREE.SphereGeometry(0.3, 32, 16, 0, PI * 2, 0, PI / 2), clay(0xe7dfd0), 0, 1.15, -0.1);
+  add(Gv, new THREE.CylinderGeometry(0.06, 0.07, 0.08, 16), clay(0xfaf6ee), 0, 1.47, -0.1);
+  {const F = grp(Gv, 0, 1.5, -0.1); add(F, new THREE.CylinderGeometry(0.008, 0.008, 0.34, 8), clay(PAL.cream), 0, 0.17, 0);
+    const fl = decal(F, 0.22, 0.13, tex(120, 72, (g, w, h) => {['#2b2b33', '#d8524c', '#f2c14e'].forEach((c, k) => {g.fillStyle = c; g.fillRect(0, k * h / 3, w, h / 3 + 1);});}), 0.11, 0.27, 0, {bump: 0.3}); fl.material.side = THREE.DoubleSide; fl.castShadow = true;}
+  const SIGNS = [['GEN Z', '#fbf8f1'], ['HÖRT UNS ZU', '#f7dd7c'], ['ZUKUNFT?', '#9fe0c6'], ['WIR SIND LAUT', '#f2a7c3'], ['#GENZ', '#9cc8f2']];
+  const HAIR = [0x3b2a20, 0x8a5a3a, 0xd9a441, 0x2b2b33, 0x6b4a2a, 0x9a7fe0, 0x6fc3d0], SKIN = [0xf3c9a5, 0xe0a87e, 0xc08a62, 0x8f5f40, 0xf6d3b8];
+  const sign = (G, sx, k) => {add(G, new THREE.CylinderGeometry(0.008, 0.008, 0.42, 8), clay(0xa0704a), sx * 0.13, 0.66, 0);
+    const [txt, bg] = SIGNS[k % SIGNS.length]; add(G, rbox(0.4, 0.22, 0.02, 0.012), clay(new THREE.Color(bg).getHex(), {bumpScale: 1}), sx * 0.13, 0.9, 0.012);
+    decal(G, 0.38, 0.2, tex(380, 200, (g, w, h) => {g.fillStyle = bg; g.fillRect(0, 0, w, h); let fs = 70; g.font = `800 ${fs}px "Inter Tight"`; while (g.measureText(txt).width > w - 40) {fs -= 2; g.font = `800 ${fs}px "Inter Tight"`;} T2(g, txt, w / 2, h / 2 + 4, g.font, PAL.ink);}), sx * 0.13, 0.9, 0.0235, {bump: 0.3});};
+  const phone = (G, sx) => {add(G, rbox(0.05, 0.09, 0.012, 0.008), clay(PAL.dark, {bumpScale: 0.3}), sx * 0.13, 0.57, 0.03);
+    decal(G, 0.04, 0.075, tex(40, 75, (g, w, h) => {const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#9cc8f2'); gr.addColorStop(1, '#c4a8f0'); g.fillStyle = gr; g.fillRect(0, 0, w, h);}), sx * 0.13, 0.57, 0.0372, {glow: 0.5, bump: 0});};
+  const CREW = [
+    [-0.92, 0.05, 'sign', -1], [-0.45, 0.0, 'sign', 1], [0.02, 0.04, 'sign', 1], [0.62, 0.02, 'sign', 1],
+    [-1.08, 0.42, 'phone', -1], [-0.55, 0.4, 'none', 0], [0.0, 0.38, 'phone', -1], [0.55, 0.42, 'phone', 1], [1.02, 0.4, 'sign', 1],
+    [-0.8, 0.8, 'phone', 1], [-0.27, 0.82, 'mega', 1], [0.3, 0.8, 'none', 0], [0.82, 0.78, 'phone', -1]];
+  let k = 0;
+  CREW.forEach(([x, z, what, sx]) => {const G = person(S, x, z, {ry: (R() - 0.5) * 0.4, up: what === 'none' ? [] : [sx], s: 0.98 + R() * 0.08, hair: HAIR[Math.floor(R() * HAIR.length)], skin: SKIN[Math.floor(R() * SKIN.length)], pack: R() < 0.45 ? BODY[Math.floor(R() * BODY.length)] : undefined});
+    if (what === 'sign') sign(G, sx, k++);
+    if (what === 'phone') phone(G, sx);
+    if (what === 'mega') {const Mg = grp(G, sx * 0.13, 0.53, 0.07); Mg.rotation.x = -0.35; const rm = redClay();
+      add(Mg, new THREE.CylinderGeometry(0.075, 0.025, 0.18, 24, 1, true).rotateX(PI / 2), rm, 0, 0, 0.1).material.side = THREE.DoubleSide;
+      add(Mg, new THREE.CylinderGeometry(0.028, 0.028, 0.06, 16).rotateX(PI / 2), rm, 0, 0, -0.01); add(Mg, rbox(0.025, 0.06, 0.03, 0.008), clay(PAL.dark), 0, -0.04, -0.01);}});
+  tree(S, -1.35, -0.25, 0.8); tree(S, 1.35, -0.2, 0.75);
+  VIEW = {az: -0.22, el: 0.32, fov: 24};
 };
 
 MOTIFS.paket = () => {   // the parcel with the red tape, a smaller one and the delivery van
