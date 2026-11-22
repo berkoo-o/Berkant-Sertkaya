@@ -15,7 +15,7 @@ const W = 1080, H = 1920, RED = 0xE01E2B, PI = Math.PI;
 let seed = 23; const R = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 
 const renderer = new THREE.WebGLRenderer({antialias: true, alpha: true, preserveDrawingBuffer: true});
-renderer.setSize(W, H); renderer.setPixelRatio(1); renderer.setClearColor(0x000000, 0); document.body.appendChild(renderer.domElement);
+renderer.setPixelRatio(+(Q.get('pr') || 1)); renderer.setSize(W, H); renderer.setClearColor(0x000000, 0); document.body.appendChild(renderer.domElement);
 renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0; renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 const scene = new THREE.Scene(); scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture; scene.environmentIntensity = 0.4;
