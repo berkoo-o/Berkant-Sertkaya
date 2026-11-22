@@ -34,12 +34,23 @@ const grain = a => {const n = document.createElement('canvas'); n.width = 256; n
 const vlight = (cx, cy, r, inner, outer) => {const gr = g.createRadialGradient(cx, cy, 0, cx, cy, r); gr.addColorStop(0, inner); gr.addColorStop(1, outer); g.fillStyle = gr; g.fillRect(0, 0, W, H);};
 
 if (S === 1) {
-  // „Galerie“: warm light grey, the motif alone with lots of space, a small caption underneath, tiny logo
+  // „Galerie“ (vom Nutzer gewählt): warm light grey, the motif alone with lots of space, small type. &l= text layout:
+  // 0 Titel unter dem Motiv · 1 oben links · 2 unten links mit feiner Linie · 3 oben zentriert · 4 in den Ecken verteilt
+  const L = +(Q.get('l') || 0), INK = '#3d3a36', MUTE = '#8d867c', TF = '600 42px "Inter Tight"';
   vlight(540, 900, 1300, '#F4F2EE', '#DEDAD3');
-  T(`Nr. ${V.nr}`, 90, 390, '600 30px "Inter Tight"', '#8d867c', {ls: '3px'});
-  motif(540, 1260, 820, 640);
-  V.title.forEach((t, i) => T(t, 540, 1400 + i * 52, '600 42px "Inter Tight"', '#3d3a36', {align: 'center'}));
-  T('function.', 540, 1600, '500 34px Poppins', '#8d867c', {align: 'center', ls: '-0.5px'});
+  if (L === 0) {T(`Nr. ${V.nr}`, 90, 390, '600 30px "Inter Tight"', MUTE, {ls: '3px'}); motif(540, 1260, 820, 640);
+    V.title.forEach((t, i) => T(t, 540, 1400 + i * 52, TF, INK, {align: 'center'})); T('function.', 540, 1600, '500 34px Poppins', MUTE, {align: 'center', ls: '-0.5px'});}
+  if (L === 1) {T(`Nr. ${V.nr} · ${V.topic}`, 90, 380, '600 28px "Inter Tight"', MUTE, {ls: '3px'}); V.title.forEach((t, i) => T(t, 90, 450 + i * 54, '600 46px "Inter Tight"', INK));
+    motif(540, 1420, 840, 700); T('function.', 540, 1610, '500 34px Poppins', MUTE, {align: 'center', ls: '-0.5px'});}
+  if (L === 2) {motif(540, 1200, 840, 700); g.fillStyle = INK; g.fillRect(90, 1336, 70, 3);
+    T(`Nr. ${V.nr} · ${V.topic}`, 90, 1392, '600 28px "Inter Tight"', MUTE, {ls: '3px'}); V.title.forEach((t, i) => T(t, 90, 1452 + i * 54, '600 46px "Inter Tight"', INK));
+    T('function.', 990, 1610, '500 34px Poppins', MUTE, {align: 'right', ls: '-0.5px'});}
+  if (L === 3) {V.title.forEach((t, i) => T(t, 540, 430 + i * 54, '600 46px "Inter Tight"', INK, {align: 'center'})); g.fillStyle = MUTE; g.fillRect(510, 510, 60, 2);
+    motif(540, 1400, 840, 720); T(`Nr. ${V.nr}`, 540, 1520, '600 28px "Inter Tight"', MUTE, {align: 'center', ls: '3px'}); T('function.', 540, 1610, '500 34px Poppins', MUTE, {align: 'center', ls: '-0.5px'});}
+  if (L === 4) {T(`Nr. ${V.nr}`, 90, 380, '600 28px "Inter Tight"', MUTE, {ls: '3px'}); T('function.', 990, 382, '500 34px Poppins', MUTE, {align: 'right', ls: '-0.5px'});
+    g.fillStyle = 'rgba(61,58,54,0.18)'; g.fillRect(90, 412, 900, 2);
+    motif(540, 1300, 840, 720); g.fillStyle = 'rgba(61,58,54,0.18)'; g.fillRect(90, 1440, 900, 2);
+    V.title.forEach((t, i) => T(t, 990, 1508 + i * 54, '600 46px "Inter Tight"', INK, {align: 'right'})); T(V.topic, 90, 1508, '600 28px "Inter Tight"', MUTE, {ls: '3px'});}
   grain(0.035);
 }
 if (S === 2) {
