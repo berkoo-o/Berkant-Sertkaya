@@ -61,7 +61,7 @@ const d = D[P], el = document.getElementById('slide'); el.style.setProperty('--b
 const img = (n, x, y, w, rot = 0, cls = 'deko') => `<img class="${cls}" src="img/${n}.png" style="left:${x}px;top:${y}px;width:${w}px;transform:rotate(${rot}deg)">`;
 const DK = N === 1 ? [['d_star', 110, 170, 70, -12], ['d_flower', 900, 150, 84, 10], ['d_heart', 945, 640, 58, 14], ['d_blob', 70, 560, 44, 0], ['d_wave', 880, 1270, 110, -6], ['d_star', 960, 980, 50, 20], ['d_flower', 60, 1010, 60, -10]]
   : [['d_star', 120, 120, 56, -12], ['d_flower', 920, 110, 70, 10], ['d_heart', 975, 1010, 46, 14], ['d_blob', 40, 780, 36, 0], ['d_wave', 80, 1270, 100, -4]];
-let h = DK.map(a => img(...a)).join('') + `<div class="num">${N}/2</div><div class="logo">function.</div>`;
+let h = DK.map(a => img(...a)).join('') + `<div class="logo">function.</div>`;
 if (N === 1) h += `<div class="c" style="top:250px"><h1 style="font-size:92px">${d.h1.join('<br>')}</h1><div class="sub">${d.sub}</div></div>
   <img class="motif" src="img/slide_${P}.png" style="top:640px;width:860px">`;
 else h += `<div class="c" style="top:150px"><h1 style="font-size:80px">${d.h2.join('<br>')}</h1></div>
