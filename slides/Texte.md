@@ -28,3 +28,62 @@ Quellen: NASA Ames Research Center (1995), Loughborough University (1997) · Sta
 Quellen: Bundeszentrum für Ernährung (BZfE), Verbraucherzentrale · Stand: 22.11.2026
 #function #brot #küche #lifehack #wissen
 ```
+
+## Instagram-Beschreibungen (ausführlich)
+
+### Akku
+
+```
+Dein Akku liebt die Mitte 🔋
+
+📱 Zwischen 20 und 80 % altert ein Handy-Akku am langsamsten.
+⚡ Bei 80 % aufhören: Eine volle Ladung setzt den Akku unter Spannung. iPhone und Samsung können das Laden bei 80 % automatisch stoppen.
+🌡️ Hitze vermeiden: Über 35 °C altert der Akku dauerhaft schneller, also nicht in der Sonne oder unter dem Kissen laden.
+🪫 Nicht leer laufen lassen: Unter 20 % wird es anstrengend für den Akku, lieber öfter kurz nachladen.
+
+Lädst du über Nacht auf 100 %? 👇
+Speicher dir das fürs nächste Aufladen 🔖
+
+Quellen: Apple (Akku und Leistung), Battery University
+Stand: 22.11.2026
+
+#function #handy #akku #iphone #samsung #lifehack #wissen #tipps
+```
+
+### Power-Nap
+
+```
+26 Minuten Schlaf machen dich wacher 😴
+
+🧑‍✈️ In einer NASA-Studie waren Piloten nach einem kurzen Nickerchen um 54 % aufmerksamer.
+⏰ Höchstens 20 bis 30 Minuten: Wer länger schläft, rutscht in den Tiefschlaf und wacht wie gerädert auf.
+☕ Kaffee direkt davor: Koffein wirkt erst nach etwa 20 Minuten, also genau dann, wenn der Wecker klingelt.
+☀️ Am frühen Nachmittag: Zwischen 13 und 15 Uhr ist das Tief am größten. Später stört der Nap den Nachtschlaf.
+
+Machst du Power-Naps? 👇
+Speicher dir das für das nächste Tief 🔖
+
+Quellen: NASA Ames Research Center (1995), Loughborough University (1997)
+Stand: 22.11.2026
+
+#function #powernap #schlaf #produktivität #lifehack #wissen #tipps
+```
+
+### Brot
+
+```
+Brot gehört nicht in den Kühlschrank 🍞
+
+❄️ Bei Kühlschrank-Temperatur wird Brot schneller altbacken als bei Zimmertemperatur.
+🏺 Im Tontopf oder Brotkasten: bei Zimmertemperatur, dunkel und luftig. Plastik macht die Kruste weich und fördert Schimmel.
+🧊 Lieber einfrieren: In Scheiben eingefroren hält Brot bis zu drei Monate und schmeckt aufgetaut wie frisch.
+🔥 Altes Brot aufbacken: Ein paar Minuten im Ofen machen trockenes Brot wieder knusprig.
+
+Wo lagerst du dein Brot? 👇
+Speicher dir das für deinen nächsten Einkauf 🔖
+
+Quellen: Bundeszentrum für Ernährung (BZfE), Verbraucherzentrale
+Stand: 22.11.2026
+
+#function #brot #küche #haushalt #lifehack #wissen #tipps
+```
