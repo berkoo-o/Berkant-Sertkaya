@@ -468,9 +468,40 @@ window.TOTAL = Math.round((END_V + VO) * 30);
 window.setT = setT;
 window.renderFrame = f => {setT(f / 30 - VO); renderer.render(scene, cam);};
 window.DBG = {THREE, scene, cam, POD, CROWD, CORO, STUD, CONV, PARA, SOLD, paraState, HOV, PX, PZ, PH, PW, STEP, CONF};
-// ?cover=1: clean thumbnail (no text, the whole staircase large in the middle, safe for the 3:4 crop of the profile grid)
-if (new URLSearchParams(location.search).get('cover')) {document.getElementById('ov').style.display = 'none'; document.getElementById('shade').style.display = 'none';
-  const f = fit([...allPts(), ...paraTop(4)], -16, 17, {x0: 70, x1: 1010, y0: 470, y1: 1450}); const v0 = 3.2;
-  window.renderFrame = () => {setT(v0); const A = f[4] * Math.PI / 180, E = f[5] * Math.PI / 180; cam.position.set(f[0] + f[3] * Math.cos(E) * Math.sin(A), f[1] + f[3] * Math.sin(E), f[2] + f[3] * Math.cos(E) * Math.cos(A)); cam.lookAt(f[0], f[1], f[2]); renderer.render(scene, cam);};}
+
+// ---- channel cover look (like geldautomat/cover_atm_modern.html?mode=clean): dark #07070B, violet and red light, floor grid,
+//      red light pool under the motif, soft glow over bright parts. Used by ?cover=1 for the clean thumbnail.
+function coverBackground(CX, CY) {
+  const c = document.createElement('canvas'); c.width = 1080; c.height = 1920; c.style.position = 'absolute'; c.style.left = '0'; c.style.top = '0'; c.style.zIndex = '-1';
+  document.body.insertBefore(c, document.body.firstChild); document.documentElement.style.background = '#07070B'; document.body.style.background = 'transparent';
+  const bg = c.getContext('2d'), W2 = 1080, H2 = 1920; bg.fillStyle = '#07070B'; bg.fillRect(0, 0, W2, H2);
+  const blob = (x, y, r, col) => {const g = bg.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, col); g.addColorStop(1, 'rgba(0,0,0,0)'); bg.fillStyle = g; bg.fillRect(0, 0, W2, H2);};
+  blob(430, CY - 400, 760, 'rgba(96,78,255,0.34)'); blob(900, CY + 80, 620, 'rgba(224,30,43,0.20)'); blob(120, CY + 280, 500, 'rgba(60,40,200,0.16)');
+  bg.save(); bg.strokeStyle = 'rgba(170,160,255,0.10)'; bg.lineWidth = 1.5; const hz = CY - 90;
+  for (let i = -14; i <= 14; i++) {bg.beginPath(); bg.moveTo(CX + i * 26, hz); bg.lineTo(CX + i * 190, H2); bg.stroke();}
+  for (let k = 0; k < 9; k++) {const y = hz + Math.pow(k / 8, 2.1) * (H2 - hz); bg.beginPath(); bg.moveTo(0, y); bg.lineTo(W2, y); bg.stroke();}
+  const f = bg.createLinearGradient(0, hz - 10, 0, hz + 170); f.addColorStop(0, '#07070B'); f.addColorStop(1, 'rgba(7,7,11,0)'); bg.fillStyle = f; bg.fillRect(0, hz - 12, W2, 190);
+  const f2 = bg.createLinearGradient(0, H2 - 220, 0, H2); f2.addColorStop(0, 'rgba(7,7,11,0)'); f2.addColorStop(1, 'rgba(7,7,11,.95)'); bg.fillStyle = f2; bg.fillRect(0, H2 - 220, W2, 220); bg.restore();
+  bg.save(); bg.translate(CX, CY); bg.scale(1, 0.24); const g = bg.createRadialGradient(0, 0, 0, 0, 0, 520); g.addColorStop(0, 'rgba(224,30,43,0.55)'); g.addColorStop(.55, 'rgba(224,30,43,0.16)'); g.addColorStop(1, 'rgba(224,30,43,0)');
+  bg.fillStyle = g; bg.beginPath(); bg.arc(0, 0, 520, 0, Math.PI * 2); bg.fill(); bg.restore();
+  const v = bg.createLinearGradient(0, 0, 0, 700); v.addColorStop(0, 'rgba(7,7,11,.4)'); v.addColorStop(1, 'rgba(7,7,11,0)'); bg.fillStyle = v; bg.fillRect(0, 0, W2, 700);}
+function coverGlow(src) {   // cheap bloom on top, keeps the transparent WebGL background
+  const c = document.createElement('canvas'); c.width = 1080; c.height = 1920; c.style.position = 'absolute'; c.style.left = '0'; c.style.top = '0'; c.style.pointerEvents = 'none'; document.body.appendChild(c);
+  const g = c.getContext('2d'); g.globalCompositeOperation = 'lighter'; g.filter = 'blur(22px) brightness(1.1)'; g.globalAlpha = 0.2; g.drawImage(src, 0, 0);}
+// ?cover=1: clean thumbnail in the channel cover look (no text, the whole staircase large in the middle, safe for the 3:4 crop)
+if (new URLSearchParams(location.search).get('cover')) {for (const id of ['ov', 'shade', 'end']) document.getElementById(id).style.display = 'none';
+  const f = fit([...allPts(), ...paraTop(4)], -16, 15, {x0: 110, x1: 970, y0: 560, y1: 1430}); const v0 = 3.2;
+  scene.children.filter(o => o.isHemisphereLight).forEach(h => {h.intensity = 0.45; h.groundColor.set(0x14080c);});
+  {const r1 = new THREE.DirectionalLight(0xff3344, 1.8); r1.position.set(4, 2.5, -3); scene.add(r1); const r2 = new THREE.DirectionalLight(0x8a78ff, 1.1); r2.position.set(-4, 2, -2); scene.add(r2);
+   const pl = new THREE.PointLight(0xff2030, 0.6, 2.2, 1.8); pl.position.copy(HOV[4]).add(new THREE.Vector3(0, 0.3, 0.45)); scene.add(pl);}
+  scene.traverse(o => {if (o.material && o.material.isShadowMaterial) {o.material.color.set(0x000000); o.material.opacity = 0.28;}});
+  window.renderFrame = () => {setT(v0); CONF.forEach(c => {c.m.visible = false;}); BLOBS.forEach(b => {b.m.visible = false;});
+    const A = f[4] * Math.PI / 180, E = f[5] * Math.PI / 180; cam.position.set(f[0] + f[3] * Math.cos(E) * Math.sin(A), f[1] + f[3] * Math.sin(E), f[2] + f[3] * Math.cos(E) * Math.cos(A)); cam.lookAt(f[0], f[1], f[2]); cam.updateMatrixWorld(); renderer.render(scene, cam);};
+  window.renderFrame();
+  // the light pool sits under the front of the staircase
+  let ys = 0; for (let i = 0; i < 5; i++) {const q = V3(PX(i), 0, PZ(i) + PW / 2).project(cam); ys = Math.max(ys, (1 - q.y) / 2 * H);}
+  coverBackground(540, ys - 40); coverGlow(renderer.domElement);
+  window.renderFrame = () => {}; window.ready = true;}
+else {
 const q0 = new URLSearchParams(location.search).get('t'); window.renderFrame(Math.round(((q0 != null ? +q0 : 0) + VO) * 30));
-window.ready = true;
+window.ready = true;}

@@ -364,7 +364,8 @@ function camAt(t) {let i = 0; while (i < KT.length - 2 && t > KT[i + 1]) i++; co
   const a = 2 * u3 - 3 * u2 + 1, b = u3 - 2 * u2 + u, c = -2 * u3 + 3 * u2, e = u3 - u2; return [0, 1, 2, 3, 4, 5, 6].map(j => a * KV[i][j] + b * h * KM[j][i] + c * KV[i + 1][j] + e * h * KM[j][i + 1]);}
 const CAMT = new THREE.Vector3();
 const CAMQ = new URLSearchParams(location.search).get('cam');
-function setCam(t) {const v = CAMQ ? (q => [q[0], q[1], q[2], Math.log(q[3]), q[4], q[5], q[6] || 26])(CAMQ.split(',').map(Number)) : camAt(t), size = Math.exp(v[3]); const az = (v[4] + 0.15 * Math.sin(t * 0.17)) * Math.PI / 180, el = (v[5] + 0.08 * Math.sin(t * 0.23 + 0.7)) * Math.PI / 180;
+const COVERQ = new URLSearchParams(location.search).get('cover'), COVER_S = +(new URLSearchParams(location.search).get('cs') || 1.22);
+function setCam(t) {const v = CAMQ ? (q => [q[0], q[1], q[2], Math.log(q[3]), q[4], q[5], q[6] || 26])(CAMQ.split(',').map(Number)) : COVERQ ? (w => {w[3] += Math.log(COVER_S); return w;})(camAt(56)) : camAt(t), size = Math.exp(v[3]); const az = (v[4] + 0.15 * Math.sin(t * 0.17)) * Math.PI / 180, el = (v[5] + 0.08 * Math.sin(t * 0.23 + 0.7)) * Math.PI / 180;
   CAMT.set(v[0], v[1], v[2]); const dir = new THREE.Vector3(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el));
   cam.fov = v[6]; const d = size / Math.tan(v[6] / 2 * Math.PI / 180); cam.position.copy(CAMT).addScaledVector(dir, d); cam.near = Math.max(0.05, d * 0.2); cam.far = d + 20;
   cam.lookAt(CAMT); cam.updateProjectionMatrix(); cam.updateMatrixWorld(); return size;}
@@ -501,4 +502,31 @@ window.CHECK = (step = 1 / 30) => {const bad = []; let minCC = 9;
 // labels must stay inside the picture and away from the subtitle band
 window.CHECK_LABELS = (step = 0.1) => {const bad = []; for (let t = 0; t <= OUT0; t += step) {setTime(t); for (const p of PILLS) {if (p[1] < 36 || p[1] + p[3] > W - 36 || p[2] < 470 || p[2] + p[4] > 1400) bad.push([+t.toFixed(1), p[0], Math.round(p[1]), Math.round(p[2])]);}} return {n: bad.length, bad: bad.slice(0, 40)};};
 window.DBGO = {THREE, scene, cam, COINS, FIG, TOWN, coinAt, discHit, TREE_SKIPPED};
-drawAt(0); window.ready = true;
+// ---- channel cover look (like geldautomat/cover_atm_modern.html?mode=clean): dark #07070B, violet and red light, floor grid,
+//      red light pool under the motif, soft glow over bright parts. Used by ?cover=1 for the clean thumbnail.
+function coverBackground(CX, CY) {
+  const c = document.createElement('canvas'); c.width = 1080; c.height = 1920; c.style.position = 'absolute'; c.style.left = '0'; c.style.top = '0'; c.style.zIndex = '-1';
+  document.body.insertBefore(c, document.body.firstChild); document.documentElement.style.background = '#07070B'; document.body.style.background = 'transparent';
+  const bg = c.getContext('2d'), W2 = 1080, H2 = 1920; bg.fillStyle = '#07070B'; bg.fillRect(0, 0, W2, H2);
+  const blob = (x, y, r, col) => {const g = bg.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, col); g.addColorStop(1, 'rgba(0,0,0,0)'); bg.fillStyle = g; bg.fillRect(0, 0, W2, H2);};
+  blob(430, CY - 400, 760, 'rgba(96,78,255,0.34)'); blob(900, CY + 80, 620, 'rgba(224,30,43,0.20)'); blob(120, CY + 280, 500, 'rgba(60,40,200,0.16)');
+  bg.save(); bg.strokeStyle = 'rgba(170,160,255,0.10)'; bg.lineWidth = 1.5; const hz = CY - 90;
+  for (let i = -14; i <= 14; i++) {bg.beginPath(); bg.moveTo(CX + i * 26, hz); bg.lineTo(CX + i * 190, H2); bg.stroke();}
+  for (let k = 0; k < 9; k++) {const y = hz + Math.pow(k / 8, 2.1) * (H2 - hz); bg.beginPath(); bg.moveTo(0, y); bg.lineTo(W2, y); bg.stroke();}
+  const f = bg.createLinearGradient(0, hz - 10, 0, hz + 170); f.addColorStop(0, '#07070B'); f.addColorStop(1, 'rgba(7,7,11,0)'); bg.fillStyle = f; bg.fillRect(0, hz - 12, W2, 190);
+  const f2 = bg.createLinearGradient(0, H2 - 220, 0, H2); f2.addColorStop(0, 'rgba(7,7,11,0)'); f2.addColorStop(1, 'rgba(7,7,11,.95)'); bg.fillStyle = f2; bg.fillRect(0, H2 - 220, W2, 220); bg.restore();
+  bg.save(); bg.translate(CX, CY); bg.scale(1, 0.24); const g = bg.createRadialGradient(0, 0, 0, 0, 0, 520); g.addColorStop(0, 'rgba(224,30,43,0.55)'); g.addColorStop(.55, 'rgba(224,30,43,0.16)'); g.addColorStop(1, 'rgba(224,30,43,0)');
+  bg.fillStyle = g; bg.beginPath(); bg.arc(0, 0, 520, 0, Math.PI * 2); bg.fill(); bg.restore();
+  const v = bg.createLinearGradient(0, 0, 0, 700); v.addColorStop(0, 'rgba(7,7,11,.4)'); v.addColorStop(1, 'rgba(7,7,11,0)'); bg.fillStyle = v; bg.fillRect(0, 0, W2, 700);}
+function coverGlow(src) {   // cheap bloom on top, keeps the transparent WebGL background
+  const c = document.createElement('canvas'); c.width = 1080; c.height = 1920; c.style.position = 'absolute'; c.style.left = '0'; c.style.top = '0'; c.style.pointerEvents = 'none'; document.body.appendChild(c);
+  const g = c.getContext('2d'); g.globalCompositeOperation = 'lighter'; g.filter = 'blur(22px) brightness(1.1)'; g.globalAlpha = 0.2; g.drawImage(src, 0, 0);}
+// ?cover=1: clean thumbnail in the channel cover look (the whole clay model in the middle, no text, safe for the 3:4 crop); &ct= time of the scene
+if (COVERQ) {for (const id of ['ov', 'shade', 'lab', 'fade', 'end']) {const e = document.getElementById(id); if (e) e.style.display = 'none';}
+  hemi.intensity = 0.55; hemi.groundColor.set(0x14080c);
+  {const r1 = new THREE.DirectionalLight(0xff3344, 1.6); r1.position.set(4, 2.5, -3); scene.add(r1); const r2 = new THREE.DirectionalLight(0x8a78ff, 1.0); r2.position.set(-4, 2, -2); scene.add(r2);}
+  drawAt(+(new URLSearchParams(location.search).get('ct') || 30));
+  const box = new THREE.Box3(); for (const x of [-2.5, 2.5]) for (const z of [1.65 + 0.12]) box.expandByPoint(new THREE.Vector3(x, -0.25, z));
+  const q = new THREE.Vector3(0, -0.25, 1.77).project(cam); coverBackground(540, (1 - q.y) / 2 * H - 30); coverGlow(renderer.domElement);
+  window.renderFrame = () => {}; window.ready = true;}
+else {drawAt(0); window.ready = true;}
