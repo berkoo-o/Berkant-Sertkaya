@@ -13,9 +13,10 @@ canvas{position:absolute;left:0;top:0}
 // warmes Hellgrau, oben links klein das Thema und darunter der Titel, das Motiv groß in der Mitte mit weichem Schatten, unten „function.“ in Rot.
 // Format 1080 × 1920 (9:16). Alles Wichtige liegt im mittleren 4:5-Bereich (y 285–1635), deshalb passt dieselbe Datei ohne Verschieben
 // für TikTok (Cover 9:16, Profilraster 3:4), Instagram (Profilraster 4:5 bzw. 3:4) und YouTube Shorts (9:16).
-// Aufruf: galerie.html?v=<name>   Motive in thumbs/motive/<name>.png (node thumbs/motiv.mjs bzw. thumbs/motive_alle.mjs)
+// Aufruf: galerie.html?v=<name>   Motive seit 22.11.2026 im Knete-Look aus thumbs/motive_knete/<name>.png (node thumbs/knete_render.mjs);
+// die älteren Motive im Original-Look liegen in thumbs/motive/ (&dir=motive).
 await Promise.all(['500 40px Poppins', '600 40px "Inter Tight"'].map(f => document.fonts.load(f)));
-const VID = new URLSearchParams(location.search).get('v') || 'gesetze';
+const VID = new URLSearchParams(location.search).get('v') || 'gesetze', DIR = new URLSearchParams(location.search).get('dir') || 'motive_knete';
 const DATA = {
   gesetze: ['Politik', 'Diese 5 Gesetze haben', 'Deutschland wütend gemacht'],
   vermoegen: ['Geld', 'Wem gehört eigentlich', 'Deutschland?'],
@@ -36,7 +37,7 @@ const DATA = {
 const [topic, t1, t2] = DATA[VID];
 const W = 1080, H = 1920, INK = '#3d3a36', MUTE = '#8d867c', RED = '#E01E2B';
 const g = document.getElementById('c').getContext('2d');
-const img = await new Promise(r => {const i = new Image(); i.onload = () => r(i); i.src = `motive/${VID}.png`;});
+const img = await new Promise(r => {const i = new Image(); i.onload = () => r(i); i.src = `${DIR}/${VID}.png`;});
 const BB = (() => {const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; const x = c.getContext('2d'); x.drawImage(img, 0, 0);
   const d = x.getImageData(0, 0, c.width, c.height).data; let x0 = 1e9, y0 = 1e9, x1 = -1, y1 = -1;
   for (let y = 0; y < c.height; y += 2) for (let xx = 0; xx < c.width; xx += 2) if (d[(y * c.width + xx) * 4 + 3] > 60) {x0 = Math.min(x0, xx); x1 = Math.max(x1, xx); y0 = Math.min(y0, y); y1 = Math.max(y1, y);}

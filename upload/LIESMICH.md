@@ -1,6 +1,6 @@
 # function. – Upload-Ordner
 
-Alles zum Hochladen an einem Ort (Stand 22.11.2026). Thumbnails im festen Stil „Galerie A“, eine Datei (1080 × 1920) passt für TikTok, Instagram und YouTube Shorts.
+Alles zum Hochladen an einem Ort (Stand 22.11.2026). Thumbnails im festen Stil „Galerie A“ mit Motiven im Knete-Look von „Wem gehört Deutschland?“, eine Datei (1080 × 1920) passt für TikTok, Instagram und YouTube Shorts.
 
 - `Diese_5_Gesetze/`: Video mit Musik, Thumbnail, Texte je Kanal (`Texte.md`, jeder Text in einem eigenen Codeblock)
 - `Wem_gehoert_Deutschland/`: Video mit Musik (Knete-Fassung), Thumbnail, Texte je Kanal
