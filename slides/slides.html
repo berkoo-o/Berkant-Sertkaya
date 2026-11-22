@@ -1,0 +1,73 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>function. – Foto-Slides</title>
+<!-- Foto-Beiträge im Knete-Look (22.11.2026): slides.html?p=akku|nap|brot&s=1|2, 1080 × 1350 (4:5), rendern mit node slides/render.mjs -->
+<style>
+@font-face{font-family:Poppins;font-weight:500;src:url(../node_modules/@fontsource/poppins/files/poppins-latin-500-normal.woff2)}
+@font-face{font-family:Poppins;font-weight:600;src:url(../node_modules/@fontsource/poppins/files/poppins-latin-600-normal.woff2)}
+@font-face{font-family:'Inter Tight';font-weight:800;src:url(../node_modules/@fontsource/inter-tight/files/inter-tight-latin-800-normal.woff2)}
+html,body{margin:0;padding:0}
+#slide{position:relative;width:1080px;height:1350px;overflow:hidden;background:var(--bg);font-family:Poppins,sans-serif;color:#fff}
+#slide::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.16) 2px,transparent 2.4px);background-size:34px 34px}
+#slide::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 42%,rgba(255,255,255,.14),transparent 62%)}
+.deko{position:absolute;z-index:1;filter:drop-shadow(0 6px 8px rgba(0,0,0,.16))}
+.c{position:absolute;left:0;right:0;z-index:2;text-align:center}
+h1{margin:0;font-family:'Inter Tight';font-weight:800;letter-spacing:-1.5px;line-height:1.08;text-shadow:0 3px 0 rgba(0,0,0,.08)}
+.u{position:relative;display:inline-block}
+.u::after{content:"";position:absolute;left:-2%;right:-2%;bottom:-6px;height:16px;border-radius:10px;background:var(--hl);transform:rotate(-1.5deg);z-index:-1;opacity:.95}
+.sub{font-weight:500;font-size:37px;line-height:1.38;color:rgba(255,255,255,.9);margin:30px auto 0;max-width:820px}
+.motif{position:absolute;left:50%;transform:translateX(-50%);z-index:2;filter:drop-shadow(0 26px 26px rgba(0,0,0,.18))}
+.rows{position:absolute;left:110px;right:90px;z-index:2}
+.row{display:flex;align-items:center;gap:34px;margin-bottom:46px}
+.ic{width:150px;height:150px;flex:none;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.16);border-radius:38px}
+.ic img{max-width:112px;max-height:118px;filter:drop-shadow(0 8px 8px rgba(0,0,0,.18))}
+.row b{display:block;font-family:'Inter Tight';font-weight:800;font-size:42px;letter-spacing:-.5px;margin-bottom:6px}
+.row span{display:block;font-size:30px;line-height:1.36;color:rgba(255,255,255,.88)}
+.save{position:absolute;left:0;right:0;bottom:178px;z-index:2;text-align:center;font-weight:500;font-size:30px;color:rgba(255,255,255,.9)}
+.save svg{vertical-align:-6px;margin-right:10px}
+.src{position:absolute;left:0;right:0;bottom:120px;z-index:2;text-align:center;font-size:20px;color:rgba(255,255,255,.7)}
+.logo{position:absolute;left:44px;bottom:40px;z-index:3;background:#fff;border-radius:40px;padding:8px 26px 12px;font-weight:500;font-size:36px;color:#E01E2B;letter-spacing:-.5px;box-shadow:0 6px 14px rgba(0,0,0,.14)}
+.num{position:absolute;right:44px;top:44px;z-index:3;background:rgba(0,0,0,.16);border-radius:30px;padding:6px 20px;font-weight:600;font-size:26px}
+</style></head><body>
+<div id="slide"></div>
+<script>
+const Q = new URLSearchParams(location.search), P = Q.get('p') || 'akku', N = +(Q.get('s') || 1);
+const D = {
+  akku: {bg: '#2a9d8f', hl: '#f7dd7c',
+    h1: ['Dein Akku liebt', 'die <span class="u">Mitte</span>.'],
+    sub: 'Zwischen 20 und 80 Prozent altert ein Handy-Akku am langsamsten.',
+    h2: ['So hält dein', '<span class="u">Akku</span> länger.'],
+    rows: [['ic_akku1', 'Bei 80 % aufhören.', 'Eine volle Ladung setzt den Akku unter Spannung. iPhone und Samsung können das Laden bei 80 % stoppen.'],
+      ['ic_akku2', 'Hitze vermeiden.', 'Über 35 °C altert der Akku dauerhaft schneller. Also nicht in der Sonne oder unter dem Kissen laden.'],
+      ['ic_akku3', 'Nicht leer laufen lassen.', 'Unter 20 % wird es für den Akku anstrengend. Lieber öfter kurz nachladen.']],
+    save: 'Speicher dir das fürs nächste Aufladen', src: 'Quellen: Apple (Akku und Leistung), Battery University · Stand 11/2026'},
+  nap: {bg: '#e8695f', hl: '#ffe08a',
+    h1: ['26 Minuten Schlaf', 'machen dich <span class="u">wacher</span>.'],
+    sub: 'In einer NASA-Studie waren Piloten nach einem kurzen Nickerchen um 54 % aufmerksamer.',
+    h2: ['So gelingt dein', '<span class="u">Power-Nap</span>.'],
+    rows: [['ic_nap1', 'Höchstens 20 bis 30 Minuten.', 'Wer länger schläft, rutscht in den Tiefschlaf und wacht wie gerädert auf.'],
+      ['ic_nap2', 'Kaffee direkt davor.', 'Koffein wirkt erst nach etwa 20 Minuten, also genau dann, wenn der Wecker klingelt.'],
+      ['ic_nap3', 'Am frühen Nachmittag.', 'Zwischen 13 und 15 Uhr ist das Tief am größten. Später stört der Nap den Nachtschlaf.']],
+    save: 'Speicher dir das für das nächste Tief', src: 'Quellen: NASA Ames Research Center (1995), Loughborough University (1997) · Stand 11/2026'},
+  brot: {bg: '#d9822b', hl: '#fff1c2',
+    h1: ['Brot gehört nicht in', 'den <span class="u">Kühlschrank</span>.'],
+    sub: 'Bei Kühlschrank-Temperatur wird Brot schneller altbacken als bei Zimmertemperatur.',
+    h2: ['So bleibt dein', '<span class="u">Brot</span> frisch.'],
+    rows: [['ic_brot1', 'Im Tontopf oder Brotkasten.', 'Bei Zimmertemperatur, dunkel und luftig. Plastik macht die Kruste weich und fördert Schimmel.'],
+      ['ic_brot2', 'Lieber einfrieren.', 'In Scheiben eingefroren hält Brot bis zu drei Monate und schmeckt aufgetaut wie frisch.'],
+      ['ic_brot3', 'Altes Brot aufbacken.', 'Ein paar Minuten im Ofen machen trockenes Brot wieder knusprig.']],
+    save: 'Speicher dir das für deinen nächsten Einkauf', src: 'Quellen: Bundeszentrum für Ernährung (BZfE), Verbraucherzentrale · Stand 11/2026'}};
+const d = D[P], el = document.getElementById('slide'); el.style.setProperty('--bg', d.bg); el.style.setProperty('--hl', d.hl);
+const img = (n, x, y, w, rot = 0, cls = 'deko') => `<img class="${cls}" src="img/${n}.png" style="left:${x}px;top:${y}px;width:${w}px;transform:rotate(${rot}deg)">`;
+const DK = N === 1 ? [['d_star', 110, 170, 70, -12], ['d_flower', 900, 150, 84, 10], ['d_heart', 945, 640, 58, 14], ['d_blob', 70, 560, 44, 0], ['d_wave', 820, 1150, 120, -6], ['d_star', 960, 980, 50, 20], ['d_flower', 60, 1010, 60, -10]]
+  : [['d_star', 120, 120, 56, -12], ['d_flower', 920, 110, 70, 10], ['d_heart', 975, 1010, 46, 14], ['d_blob', 40, 780, 36, 0], ['d_wave', 470, 1255, 120, -4]];
+let h = DK.map(a => img(...a)).join('') + `<div class="num">${N}/2</div><div class="logo">function.</div>`;
+if (N === 1) h += `<div class="c" style="top:250px"><h1 style="font-size:92px">${d.h1.join('<br>')}</h1><div class="sub">${d.sub}</div></div>
+  <img class="motif" src="img/slide_${P}.png" style="top:660px;width:900px">`;
+else h += `<div class="c" style="top:150px"><h1 style="font-size:80px">${d.h2.join('<br>')}</h1></div>
+  <div class="rows" style="top:420px">${d.rows.map(([ic, b, t]) => `<div class="row"><div class="ic"><img src="img/${ic}.png"></div><div><b>${b}</b><span>${t}</span></div></div>`).join('')}</div>
+  <div class="save"><svg width="26" height="32" viewBox="0 0 26 32"><path d="M3 3h20v26l-10-7-10 7z" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round"/></svg>${d.save}</div>
+  <div class="src">${d.src}</div>`;
+el.innerHTML = h;
+Promise.all([document.fonts.ready, ...[...el.querySelectorAll('img')].map(i => i.decode().catch(() => {}))]).then(() => window.ready = true);
+</script></body></html>

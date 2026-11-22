@@ -551,6 +551,87 @@ MOTIFS.wasserscheide = () => {   // a ridge, a drop on the top, the red line is 
   VIEW = {az: -0.12, el: 0.42, fov: 24};
 };
 
+// ------------------------------------------------------------------ Foto-Beiträge (Slides, 22.11.2026): Hauptmotive, kleine Symbole und Deko
+const extr = (shape, d = 0.08) => {const g = new THREE.ExtrudeGeometry(shape, {depth: d, bevelEnabled: true, bevelSize: 0.02, bevelThickness: 0.02, bevelSegments: 3, curveSegments: 16}); g.center(); return g;};
+const tubeM = (pts, r, m) => add(S, new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(p => new THREE.Vector3(...p))), 80, r, 14, false), m);
+function battery(par, x, z, s = 1, fill = 4) {const B = grp(par, x, 0, z); B.scale.setScalar(s);
+  add(B, rbox(0.5, 0.06, 0.5, 0.025), clay(PAL.dark), 0, 0.03, 0);
+  for (let i = 0; i < 5; i++) add(B, rbox(0.46, 0.17, 0.46, 0.04), i < fill ? clay(PAL.mint) : glass(0xe8f4ff, 0.35), 0, 0.06 + 0.09 + i * 0.185, 0);
+  add(B, rbox(0.5, 0.05, 0.5, 0.025), clay(PAL.dark), 0, 0.06 + 5 * 0.185 + 0.01, 0); add(B, rbox(0.2, 0.08, 0.2, 0.03), clay(PAL.dark), 0, 0.06 + 5 * 0.185 + 0.07, 0); return B;}
+function phone(par, x, y, z, s, screen) {const P = grp(par, x, y, z); P.scale.setScalar(s); add(P, rbox(0.62, 1.2, 0.08, 0.1), clay(PAL.dark), 0, 0, 0);
+  decal(P, 0.54, 1.08, tex(540, 1080, screen), 0, 0, 0.042, {bump: 0.15, glow: 0.25}); return P;}
+function clock(par, x, z, s, col, face) {const C = grp(par, x, 0, z); C.scale.setScalar(s); const m = clay(col);
+  const body = add(C, new THREE.CylinderGeometry(0.32, 0.32, 0.18, 40).rotateX(PI / 2), m, 0, 0.42, 0);
+  decal(C, 0.5, 0.5, tex(400, 400, (g, w, h) => {g.fillStyle = '#fbf8f1'; g.beginPath(); g.arc(w / 2, h / 2, w / 2, 0, 7); g.fill(); face(g, w, h);}), 0, 0.42, 0.092, {bump: 0.15});
+  for (const sx of [-1, 1]) {add(C, new THREE.SphereGeometry(0.1, 20, 12, 0, PI * 2, 0, PI / 2), m, sx * 0.2, 0.7, 0).rotation.z = -sx * 0.5; add(C, new THREE.CylinderGeometry(0.025, 0.03, 0.16, 10), clay(PAL.dark), sx * 0.2, 0.12, 0).rotation.z = sx * 0.4;}
+  return C;}
+function cup(par, x, z, s, col) {const C = grp(par, x, 0, z); C.scale.setScalar(s); add(C, new THREE.CylinderGeometry(0.2, 0.16, 0.36, 32), clay(col), 0, 0.18, 0);
+  add(C, new THREE.CylinderGeometry(0.17, 0.17, 0.02, 32), clay(0x6b4a2a, {bumpScale: 0.5}), 0, 0.35, 0); const h = add(C, new THREE.TorusGeometry(0.09, 0.03, 12, 24), clay(col), 0.21, 0.19, 0); h.rotation.y = 0;
+  add(C, new THREE.CylinderGeometry(0.28, 0.28, 0.03, 32), clay(PAL.cream), 0, 0.015, 0); return C;}
+function loaf(par, x, y, z, s, ry = 0) {const L = grp(par, x, y, z, ry); L.scale.setScalar(s); const b = add(L, new THREE.SphereGeometry(0.5, 40, 24), clay(0xd99a55), 0, 0, 0); b.scale.set(1, 0.55, 0.6);
+  for (let i = 0; i < 3; i++) {const c = add(L, new THREE.SphereGeometry(0.1, 16, 10), clay(0xf0cf95), -0.22 + i * 0.22, 0.255, 0); c.scale.set(0.35, 0.18, 1.5); c.rotation.y = 0.5;} return L;}
+function slice(par, x, y, z, s, rx = 0) {const L = grp(par, x, y, z); L.scale.setScalar(s); L.rotation.x = rx; const sh = new THREE.Shape(); sh.moveTo(-0.22, -0.2); sh.lineTo(0.22, -0.2); sh.lineTo(0.24, 0.05);
+  sh.absarc(0, 0.08, 0.24, 0, PI, false); sh.lineTo(-0.22, -0.2); add(L, extr(sh, 0.04), [clay(0xf3dfb4), clay(0xb87a3c)], 0, 0, 0); return L;}
+const star = (r1 = 0.3, r2 = 0.14) => {const sh = new THREE.Shape(); for (let i = 0; i < 10; i++) {const a = PI / 2 + i * PI / 5, r = i % 2 ? r2 : r1; i ? sh.lineTo(Math.cos(a) * r, Math.sin(a) * r) : sh.moveTo(Math.cos(a) * r, Math.sin(a) * r);} return sh;};
+const heart = () => {const sh = new THREE.Shape(); sh.moveTo(0, -0.28); sh.bezierCurveTo(-0.45, 0.0, -0.3, 0.32, 0, 0.14); sh.bezierCurveTo(0.3, 0.32, 0.45, 0.0, 0, -0.28); return sh;};
+
+MOTIFS.slide_akku = () => {   // Handy auf dem Ständer zeigt 80 %, daneben ein großer Knete-Akku mit vier von fünf Feldern, rotes Ladekabel zum Stecker
+  plinth(2.7, 1.8, [[-1, -1], [1, 1]]);
+  add(S, rbox(0.5, 0.08, 0.36, 0.03), clay(PAL.lilac), -0.45, 0.04, 0.05); const st = add(S, rbox(0.42, 0.5, 0.06, 0.03), clay(PAL.lilac), -0.45, 0.3, -0.12); st.rotation.x = -0.3;
+  const P = phone(S, -0.45, 0.68, 0.02, 0.95, (g, w, h) => {g.fillStyle = '#eef6ff'; g.fillRect(0, 0, w, h); g.strokeStyle = '#3e3f5a'; g.lineWidth = 16; g.beginPath(); g.roundRect(120, 300, 300, 520, 40); g.stroke();
+    g.fillStyle = '#3e3f5a'; g.fillRect(220, 268, 100, 34); g.fillStyle = '#58b48c'; g.beginPath(); g.roundRect(142, 426, 256, 372, 22); g.fill(); T2(g, '80 %', w / 2, 950, '800 120px "Inter Tight"', '#2b2b38'); T2(g, '9:41', w / 2, 120, '600 60px Poppins', '#3e3f5a');});
+  P.rotation.x = -0.3;
+  battery(S, 0.55, -0.1, 1.15, 4);
+  {const pl = grp(S, -1.05, 0, 0.55); add(pl, rbox(0.22, 0.16, 0.26, 0.05), clay(0xfbf8f1), 0, 0.08, 0); for (const sx of [-1, 1]) add(pl, new THREE.CylinderGeometry(0.018, 0.018, 0.1, 10).rotateX(PI / 2), clay(0xc9c3b8, {metalness: 0.4, roughness: 0.4}), sx * 0.05, 0.08, -0.17);}
+  tubeM([[-0.45, 0.11, 0.24], [-0.5, 0.04, 0.45], [-0.75, 0.035, 0.62], [-1.05, 0.08, 0.66]], 0.028, redClay());
+  VIEW = {az: -0.25, el: 0.28, fov: 24};
+};
+MOTIFS.slide_nap = () => {   // Knetfigur schläft auf dem Sofa unter einer Decke, Zzz darüber, roter Wecker auf 20 Minuten, Kaffeetasse
+  plinth(2.7, 1.8, [[-1, -1], [1, 1]]);
+  const So = grp(S, -0.15, 0, -0.1); add(So, rbox(1.6, 0.3, 0.7, 0.1), clay(PAL.sky), 0, 0.2, 0); add(So, rbox(1.6, 0.5, 0.2, 0.1), clay(PAL.sky), 0, 0.5, -0.27);
+  for (const sx of [-1, 1]) add(So, rbox(0.2, 0.45, 0.7, 0.09), clay(PAL.sky), sx * 0.75, 0.3, 0); for (const sx of [-1, 1]) add(So, new THREE.CylinderGeometry(0.03, 0.03, 0.06, 10), clay(PAL.dark), sx * 0.7, 0.03, 0.28);
+  const pil = add(So, rbox(0.34, 0.14, 0.42, 0.07), clay(0xfbf8f1), -0.52, 0.42, 0.02); pil.rotation.z = 0.25;
+  const P = person(So, -0.02, 0.05, {body: PAL.mint, hair: 0x3b2a20, s: 1.15}); P.rotation.z = PI / 2; P.position.set(0.02, 0.45, 0.04);
+  const bl = add(So, rbox(0.72, 0.2, 0.5, 0.08), clay(PAL.lilac), 0.02, 0.47, 0.04);
+  const zz = clay(PAL.deep, {bumpScale: 1}); [[0.16, -0.35, 0.95], [0.12, -0.15, 1.18], [0.09, 0.02, 1.36]].forEach(([sz, x, y]) => {const t = text3d(So, 'Z', sz, 0.05, zz); t.position.set(x, y, 0.05); t.rotation.z = 0.15;});
+  const tb = grp(S, 0.95, 0, 0.25); add(tb, new THREE.CylinderGeometry(0.28, 0.28, 0.05, 32), clay(0xc49a64), 0, 0.42, 0); add(tb, new THREE.CylinderGeometry(0.04, 0.05, 0.4, 12), clay(0xb08a5a), 0, 0.2, 0); add(tb, new THREE.CylinderGeometry(0.16, 0.18, 0.03, 24), clay(0xb08a5a), 0, 0.015, 0);
+  const ck = clock(tb, -0.05, -0.05, 0.42, RED, (g, w, h) => {T2(g, '20', w / 2, h / 2 + 8, '800 150px "Inter Tight"', '#2b2b38'); T2(g, 'min', w / 2, h / 2 + 100, '600 44px Poppins', '#6a6a7a');}); ck.position.y = 0.44; ck.children.forEach(c => {if (c.material && c.material.color && c.material.color.getHex() === RED) c.material = redClay();});
+  cup(tb, 0.13, 0.12, 0.32, PAL.yellow).position.y = 0.445;
+  VIEW = {az: -0.25, el: 0.3, fov: 24};
+};
+MOTIFS.slide_brot = () => {   // Brotlaib und Scheiben auf dem Holzbrett, dahinter ein Kühlschrank mit rotem Verbotsschild, rechts der Tontopf
+  plinth(2.7, 1.8, [[-1, -1], [1, 1]]);
+  const F = grp(S, -0.75, 0, -0.35); add(F, rbox(0.75, 1.5, 0.6, 0.1), clay(0xf6f4f8), 0, 0.75, 0); add(F, rbox(0.71, 0.02, 0.02, 0.008), clay(0xd6d2dc), 0, 1.02, 0.3);
+  for (const y of [0.75, 1.25]) add(F, rbox(0.05, 0.22, 0.05, 0.02), clay(0xc9c3b8), 0.27, y, 0.32);
+  {const N = grp(F, -0.02, 0.6, 0.31); add(N, new THREE.TorusGeometry(0.2, 0.04, 14, 40), redClay(), 0, 0, 0); const sl = add(N, rbox(0.38, 0.06, 0.05, 0.02), redClay(), 0, 0, 0); sl.rotation.z = -PI / 4;
+    const lb = loaf(N, 0, 0, -0.02, 0.28); lb.rotation.x = PI / 2.4;}
+  add(S, rbox(1.2, 0.06, 0.62, 0.03), clay(0xc49a64), 0.25, 0.03, 0.3); loaf(S, 0.05, 0.22, 0.3, 0.95, 0.2);
+  [0, 1, 2].forEach(i => {const sl = slice(S, 0.62 + i * 0.07, 0.27, 0.33, 0.9); sl.rotation.y = -0.6;});
+  {const T = grp(S, 0.95, 0, -0.35); add(T, new THREE.CylinderGeometry(0.3, 0.25, 0.5, 32), clay(0xc8794f), 0, 0.25, 0); add(T, new THREE.CylinderGeometry(0.33, 0.33, 0.08, 32), clay(0xb86a42), 0, 0.53, 0); add(T, new THREE.SphereGeometry(0.06, 16, 10), clay(0xb86a42), 0, 0.6, 0);}
+  VIEW = {az: -0.22, el: 0.3, fov: 24};
+};
+// kleine Symbole für die zweite Slide (ohne Platte)
+MOTIFS.ic_akku1 = () => {battery(S, 0, 0, 1, 4); VIEW = {az: -0.35, el: 0.3, fov: 24};};
+MOTIFS.ic_akku2 = () => {const m = clay(0xfbf8f1); add(S, new THREE.CylinderGeometry(0.09, 0.09, 0.9, 24), m, 0, 0.65, 0); add(S, new THREE.SphereGeometry(0.17, 24, 16), clay(0xf28c5a), 0, 0.17, 0);
+  add(S, new THREE.CylinderGeometry(0.045, 0.045, 0.75, 16), clay(0xf28c5a), 0, 0.55, 0.03); const sun = add(S, new THREE.SphereGeometry(0.22, 24, 16), clay(PAL.yellow), 0.42, 0.95, -0.1);
+  for (let i = 0; i < 8; i++) {const a = i * PI / 4, r = add(S, new THREE.ConeGeometry(0.05, 0.14, 10), clay(PAL.yellow), 0.42 + Math.cos(a) * 0.33, 0.95 + Math.sin(a) * 0.33, -0.1); r.rotation.z = a - PI / 2;} VIEW = {az: -0.2, el: 0.15, fov: 24};};
+MOTIFS.ic_akku3 = () => {phone(S, 0, 0.6, 0, 0.9, (g, w, h) => {g.fillStyle = '#eef6ff'; g.fillRect(0, 0, w, h); g.strokeStyle = '#3e3f5a'; g.lineWidth = 16; g.beginPath(); g.roundRect(120, 300, 300, 520, 40); g.stroke();
+    g.fillStyle = '#3e3f5a'; g.fillRect(220, 268, 100, 34); g.fillStyle = '#f28c5a'; g.beginPath(); g.roundRect(142, 724, 256, 74, 18); g.fill(); T2(g, '20 %', w / 2, 950, '800 120px "Inter Tight"', '#2b2b38');}); VIEW = {az: -0.3, el: 0.15, fov: 24};};
+MOTIFS.ic_nap1 = () => {clock(S, 0, 0, 1, PAL.sky, (g, w, h) => {T2(g, '20', w / 2, h / 2 + 8, '800 150px "Inter Tight"', '#2b2b38'); T2(g, 'min', w / 2, h / 2 + 100, '600 44px Poppins', '#6a6a7a');}); VIEW = {az: -0.3, el: 0.2, fov: 24};};
+MOTIFS.ic_nap2 = () => {cup(S, 0, 0, 1, PAL.yellow); for (let i = 0; i < 3; i++) add(S, new THREE.SphereGeometry(0.06 - i * 0.01, 14, 10), clay(0xfbf8f1), 0.03 * Math.sin(i * 2), 0.48 + i * 0.13, 0); VIEW = {az: -0.3, el: 0.3, fov: 24};};
+MOTIFS.ic_nap3 = () => {add(S, new THREE.SphereGeometry(0.3, 28, 18), clay(PAL.yellow), 0, 0, 0); for (let i = 0; i < 10; i++) {const a = i * PI / 5, r = add(S, new THREE.ConeGeometry(0.06, 0.18, 10), clay(0xf6b38f), Math.cos(a) * 0.45, Math.sin(a) * 0.45, 0); r.rotation.z = a - PI / 2;} VIEW = {az: -0.2, el: 0.1, fov: 24};};
+MOTIFS.ic_brot1 = () => {add(S, new THREE.CylinderGeometry(0.3, 0.25, 0.5, 32), clay(0xc8794f), 0, 0.25, 0); add(S, new THREE.CylinderGeometry(0.33, 0.33, 0.08, 32), clay(0xb86a42), 0, 0.53, 0); add(S, new THREE.SphereGeometry(0.06, 16, 10), clay(0xb86a42), 0, 0.6, 0); VIEW = {az: -0.3, el: 0.3, fov: 24};};
+MOTIFS.ic_brot2 = () => {[0, 1, 2].forEach(i => slice(S, -0.12 + i * 0.12, 0.25, 0, 1)); add(S, rbox(0.62, 0.6, 0.3, 0.06), glass(0xd6ecff, 0.4), 0, 0.27, 0); add(S, rbox(0.66, 0.06, 0.06, 0.02), clay(PAL.sky), 0, 0.6, 0);
+  const fl = add(S, extr(star(0.12, 0.05), 0.02), clay(0xffffff), 0.32, 0.55, 0.16); fl.scale.setScalar(1); VIEW = {az: -0.3, el: 0.2, fov: 24};};
+MOTIFS.ic_brot3 = () => {add(S, rbox(0.8, 0.55, 0.55, 0.08), clay(0xf6f4f8), 0, 0.3, 0); decal(S, 0.6, 0.32, tex(600, 320, (g, w, h) => {g.fillStyle = '#3e3f5a'; g.beginPath(); g.roundRect(0, 0, w, h, 30); g.fill(); g.fillStyle = '#f6a04d'; g.beginPath(); g.roundRect(30, 40, w - 60, h - 80, 20); g.fill();}), -0.05, 0.3, 0.28, {glow: 0.6});
+  for (let i = 0; i < 2; i++) add(S, new THREE.CylinderGeometry(0.04, 0.04, 0.03, 16).rotateX(PI / 2), clay(PAL.dark), 0.33, 0.42 - i * 0.12, 0.28); VIEW = {az: -0.3, el: 0.2, fov: 24};};
+// Deko
+MOTIFS.d_star = () => {add(S, extr(star(), 0.08), clay(PAL.yellow)); VIEW = {az: -0.4, el: 0.2, fov: 24};};
+MOTIFS.d_heart = () => {add(S, extr(heart(), 0.1), clay(PAL.pink)); VIEW = {az: -0.4, el: 0.2, fov: 24};};
+MOTIFS.d_flower = () => {for (let i = 0; i < 5; i++) {const a = i * 2 * PI / 5; add(S, new THREE.SphereGeometry(0.13, 20, 14), clay(0xf7a8c8), Math.cos(a) * 0.15, Math.sin(a) * 0.15, 0).scale.z = 0.5;} add(S, new THREE.SphereGeometry(0.09, 20, 14), clay(PAL.yellow), 0, 0, 0.04); VIEW = {az: -0.3, el: 0.25, fov: 24};};
+MOTIFS.d_blob = () => {add(S, new THREE.SphereGeometry(0.2, 24, 16), clay(PAL.mint)); VIEW = {az: -0.3, el: 0.3, fov: 24};};
+MOTIFS.d_wave = () => {const P = []; for (let i = 0; i <= 20; i++) P.push([-0.5 + i * 0.05, Math.sin(i / 20 * PI * 2) * 0.1, 0]); tubeM(P, 0.04, clay(PAL.yellow)); VIEW = {az: -0.2, el: 0.2, fov: 24};};
+
 // ------------------------------------------------------------------ build, light, frame, render
 await (MOTIFS[MOT] || MOTIFS.gesetze)();
 const box = new THREE.Box3().setFromObject(S), size = box.getSize(new THREE.Vector3()), ctr = box.getCenter(new THREE.Vector3());
