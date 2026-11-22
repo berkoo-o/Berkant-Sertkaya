@@ -84,3 +84,9 @@ Diese Datei enthält alle festen Wünsche und Regeln des Nutzers. Den aktuellen 
 - Nicht gemocht: das rote § über den Gesetze-Podesten, eine automatische Umwandlung alter Cover in Knete (lila Klötze), dunkler Kanal-Cover-Look, Roter Punkt, Große Zahl, Exponat, Akte, Magazin, Sticker-Pop, Blaupause, Risographie.
 - Das Thumbnail kommt **niemals** als erstes Bild ins Video. Hinweis für den Nutzer: TikTok übernimmt ein eigenes Cover nur bei Business-Konten, YouTube nur bei freigeschalteten Shorts-Thumbnails.
 - Abgelöst, nur als Referenz: das cleane dunkle Cover (`geldautomat/cover_atm_modern.html?mode=clean`, `strom/v4/cover_strom.html`, `rundfunk/cover/cover_turm.html`), das GEZ-Cover mit ARD- und ZDF-Logos (`rundfunk/cover/cover_gez.html`) und das alte Template `paket-test/cover3.html`.
+
+## Foto-Beiträge (Slides, seit 22.11.2026)
+
+- Vorbild sind die Karussell-Beiträge von schraffuren (Bildschirmfoto des Nutzers): einfarbiger Hintergrund mit feinem Punktraster und kleiner Deko, Slide 1 mit starker Aussage (Schlüsselwort farbig unterstrichen), einem Fakt mit Zahl und einem großen Knetmodell, Slide 2 mit drei Tipps samt kleinen Knet-Symbolen, „Speicher dir das …“ und Quellenzeile. Sehr informativ, belegte Fakten. Jeder Beitrag hat eine eigene Farbe.
+- Format 1080 × 1350 (4:5). Das Logo „function.“ steht immer **unten in der Mitte in weißer Schrift** (Poppins Medium, Wunsch des Nutzers).
+- Umsetzung: `slides/slides.html?p=<name>&s=1|2` (Inhalte in `D`), rendern mit `node slides/render.mjs` nach `slides/final/`, Motive in `thumbs/knete_studio.js` (`MOTIFS.slide_*`, Symbole `ic_*`, Deko `d_*`), zugeschnitten in `slides/img/`, Texte je Beitrag in `slides/Texte.md`.

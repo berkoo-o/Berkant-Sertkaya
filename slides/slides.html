@@ -26,7 +26,7 @@ h1{margin:0;font-family:'Inter Tight';font-weight:800;letter-spacing:-1.5px;line
 .save{position:absolute;left:0;right:0;bottom:178px;z-index:2;text-align:center;font-weight:500;font-size:30px;color:rgba(255,255,255,.9)}
 .save svg{vertical-align:-6px;margin-right:10px}
 .src{position:absolute;left:0;right:0;bottom:120px;z-index:2;text-align:center;font-size:20px;color:rgba(255,255,255,.7)}
-.logo{position:absolute;left:44px;bottom:40px;z-index:3;background:#fff;border-radius:40px;padding:8px 26px 12px;font-weight:500;font-size:36px;color:#E01E2B;letter-spacing:-.5px;box-shadow:0 6px 14px rgba(0,0,0,.14)}
+.logo{position:absolute;left:0;right:0;bottom:34px;z-index:3;text-align:center;font-weight:500;font-size:44px;color:#fff;letter-spacing:-.5px;text-shadow:0 3px 10px rgba(0,0,0,.18)}
 .num{position:absolute;right:44px;top:44px;z-index:3;background:rgba(0,0,0,.16);border-radius:30px;padding:6px 20px;font-weight:600;font-size:26px}
 </style></head><body>
 <div id="slide"></div>
@@ -59,11 +59,11 @@ const D = {
     save: 'Speicher dir das für deinen nächsten Einkauf', src: 'Quellen: Bundeszentrum für Ernährung (BZfE), Verbraucherzentrale · Stand 11/2026'}};
 const d = D[P], el = document.getElementById('slide'); el.style.setProperty('--bg', d.bg); el.style.setProperty('--hl', d.hl);
 const img = (n, x, y, w, rot = 0, cls = 'deko') => `<img class="${cls}" src="img/${n}.png" style="left:${x}px;top:${y}px;width:${w}px;transform:rotate(${rot}deg)">`;
-const DK = N === 1 ? [['d_star', 110, 170, 70, -12], ['d_flower', 900, 150, 84, 10], ['d_heart', 945, 640, 58, 14], ['d_blob', 70, 560, 44, 0], ['d_wave', 820, 1150, 120, -6], ['d_star', 960, 980, 50, 20], ['d_flower', 60, 1010, 60, -10]]
-  : [['d_star', 120, 120, 56, -12], ['d_flower', 920, 110, 70, 10], ['d_heart', 975, 1010, 46, 14], ['d_blob', 40, 780, 36, 0], ['d_wave', 470, 1255, 120, -4]];
+const DK = N === 1 ? [['d_star', 110, 170, 70, -12], ['d_flower', 900, 150, 84, 10], ['d_heart', 945, 640, 58, 14], ['d_blob', 70, 560, 44, 0], ['d_wave', 880, 1270, 110, -6], ['d_star', 960, 980, 50, 20], ['d_flower', 60, 1010, 60, -10]]
+  : [['d_star', 120, 120, 56, -12], ['d_flower', 920, 110, 70, 10], ['d_heart', 975, 1010, 46, 14], ['d_blob', 40, 780, 36, 0], ['d_wave', 80, 1270, 100, -4]];
 let h = DK.map(a => img(...a)).join('') + `<div class="num">${N}/2</div><div class="logo">function.</div>`;
 if (N === 1) h += `<div class="c" style="top:250px"><h1 style="font-size:92px">${d.h1.join('<br>')}</h1><div class="sub">${d.sub}</div></div>
-  <img class="motif" src="img/slide_${P}.png" style="top:660px;width:900px">`;
+  <img class="motif" src="img/slide_${P}.png" style="top:640px;width:860px">`;
 else h += `<div class="c" style="top:150px"><h1 style="font-size:80px">${d.h2.join('<br>')}</h1></div>
   <div class="rows" style="top:420px">${d.rows.map(([ic, b, t]) => `<div class="row"><div class="ic"><img src="img/${ic}.png"></div><div><b>${b}</b><span>${t}</span></div></div>`).join('')}</div>
   <div class="save"><svg width="26" height="32" viewBox="0 0 26 32"><path d="M3 3h20v26l-10-7-10 7z" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round"/></svg>${d.save}</div>
