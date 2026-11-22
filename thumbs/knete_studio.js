@@ -102,7 +102,7 @@ function plateTex(city, rest, redCity = false) {return tex(1040, 232, (g, w, h) 
 const MOTIFS = {};
 let VIEW = {az: -0.32, el: 0.4, fov: 24};
 
-MOTIFS.gesetze = () => {   // five podiums 5 → 1 with the five laws, the red § floats over number 1
+MOTIFS.gesetze = () => {   // five podiums 5 → 1 with the five laws (without the red §, Wunsch des Nutzers)
   plinth(4.15, 1.95, [[-1, -1], [1, 1]]);
   const cols = [PAL.mint, PAL.sky, PAL.yellow, PAL.lilac, PAL.peach], hs = [0.42, 0.56, 0.7, 0.84, 1.0], labs = ['WEHRDIENST', 'AGRARDIESEL', 'HEIZUNGSGESETZ', 'CORONA-REGELN', 'HARTZ IV'];
   const P = hs.map((h, i) => {const G = grp(S, -1.5 + i * 0.75, 0, 0.18 - i * 0.09); add(G, rbox(0.66, h, 0.66, 0.07), clay(cols[i]), 0, h / 2, 0);
@@ -141,7 +141,7 @@ MOTIFS.gesetze = () => {   // five podiums 5 → 1 with the five laws, the red �
       T2(g, 'Bescheid', 22, 84, '600 24px Poppins', '#6a6a7a', 'left'); g.fillStyle = '#c9c5d4'; for (let k = 0; k < 7; k++) g.fillRect(22, 120 + k * 30, k % 3 === 2 ? 150 : 240, 9);
       g.strokeStyle = '#9a96aa'; g.lineWidth = 5; g.beginPath(); g.arc(215, 320, 32, 0, 7); g.stroke();}), 0, -0.01, 0.017);
     add(Cb, rbox(0.12, 0.05, 0.04, 0.015), clay(0xc9ccd6, {roughness: 0.5}), 0, 0.205, 0.02);}
-  const para = text3d(S, '§', 0.5, 0.11, redClay()); para.position.set(1.5, 1.0 + 0.86, -0.18); para.rotation.y = -0.25;
+  // das rote § über Podest 1 hat der Nutzer am 22.11.2026 entfernen lassen
   VIEW = {az: -0.28, el: 0.36, fov: 24};
 };
 
