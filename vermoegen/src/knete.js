@@ -527,6 +527,8 @@ if (COVERQ) {for (const id of ['ov', 'shade', 'lab', 'fade', 'end']) {const e = 
   {const r1 = new THREE.DirectionalLight(0xff3344, 1.6); r1.position.set(4, 2.5, -3); scene.add(r1); const r2 = new THREE.DirectionalLight(0x8a78ff, 1.0); r2.position.set(-4, 2, -2); scene.add(r2);}
   drawAt(+(new URLSearchParams(location.search).get('ct') || 30));
   const box = new THREE.Box3(); for (const x of [-2.5, 2.5]) for (const z of [1.65 + 0.12]) box.expandByPoint(new THREE.Vector3(x, -0.25, z));
-  const q = new THREE.Vector3(0, -0.25, 1.77).project(cam); coverBackground(540, (1 - q.y) / 2 * H - 30); coverGlow(renderer.domElement);
+  const q = new THREE.Vector3(0, -0.25, 1.77).project(cam);
+  if (new URLSearchParams(location.search).get('bg') === '0') {document.documentElement.style.background = 'transparent'; document.body.style.background = 'transparent';}
+  else {coverBackground(540, (1 - q.y) / 2 * H - 30); coverGlow(renderer.domElement);}
   window.renderFrame = () => {}; window.ready = true;}
 else {drawAt(0); window.ready = true;}

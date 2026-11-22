@@ -500,7 +500,8 @@ if (new URLSearchParams(location.search).get('cover')) {for (const id of ['ov', 
   window.renderFrame();
   // the light pool sits under the front of the staircase
   let ys = 0; for (let i = 0; i < 5; i++) {const q = V3(PX(i), 0, PZ(i) + PW / 2).project(cam); ys = Math.max(ys, (1 - q.y) / 2 * H);}
-  coverBackground(540, ys - 40); coverGlow(renderer.domElement);
+  if (new URLSearchParams(location.search).get('bg') === '0') {document.documentElement.style.background = 'transparent'; document.body.style.background = 'transparent';}
+  else {coverBackground(540, ys - 40); coverGlow(renderer.domElement);}
   window.renderFrame = () => {}; window.ready = true;}
 else {
 const q0 = new URLSearchParams(location.search).get('t'); window.renderFrame(Math.round(((q0 != null ? +q0 : 0) + VO) * 30));

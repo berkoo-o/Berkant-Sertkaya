@@ -1,0 +1,97 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>function. – Thumbnail-System</title>
+<style>
+@font-face{font-family:Poppins;font-weight:500;src:url(node_modules/@fontsource/poppins/files/poppins-latin-500-normal.woff2)}
+@font-face{font-family:'Inter Tight';font-weight:600;src:url(node_modules/@fontsource/inter-tight/files/inter-tight-latin-600-normal.woff2)}
+@font-face{font-family:'Inter Tight';font-weight:800;src:url(node_modules/@fontsource/inter-tight/files/inter-tight-latin-800-normal.woff2)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#07070B}
+canvas{position:absolute;left:0;top:0}
+</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script type="module">
+// Einheitliches Thumbnail-System für function., unabhängig vom Animationsstil des Videos.
+// ?s=1 Roter Punkt · ?s=2 Große Zahl · ?s=3 Exponat · ?s=4 Akte    &v=gesetze|vermoegen
+// Das Motiv kommt als freigestelltes PNG aus thumbs/motive/ (node thumbs/motiv.mjs). Alles Wichtige liegt im 3:4-Ausschnitt (y 240–1680).
+await Promise.all(['500 60px Poppins', '600 40px "Inter Tight"', '800 100px "Inter Tight"'].map(f => document.fonts.load(f)));
+const Q = new URLSearchParams(location.search), S = +(Q.get('s') || 1), VID = Q.get('v') || 'gesetze';
+const W = 1080, H = 1920, RED = '#E01E2B', BG = '#07070B';
+const V = {
+  gesetze: {title: ['5 Gesetze, die', 'Deutschland', 'wütend machten'], num: '5', numSub: ['Gesetze, die Deutschland', 'richtig wütend machten'], file: 'FALL 07 · POLITIK'},
+  vermoegen: {title: ['Wem gehört', 'eigentlich', 'Deutschland?'], num: '54 %', numSub: ['von allem gehört den', 'reichsten zehn Prozent'], file: 'FALL 06 · GELD'}}[VID];
+const g = document.getElementById('c').getContext('2d');
+const img = await new Promise(r => {const i = new Image(); i.onload = () => r(i); i.src = `motive/${VID}.png`;});
+// bounding box of the visible motif (alpha > 20)
+const BB = (() => {const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; const x = c.getContext('2d'); x.drawImage(img, 0, 0);
+  const d = x.getImageData(0, 0, c.width, c.height).data; let x0 = 1e9, y0 = 1e9, x1 = -1, y1 = -1;
+  for (let y = 0; y < c.height; y += 2) for (let xx = 0; xx < c.width; xx += 2) if (d[(y * c.width + xx) * 4 + 3] > 20) {x0 = Math.min(x0, xx); x1 = Math.max(x1, xx); y0 = Math.min(y0, y); y1 = Math.max(y1, y);}
+  return {x0, y0, w: x1 - x0, h: y1 - y0};})();
+// draw the motif so that its visible part has width w (or height h if given), centred at cx, bottom at by
+function motif(cx, by, w, maxH = 1e9, ctx = g) {const s = Math.min(w / BB.w, maxH / BB.h); const dw = BB.w * s, dh = BB.h * s;
+  ctx.drawImage(img, BB.x0, BB.y0, BB.w, BB.h, cx - dw / 2, by - dh, dw, dh); return {x: cx - dw / 2, y: by - dh, w: dw, h: dh};}
+const blob = (x, y, r, col, ctx = g) => {const gr = ctx.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, col); gr.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gr; ctx.fillRect(0, 0, W, H);};
+const grain = (a = 0.05) => {const n = document.createElement('canvas'); n.width = 256; n.height = 256; const x = n.getContext('2d'), d = x.createImageData(256, 256);
+  for (let i = 0; i < d.data.length; i += 4) {const v = Math.random() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255 * a;} x.putImageData(d, 0, 0); g.fillStyle = g.createPattern(n, 'repeat'); g.fillRect(0, 0, W, H);};
+function text(t, x, y, font, col, opt = {}) {g.save(); g.font = font; g.fillStyle = col; g.textAlign = opt.align || 'left'; g.letterSpacing = opt.ls || '0px'; if (opt.shadow) {g.shadowColor = opt.shadow; g.shadowBlur = 24;} g.fillText(t, x, y); g.restore();}
+const logo = (x, y, size, col = RED, align = 'left') => {g.save(); g.font = `500 ${size}px Poppins`; g.letterSpacing = `${-size * 0.02}px`; g.textAlign = align; g.fillStyle = col; g.fillText('function.', x, y); g.restore();};
+
+g.fillStyle = BG; g.fillRect(0, 0, W, H);
+if (S === 1) {
+  // „Der rote Punkt“: the red dot of the logo as a big circle, the motif breaks out of it, short headline on top
+  blob(540, 1150, 900, 'rgba(70,40,140,0.35)');
+  const cx = 540, cy = 1150, R = 400;
+  {const gr = g.createRadialGradient(cx - 120, cy - 160, 40, cx, cy, R); gr.addColorStop(0, '#ff3a47'); gr.addColorStop(1, '#c0121e'); g.fillStyle = gr; g.beginPath(); g.arc(cx, cy, R, 0, Math.PI * 2); g.fill();}
+  g.save(); g.globalAlpha = 0.55; g.filter = 'blur(26px)'; g.fillStyle = '#000'; g.beginPath(); g.ellipse(cx, cy + R * 0.62, R * 0.95, 60, 0, 0, Math.PI * 2); g.fill(); g.restore();
+  motif(cx, cy + R * 0.66, 940, 820);
+  V.title.forEach((t, i) => text(t, 80, 360 + i * 104, '800 104px "Inter Tight"', '#fff', {ls: '-2.5px'}));
+  logo(540, 1655, 64, '#ffffff', 'center');
+}
+if (S === 2) {
+  // „Große Zahl“: one huge number is the hook, the motif small underneath, the red bar and the logo as the fixed frame
+  blob(820, 1350, 700, 'rgba(224,30,43,0.22)'); blob(250, 600, 700, 'rgba(96,78,255,0.22)');
+  const fs = V.num.length > 2 ? 330 : 560; g.save(); g.font = `800 ${fs}px "Inter Tight"`; g.letterSpacing = `${-fs * 0.04}px`; g.fillStyle = '#fff'; g.fillText(V.num, 62, 300 + fs * 0.78); const nw = g.measureText(V.num).width; g.restore();
+  g.fillStyle = RED; g.beginPath(); g.arc(62 + nw + 40, 300 + fs * 0.78 - 34, 34, 0, Math.PI * 2); g.fill();   // the red dot of the logo
+  V.numSub.forEach((t, i) => text(t, 80, 300 + fs * 0.78 + 110 + i * 74, '600 64px "Inter Tight"', 'rgba(255,255,255,0.86)'));
+  {g.save(); g.translate(560, 1570); g.scale(1, 0.22); const gr = g.createRadialGradient(0, 0, 0, 0, 0, 480); gr.addColorStop(0, 'rgba(224,30,43,0.5)'); gr.addColorStop(1, 'rgba(224,30,43,0)'); g.fillStyle = gr; g.beginPath(); g.arc(0, 0, 480, 0, 7); g.fill(); g.restore();}
+  motif(560, 1590, 860, 560);
+  g.fillStyle = RED; g.fillRect(80, 1640, 120, 12);
+}
+if (S === 3) {
+  // „Exponat“: every topic is one exhibit on the same black pedestal under the same spotlight, no text at all
+  {const gr = g.createLinearGradient(540, 0, 540, 1500); gr.addColorStop(0, 'rgba(190,180,255,0.0)'); gr.addColorStop(1, 'rgba(190,180,255,0.0)');
+    g.save(); g.beginPath(); g.moveTo(400, 0); g.lineTo(680, 0); g.lineTo(1000, 1420); g.lineTo(80, 1420); g.closePath(); const cone = g.createLinearGradient(0, 0, 0, 1420); cone.addColorStop(0, 'rgba(200,190,255,0.20)'); cone.addColorStop(1, 'rgba(200,190,255,0.03)');
+    g.fillStyle = cone; g.filter = 'blur(30px)'; g.fill(); g.restore();}
+  blob(540, 1420, 620, 'rgba(96,78,255,0.18)');
+  // pedestal: dark cylinder with a red LED ring
+  const px = 540, py = 1440, rx = 440, ry = 80, ph = 120;
+  {const side = g.createLinearGradient(px - rx, 0, px + rx, 0); side.addColorStop(0, '#0c0b12'); side.addColorStop(0.45, '#23212e'); side.addColorStop(1, '#0a0910');
+    g.fillStyle = side; g.beginPath(); g.ellipse(px, py + ph, rx, ry, 0, 0, Math.PI); g.lineTo(px - rx, py); g.ellipse(px, py, rx, ry, 0, Math.PI, 0, true); g.closePath(); g.fill();
+    g.fillStyle = '#1b1a24'; g.beginPath(); g.ellipse(px, py, rx, ry, 0, 0, Math.PI * 2); g.fill();
+    g.save(); g.strokeStyle = RED; g.lineWidth = 5; g.shadowColor = RED; g.shadowBlur = 26; g.beginPath(); g.ellipse(px, py + 8, rx - 2, ry - 1, 0, 0.05, Math.PI - 0.05); g.stroke(); g.restore();
+    const top = g.createRadialGradient(px, py, 20, px, py, rx); top.addColorStop(0, 'rgba(255,255,255,0.10)'); top.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = top; g.beginPath(); g.ellipse(px, py, rx, ry, 0, 0, Math.PI * 2); g.fill();}
+  motif(540, 1452, 800, 880);
+  {g.save(); g.translate(540, py + ph + 120); g.scale(1, 0.25); const gr = g.createRadialGradient(0, 0, 0, 0, 0, 520); gr.addColorStop(0, 'rgba(224,30,43,0.35)'); gr.addColorStop(1, 'rgba(224,30,43,0)'); g.fillStyle = gr; g.beginPath(); g.arc(0, 0, 520, 0, 7); g.fill(); g.restore();}
+}
+if (S === 4) {
+  // „Akte“: every video is a case file: cream sheet, typed headline, a photo of the motif clipped on, the red stamp of the logo
+  blob(540, 900, 900, 'rgba(96,78,255,0.16)');
+  g.save(); g.translate(540, 980); g.rotate(-0.035);
+  g.shadowColor = 'rgba(0,0,0,0.6)'; g.shadowBlur = 50; g.shadowOffsetY = 18; g.fillStyle = '#efe8da'; g.fillRect(-440, -640, 880, 1300); g.shadowColor = 'transparent';
+  g.fillStyle = 'rgba(120,100,70,0.08)'; for (let y = -560; y < 640; y += 54) g.fillRect(-400, y, 800, 2);
+  g.font = '600 34px "Inter Tight"'; g.letterSpacing = '6px'; g.fillStyle = '#7a6a55'; g.fillText(V.file, -390, -560); g.letterSpacing = '0px';
+  g.fillStyle = '#16141c'; g.font = '800 100px "Inter Tight"'; g.letterSpacing = '-2.5px'; V.title.forEach((t, i) => g.fillText(t, -390, -440 + i * 102));
+  // photo
+  g.save(); g.translate(60, 300); g.rotate(0.06); g.shadowColor = 'rgba(0,0,0,0.45)'; g.shadowBlur = 26; g.shadowOffsetY = 10; g.fillStyle = '#fbfaf6'; g.fillRect(-330, -260, 660, 560); g.shadowColor = 'transparent';
+  g.fillStyle = BG; g.fillRect(-300, -230, 600, 440);
+  {const gr = g.createRadialGradient(0, 40, 10, 0, 40, 360); gr.addColorStop(0, 'rgba(96,78,255,0.35)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(-300, -230, 600, 440);}
+  g.save(); g.beginPath(); g.rect(-300, -230, 600, 440); g.clip(); const s = Math.min(560 / BB.w, 400 / BB.h); g.drawImage(img, BB.x0, BB.y0, BB.w, BB.h, -BB.w * s / 2, 190 - BB.h * s, BB.w * s, BB.h * s); g.restore();
+  g.fillStyle = '#b9b9c2'; g.fillRect(-60, -290, 120, 60); g.fillStyle = '#8d8d96'; g.fillRect(-48, -282, 96, 14);   // clip
+  g.restore();
+  // red stamp
+  g.save(); g.translate(-200, 520); g.rotate(-0.16); g.globalAlpha = 0.9; g.font = '500 74px Poppins'; g.letterSpacing = '-1.5px'; const sw = g.measureText('function.').width;
+  g.strokeStyle = RED; g.lineWidth = 9; g.strokeRect(-sw / 2 - 30, -70, sw + 60, 116); g.fillStyle = RED; g.textAlign = 'center'; g.fillText('function.', 0, 16); g.restore();
+  g.restore();
+}
+grain(0.035);
+window.ready = true;
+</script></body></html>
