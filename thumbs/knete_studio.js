@@ -376,6 +376,35 @@ MOTIFS.genz = () => {   // Gen-Z-Protest: junge Knetfiguren mit Schildern und Ha
   VIEW = {az: -0.22, el: 0.32, fov: 24};
 };
 
+MOTIFS.blackfriday = () => {   // shop with awning and the big red sale sign, shoppers with bags
+  plinth(2.9, 1.95, [[-1, -1], [1, -1]]);
+  const A = grp(S, 0, 0, -0.35);
+  add(A, rbox(1.7, 1.05, 0.6, 0.06), clay(PAL.peach), 0, 0.525, 0);
+  decal(A, 1.0, 0.5, tex(760, 400, (g, w, h) => {g.fillStyle = '#cfe6f7'; g.fillRect(0, 0, w, h); [[90, 150, 160, 110, '#5b4a9a'], [300, 190, 120, 90, '#f7dd7c'], [470, 130, 200, 130, '#3e3f5a'], [60, 290, 140, 40, '#f2a7c3'], [320, 300, 160, 40, '#9fe0c6']].forEach(([x, y, ww, hh, c]) => {g.fillStyle = c; g.beginPath(); g.roundRect(x, y, ww, hh, 12); g.fill();});}), 0.25, 0.45, 0.302);
+  add(A, rbox(0.3, 0.62, 0.03, 0.03), clay(PAL.deep), -0.55, 0.31, 0.3);
+  {const aw = grp(A, 0, 0.84, 0.32); aw.rotation.x = 0.55; add(aw, rbox(1.7, 0.03, 0.34, 0.012), clay(0xffffff, {map: tex(512, 64, (g, w, h) => {for (let i = 0; i < 8; i++) {g.fillStyle = i % 2 ? '#f3ece0' : '#c4a8f0'; g.fillRect(i * w / 8, 0, w / 8 + 1, h);}})}), 0, 0, 0.17);}
+  add(A, rbox(1.2, 0.24, 0.06, 0.04), clay(PAL.cream), 0, 1.2, 0.05); decal(A, 1.1, 0.2, tex(880, 160, (g, w, h) => T2(g, 'SALE  SALE', w / 2, h / 2 + 4, '800 120px "Inter Tight"', '#5b4a9a')), 0, 1.2, 0.082);
+  const sg = grp(S, 0.66, 0, 0.5); add(sg, new THREE.CylinderGeometry(0.26, 0.3, 0.08, 32), clay(PAL.cream), 0, 0.04, 0);
+  const t = text3d(sg, '-50%', 0.42, 0.12, redClay()); t.position.y = 0.08 + 0.21; t.rotation.y = -0.15;
+  [[-0.95, 0.4, 0.5, PAL.sky, PAL.yellow], [-0.55, 0.6, 0.2, PAL.mint, PAL.lilac]].forEach(([x, z, ry, c, b]) => {const P = person(S, x, z, {body: c, ry, s: 1.15}); add(P, rbox(0.12, 0.14, 0.05, 0.015), clay(b), 0.13, 0.2, 0.02);});
+  VIEW = {az: -0.3, el: 0.32, fov: 24};
+};
+
+MOTIFS.brutto = () => {   // the money tower on its cart: coloured slices for pension, health, care, unemployment, tax, the red net part at the bottom
+  plinth(3.0, 2.0, [[-1, -1], [1, 1]]);
+  const C = grp(S, -0.25, 0, 0.2);
+  add(C, rbox(0.7, 0.06, 0.7, 0.025), clay(0xc49a64), 0, 0.1, 0);
+  for (const [x, z] of [[-0.26, 0.29], [0.26, 0.29], [-0.26, -0.29], [0.26, -0.29]]) add(C, new THREE.CylinderGeometry(0.07, 0.07, 0.04, 20).rotateX(PI / 2), clay(PAL.dark), x, 0.07, z);
+  const U = 0.5 / 1000; let y = 0.13; [[2054, RED], [293, 0xb9b4d6], [39, PAL.yellow], [72, PAL.pink], [262, PAL.mint], [279, PAL.sky]].forEach(([e, c]) => {const h = e * U;
+    add(C, rbox(0.54, h, 0.54, Math.min(0.03, h / 2 - 0.001)), c === RED ? redClay() : clay(c), 0, y + h / 2, 0); y += h;});
+  {const L = grp(C, 0, 0.62, 0.29); add(L, rbox(0.46, 0.2, 0.03, 0.02), redClay(), 0, 0, 0); decal(L, 0.44, 0.19, tex(440, 190, (g, w, h) => {T2(g, 'netto', w / 2, 52, '600 46px Poppins', '#ffffff'); T2(g, '2.054 €', w / 2, 128, '800 76px "Inter Tight"', '#ffffff');}), 0, 0, 0.016, {bump: 0.2});}
+  {const L = grp(C, 0, y + 0.16, 0); add(L, rbox(0.56, 0.18, 0.03, 0.02), clay(0xfbf8f1), 0, 0, 0); decal(L, 0.54, 0.17, tex(540, 170, (g, w, h) => T2(g, '3.000 €', w / 2, h / 2 + 4, '800 110px "Inter Tight"', '#2b2b38')), 0, 0, 0.016, {bump: 0.2});}
+  [[0.55, PAL.sky, 0x6f9fd8], [1.05, PAL.mint, 0x58b48c], [0.85, 0xb9b4d6, 0x7a72a8]].forEach(([x, c, r], i) => house(S, x, -0.5 + (i === 2 ? 0.0 : 0) - (i === 1 ? 0.05 : 0), c, r, 0.42, 0.42, -0.1));
+  const fl = add(S, rbox(0.4, 0.1, 0.4, 0.03), clay(PAL.lilac), 0.35, 1.35, -0.05); fl.rotation.set(0.3, 0.5, 0.2);
+  person(S, 0.45, 0.5, {body: PAL.mint, ry: -0.5, s: 1.2});
+  VIEW = {az: -0.3, el: 0.3, fov: 24};
+};
+
 MOTIFS.paket = () => {   // the parcel with the red tape, a smaller one and the delivery van
   plinth(3.3, 2.0, [[-1, -1], [1, 1]]);
   const P = grp(S, -0.55, 0, 0.05, 0.22), kraft = 0xdcae74;

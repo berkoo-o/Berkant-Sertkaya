@@ -1,0 +1,19 @@
+{
+  "page": "bf.html",
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "jobs": [
+    {
+      "name": "Black_Friday_Knete",
+      "query": "",
+      "frames": 1217,
+      "audio": [
+        {"file": "mix_bf_music.flac", "suffix": "_mit_Musik"},
+        {"file": "mix_bf_fx.flac", "suffix": "_nur_Effekte"}
+      ]
+    }
+  ],
+  "title": "Black Friday: Sind die Rabatte echt? (Knete, fünf Stationen)",
+  "upload": ["_mit_Musik"]
+}
