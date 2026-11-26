@@ -1,4 +1,4 @@
-# STATUS – function. (Stand 22.11.2026)
+# STATUS – function. (Stand 26.11.2026)
 
 > **Für jede neue Sitzung:** Zuerst diese Datei und `CLAUDE.md` lesen. Dort stehen alle festen Regeln (Stimme, Musik, Look, Thumbnails, Outro, Texte, Rendern). Nichts davon neu erfragen. Gearbeitet wird auf dem Branch `claude/nice-galileo-neyrpn`. Das ausführliche Protokoll aller früheren Schritte steht in `STATUS_Verlauf.md`, die Checkliste für einen neuen Claude-Account in `UEBERGABE.md`.
 
@@ -10,7 +10,7 @@
 
 | Video | Ordner | Fertiges Video | Stand |
 |---|---|---|---|
-| Weihnachtsgeld: Warum bleibt so wenig? | `weihnachtsgeld/` | noch nicht gerendert (Testvideo `Test_Weihnachtsgeld.mp4`, Einstieg `Test_Weihnachtsgeld_Einstieg.mp4`) | Gebaut und geprüft, PC-Auftrag `weihnachtsgeld/render.json` bereit, Rendern nach Go. |
+| Weihnachtsgeld: Warum bleibt so wenig? | `weihnachtsgeld/` | `weihnachtsgeld/renders/Weihnachtsgeld_Knete_mit_Musik.mp4` (43,2 s) | Fertig, auf dem PC gerendert, geprüft und am 26.11.2026 geschickt. Thumbnail und Texte in `weihnachtsgeld/social/`. Passt bis Anfang Dezember. |
 | Black Friday: Sind die Rabatte echt? | `blackfriday/` | `blackfriday/renders/Black_Friday_Knete_mit_Musik.mp4` (40,6 s) | Fertig, geprüft, geschickt. **Vor Freitag, 27.11.2026 hochladen.** |
 | 3.000 € brutto: So viel bleibt dir | `brutto/` | `brutto/renders/Brutto_Netto_Knete_mit_Musik.mp4` (42,7 s) | Fertig, geprüft, geschickt. Läuft jederzeit. |
 | Diese 5 Gesetze haben Deutschland richtig wütend gemacht | `gesetze/` | `gesetze/renders/Diese_5_Gesetze_Podest_mit_Musik.mp4` (58,6 s) | Fertig, mit schlichter 2D-Outro. Upload-Paket in `upload/Diese_5_Gesetze/`. |
@@ -33,6 +33,7 @@ Alle 19 Thumbnails im System „Galerie A“ mit Knete-Motiv liegen in `thumbs/f
 
 ## Offene Punkte
 
+- **Weihnachtsgeld hochladen**, solange das Thema läuft (Ende November bis Anfang Dezember), Texte in `weihnachtsgeld/social/Texte.md`.
 - **Black Friday hochladen** vor dem 27.11.2026, Texte in `blackfriday/social/Texte.md`.
 - **Gen-Z-Proteste:** Es gibt kein Video dazu. Ein Entwurfs-Thumbnail mit Arbeitstitel liegt in `thumbs/final/Thumbnail_genz.png` (`upload/Thumbnails_alle_Videos/Thumbnail_genz_Entwurf.png`). Offen ist der echte Titel oder das Thema vom Nutzer.
 - Das Black-Friday-Thumbnail zeigt das „-50%“-Schild noch frei stehend, im Video ist es inzwischen eine Klapptafel. Nur anpassen, wenn der Nutzer es möchte.
