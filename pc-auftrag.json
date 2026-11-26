@@ -1,7 +1,5 @@
 {
-  "title": "Zwei Videos nacheinander: Black Friday, dann 3.000 € brutto (Knete)",
-  "queue": [
-    {"folder": "blackfriday", "task": "render", "title": "Black Friday: Sind die Rabatte echt?"},
-    {"folder": "brutto", "task": "render", "title": "3.000 € brutto: So viel bleibt dir"}
-  ]
+  "title": "Weihnachtsgeld: Warum bleibt so wenig? (Knete, Winternacht)",
+  "folder": "weihnachtsgeld",
+  "task": "render"
 }
