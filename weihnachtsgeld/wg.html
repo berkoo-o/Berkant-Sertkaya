@@ -19,11 +19,11 @@ canvas{position:absolute;left:0;top:0}
 #logo{position:absolute;left:78px;bottom:108px;color:#E01E2B;font-weight:500;font-size:58px;letter-spacing:-1px}
 </style></head><body>
 <div id="bgfx" style="position:absolute;inset:0"></div>
-<script>/* Hintergrund-Varianten: wg.html?bg=1 Dunkelviolett (Kanal) · 2 Winternacht mit Schnee · 3 Tannengrün mit Lichterkette · 4 warmes Kaminlicht */
-{const v = new URLSearchParams(location.search).get('bg') || '1', b = document.body.style, fx = document.getElementById('bgfx').style;
+<script>/* Hintergrund-Varianten (gewählt: 2, Wunsch des Nutzers 26.11.2026): wg.html?bg=1 Dunkelviolett (Kanal) · 2 Winternacht mit Schnee · 3 Tannengrün mit Lichterkette · 4 warmes Kaminlicht */
+{const v = new URLSearchParams(location.search).get('bg') || '2', b = document.body.style, fx = document.getElementById('bgfx').style;
  const snow = Array.from({length: 90}, (_, i) => {const x = (i * 197) % 1080, y = (i * 373) % 1920, r = 2 + (i * 7) % 5; return `radial-gradient(circle ${r}px at ${x}px ${y}px, rgba(255,255,255,${0.25 + (i % 4) * 0.12}) 0 ${r - 0.5}px, transparent ${r}px)`;}).join(',');
  const bokeh = (cols) => Array.from({length: 26}, (_, i) => {const x = (i * 263) % 1080, y = 120 + (i * 431) % 700, r = 18 + (i * 11) % 30, c = cols[i % cols.length]; return `radial-gradient(circle ${r}px at ${x}px ${y}px, ${c} 0, transparent ${r}px)`;}).join(',');
- if (v === '2') {b.background = 'radial-gradient(ellipse 120% 70% at 50% 46%,#1f3558 0%,#14223d 45%,#0a111f 80%,#070a12 100%)'; fx.background = snow;}
+ if (v === '2') {b.background = 'radial-gradient(ellipse 120% 70% at 50% 46%,#1f3558 0%,#14223d 45%,#0a111f 80%,#070a12 100%)'; fx.background = snow; fx.backgroundSize = '1080px 1920px'; fx.backgroundRepeat = 'repeat';}
  if (v === '3') {b.background = 'radial-gradient(ellipse 120% 70% at 50% 46%,#1d3a2c 0%,#142a20 45%,#0a1510 80%,#060b08 100%)'; fx.background = bokeh(['rgba(255,214,120,.22)', 'rgba(255,240,200,.16)', 'rgba(255,190,90,.18)']);}
  if (v === '4') {b.background = 'radial-gradient(ellipse 120% 70% at 50% 50%,#4a2f22 0%,#2e1d16 45%,#160e0b 80%,#0b0706 100%)'; fx.background = bokeh(['rgba(255,170,80,.2)', 'rgba(255,210,140,.14)']);}}
 </script>

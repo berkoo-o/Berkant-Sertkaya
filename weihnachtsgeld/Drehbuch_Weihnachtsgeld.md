@@ -2,7 +2,7 @@
 
 ## Idee
 
-Kurzes Video (etwa 40 Sekunden) passend zum Monatsende November, wenn das Weihnachtsgeld auf dem Konto landet. Es knüpft an „3.000 € brutto: So viel bleibt dir“ an (gleiche Person, gleiche Rechnung) und erklärt, warum vom Weihnachtsgeld weniger übrig bleibt als von einem normalen Monatsgehalt. Knete-Look mit mehreren Stationen auf einer Platte, roter Faden ist der rote Geschenkumschlag „Weihnachtsgeld“, dessen roter Netto-Teil am Ende übrig bleibt.
+Hintergrund: Winternacht in Nachtblau mit leise fallendem Schnee (Wahl des Nutzers am 26.11.2026 aus vier Varianten, `Hintergrund_Vergleich.jpg`). Kurzes Video (etwa 40 Sekunden) passend zum Monatsende November, wenn das Weihnachtsgeld auf dem Konto landet. Es knüpft an „3.000 € brutto: So viel bleibt dir“ an (gleiche Person, gleiche Rechnung) und erklärt, warum vom Weihnachtsgeld weniger übrig bleibt als von einem normalen Monatsgehalt. Knete-Look mit mehreren Stationen auf einer Platte, roter Faden ist der rote Geschenkumschlag „Weihnachtsgeld“, dessen roter Netto-Teil am Ende übrig bleibt.
 
 ## A. Drei Hook-Varianten
 

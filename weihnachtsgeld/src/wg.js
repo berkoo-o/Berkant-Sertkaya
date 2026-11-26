@@ -11,6 +11,7 @@ import {THREE, RED, PI, clamp, lerp, seg, sm, eo, eio, popIn, V3, renderer, scen
 const VO = 0.15, OUT0 = 39.3, END_V = 43.05;
 const WORDS = (await (await fetch('voice/words.json')).json()).words;
 const S = new THREE.Group(); scene.add(S);
+const BGFX = document.getElementById('bgfx');
 plinth(S, 9.8, 2.6, [[-1, -1], [1, -1], [-1, 1], [1, 1]]);
 lightRig(0, 0, 5.6);
 const mat = (par, w, d, c) => add(par, rbox(w, 0.03, d, 0.012), clay(c, {bumpScale: 2.6}), 0, 0.015, 0);
@@ -135,6 +136,8 @@ function setT(v) {
     RATE.scale.setScalar(Math.max(1e-3, popIn(v, 34.2, 0.35)));}
   // bubble
   {const p = popIn(v, 35.9, 0.45); BUB.scale.setScalar(Math.max(1e-3, p)); BUB.position.y = 2.35 + Math.sin(v * 2) * 0.03; BUB.visible = p > 0.01;}
+  // the snow in the winter-night background falls slowly (the pattern repeats every 1920 px)
+  BGFX.style.backgroundPosition = `${Math.sin(v * 0.4) * 12}px ${((v + 1) * 38) % 1920}px`;
   dimLights(v, OUT0); outro(v, OUT0);}
 
 // collision check: the card must never touch the envelope, the Christmas bonus must not sink into the stack
