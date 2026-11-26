@@ -1,0 +1,27 @@
+{
+  "page": "wg.html",
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "jobs": [
+    {
+      "name": "Weihnachtsgeld_Knete",
+      "query": "",
+      "frames": 1296,
+      "audio": [
+        {
+          "file": "mix_wg_music.flac",
+          "suffix": "_mit_Musik"
+        },
+        {
+          "file": "mix_wg_fx.flac",
+          "suffix": "_nur_Effekte"
+        }
+      ]
+    }
+  ],
+  "title": "Weihnachtsgeld: Warum bleibt so wenig? (Knete, vier Stationen)",
+  "upload": [
+    "_mit_Musik"
+  ]
+}
