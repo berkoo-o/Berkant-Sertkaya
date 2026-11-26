@@ -1,7 +1,7 @@
 // Knete-Motive rendern: node thumbs/knete_render.mjs [name…]  → thumbs/motive_knete/<name>.png (transparent, 1080 × 1920)   (Server Port 8780 im Hauptordner)   PR=3 node … rendert in dreifacher Auflösung (Slides)
 import {chromium} from 'playwright';
 import fs from 'node:fs';
-const ALL = ['gesetze', 'bankrun1', 'bankrun2', 'geldautomat', 'strom', 'rundfunk', 'merz', 'jahr2027', 'paket', 'tuev', 'umwelt', 'autobahn', 'benzin', 'kennzeichen', 'wasserscheide', 'genz', 'blackfriday', 'brutto'];
+const ALL = ['gesetze', 'bankrun1', 'bankrun2', 'geldautomat', 'strom', 'rundfunk', 'merz', 'jahr2027', 'paket', 'tuev', 'umwelt', 'autobahn', 'benzin', 'kennzeichen', 'wasserscheide', 'genz', 'blackfriday', 'brutto', 'weihnachtsgeld'];
 const names = process.argv.slice(2).length ? process.argv.slice(2) : ALL;
 fs.mkdirSync('thumbs/motive_knete', {recursive: true});
 const b = await chromium.launch({args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist']});

@@ -41,6 +41,10 @@ Die Sozialabgaben sind gleich. Aber die Lohnsteuer ist mehr als doppelt so hoch:
 
 (etwa 95 Wörter, rund 38 Sekunden)
 
+## Feinschliff nach dem Testvideo (26.11.2026, Wunsch „so viel Feinschliff wie möglich“)
+
+Karte ragt schon im ersten Bild mit „3.000 €“ aus dem Umschlag; rote Klammer „−370 € weniger netto“ zwischen den Türmen; Türme stehen schon, wenn die Kamera ankommt; breitere Platte mit mehr Abstand zwischen den Stationen; Schnee auf Baum und Platte, funkelnde Lichterkette; Figuren ohne Geschenk lassen den Kopf hängen; Steuer-Skala von „0 %“ bis „28 %“, auf dem Stapel „im Schnitt knapp 10 % Lohnsteuer“ (3.517 € von 36.000 €); Hintergrund Winternacht mit fallendem Schnee; Thumbnail im Galerie-Knete-Stil.
+
 ## E. Szenenplan (Technik)
 
 Three.js im Knete-Look mit `kit/knete_kit.js`, Seite `weihnachtsgeld/wg.html`, Code `weihnachtsgeld/src/wg.js`. Die Geldtürme aus `brutto/src/brutto.js` (1.000 € = 0,55 Einheiten) werden wiederverwendet. Stationen in einer Reihe, keine hohen Objekte vor Zielen, Figuren nur auf geschlossenen Runden.
@@ -59,7 +63,7 @@ Musik „Radar Focus“, Whooshes des Nutzers bei den Kamerafahrten, Papierrasch
 
 ## I. TikTok-Titel, Beschreibung und Hashtags
 
-Folgt in `social/Texte.md` nach der Freigabe.
+Siehe `social/Texte.md`.
 
 ## Faktencheck (Stand 26.11.2026)
 

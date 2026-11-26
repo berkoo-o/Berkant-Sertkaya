@@ -551,6 +551,25 @@ MOTIFS.wasserscheide = () => {   // a ridge, a drop on the top, the red line is 
   VIEW = {az: -0.12, el: 0.42, fov: 24};
 };
 
+MOTIFS.weihnachtsgeld = () => {   // verschneiter Tannenbaum mit Lichterkette, roter Umschlag „Weihnachtsgeld“, die Karte zeigt rot 1.684 €, daneben der Geldturm mit dem roten Netto-Teil
+  plinth(3.0, 1.95, [[-1, -1], [1, 1]]);
+  const snow = clay(0xf7f9ff, {bumpScale: 1.2, roughness: 0.8});
+  const T = grp(S, -0.75, 0, -0.35); add(T, new THREE.CylinderGeometry(0.07, 0.08, 0.2, 12), clay(0xa0704a), 0, 0.1, 0);
+  [[0.58, 0.6, 0.48], [0.46, 0.54, 0.88], [0.33, 0.46, 1.23]].forEach(([r, h, y], i) => {add(T, new THREE.ConeGeometry(r, h, 28), clay(PAL.tree[i % 3]), 0, y, 0); add(T, new THREE.ConeGeometry(r * 0.42, h * 0.42, 28), snow, 0, y + h * 0.29 + 0.004, 0);});
+  add(T, new THREE.IcosahedronGeometry(0.09, 1), clay(PAL.yellow, {emissive: PAL.yellow, emissiveIntensity: 0.3}), 0, 1.53, 0);
+  for (let i = 0; i < 30; i++) {const u = i / 29, y = 0.28 + u * 1.12, r = 0.6 - u * 0.48, a = u * PI * 7.5 + 0.6, c = [0xfff1c4, 0xffd27a, 0xbfe3ff][i % 3];
+    add(T, new THREE.SphereGeometry(0.026, 10, 8), new THREE.MeshStandardMaterial({color: c, emissive: c, emissiveIntensity: 0.9}), Math.sin(a) * r, y, Math.cos(a) * r);}
+  const E = grp(S, -0.15, 0, 0.35, -0.2); add(E, rbox(0.8, 0.52, 0.07, 0.035), redClay(), 0, 0.26, 0);
+  decal(E, 0.72, 0.15, tex(720, 150, (g, w, h) => T2(g, 'Weihnachtsgeld', w / 2, h / 2 + 4, '800 96px "Inter Tight"', '#ffffff')), 0, 0.16, 0.037, {bump: 0.2});
+  {const C = grp(E, 0, 0.74, 0); add(C, rbox(0.66, 0.32, 0.025, 0.012), clay(0xfbf8f1, {bumpScale: 1}), 0, 0, 0); decal(C, 0.64, 0.3, tex(640, 300, (g, w, h) => T2(g, '1.684 €', w / 2, h / 2 + 6, '800 150px "Inter Tight"', '#E01E2B')), 0, 0, 0.014, {bump: 0.15});}
+  const W = grp(S, 0.95, 0, -0.05); add(W, rbox(0.62, 0.06, 0.62, 0.025), clay(0xc49a64), 0, 0.1, 0);
+  for (const [x, z] of [[-0.24, 0.26], [0.24, 0.26], [-0.24, -0.26], [0.24, -0.26]]) add(W, new THREE.CylinderGeometry(0.06, 0.06, 0.04, 20).rotateX(PI / 2), clay(PAL.dark), x, 0.065, z);
+  {const U = 0.5 / 1000; let y = 0.13; [[1683.5, RED], [664, 0xb9b4d6], [652.5, PAL.mint]].forEach(([e, c]) => {const h = e * U; add(W, rbox(0.48, h, 0.48, 0.03), c === RED ? redClay() : clay(c), 0, y + h / 2, 0); y += h;});}
+  const P = person(S, 0.4, 0.55, {body: PAL.sky, ry: -0.4, s: 1.2, up: [-1, 1]});
+  for (const [x, z, r] of [[-1.3, 0.75, 0.12], [1.32, -0.75, 0.11], [0.2, -0.8, 0.09], [-1.25, -0.2, 0.08]]) {const b = add(S, new THREE.SphereGeometry(r, 18, 12), snow, x, 0.0, z); b.scale.y = 0.45;}
+  VIEW = {az: -0.25, el: 0.3, fov: 24};
+};
+
 // ------------------------------------------------------------------ Foto-Beiträge (Slides, 22.11.2026): Hauptmotive, kleine Symbole und Deko
 const extr = (shape, d = 0.08) => {const g = new THREE.ExtrudeGeometry(shape, {depth: d, bevelEnabled: true, bevelSize: 0.02, bevelThickness: 0.02, bevelSegments: 3, curveSegments: 16}); g.center(); return g;};
 const tubeM = (pts, r, m) => add(S, new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(p => new THREE.Vector3(...p))), 80, r, 14, false), m);

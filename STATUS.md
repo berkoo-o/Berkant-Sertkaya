@@ -10,6 +10,7 @@
 
 | Video | Ordner | Fertiges Video | Stand |
 |---|---|---|---|
+| Weihnachtsgeld: Warum bleibt so wenig? | `weihnachtsgeld/` | noch nicht gerendert (Testvideo `Test_Weihnachtsgeld.mp4`, Einstieg `Test_Weihnachtsgeld_Einstieg.mp4`) | Gebaut und geprüft, PC-Auftrag `weihnachtsgeld/render.json` bereit, Rendern nach Go. |
 | Black Friday: Sind die Rabatte echt? | `blackfriday/` | `blackfriday/renders/Black_Friday_Knete_mit_Musik.mp4` (40,6 s) | Fertig, geprüft, geschickt. **Vor Freitag, 27.11.2026 hochladen.** |
 | 3.000 € brutto: So viel bleibt dir | `brutto/` | `brutto/renders/Brutto_Netto_Knete_mit_Musik.mp4` (42,7 s) | Fertig, geprüft, geschickt. Läuft jederzeit. |
 | Diese 5 Gesetze haben Deutschland richtig wütend gemacht | `gesetze/` | `gesetze/renders/Diese_5_Gesetze_Podest_mit_Musik.mp4` (58,6 s) | Fertig, mit schlichter 2D-Outro. Upload-Paket in `upload/Diese_5_Gesetze/`. |
