@@ -150,13 +150,13 @@ export async function build({renderer, scene, cam}) {
   Object.assign(sun.shadow.camera, {left: -9, right: 9, top: 9, bottom: -9, near: 1, far: 40}); sun.shadow.bias = -0.0002; sun.shadow.normalBias = 0.008; sun.shadow.radius = 3; scene.add(sun);
   const CAM = [[0, 0, 0.08, 0.15, 6.2, 0, 24], [2.7, 0, 0.1, 0.15, 5.6, 6, 26], [3.9, 0, 0.1, 0.15, 5.8, 10, 30], [4.9, 0, 0.3, 0.45, 7.0, 8, 42],
     [5.6, 0, 0.0, 0.73, 8.0, 10, 58], [6.8, 0, 0.0, 0.73, 7.2, -8, 62], [8.1, 0, 0.0, 0.73, 6.9, -20, 52], [9.1, BX, BY + 0.2, BZ, 9.8, BRY * 180 / PI, 10], [11.2, BX, BY + 0.2, BZ, 9.3, BRY * 180 / PI + 6, 9],
-    [12.3, 0, 0.3, -0.2, 15.5, 22, 40], [13.5, 0, 0.3, -0.2, 14.6, 30, 38]];
+    [12.3, 0, 0.3, -0.6, 15.5, -8, 40], [13.5, 0, 0.3, -0.6, 14.6, -2, 38]];
   const camAt = camPath(cam, CAM);
   const composer = new EffectComposer(renderer); composer.setSize(W, H); composer.addPass(new RenderPass(scene, cam));
   const tilt = []; for (const d of [[1 / W, 0], [0, 1 / H], [1.6 / W, 0], [0, 1.6 / H]]) {const p = new ShaderPass(TiltShader); p.uniforms.dir.value.set(d[0], d[1]); composer.addPass(p); tilt.push(p);}
   composer.addPass(new OutputPass()); composer.addPass(new ShaderPass(SAT)); const grade = new ShaderPass(GRADE); grade.uniforms.vig.value = 0.25; grade.uniforms.grain.value = 0.025; composer.addPass(grade);
   let lastBoard = -1;
   return {update(v) {poseDeck(cards, v, ORIGIN); thread(v); placePeople(v); placeCars(v); camAt(v); grade.uniforms.t.value = v;
-      tilt.forEach((p, i) => {p.uniforms.amt.value = (i < 2 ? 2.6 : 2.1) * lerp(1, 0.55, sm(seg(v, 8.6, 9.2)) * (1 - sm(seg(v, 11.4, 12.2))));});
+      tilt.forEach((p, i) => {p.uniforms.amt.value = (i < 2 ? 2.6 : 2.1) * lerp(1, 0.55, sm(seg(v, 8.6, 9.2)) * (1 - 0.55 * sm(seg(v, 11.4, 12.2))));});
       const fb = Math.round(v * 30); if (fb !== lastBoard) {flapBoard(boardG, 1024, 1124, v, 8.4, {bg: '#1a1d24', cell: '#2a2e38', cell2: '#252832', digit: '#f6f2ea', hinge: '#14161b', pin: '#3a3f4c'}); boardT.needsUpdate = true; lastBoard = fb;}},
     render() {composer.render();}};}

@@ -141,7 +141,7 @@ export async function build({renderer, scene, cam}) {
   // ---------------------------------------------------------------- camera and post
   const CAM = [[0, 0, 0.1, 0.15, 6.3, 0, 15], [2.7, 0, 0.12, 0.15, 5.6, 4, 17], [3.9, 0, 0.12, 0.15, 5.8, 6, 20], [4.9, 0, 0.3, 0.4, 6.6, 4, 36],
     [5.6, 0, 0.0, 0.7, 7.6, 6, 56], [6.8, 0, 0.0, 0.7, 6.9, -10, 60], [8.1, 0, 0.0, 0.7, 6.5, -24, 50], [9.1, 0, BY + 0.12, BZ, 14.4, 0, 4], [11.2, 0, BY + 0.12, BZ, 13.6, 5, 3],
-    [12.3, 0, 1.0, -1.2, 16.5, 20, 16], [13.5, 0, 1.0, -1.2, 15.8, 26, 15]];
+    [12.3, 0, 1.1, -1.6, 16.8, 8, 15], [13.5, 0, 1.1, -1.6, 16.0, 13, 14]];
   const camAt = camPath(cam, CAM);
   const composer = new EffectComposer(renderer); composer.setSize(W, H); composer.addPass(new RenderPass(scene, cam));
   const bokeh = new BokehPass(scene, cam, {focus: 6, aperture: 0.0028, maxblur: 0.009}); composer.addPass(bokeh);
