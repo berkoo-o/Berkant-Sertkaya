@@ -1,6 +1,6 @@
 # Texte zum Hochladen – „Diese Reihenfolge gab es noch nie“
 
-Stand: 27.11.2026 · Video: `karten/renders/Kartenspiel_Noir_mit_Musik.mp4` (nach dem PC-Render) · Thumbnail: `Thumbnail_Kartenspiel_9x16.png`
+Stand: 27.11.2026 · Video: `karten/renders/Kartenspiel_Noir_mit_Musik_Upload.mp4` · Thumbnail: `Thumbnail_Kartenspiel_9x16.png`
 
 ## TikTok – Titel
 
