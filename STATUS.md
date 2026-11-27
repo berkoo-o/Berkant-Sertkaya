@@ -10,7 +10,7 @@
 
 | Video | Ordner | Fertiges Video | Stand |
 |---|---|---|---|
-| Diese Reihenfolge gab es noch nie (Kartenspiel, 52!) | `karten/` | noch nicht gerendert; Seite `karten/noir.html`, Ton `mix_karten_music.flac`, `render.json` liegt bereit | Look „Spieltisch Noir“ (modern, dunkel, sehr detailreich, vom Nutzer am 27.11.2026 aus drei Stiltests gewählt). Stimme, Szene, Ton, Thumbnail und Texte fertig, Kollisionsprüfung 0 Treffer. **Wartet auf das „Go“ des Nutzers**, erst dann `pc-auftrag.json` auf `karten` stellen. |
+| Diese Reihenfolge gab es noch nie (Kartenspiel, 52!) | `karten/` | noch nicht gerendert; Seite `karten/noir.html`, Ton `mix_karten_music.flac`, `render.json` liegt bereit | Look „Spieltisch Noir“ (modern, dunkel, sehr detailreich, vom Nutzer am 27.11.2026 aus drei Stiltests gewählt). Stimme, Szene, Ton, Thumbnail und Texte fertig, Kollisionsprüfung 0 Treffer. „Go“ am 27.11.2026 gegeben, `pc-auftrag.json` zeigt auf `karten`; wartet auf den PC-Render. |
 | Weihnachtsgeld: Warum bleibt so wenig? | `weihnachtsgeld/` | `weihnachtsgeld/renders/Weihnachtsgeld_Knete_mit_Musik.mp4` (43,2 s) | Fertig, auf dem PC gerendert, geprüft und am 26.11.2026 geschickt. Thumbnail und Texte in `weihnachtsgeld/social/`. Passt bis Anfang Dezember. |
 | Black Friday: Sind die Rabatte echt? | `blackfriday/` | `blackfriday/renders/Black_Friday_Knete_mit_Musik.mp4` (40,6 s) | Fertig, geprüft, geschickt. **Vor Freitag, 27.11.2026 hochladen.** |
 | 3.000 € brutto: So viel bleibt dir | `brutto/` | `brutto/renders/Brutto_Netto_Knete_mit_Musik.mp4` (42,7 s) | Fertig, geprüft, geschickt. Läuft jederzeit. |
@@ -34,7 +34,7 @@ Alle 19 Thumbnails im System „Galerie A“ mit Knete-Motiv liegen in `thumbs/f
 
 ## Offene Punkte
 
-- **Kartenspiel (Noir):** Vorschau und Kontaktbögen sind geschickt. Nach dem „Go“ `pc-auftrag.json` auf `{"folder": "karten"}` stellen, der PC rendert `karten/render.json` (1.323 Bilder, 44,1 s).
+- **Kartenspiel (Noir) rendern:** Das „Go“ ist da (27.11.2026), `pc-auftrag.json` zeigt auf `karten` (1.323 Bilder, 44,1 s). Der Nutzer klickt am PC doppelt auf „function. rendern“; danach das Video mit `git fetch` holen, prüfen und schicken.
 - **Weihnachtsgeld hochladen**, solange das Thema läuft (Ende November bis Anfang Dezember), Texte in `weihnachtsgeld/social/Texte.md`.
 - **Black Friday hochladen** vor dem 27.11.2026, Texte in `blackfriday/social/Texte.md`.
 - **Gen-Z-Proteste:** Es gibt kein Video dazu. Ein Entwurfs-Thumbnail mit Arbeitstitel liegt in `thumbs/final/Thumbnail_genz.png` (`upload/Thumbnails_alle_Videos/Thumbnail_genz_Entwurf.png`). Offen ist der echte Titel oder das Thema vom Nutzer.
