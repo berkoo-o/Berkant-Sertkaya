@@ -247,7 +247,7 @@ const G0 = [GX, 0.7, GZ], K2 = [D2.x, 0.2, D2.z - 0.4];
 const CAM = [[0, 0, 0.1, 0.15, 6.3, 0, 15, 0, 0.0028], [2.7, 0, 0.12, 0.15, 5.6, 4, 17, 0, 0.0028], [3.9, 0, 0.12, 0.15, 5.8, 6, 20, 0, 0.0028], [4.9, 0, 0.3, 0.4, 6.6, 4, 36, 0, 0.0026],
   [5.6, 0, 0.0, 0.7, 7.6, 6, 56, 0, 0.0024], [6.8, 0, 0.0, 0.7, 6.9, -10, 60, 0, 0.0024], [8.3, 0, 0.0, 0.7, 6.6, -22, 52, 0, 0.0024],
   [9.6, 0, BY + 0.12, BZ, 14.4, 0, 4, 0, 0.0016], [14.3, 0, BY + 0.12, BZ, 13.4, 4, 3, 0, 0.0016],
-  [15.5, ...G0, 5.3, -10, 13, 7, 0.0024], [20.0, ...G0, 4.8, 8, 15, 7, 0.0024],
+  [15.5, ...G0, 5.3, 17, 13, 7, 0.0024], [20.0, ...G0, 4.8, 27, 15, 7, 0.0024],
   [21.2, 0, BY + 0.12, BZ, 14.0, -3, 4, 0, 0.0016], [30.1, 0, BY + 0.12, BZ, 13.2, 3, 3, 0, 0.0016],
   [31.2, ...K2, 6.0, 8, 27, 5, 0.0024], [37.3, ...K2, 5.5, -5, 25, 5, 0.0024],
   [39.0, 0, 1.0, -1.2, 22, -2, 16, 0, 0.0011], [END + 0.1, 0, 1.0, -1.2, 21, 2, 15, 0, 0.0011]];
@@ -268,13 +268,13 @@ const SUBS = []; {const wn = WORDS.filter(w => !w.text.startsWith('[') && !w.tex
   SUBG.forEach(s => {const n = s.split(' ').length; let txt = s; for (const [k, r] of Object.entries(SHOW)) txt = txt.replace(k, r); SUBS.push([wn[i].start + VO - 0.05, wn[i + n - 1].end + VO + 0.25, txt]); i += n;});
   for (let k = 0; k < SUBS.length - 1; k++) SUBS[k][1] = Math.min(SUBS[k][1], SUBS[k + 1][0]); SUBS[SUBS.length - 1][1] = OUT0;}
 const TEXT = {
-  TITLES: [[0, 4.6, 'Diese Reihenfolge<br>gab es noch nie.'], [38.1, OUT0, 'Wie oft mischst du?']],
+  TITLES: [[-0.3, 4.6, 'Diese Reihenfolge<br>gab es noch nie.'], [38.1, OUT0, 'Wie oft mischst du?']],
   NUMS: [[5.0, 9.3, '52', 'Karten, und jede Reihenfolge ist möglich'], [11.15, 14.95, '8 × 10<sup>67</sup>', 'Möglichkeiten, 52 Karten zu ordnen. Ausgeschrieben hat die Zahl 68 Stellen.'],
     [15.2, 20.15, '<span class="mid">600 Billiarden</span>', 'Mal mehr Möglichkeiten, als die Erde Atome hat (etwa 1,3 × 10<sup>50</sup>)'],
     [21.4, 26.1, '8 Mrd.', 'Menschen mischen seit dem Urknall jede Sekunde ein Kartenspiel'], [28.2, 30.6, '0', 'Reihenfolgen doppelt. Die Chance dafür liegt bei etwa 1 zu 13 Billionen.'],
     [36.8, 38.0, '7-mal', 'mischen, dann ist die Reihenfolge wirklich zufällig']],
   SUBS,
-  SRCS: [[0.2, 14.95, 'Kombinatorik: 52! = 8,07 × 10⁶⁷ · Modell vereinfacht'], [15.0, 20.2, 'Atome der Erde ≈ 1,33 × 10⁵⁰ (Jefferson Lab) · Modell vereinfacht'],
+  SRCS: [[-0.3, 14.95, 'Kombinatorik: 52! = 8,07 × 10⁶⁷ · Modell vereinfacht'], [15.0, 20.2, 'Atome der Erde ≈ 1,33 × 10⁵⁰ (Jefferson Lab) · Modell vereinfacht'],
     [20.3, 30.65, 'Gedankenexperiment: 8,2 Mrd. Menschen (UN 2024), 13,8 Mrd. Jahre (Planck 2018) · Modell vereinfacht'], [30.7, OUT0, 'Bayer & Diaconis 1992: sieben Riffle-Mischungen · Modell vereinfacht']]};
 const ov = overlays(TEXT), ovEl = document.getElementById('ov');
 
@@ -298,7 +298,7 @@ function outro(v) {const u = v - OUT0; endG.clearRect(0, 0, W, H); if (u < 0) re
 // ------------------------------------------------------------------ frame
 let lastBoard = -1, lastCnt = -1;
 function update(v) {poseDeck(cards, v, ORIGIN); thread(v); poseDeck(cards2, deck2T(v), D2); dust(v);
-  sphere.rotation.y = +(new URLSearchParams(location.search).get('gr') || 3.5) + (v - 17.5) * 0.16;   // Europe and Africa face the camera during the globe shot
+  sphere.rotation.y = +(new URLSearchParams(location.search).get('gr') || 3.8) + (v - 17.5) * 0.16;   // Europe and Africa face the camera during the globe shot
   const qv = camAt(v); focus.position.set(qv[1] + 0.7, qv[2] + 3.4, qv[3] + 1.9); focus.target.position.set(qv[1], qv[2], qv[3]); focus.intensity = qv[7];
   bokeh.uniforms.focus.value = qv[4] * 0.98; bokeh.uniforms.aperture.value = qv[8]; grade.uniforms.t.value = v;
   const fb = Math.round(v * 30); if (fb !== lastBoard) {drawBoard(v); lastBoard = fb;}
