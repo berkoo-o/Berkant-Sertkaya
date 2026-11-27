@@ -139,10 +139,10 @@ const Y = V3(0, 1, 0), Z = V3(0, 0, 1), X = V3(1, 0, 0);
 const qYaw = new THREE.Quaternion().setFromAxisAngle(Y, PI / 2), qDown = new THREE.Quaternion().setFromAxisAngle(Z, PI);
 const qLand = qYaw.clone().multiply(qDown);   // landscape, face down
 const QD1 = new THREE.Quaternion().setFromAxisAngle(Z, PI);   // deck frame after turning over (portrait); card = QD * qDown = identity
-export const FAN_PIV = 0.58, FAN_ANG = 5.75;
+export const FAN_PIV = 0.58, FAN_ANG = 5.75, FAN_H = 0.3;   // FAN_H: in the open fan the cards lie closer together (less shadow from the top card)
 // fan pose of the card at height level k (0 = bottom): rotate about a pivot beyond the card's bottom edge
 export function fanPose(k, u, out) {const phi = (FAN_ANG / 2 - k / 51 * FAN_ANG) * u; q.setFromAxisAngle(Y, phi); out.q.copy(q);
-  out.p.set(0, 0, -FAN_PIV).applyQuaternion(q).add(v3.set(0, k * CT + CT / 2, FAN_PIV)); return out;}
+  out.p.set(0, 0, -FAN_PIV).applyQuaternion(q).add(v3.set(0, k * CT * lerp(1, FAN_H, u) + CT / 2, FAN_PIV)); return out;}
 const tmp = {p: V3(0, 0, 0), q: new THREE.Quaternion()};
 // count of released cards (smooth)
 const relCount = v => {let n = 0; for (let i = 0; i < 52; i++) n += clamp((v - relT(i)) / 0.05); return n;};

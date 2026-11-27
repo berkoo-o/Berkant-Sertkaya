@@ -570,6 +570,28 @@ MOTIFS.weihnachtsgeld = () => {   // verschneiter Tannenbaum mit Lichterkette, r
   VIEW = {az: -0.25, el: 0.3, fov: 24};
 };
 
+MOTIFS.karten = () => {   // Kartenspiel: aufgefächerte Karten in einem Halter, der rote Faden läuft durch alle Eckzeichen („die eine Reihenfolge“), davor ein Stapel und eine staunende Figur
+  plinth(2.7, 1.75, [[-1, -1], [1, 1]]);
+  const RK = ['A', '7', 'K', '3', '10', 'D', '5', '9', 'B', '2', '8', '4', '6', 'A', 'K'], SU = ['♠', '♥', '♣', '♦'];
+  const cardT = (r, su) => tex(420, 600, (g, w, h) => {const col = (su === '♥' || su === '♦') ? '#d9668a' : '#2b2b38'; g.fillStyle = '#fbf8f1'; g.beginPath(); g.roundRect(0, 0, w, h, 34); g.fill();
+    g.strokeStyle = '#e6dccb'; g.lineWidth = 8; g.beginPath(); g.roundRect(12, 12, w - 24, h - 24, 26); g.stroke();
+    T2(g, r, 64, 78, '800 84px "Inter Tight"', col); T2(g, su, 64, 158, '700 64px "Inter Tight"', col); T2(g, su, w / 2, h / 2 + 20, '700 230px "Inter Tight"', col);
+    g.save(); g.translate(w - 64, h - 78); g.rotate(PI); T2(g, r, 0, 0, '800 84px "Inter Tight"', col); T2(g, su, 0, -80, '700 64px "Inter Tight"', col); g.restore();});
+  const F = grp(S, -0.22, 0, -0.1), FS = 1.55, N = 15, CWd = 0.42, CHt = 0.6, PIV = 0.2, OFF = 0.36, pts = [];
+  add(F, rbox(0.62, 0.3, 0.42, 0.06), clay(PAL.deep), 0, 0.15, 0.0); add(F, rbox(0.68, 0.05, 0.48, 0.02), clay(PAL.lilac), 0, 0.025, 0.0);
+  for (let k = 0; k < N; k++) {const a = (62 - k * 124 / (N - 1)) * PI / 180, z = -0.1 + k * 0.014, C = grp(F, 0, PIV, z); C.rotation.z = a;
+    add(C, rbox(CWd, CHt, 0.01, 0.004), clay(0xfbf8f1, {bumpScale: 0.8}), 0, OFF, 0);
+    decal(C, CWd, CHt, cardT(RK[k], SU[k % 4]), 0, OFF, 0.0062, {bump: 0.12});
+    const c = new THREE.Vector3(-0.155, OFF + 0.215, 0.024).applyAxisAngle(new THREE.Vector3(0, 0, 1), a); pts.push(new THREE.Vector3(c.x * FS - 0.22, (c.y + PIV) * FS, (c.z + z) * FS - 0.1));}
+  F.scale.setScalar(FS);
+  {const m = redClay(); add(S, new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, false, 'centripetal'), 200, 0.011, 10, false), m);
+    pts.forEach(p => add(S, new THREE.SphereGeometry(0.019, 12, 10), m, p.x, p.y, p.z));}
+  const D = grp(S, 0.88, 0, 0.42, -0.35); add(D, rbox(0.42, 0.13, 0.6, 0.03), clay(0xfbf8f1), 0, 0.065, 0); add(D, rbox(0.4, 0.012, 0.58, 0.004), clay(PAL.deep), 0, 0.136, 0);
+  decal(D, 0.3, 0.46, tex(300, 460, (g, w, h) => {g.strokeStyle = '#c4a8f0'; g.lineWidth = 10; g.beginPath(); g.roundRect(14, 14, w - 28, h - 28, 22); g.stroke(); T2(g, '52', w / 2, h / 2 + 8, '800 120px "Inter Tight"', '#c4a8f0');}), 0, 0.1435, 0, {rx: -PI / 2, bump: 0.1});
+  person(S, 1.06, -0.16, {body: PAL.sky, hair: 0x8a5a3a, ry: -0.6, s: 1.3, up: [1]});
+  VIEW = {az: 0.08, el: 0.22, fov: 24};
+};
+
 // ------------------------------------------------------------------ Foto-Beiträge (Slides, 22.11.2026): Hauptmotive, kleine Symbole und Deko
 const extr = (shape, d = 0.08) => {const g = new THREE.ExtrudeGeometry(shape, {depth: d, bevelEnabled: true, bevelSize: 0.02, bevelThickness: 0.02, bevelSegments: 3, curveSegments: 16}); g.center(); return g;};
 const tubeM = (pts, r, m) => add(S, new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(p => new THREE.Vector3(...p))), 80, r, 14, false), m);
