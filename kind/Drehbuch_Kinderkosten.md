@@ -2,7 +2,7 @@
 
 ## Idee
 
-Fast jeder hat eine Zahl im Kopf, und fast jeder liegt daneben. Das Video stellt die Frage gleich am Anfang, lässt die Zuschauer schätzen und baut die Antwort Schritt für Schritt auf. Auf einer Knetplatte wird ein Kind an drei Stationen größer: Kleinkind, Schulkind, Teenager. An jeder Station steht, was es im Monat kostet. Am Ende stapeln sich 18 Jahresblöcke zu einem Geldturm, der mit den heutigen Preisen noch ein Stück wächst. Daneben steht der viel kleinere Turm, den das Kindergeld abdeckt.
+Fast jeder hat eine Zahl im Kopf, und fast jeder liegt daneben. Das Video stellt die Frage gleich am Anfang, lässt die Zuschauer schätzen und baut die Antwort Schritt für Schritt auf. Dabei wächst ein Kinderzimmer mit: aus dem Gitterbett wird ein Kinderbett, daraus ein Teenager-Zimmer. Zu jedem Alter steht oben, was es im Monat kostet. Im Zeitraffer zählt der Betrag bis zum 18. Geburtstag hoch, am Ende landet der Kindergeld-Brief auf dem Bett.
 
 Look (neu nach Rückmeldung vom 27.11.2026, der Knete-Look gefiel nicht): ein aufgeschnittenes Kinderzimmer wie ein Puppenhaus, das mit dem Kind mitwächst. Aus dem Gitterbett wird ein Kinderbett mit Schreibtisch, daraus ein Teenager-Zimmer mit Monitor und Gitarre. An der Wand hängt eine Messlatte mit den Größenmarken. Der rote Faden ist ein roter Teddy, der in jedem Alter dabei ist. Stiltests mit drei Looks: `kind/zimmer.html?s=1|2|3&a=0|1|2`, Vergleich in `kind/Stiltest_Kinderzimmer.jpg`. Szenenplan E und G werden nach der Wahl des Looks angepasst.
 
@@ -18,17 +18,20 @@ Die Frage zieht jeden sofort hinein, weil jeder eine Schätzung im Kopf hat und 
 
 ## C. Drehbuch
 
-| Zeit (ca.) | Bild | Was passiert |
+Ein durchgehender One-Take im aufgeschnittenen Kinderzimmer. Look 2 spielt am Abend (Nachtlicht, Lampen, Lichterkette, leichte Tiefenunschärfe), Look 3 an einem sonnigen Morgen (Lichtstrahl durchs Fenster, Tilt-Shift wie ein Modell).
+
+| Zeit (Stimme) | Bild | Was passiert |
 |---|---|---|
-| 0–3 s | Station A: Kleinkind mit rotem Luftballon, Kinderwagen, Bauklötze | Titel „Was kostet ein Kind bis 18?“. Münzen fallen in eine kleine Spardose. |
-| 3–8 s | Station A nah | Schild „679 € im Monat“ ploppt auf, Zahl oben links. |
-| 8–11 s | Station B: Schulkind mit Ranzen am Pult | Schild „≈ 785 € im Monat“. |
-| 11–15 s | Station C: Teenager mit Handy und Kopfhörern | Schild „953 € im Monat“. |
-| 15–19 s | Alle drei Stationen | Über den Kindern ploppen Haus, Teller und T-Shirt auf: „etwa die Hälfte für Wohnen, Essen und Kleidung“. |
-| 19–27 s | Station D: Geldturm | 18 Jahresblöcke stapeln sich (Farben wie die drei Stationen), Schild „174.000 €“. Dann wächst ein heller Block oben drauf, das Schild kippt auf „216.000 €“. |
-| 27–33 s | Station D mit Kindergeld-Turm | Daneben wächst der Kindergeld-Turm auf 56.000 €, gut ein Viertel so hoch. |
-| 33–36 s | Ganze Platte | Frage an die Zuschauer. |
-| 36–39 s | Outro | Schlichte 2D-Outro mit dem roten Punkt. |
+| 0–4 s | Nah am Kleinkind auf dem Spielteppich, das den roten Teddy hält, das Mobile dreht sich | Titel „Was kostet ein Kind bis 18?“. Die Kamera zieht auf das ganze Zimmer auf. |
+| 4–8,5 s | Kleinkind-Zimmer: Gitterbett, Wickelkommode, Stillsessel, Schaukelpferd, Wimpelkette | „679 €“ im Monat. |
+| 8,5–10,7 s | Die Möbel wechseln von links nach rechts, die Wand wird hellblau | Schulkind mit Ranzen, Bett mit Raketenbettwäsche, Schreibtisch, Straßenteppich. „≈ 785 €“. |
+| 10,7–14 s | Zweiter Wechsel, die Wand wird dunkelgrau | Teenager mit Handy auf dem Bett, Monitor, PC, Gitarre, Lichterkette. „953 €“. |
+| 14–17,6 s | Die Kamera fährt näher heran | Schilder „Wohnen“ (Bett), „Essen“ (Pizza), „Kleidung“ (Jacke am Stuhl). „≈ 50 %“. |
+| 17,6–21,2 s | Zeitraffer: das Zimmer läuft noch einmal durch alle drei Alter, die Wanduhr dreht sich schnell | Oben zählt der Betrag bis „174.000 €“ hoch. |
+| 21,2–30 s | Das Teenager-Zimmer bleibt | „174.000 €“ (Preise 2018), auf „zweihunderttausend“ springt die Zahl auf „216.000 €“. |
+| 30–35,4 s | Nah am Teenager | Ein gelber Brief „Kindergeld“ fällt aufs Bett. „259 €“, dann „≈ 26 %“. |
+| 35,4–38,7 s | Ganzes Zimmer | Der Teenager schaut auf und winkt. Frage „Hättest du so viel geschätzt?“ |
+| 38,7–42,5 s | Outro | Schlichte 2D-Outro mit dem roten Punkt. |
 
 ## D. Sprechertext für Tom (eleven_v4, Audio-Tags)
 
@@ -50,26 +53,19 @@ Der Staat zahlt zweihundertneunundfünfzig Euro Kindergeld im Monat. Das deckt n
 
 ## E. Szenenplan (Technik)
 
-Three.js im Knete-Look mit `kit/knete_kit.js`. Eine lila Knetplatte mit vier Stationen in einer Reihe, keine Station steht vor einer anderen:
-
-- **A Kleinkind (0–6):** Figur in Größe 0,6 auf einer hellblauen Matte, Kinderwagen, Bauklötze, kleine Spardose. Schild hinten auf Pfosten.
-- **B Schulkind (6–12):** Figur in Größe 0,8 mit Schulranzen auf einer mintfarbenen Matte, Pult mit Büchern.
-- **C Teenager (12–18):** Figur in Größe 1,0 mit Handy und Kopfhörern auf einer pfirsichfarbenen Matte, Skateboard.
-- **D Geldturm:** 18 Jahresblöcke, Höhe nach den Jahreskosten (8.148 €, 9.420 €, 11.436 €), Farben wie die Matten der drei Stationen. Darauf ein heller Block für die Teuerung seit 2018. Daneben der mintfarbene Kindergeld-Turm. Maßstab 100.000 € = 1,2 Einheiten.
-
-Die Kinder stehen still und bewegen nur Kopf und Arme, keine Figur läuft. Der Ballon hängt an einer Schnur an der Hand und wippt leicht. Die Schilder stehen hinter den Kindern, die Ballons schweben vor den Schildern und berühren sie nie.
+Three.js ohne Knete, Seite `kind/zimmer.html?s=2|3`, Code `kind/src/zimmer.js`. Zimmer 3,4 × 3,0 m mit Holzdielen, Fußleisten, Fenster mit Griff, Vorhängen mit Raffhaltern, Heizkörper mit Thermostat, Wanduhr, Steckdosen, Lichtschalter und Messlatte (die Größenmarken kommen mit jedem Alter dazu). Jede Altersstufe ist eine eigene Gruppe mit vielen Einzelteilen, die von links nach rechts verschwinden und auftauchen; dabei steht nie ein altes und ein neues Möbelstück gleichzeitig am selben Platz. Die Figuren sind glatt und leicht stilisiert, mit Gelenken (sitzen, winken, Kopf drehen). Unsichtbare Decke und rechte Wand werfen nur Schatten, damit die Sonne nur durchs Fenster fällt. Prüfbilder: `node kind/shot_zimmer.mjs <ordner> 2,3 a0,a1,a2` und Zeitpunkte `t…`; Thumbnail-Motiv: `node kind/motif.mjs 3 1 thumbs/motive_knete/kind.png`.
 
 ## F. Higgsfield-Prompts
 
-Komplett in Three.js gebaut, Higgsfield wird nicht gebraucht. Falls nötig: „Claymation diorama on a lilac clay base: a toddler, a schoolchild with a backpack and a teenager with a phone stand in a row, each holding a glossy red clay balloon, next to a tall stack of pastel clay money blocks, soft warm light, dark violet background, plasticine texture.“
+Komplett in Three.js gebaut, Higgsfield wird nicht gebraucht. Falls nötig: „Isometric cutaway of a cozy children's room like a dollhouse, wooden floor, window with curtains and a radiator, a toddler on a play rug hugging a red teddy bear, crib with a mobile, soft evening lamp light, highly detailed, stylized 3D render.“
 
 ## G. Animations- und Kameraanweisungen
 
-Die Kamera fährt ruhig von links nach rechts von Station zu Station und bleibt bei jeder Zahl kurz stehen. Bei „die Hälfte“ zeigt sie die drei Kinder zusammen. Beim Geldturm fährt sie langsam am Turm hoch, während die Jahresblöcke von unten nach oben aufploppen. Zum Kindergeld fährt sie etwas zurück, damit beide Türme ganz im Bild sind. Am Ende zeigt sie die ganze Platte.
+Die Kamera startet nah am Kleinkind und zieht ruhig auf das ganze Zimmer auf. Bei den Wechseln bleibt sie auf dem ganzen Zimmer, damit man sieht, wie es mitwächst. Zu „Wohnen, Essen und Kleidung“ fährt sie näher heran, im Zeitraffer dreht sie sich langsam etwas, zum Kindergeld geht sie nah an den Teenager und am Ende wieder auf das ganze Zimmer. Kleine Bewegungen halten das Bild lebendig: Das Mobile dreht sich, das Kleinkind wiegt sich, das Schulkind schaut sich um, der Teenager schaut aufs Handy und winkt am Ende.
 
 ## H. Übergänge und Sounddesign
 
-Musik „Radar Focus“. Kamerafahrten mit den Whooshes des Nutzers (`paket-test/sfx_epidemic/whoosh.mp3`). Münzklimpern nur bei den Schildern mit den Monatsbeträgen, ein leises Pop für die drei Symbole, ein kurzes Tick-Rattern beim Stapeln der Jahresblöcke (nur einmal, nicht pro Block) und ein weicher Aufschlag, wenn der Kindergeld-Turm steht. Liste in `SOUNDS.md`.
+Musik „Radar Focus“. Ein Whoosh bei jedem Wechsel der Altersstufe und bei den Kamerafahrten, ein leises Klicken bei den Monatsbeträgen, ein Pop je Schild, ein Glockenspiel-Ton für das Mobile am Anfang, Blätterrauschen im Zeitraffer, ein Münzklang beim Endbetrag und ein Papiergeräusch, wenn der Kindergeld-Brief landet. Skript `audio_kind.py`, Liste in `SOUNDS.md`.
 
 ## I. TikTok-Titel, Beschreibung und Hashtags
 
