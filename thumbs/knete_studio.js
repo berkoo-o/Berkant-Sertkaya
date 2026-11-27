@@ -593,6 +593,17 @@ MOTIFS.karten = () => {   // Kartenspiel (überarbeitet 27.11.2026): 11 verschie
   VIEW = {az: 0.08, el: 0.22, fov: 24};
 };
 
+MOTIFS.schatten = () => {   // A und B haben dieselbe Farbe: Schachbrett aus Knete, grüner Zylinder wirft seinen Schatten auf B, A und B mit roten Rahmen (roter Faden) und kleinen Namensschildern
+  plinth(2.7, 1.9, [[1, -1], [-1, 1]]);
+  const Bd = grp(S, 0, 0, 0.05), Q = 0.34; add(Bd, rbox(1.94, 0.12, 1.94, 0.05), clay(0x4a3426, {bumpScale: 1}), 0, 0.06, 0);
+  for (let j = 0; j < 5; j++) for (let i = 0; i < 5; i++) add(Bd, rbox(Q - 0.006, 0.02, Q - 0.006, 0.006), clay((i + j) % 2 ? 0x5f5d6c : 0xece5d6, {bumpScale: 0.8}), (i - 2) * Q, 0.13, (j - 2) * Q);
+  add(Bd, new THREE.CylinderGeometry(0.2, 0.2, 0.95, 48), clay(0x5fae6e, {bumpScale: 1.2}), -0.37, 0.14 + 0.475, 0.55);   // the key light comes from the front left, so its shadow falls exactly onto B
+  const frame = (x, z) => {const m = redClay(), w = Q + 0.05, t = 0.035; for (const [dx, dz, sx, sz] of [[0, -w / 2, w + t, t], [0, w / 2, w + t, t], [-w / 2, 0, t, w], [w / 2, 0, t, w]]) add(Bd, rbox(sx, 0.03, sz, 0.012), m, x + dx, 0.155, z + dz);};
+  const tag = (x, z, s) => {const T = grp(Bd, x, 0.14, z - Q / 2 - 0.14); add(T, rbox(0.2, 0.24, 0.05, 0.03), clay(0xfbf8f1), 0, 0.12, 0); decal(T, 0.17, 0.2, tex(170, 200, (g, w, h) => T2(g, s, w / 2, h / 2 + 8, '800 150px "Inter Tight"', '#2b2b38')), 0, 0.12, 0.027, {bump: 0.15});};
+  const A = [1 * Q, -2 * Q], B = [0, 0]; frame(...A); frame(...B); tag(...A, 'A'); tag(...B, 'B');
+  VIEW = {az: 0.35, el: 0.5, fov: 24};
+};
+
 // ------------------------------------------------------------------ Foto-Beiträge (Slides, 22.11.2026): Hauptmotive, kleine Symbole und Deko
 const extr = (shape, d = 0.08) => {const g = new THREE.ExtrudeGeometry(shape, {depth: d, bevelEnabled: true, bevelSize: 0.02, bevelThickness: 0.02, bevelSegments: 3, curveSegments: 16}); g.center(); return g;};
 const tubeM = (pts, r, m) => add(S, new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(p => new THREE.Vector3(...p))), 80, r, 14, false), m);

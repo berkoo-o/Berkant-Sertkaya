@@ -1,0 +1,27 @@
+{
+  "page": "feld.html",
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "jobs": [
+    {
+      "name": "Gleiche_Farbe",
+      "query": "",
+      "frames": 1152,
+      "audio": [
+        {
+          "file": "mix_feld_music.flac",
+          "suffix": "_mit_Musik"
+        },
+        {
+          "file": "mix_feld_fx.flac",
+          "suffix": "_nur_Effekte"
+        }
+      ]
+    }
+  ],
+  "title": "A und B haben exakt dieselbe Farbe (Studio)",
+  "upload": [
+    "_mit_Musik"
+  ]
+}
