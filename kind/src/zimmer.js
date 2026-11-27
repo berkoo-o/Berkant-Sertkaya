@@ -505,9 +505,11 @@ const sun = new THREE.DirectionalLight(LOOK.sun[0], LOOK.sun[1]);
     BEAM = new THREE.Mesh(g, m); BEAM.renderOrder = 5; scene.add(BEAM);}}
 
 // ------------------------------------------------------------------ timeline: which age is shown (each item pops with a small left-to-right delay)
-const WIN = [[[-1, 8.5], [17.9, 18.9]], [[8.8, 10.7], [19.2, 20.1]], [[11.0, 17.6], [20.4, 99]]];
+// the room changes as a wave from left to right: at each place the old piece shrinks away first, then the new one grows (never both at once)
+const CHG = [[-9, 0], [8.4, 1], [10.75, 2], [17.6, 0], [18.75, 1], [19.95, 2]], SWEEP = 0.5;
 const vis = (a, v, k = 0.5) => {if (FIXA >= 0) return a === FIXA ? 1 : 0; let s = 0;
-  for (const [t0, t1] of WIN[a]) {const i = eo(seg(v, t0 + k * 0.25, t0 + k * 0.25 + 0.36)), o = 1 - sm(seg(v, t1 + k * 0.22, t1 + k * 0.22 + 0.22)); s = Math.max(s, Math.min(i, o));} return s;};
+  CHG.forEach(([t0, age], i) => {if (age !== a) return; const t1 = i + 1 < CHG.length ? CHG[i + 1][0] : 1e9, d = k * SWEEP;
+    const inn = i === 0 ? 1 : eo(seg(v, t0 + d + 0.3, t0 + d + 0.58)), out = 1 - sm(seg(v, t1 + d, t1 + d + 0.22)); s = Math.max(s, Math.min(inn, out));}); return s;};
 // every top-level child of an age group is one item; a wrapper at the origin gets its pivot moved to the bottom centre of its content
 ROOM.updateMatrixWorld(true);
 const ITEMS = [];
@@ -562,10 +564,10 @@ const SUBG = [[8, 'Was kostet ein Kind, bis es 18 ist?'], [2, 'Schätz mal.'], [
   [5, 'Hättest du so viel geschätzt?'], [4, 'Schreib’s in die Kommentare.']];
 const SUBS = []; {let i = 0; SUBG.forEach(([n, s]) => {SUBS.push([wordsN[i].start - 0.05, wordsN[i + n - 1].end + 0.25, s]); i += n;}); for (let k = 0; k < SUBS.length - 1; k++) SUBS[k][1] = Math.min(SUBS[k][1], SUBS[k + 1][0]);}
 const fmt = n => Math.round(n).toLocaleString('de-DE') + ' €';
-const COUNT = v => {const a = 679 * 72, b = a + 785 * 72, c = b + 953 * 72; if (v < 17.9) return 0; if (v < 19.2) return a * eio(seg(v, 17.9, 18.9)); if (v < 20.4) return a + (b - a) * eio(seg(v, 19.2, 20.1)); return b + (c - b) * eio(seg(v, 20.4, 21.2));};
+const COUNT = v => {const a = 679 * 72, b = a + 785 * 72, c = b + 953 * 72; if (v < 18.75) return a * eio(seg(v, 17.75, 18.75)); if (v < 19.95) return a + (b - a) * eio(seg(v, 18.85, 19.95)); return b + (c - b) * eio(seg(v, 20.05, 21.2));};
 const NUMS = [[6.45, 8.75, '679 €', 'im Monat für ein Kind unter 6 Jahren'], [9.95, 10.9, '≈ 785 €', 'im Monat für ein Kind von 6 bis 12 Jahren'],
   [12.55, 14.1, '953 €', 'im Monat für Jugendliche von 12 bis 18 Jahren'], [14.45, 17.75, '≈ 50 %', 'davon für Wohnen, Essen und Kleidung'],
-  [17.9, 26.4, v => fmt(Math.round(COUNT(v) / 1000) * 1000), 'bis zum 18. Geburtstag, mit den Preisen von 2018'], [26.45, 29.95, v => v < 28.45 ? '174.000 €' : '216.000 €', 'mit den Preisen von heute (hochgerechnet)', 'cont'],
+  [17.85, 28.45, v => fmt(Math.round(COUNT(v) / 1000) * 1000), 'bis zum 18. Geburtstag, mit den Preisen von 2018'], [28.45, 29.95, '216.000 €', 'mit den Preisen von heute (hochgerechnet)'],
   [30.75, 33.62, '259 €', 'Kindergeld im Monat, bis 18 rund 56.000 €'], [33.65, 35.45, '≈ 26 %', 'der Kosten deckt das Kindergeld']];
 const TITLES = [[-1, 4.25, 'Was kostet ein Kind<br>bis 18?'], [35.5, OUT0, 'Hättest du so viel<br>geschätzt?']];
 const SRCS = [[-1, 17.8, 'Quelle: Statistisches Bundesamt, EVS 2018 (Paare mit einem Kind, Konsumausgaben für das Kind) · Modell vereinfacht'],
