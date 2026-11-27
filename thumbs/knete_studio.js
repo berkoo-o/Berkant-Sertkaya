@@ -570,19 +570,19 @@ MOTIFS.weihnachtsgeld = () => {   // verschneiter Tannenbaum mit Lichterkette, r
   VIEW = {az: -0.25, el: 0.3, fov: 24};
 };
 
-MOTIFS.karten = () => {   // Kartenspiel (überarbeitet 27.11.2026): 11 verschiedene Karten (ohne 6 und 9, die man gedreht verwechseln könnte) fächern sich aus ihrer Schachtel auf, der rote Faden läuft über allen Eckzeichen entlang („die eine Reihenfolge“), daneben eine staunende Figur
-  plinth(2.7, 1.75, [[-1, -1], [-1, 1]]);
+MOTIFS.karten = () => {   // Kartenspiel (überarbeitet 27.11.2026): 11 verschiedene Karten (ohne 6 und 9, die man gedreht verwechseln könnte) fächern sich aus ihrer Schachtel auf, der rote Faden läuft über allen Eckzeichen entlang („die eine Reihenfolge“); ohne Knetfigur und ohne Schriftzug (Wunsch des Nutzers)
+  plinth(2.5, 1.6, [[-1, -1], [1, 1]]);
   const RK = ['A', '7', 'K', '3', '10', 'D', '5', 'B', '2', '8', '4'], SU = ['♠', '♥', '♣', '♦'];
   const cardT = (r, su) => tex(420, 600, (g, w, h) => {const col = (su === '♥' || su === '♦') ? '#e0607e' : '#2b2b38', fr = r === '10' ? 64 : 80;
     g.fillStyle = '#fffdf8'; g.beginPath(); g.roundRect(0, 0, w, h, 34); g.fill(); g.strokeStyle = '#eadfcc'; g.lineWidth = 7; g.beginPath(); g.roundRect(12, 12, w - 24, h - 24, 26); g.stroke();
     T2(g, r, 62, 94, `800 ${fr}px "Inter Tight"`, col); T2(g, su, 62, 166, '700 56px "Inter Tight"', col);
     g.save(); g.translate(w - 62, h - 94); g.rotate(PI); T2(g, r, 0, 0, `800 ${fr}px "Inter Tight"`, col); T2(g, su, 0, -72, '700 56px "Inter Tight"', col); g.restore();});
-  const FX = -0.2, FZ = -0.05, FS = 1.55, N = 11, CWd = 0.42, CHt = 0.6, PIV = 0.2, OFF = 0.36, pts = [], F = grp(S, FX, 0, FZ);
-  // the card box the fan comes out of: front label „52 Karten“, open lid leaning back
+  const FX = 0, FZ = -0.05, FS = 1.55, N = 11, CWd = 0.42, CHt = 0.6, PIV = 0.2, OFF = 0.36, pts = [], F = grp(S, FX, 0, FZ);
+  // the card box the fan comes out of: front label with the four suits (ohne Schriftzug, Wunsch des Nutzers), open lid leaning back
   add(F, rbox(0.6, 0.34, 0.36, 0.045), clay(PAL.deep), 0, 0.17, 0);
   add(F, rbox(0.6, 0.012, 0.17, 0.005), clay(PAL.deep), 0, 0.42, -0.24).rotation.x = -0.55;
   decal(F, 0.5, 0.24, tex(500, 240, (g, w, h) => {g.fillStyle = '#f3ece0'; g.beginPath(); g.roundRect(6, 6, w - 12, h - 12, 26); g.fill();
-    T2(g, '52 Karten', w / 2, 92, '800 78px "Inter Tight"', '#5b4a9a'); ['♠', '♥', '♣', '♦'].forEach((c, i) => T2(g, c, w / 2 + (i - 1.5) * 62, 178, '700 50px "Inter Tight"', (c === '♥' || c === '♦') ? '#e0607e' : '#2b2b38'));}), 0, 0.17, 0.182, {bump: 0.12});
+    ['♠', '♥', '♣', '♦'].forEach((c, i) => T2(g, c, w / 2 + (i - 1.5) * 96, h / 2 + 6, '700 92px "Inter Tight"', (c === '♥' || c === '♦') ? '#e0607e' : '#2b2b38'));}), 0, 0.17, 0.182, {bump: 0.12});
   for (let k = 0; k < N; k++) {const a = (66 - k * 132 / (N - 1)) * PI / 180, z = -0.1 + k * 0.014, C = grp(F, 0, PIV, z); C.rotation.z = a;
     add(C, rbox(CWd, CHt, 0.01, 0.004), clay(0xfffdf8, {bumpScale: 0.6}), 0, OFF, 0);
     decal(C, CWd, CHt, cardT(RK[k], SU[k % 4]), 0, OFF, 0.0062, {bump: 0.1, glow: 0.12});
@@ -590,7 +590,6 @@ MOTIFS.karten = () => {   // Kartenspiel (überarbeitet 27.11.2026): 11 verschie
   F.scale.setScalar(FS);
   {const m = redClay(); add(S, new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, false, 'centripetal'), 200, 0.0105, 10, false), m);
     pts.forEach(p => add(S, new THREE.SphereGeometry(0.0135, 12, 10), m, p.x, p.y, p.z));}
-  person(S, 1.0, 0.3, {body: PAL.sky, hair: 0x8a5a3a, ry: -0.75, s: 1.3, up: [1]});
   VIEW = {az: 0.08, el: 0.22, fov: 24};
 };
 
