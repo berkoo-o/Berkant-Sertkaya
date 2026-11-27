@@ -133,7 +133,7 @@ function draw2d(v) {fx.clearRect(0, 0, W, H); cam.updateMatrixWorld(); const [ax
   // labels in the explanation: the light comes from the lamp, the cylinder throws the shadow onto B
   const la = sm(seg(v, T.lab - 0.8, T.lab - 0.3)) * (1 - sm(seg(v, T.beam1 - 0.2, T.beam1 + 0.2))), ls = sm(seg(v, T.lab, T.lab + 0.5)) * (1 - sm(seg(v, T.beam1 - 0.2, T.beam1 + 0.2)));
   if (la > 0) {const [x, y] = scr(LAMP); fx.globalAlpha = la; fx.strokeStyle = 'rgba(23,23,28,0.8)'; fx.lineWidth = 3; fx.beginPath(); fx.moveTo(x - 30, y + 30); fx.lineTo(x - 150, y + 150); fx.stroke(); pill(x - 150, y + 150, 'Licht', false, la);}
-  if (ls > 0) {const [x, y] = scr(SHADOWP); fx.globalAlpha = ls; fx.strokeStyle = 'rgba(23,23,28,0.8)'; fx.lineWidth = 3; fx.beginPath(); fx.moveTo(x, y); fx.lineTo(x - 160, y + 100); fx.stroke(); fx.fillStyle = 'rgba(23,23,28,0.9)'; fx.beginPath(); fx.arc(x, y, 7, 0, 7); fx.fill(); pill(x - 160, y + 100, 'Schatten', false, ls);}
+  if (ls > 0) {const [x, y] = scr(SHADOWP); fx.globalAlpha = ls; fx.strokeStyle = 'rgba(23,23,28,0.8)'; fx.lineWidth = 3; fx.beginPath(); fx.moveTo(x, y); fx.lineTo(x - 170, y + 40); fx.stroke(); fx.fillStyle = 'rgba(23,23,28,0.9)'; fx.beginPath(); fx.arc(x, y, 7, 0, 7); fx.fill(); pill(x - 170, y + 40, 'Schatten', false, ls);}
   fx.globalAlpha = 1; window.__AB = {a: ca, b: cb};}
 
 // ------------------------------------------------------------------ texts (subtitles from the word times of take 1)
