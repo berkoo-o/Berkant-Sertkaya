@@ -1,0 +1,19 @@
+{
+  "page": "knete.html",
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "jobs": [
+    {
+      "name": "Wem_gehoert_Deutschland_Knete",
+      "query": "",
+      "frames": 2321,
+      "audio": [
+        {"file": "mix_knete_music.flac", "suffix": "_mit_Musik"},
+        {"file": "mix_knete_fx.flac", "suffix": "_nur_Effekte"}
+      ]
+    }
+  ],
+  "title": "Wem gehört eigentlich Deutschland? (Knete, zehn Figuren und 100 Münzen)",
+  "upload": ["_mit_Musik"]
+}

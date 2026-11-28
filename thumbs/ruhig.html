@@ -1,0 +1,91 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>function. – Thumbnail-System ruhig</title>
+<style>
+@font-face{font-family:Poppins;font-weight:500;src:url(node_modules/@fontsource/poppins/files/poppins-latin-500-normal.woff2)}
+@font-face{font-family:'Inter Tight';font-weight:600;src:url(node_modules/@fontsource/inter-tight/files/inter-tight-latin-600-normal.woff2)}
+@font-face{font-family:'Inter Tight';font-weight:800;src:url(node_modules/@fontsource/inter-tight/files/inter-tight-latin-800-normal.woff2)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#eee}
+canvas{position:absolute;left:0;top:0}
+</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script type="module">
+// Dezente Thumbnail-Stile für function. (Wunsch des Nutzers 22.11.2026: die vorigen waren „viel zu auffällig“): viel Luft, gedämpfte Farben,
+// kleine Schrift, kein Glühen. ?s=1 Galerie · ?s=2 Schiefer · ?s=3 Salbei · ?s=4 Passepartout    &v=gesetze|vermoegen
+await Promise.all(['500 40px Poppins', '600 40px "Inter Tight"', '800 60px "Inter Tight"'].map(f => document.fonts.load(f)));
+const Q = new URLSearchParams(location.search), S = +(Q.get('s') || 1), VID = Q.get('v') || 'gesetze';
+const W = 1080, H = 1920;
+const V = {
+  gesetze: {title: ['Diese 5 Gesetze haben', 'Deutschland wütend gemacht'], nr: '07', topic: 'Politik'},
+  vermoegen: {title: ['Wem gehört eigentlich', 'Deutschland?'], nr: '06', topic: 'Geld'}}[VID];
+const g = document.getElementById('c').getContext('2d');
+const img = await new Promise(r => {const i = new Image(); i.onload = () => r(i); i.src = `motive/${VID}.png`;});
+const BB = (() => {const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; const x = c.getContext('2d'); x.drawImage(img, 0, 0);
+  const d = x.getImageData(0, 0, c.width, c.height).data; let x0 = 1e9, y0 = 1e9, x1 = -1, y1 = -1;
+  for (let y = 0; y < c.height; y += 2) for (let xx = 0; xx < c.width; xx += 2) if (d[(y * c.width + xx) * 4 + 3] > 60) {x0 = Math.min(x0, xx); x1 = Math.max(x1, xx); y0 = Math.min(y0, y); y1 = Math.max(y1, y);}
+  return {x0, y0, w: x1 - x0, h: y1 - y0};})();
+function motif(cx, by, maxW, maxH, shadow = 'rgba(40,35,30,0.22)') {const s = Math.min(maxW / BB.w, maxH / BB.h), w = BB.w * s, h = BB.h * s;
+  // soft contact shadow on the ground
+  g.save(); g.filter = 'blur(28px)'; g.fillStyle = shadow; g.beginPath(); g.ellipse(cx, by - 6, w * 0.46, 34, 0, 0, Math.PI * 2); g.fill(); g.restore();
+  g.drawImage(img, BB.x0, BB.y0, BB.w, BB.h, cx - w / 2, by - h, w, h); return {w, h};}
+const T = (t, x, y, font, col, o = {}) => {g.save(); g.font = font; g.fillStyle = col; g.textAlign = o.align || 'left'; g.letterSpacing = o.ls || '0px'; g.fillText(t, x, y); g.restore();};
+const grain = a => {const n = document.createElement('canvas'); n.width = 256; n.height = 256; const x = n.getContext('2d'), d = x.createImageData(256, 256);
+  for (let i = 0; i < d.data.length; i += 4) {d.data[i] = d.data[i + 1] = d.data[i + 2] = 0; d.data[i + 3] = 255 * a * Math.random();} x.putImageData(d, 0, 0); g.fillStyle = g.createPattern(n, 'repeat'); g.fillRect(0, 0, W, H);};
+const vlight = (cx, cy, r, inner, outer) => {const gr = g.createRadialGradient(cx, cy, 0, cx, cy, r); gr.addColorStop(0, inner); gr.addColorStop(1, outer); g.fillStyle = gr; g.fillRect(0, 0, W, H);};
+
+if (S === 1) {
+  // „Galerie“ (vom Nutzer gewählt): warm light grey, the motif alone with lots of space, small type. &l= text layout:
+  // 0 Titel unter dem Motiv · 1 oben links · 2 unten links mit feiner Linie · 3 oben zentriert · 4 in den Ecken verteilt
+  const L = +(Q.get('l') || 0), INK = '#3d3a36', MUTE = '#8d867c', TF = '600 42px "Inter Tight"';
+  vlight(540, 900, 1300, '#F4F2EE', '#DEDAD3');
+  if (L === 0) {T(`Nr. ${V.nr}`, 90, 390, '600 30px "Inter Tight"', MUTE, {ls: '3px'}); motif(540, 1260, 820, 640);
+    V.title.forEach((t, i) => T(t, 540, 1400 + i * 52, TF, INK, {align: 'center'})); T('function.', 540, 1600, '500 34px Poppins', MUTE, {align: 'center', ls: '-0.5px'});}
+  if (L === 1) {T(`Nr. ${V.nr} · ${V.topic}`, 90, 380, '600 28px "Inter Tight"', MUTE, {ls: '3px'}); V.title.forEach((t, i) => T(t, 90, 450 + i * 54, '600 46px "Inter Tight"', INK));
+    motif(540, 1420, 840, 700); T('function.', 540, 1610, '500 34px Poppins', MUTE, {align: 'center', ls: '-0.5px'});}
+  if (L === 2) {motif(540, 1200, 840, 700); g.fillStyle = INK; g.fillRect(90, 1336, 70, 3);
+    T(`Nr. ${V.nr} · ${V.topic}`, 90, 1392, '600 28px "Inter Tight"', MUTE, {ls: '3px'}); V.title.forEach((t, i) => T(t, 90, 1452 + i * 54, '600 46px "Inter Tight"', INK));
+    T('function.', 990, 1610, '500 34px Poppins', MUTE, {align: 'right', ls: '-0.5px'});}
+  if (L === 3) {V.title.forEach((t, i) => T(t, 540, 430 + i * 54, '600 46px "Inter Tight"', INK, {align: 'center'})); g.fillStyle = MUTE; g.fillRect(510, 510, 60, 2);
+    motif(540, 1400, 840, 720); T(`Nr. ${V.nr}`, 540, 1520, '600 28px "Inter Tight"', MUTE, {align: 'center', ls: '3px'}); T('function.', 540, 1610, '500 34px Poppins', MUTE, {align: 'center', ls: '-0.5px'});}
+  if (L === 4) {T(`Nr. ${V.nr}`, 90, 380, '600 28px "Inter Tight"', MUTE, {ls: '3px'}); T('function.', 990, 382, '500 34px Poppins', MUTE, {align: 'right', ls: '-0.5px'});
+    g.fillStyle = 'rgba(61,58,54,0.18)'; g.fillRect(90, 412, 900, 2);
+    motif(540, 1300, 840, 720); g.fillStyle = 'rgba(61,58,54,0.18)'; g.fillRect(90, 1440, 900, 2);
+    V.title.forEach((t, i) => T(t, 990, 1508 + i * 54, '600 46px "Inter Tight"', INK, {align: 'right'})); T(V.topic, 90, 1508, '600 28px "Inter Tight"', MUTE, {ls: '3px'});}
+  grain(0.035);
+}
+if (S === 2) {
+  // „Schiefer“: matte dark slate, a soft top light, white motif presentation, small white type, no colour accents
+  {const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#2b2e34'); gr.addColorStop(1, '#16181c'); g.fillStyle = gr; g.fillRect(0, 0, W, H);}
+  vlight(540, 1000, 760, 'rgba(255,255,255,0.07)', 'rgba(255,255,255,0)');
+  T(V.title[0], 90, 420, '600 44px "Inter Tight"', 'rgba(255,255,255,0.92)'); T(V.title[1], 90, 476, '600 44px "Inter Tight"', 'rgba(255,255,255,0.92)');
+  g.fillStyle = 'rgba(255,255,255,0.35)'; g.fillRect(90, 512, 60, 3);
+  motif(540, 1360, 840, 700, 'rgba(0,0,0,0.45)');
+  T('function.', 90, 1610, '500 34px Poppins', 'rgba(255,255,255,0.55)', {ls: '-0.5px'});
+  grain(0.04);
+}
+if (S === 3) {
+  // „Salbei“: a quiet sage-to-sand gradient, the motif in the middle, title small at the bottom
+  {const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#d7dfd2'); gr.addColorStop(1, '#ece4d6'); g.fillStyle = gr; g.fillRect(0, 0, W, H);}
+  vlight(540, 980, 700, 'rgba(255,255,255,0.35)', 'rgba(255,255,255,0)');
+  motif(540, 1240, 840, 680, 'rgba(60,70,50,0.22)');
+  T(V.title[0], 540, 1420, '600 44px "Inter Tight"', '#3b4236', {align: 'center'}); T(V.title[1], 540, 1474, '600 44px "Inter Tight"', '#3b4236', {align: 'center'});
+  T('function.', 540, 1600, '500 32px Poppins', '#7d8676', {align: 'center', ls: '-0.5px'});
+  grain(0.03);
+}
+if (S === 4) {
+  // „Passepartout“: the motif like a framed print on a wall, with a small museum label
+  g.fillStyle = '#E6E1D7'; g.fillRect(0, 0, W, H);
+  const fx = 120, fy = 430, fw = 840, fh = 900;
+  g.save(); g.shadowColor = 'rgba(40,30,20,0.22)'; g.shadowBlur = 40; g.shadowOffsetY = 16; g.fillStyle = '#fbfaf7'; g.fillRect(fx, fy, fw, fh); g.restore();
+  g.strokeStyle = 'rgba(0,0,0,0.08)'; g.lineWidth = 2; g.strokeRect(fx + 70, fy + 70, fw - 140, fh - 140);
+  g.fillStyle = '#efece6'; g.fillRect(fx + 71, fy + 71, fw - 142, fh - 142);
+  g.save(); g.beginPath(); g.rect(fx + 71, fy + 71, fw - 142, fh - 142); g.clip(); motif(540, fy + fh - 150, fw - 220, fh - 300, 'rgba(40,35,30,0.2)'); g.restore();
+  // label
+  g.fillStyle = '#fbfaf7'; g.fillRect(120, 1420, 480, 200); g.strokeStyle = 'rgba(0,0,0,0.06)'; g.strokeRect(120, 1420, 480, 200);
+  T(`Nr. ${V.nr} · ${V.topic}`, 150, 1472, '600 24px "Inter Tight"', '#8d867c', {ls: '2px'});
+  T(V.title[0], 150, 1524, '600 30px "Inter Tight"', '#2f2c28'); T(V.title[1], 150, 1562, '600 30px "Inter Tight"', '#2f2c28');
+  T('function.', 150, 1600, '500 24px Poppins', '#8d867c');
+  grain(0.03);
+}
+window.ready = true;
+</script></body></html>

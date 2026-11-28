@@ -1,0 +1,12 @@
+{
+  "page": "zimmer.html",
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "jobs": [
+    {"name": "Kind_bis_18_Abendlicht", "query": "?s=2", "frames": 1280, "audio": [{"file": "mix_kind_music.flac", "suffix": "_mit_Musik"}, {"file": "mix_kind_fx.flac", "suffix": "_nur_Effekte"}]},
+    {"name": "Kind_bis_18_Morgen", "query": "?s=3", "frames": 1280, "audio": [{"file": "mix_kind_music.flac", "suffix": "_mit_Musik"}, {"file": "mix_kind_fx.flac", "suffix": "_nur_Effekte"}]}
+  ],
+  "title": "Was kostet ein Kind bis 18? (Kinderzimmer, Abendlicht und Morgen)",
+  "upload": ["_mit_Musik"]
+}

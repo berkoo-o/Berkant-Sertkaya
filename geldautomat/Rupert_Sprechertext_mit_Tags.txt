@@ -1,0 +1,25 @@
+function. – „Der Geldautomat“ – Sprechertext für ElevenLabs „Rupert“ (Eleven v3/v4, Audio-Tags)
+Stand: 15.11.2026 – komplett ins Textfeld kopieren
+
+[calm][curious] In diesem Kasten liegen oft bis zu hunderttausend Euro. [short pause] [intrigued] Wie kommt genau dein Schein heraus?
+
+[matter-of-fact] Rund achtundvierzigtausend Geldautomaten stehen in Deutschland.
+
+[calm] Du steckst die Karte ein. [short pause] Der Automat liest den Chip und schickt deine PIN verschlüsselt an die Bank. [short pause] [explaining] Erst wenn sie zustimmt, geht es weiter.
+
+[calm] Unten im Tresor stecken meist vier Kassetten voller Scheine.
+
+[explaining] Gummiwalzen ziehen sie einzeln ab. [short pause] Ein Sensor misst die Dicke jedes Scheins. [short pause] [slightly amused] Kleben zwei zusammen, landen sie in einem Extrafach.
+
+[calm] Bänder tragen dein Geld nach oben zum Ausgabefach. [short pause] Nimmst du es nicht, zieht der Automat es wieder ein.
+
+[curious] Und Diebe? [short pause] [matter-of-fact] Wird der Tresor gesprengt, färbt Tinte die Scheine ein. [short pause] Zweitausendzweiundzwanzig gab es fast fünfhundert Sprengungen, [short pause] zweitausendvierundzwanzig noch zweihundertneunundsechzig.
+
+[long pause] [warm] Der erste deutsche Geldautomat stand übrigens neunzehnhundertachtundsechzig in Tübingen. [short pause] [softly] Damals nur für tausend ausgewählte Kunden.
+
+
+Einstellungen:
+- Stability: „Natural“
+- Sprache: Deutsch
+- Ziel: ca. 55–58 Sekunden (danach kommen noch ~3 Sekunden Outro)
+- Als eine durchgehende MP3 exportieren und hochladen

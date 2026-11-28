@@ -1,0 +1,7 @@
+node_modules
+out/
+fr/
+fr2/
+sfx/
+*.wav
+video.mp4

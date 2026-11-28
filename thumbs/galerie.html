@@ -1,0 +1,67 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>function. – Thumbnail Galerie</title>
+<style>
+@font-face{font-family:Poppins;font-weight:500;src:url(node_modules/@fontsource/poppins/files/poppins-latin-500-normal.woff2)}
+@font-face{font-family:'Inter Tight';font-weight:600;src:url(node_modules/@fontsource/inter-tight/files/inter-tight-latin-600-normal.woff2)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#eee}
+canvas{position:absolute;left:0;top:0}
+</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script type="module">
+// Festes Thumbnail-System „Galerie A“ (vom Nutzer gewählt am 22.11.2026), gleich für jedes Video, egal in welchem Animationsstil:
+// warmes Hellgrau, oben links klein das Thema und darunter der Titel, das Motiv groß in der Mitte mit weichem Schatten, unten „function.“ in Rot.
+// Format 1080 × 1920 (9:16). Alles Wichtige liegt im mittleren 4:5-Bereich (y 285–1635), deshalb passt dieselbe Datei ohne Verschieben
+// für TikTok (Cover 9:16, Profilraster 3:4), Instagram (Profilraster 4:5 bzw. 3:4) und YouTube Shorts (9:16).
+// Aufruf: galerie.html?v=<name>   Motive seit 22.11.2026 im Knete-Look aus thumbs/motive_knete/<name>.png (node thumbs/knete_render.mjs);
+// die älteren Motive im Original-Look liegen in thumbs/motive/ (&dir=motive).
+await Promise.all(['500 40px Poppins', '600 40px "Inter Tight"'].map(f => document.fonts.load(f)));
+const VID = new URLSearchParams(location.search).get('v') || 'gesetze', DIR = new URLSearchParams(location.search).get('dir') || 'motive_knete';
+const DATA = {
+  gesetze: ['Politik', 'Diese 5 Gesetze haben', 'Deutschland wütend gemacht'],
+  vermoegen: ['Geld', 'Wem gehört eigentlich', 'Deutschland?'],
+  bankrun1: ['Geld', 'Was wäre, wenn alle gleichzeitig', 'ihr Geld abheben?'],
+  bankrun2: ['Geld', 'Was wäre, wenn alle gleichzeitig', 'ihr Geld abheben?'],
+  geldautomat: ['Alltag', 'Wie kommt dein Schein', 'aus dem Geldautomaten?'],
+  strom: ['Energie', 'Wie kommt der Strom', 'in deine Steckdose?'],
+  rundfunk: ['Medien', 'Wohin geht dein', 'Rundfunkbeitrag?'],
+  merz: ['Politik', 'Ist Merz der', 'unbeliebteste Kanzler?'],
+  jahr2027: ['Alltag', 'Was ändert sich', '2027 für dich?'],
+  paket: ['Alltag', 'Der Weg deines Pakets', 'in 60 Sekunden'],
+  tuev: ['Alltag', 'Wie liest man die', 'TÜV-Plakette?'],
+  umwelt: ['Alltag', 'Braucht man die', 'Umweltplakette noch?'],
+  autobahn: ['Alltag', 'Was verrät die', 'Autobahn-Nummer?'],
+  benzin: ['Geld', 'Wie viel vom Liter', 'geht an den Staat?'],
+  kennzeichen: ['Alltag', 'Warum nur', 'ein K?'],
+  wasserscheide: ['Geografie', 'Nordsee oder', 'Schwarzes Meer?'],
+  genz: ['Politik', 'Warum geht die Gen Z', 'auf die Straße?'],
+  blackfriday: ['Geld', 'Black Friday:', 'Sind die Rabatte echt?'],
+  brutto: ['Geld', '3.000 € brutto:', 'So viel bleibt dir'],
+  weihnachtsgeld: ['Geld', 'Weihnachtsgeld:', 'Warum bleibt so wenig?'],
+  karten: ['Wissen', 'Diese Reihenfolge', 'gab es noch nie'],
+  schatten: ['Wissen', 'A und B haben', 'dieselbe Farbe'],
+  kind: ['Geld', 'Was kostet ein Kind', 'bis 18?']};
+const [topic, t1, t2] = DATA[VID];
+const W = 1080, H = 1920, INK = '#3d3a36', MUTE = '#8d867c', RED = '#E01E2B';
+const g = document.getElementById('c').getContext('2d');
+const img = await new Promise(r => {const i = new Image(); i.onload = () => r(i); i.src = `${DIR}/${VID}.png`;});
+const BB = (() => {const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; const x = c.getContext('2d'); x.drawImage(img, 0, 0);
+  const d = x.getImageData(0, 0, c.width, c.height).data; let x0 = 1e9, y0 = 1e9, x1 = -1, y1 = -1;
+  for (let y = 0; y < c.height; y += 2) for (let xx = 0; xx < c.width; xx += 2) if (d[(y * c.width + xx) * 4 + 3] > 60) {x0 = Math.min(x0, xx); x1 = Math.max(x1, xx); y0 = Math.min(y0, y); y1 = Math.max(y1, y);}
+  return {x0, y0, w: x1 - x0, h: y1 - y0};})();
+const T = (t, x, y, font, col, o = {}) => {g.save(); g.font = font; g.fillStyle = col; g.textAlign = o.align || 'left'; g.letterSpacing = o.ls || '0px'; g.fillText(t, x, y); g.restore();};
+// background: warm light grey with a soft light in the middle and a little grain
+{const gr = g.createRadialGradient(540, 960, 0, 540, 960, 1300); gr.addColorStop(0, '#F4F2EE'); gr.addColorStop(1, '#DEDAD3'); g.fillStyle = gr; g.fillRect(0, 0, W, H);}
+// text top left
+T(topic.toUpperCase(), 90, 392, '600 28px "Inter Tight"', MUTE, {ls: '4px'});
+T(t1, 90, 462, '600 48px "Inter Tight"', INK); T(t2, 90, 518, '600 48px "Inter Tight"', INK);
+// motif: as large as fits between the title and the logo, centred, with a soft contact shadow
+{const top = 600, bottom = 1490, maxW = 960, maxH = bottom - top, s = Math.min(maxW / BB.w, maxH / BB.h), w = BB.w * s, h = BB.h * s, cx = 540, by = bottom - (maxH - h) * 0.35;
+  g.save(); g.filter = 'blur(28px)'; g.fillStyle = 'rgba(40,35,30,0.22)'; g.beginPath(); g.ellipse(cx, by - 6, w * 0.44, 34, 0, 0, Math.PI * 2); g.fill(); g.restore();
+  g.drawImage(img, BB.x0, BB.y0, BB.w, BB.h, cx - w / 2, by - h, w, h);}
+// logo in red at the bottom
+T('function.', 540, 1588, '500 40px Poppins', RED, {align: 'center', ls: '-0.8px'});
+{const n = document.createElement('canvas'); n.width = 256; n.height = 256; const x = n.getContext('2d'), d = x.createImageData(256, 256);
+  for (let i = 0; i < d.data.length; i += 4) {d.data[i] = d.data[i + 1] = d.data[i + 2] = 0; d.data[i + 3] = 255 * 0.035 * Math.random();} x.putImageData(d, 0, 0); g.fillStyle = g.createPattern(n, 'repeat'); g.fillRect(0, 0, W, H);}
+window.ready = true;
+</script></body></html>

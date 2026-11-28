@@ -1,0 +1,10 @@
+node_modules
+package-lock.json
+pc-out/
+gesetze/sfx/
+thumbs/out/
+blackfriday/sfx/
+brutto/sfx/
+karten/sfx/
+schatten/sfx/
+thumbs/motive_knete_hd/

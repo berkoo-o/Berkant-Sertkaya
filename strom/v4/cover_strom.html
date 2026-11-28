@@ -1,0 +1,123 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#07070B}
+canvas{position:absolute;left:0;top:0}
+</style></head><body>
+<canvas id="bg" width="1080" height="1920"></canvas>
+<canvas id="fg" width="1080" height="1920"></canvas>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+// function. – Cover „Der Strom“, clean (nur Motiv), im Stil des Geldautomaten-Covers: kompaktes Windrad mit gläserner Gondel und gläsernem Turm,
+// innen Antriebsstrang, Generator, Schaltschrank, Leiter und Transformator; der rote Strom läuft vom Generator bis zum Stecker in der Steckdose
+import * as THREE from 'three';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
+const W=1080,H=1920;const Q=new URLSearchParams(location.search);
+const bg=document.getElementById('bg').getContext('2d'),fg=document.getElementById('fg').getContext('2d');
+const CX=+(new URLSearchParams(location.search).get('cx')||605),CY=+(new URLSearchParams(location.search).get('cy')||1490);
+// ---------- background (same recipe as geldautomat/cover_atm_modern.html?mode=clean) ----------
+{bg.fillStyle='#07070B';bg.fillRect(0,0,W,H);
+ const blob=(x,y,r,c)=>{const g=bg.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,c);g.addColorStop(1,'rgba(0,0,0,0)');bg.fillStyle=g;bg.fillRect(0,0,W,H);};
+ blob(430,900,800,'rgba(96,78,255,0.32)');blob(900,1500,620,'rgba(224,30,43,0.20)');blob(120,1700,500,'rgba(60,40,200,0.16)');
+ bg.save();bg.strokeStyle='rgba(170,160,255,0.10)';bg.lineWidth=1.5;const hz=1380;
+ for(let i=-14;i<=14;i++){bg.beginPath();bg.moveTo(CX+i*26,hz);bg.lineTo(CX+i*190,H);bg.stroke();}
+ for(let k=0;k<9;k++){const y=hz+Math.pow(k/8,2.1)*(H-hz);bg.beginPath();bg.moveTo(0,y);bg.lineTo(W,y);bg.stroke();}
+ const f=bg.createLinearGradient(0,hz-10,0,hz+170);f.addColorStop(0,'#07070B');f.addColorStop(1,'rgba(7,7,11,0)');bg.fillStyle=f;bg.fillRect(0,hz-12,W,190);
+ const f2=bg.createLinearGradient(0,1740,0,H);f2.addColorStop(0,'rgba(7,7,11,0)');f2.addColorStop(1,'rgba(7,7,11,.95)');bg.fillStyle=f2;bg.fillRect(0,1740,W,180);bg.restore();
+ bg.save();bg.translate(CX,CY+10);bg.scale(1,0.24);const g=bg.createRadialGradient(0,0,0,0,0,460);g.addColorStop(0,'rgba(224,30,43,0.55)');g.addColorStop(.55,'rgba(224,30,43,0.16)');g.addColorStop(1,'rgba(224,30,43,0)');bg.fillStyle=g;bg.beginPath();bg.arc(0,0,460,0,7);bg.fill();bg.restore();
+ const v=bg.createLinearGradient(0,0,0,600);v.addColorStop(0,'rgba(7,7,11,.4)');v.addColorStop(1,'rgba(7,7,11,0)');bg.fillStyle=v;bg.fillRect(0,0,W,600);}
+// ---------- 3D ----------
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});
+renderer.setSize(W,H);renderer.setPixelRatio(1);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.setClearColor(0x000000,0);
+renderer.domElement.style.position='absolute';document.body.insertBefore(renderer.domElement,document.getElementById('fg'));
+const scene=new THREE.Scene();const pm=new THREE.PMREMGenerator(renderer);scene.environment=pm.fromScene(new RoomEnvironment(),0.04).texture;scene.environmentIntensity=0.4;
+const D=10.2,el=15*Math.PI/180;const cam=new THREE.PerspectiveCamera(30,W/H,0.1,100);
+cam.position.set(0,D*Math.sin(el),D*Math.cos(el));cam.lookAt(0,0,0);cam.updateMatrixWorld();
+scene.add(new THREE.HemisphereLight(0xcfd4ff,0x14080c,0.5));
+const key=new THREE.DirectionalLight(0xfff1e4,2.3);key.position.set(-2.5,7,5);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.radius=14;
+Object.assign(key.shadow.camera,{left:-4,right:4,top:6,bottom:-4});scene.add(key);
+const rim=new THREE.DirectionalLight(0xff3344,2.4);rim.position.set(4,2.5,-3);scene.add(rim);
+const rim2=new THREE.DirectionalLight(0x8a78ff,1.4);rim2.position.set(-4,2,-2);scene.add(rim2);
+const M=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:.45,metalness:.15,...o});
+const root=new THREE.Group();root.scale.setScalar(+(Q.get('s')||1.22));scene.add(root);
+const gp=new THREE.Group();gp.rotation.y=+(Q.get('ry')||-1.05);root.add(gp);
+const BODY=M(0xdedaff,{roughness:.5}),VIO=M(0x5257b8),PAN=M(0x24205e,{roughness:.35}),LIL=M(0xa48cff,{roughness:.3}),DARK=M(0x0c0a26,{roughness:.25});
+const REDM=new THREE.MeshBasicMaterial({color:0xff2a3a,toneMapped:false});
+const add=(par,geo,m,x=0,y=0,z=0)=>{const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;par.add(o);return o;};
+const RB=(par,w,h,d,m,x,y,z,r=0.02)=>add(par,new RoundedBoxGeometry(w,h,d,3,r),m,x,y,z);
+const glass=(par,g,x,y,z,op=.14)=>{const sh=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:0x8f86ff,transparent:true,opacity:op,roughness:.1,depthWrite:false,side:THREE.DoubleSide,emissive:0x4a40c0,emissiveIntensity:.25}));sh.position.set(x,y,z);sh.renderOrder=5;par.add(sh);return sh;};
+const edges=(par,g,x,y,z,th=1)=>{const ed=new THREE.LineSegments(new THREE.EdgesGeometry(g,th),new THREE.LineBasicMaterial({color:0xcfc8ff,transparent:true,opacity:.95}));ed.position.set(x,y,z);ed.renderOrder=6;par.add(ed);return ed;};
+const tube=(par,pts,r=0.018)=>{const t=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(p=>new THREE.Vector3(...p)),false,'catmullrom',0.25),160,r,12),REDM);t.renderOrder=7;par.add(t);return t;};
+const lerp=(a,b,u)=>a+(b-a)*u;
+const rod=(par,a,b,r,m)=>{const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b);const len=A.distanceTo(B);const g=new THREE.CylinderGeometry(r,r,len,10);g.translate(0,len/2,0);g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),B.clone().sub(A).normalize()));const o=new THREE.Mesh(g,m);o.position.copy(A);o.castShadow=true;par.add(o);return o;};
+const cylZ=(par,r,len,m,x,y,z,seg=28)=>add(par,new THREE.CylinderGeometry(r,r,len,seg).rotateX(Math.PI/2),m,x,y,z);
+const LIGHT=M(0xece6ff,{roughness:.6}),METAL=M(0xc9c2ff,{metalness:.6,roughness:.25}),NAVY=M(0x2b2778),NODE=M(0x15123a);
+const TB=0.1,TH=1.6,rT=y=>lerp(0.21,0.13,(y-TB)/(TH-TB)),NY=1.90;
+// ---------- foundation with bolt circle ----------
+add(root,new THREE.CylinderGeometry(0.6,0.63,0.07,56),DARK,0,0.035,0);add(root,new THREE.TorusGeometry(0.6,0.008,8,72).rotateX(Math.PI/2),REDM,0,0.07,0);
+add(root,new THREE.CylinderGeometry(0.3,0.32,0.05,40),PAN,0,0.095,0);for(let i=0;i<14;i++){const a=i/14*6.283;add(root,new THREE.CylinderGeometry(0.013,0.013,0.022,8),LIL,Math.cos(a)*0.265,0.128,Math.sin(a)*0.265);}
+// ---------- glass tower: flanges, platforms, ladder, transformer in the base ----------
+glass(root,new THREE.CylinderGeometry(0.13,0.21,TH-TB,40,1,true),0,(TH+TB)/2,0,.16);
+for(const y of [TB+0.02,0.62,1.12,TH])add(root,new THREE.TorusGeometry(rT(y)+0.004,0.012,8,48).rotateX(Math.PI/2),LIL,0,y,0);
+for(const y of [0.62,1.12]){const p=new THREE.Mesh(new THREE.CylinderGeometry(rT(y)-0.012,rT(y)-0.012,0.012,36),new THREE.MeshStandardMaterial({color:0xa48cff,transparent:true,opacity:.3,roughness:.3,depthWrite:false}));p.position.set(0,y,0);p.renderOrder=4;root.add(p);}
+{const lg=new THREE.Group();lg.rotation.y=0.75;root.add(lg);const zl=y=>-(rT(y)-0.035);for(const s of [-1,1])rod(lg,[s*0.036,0.13,zl(0.13)],[s*0.036,TH-0.02,zl(TH-0.02)],0.0065,LIL);for(let y=0.18;y<TH-0.04;y+=0.075)rod(lg,[-0.036,y,zl(y)],[0.036,y,zl(y)],0.005,LIL);}
+RB(root,0.2,0.24,0.17,NAVY,0,0.26,0,0.02);for(const s of [-1,1])for(let i=0;i<5;i++)RB(root,0.014,0.19,0.02,LIL,s*0.107,0.26,-0.06+i*0.03,0.004);
+RB(root,0.1,0.06,0.012,PAN,0,0.29,0.091,0.004);add(root,new THREE.SphereGeometry(0.009,10,8),REDM,0.03,0.29,0.099);
+for(const x of [-0.06,0,0.06]){add(root,new THREE.CylinderGeometry(0.013,0.018,0.075,12),LIGHT,x,0.418,0);add(root,new THREE.SphereGeometry(0.016,12,10),METAL,x,0.46,0);}
+{const p=new THREE.PointLight(0x9a8cff,0.5,0.9,2);p.position.set(0.1,0.5,0.25);root.add(p);}
+// door with two steps and a small lamp
+{const a=0.75,r=rT(0.26)+0.006;const dg=new THREE.Group();dg.position.set(Math.sin(a)*r,0.245,Math.cos(a)*r);dg.rotation.y=a;root.add(dg);RB(dg,0.11,0.2,0.016,PAN,0,0,0,0.008);RB(dg,0.012,0.03,0.012,LIL,0.035,0,0.012,0.004);add(dg,new THREE.SphereGeometry(0.011,10,8),new THREE.MeshBasicMaterial({color:0xfff0d8,toneMapped:false}),0,0.135,0.012);
+ RB(dg,0.14,0.022,0.06,PAN,0,-0.125,0.03,0.006);RB(dg,0.14,0.022,0.06,PAN,0,-0.147,0.085,0.006);}
+// ---------- yaw bearing with gear teeth ----------
+add(root,new THREE.CylinderGeometry(0.16,0.16,0.05,36),PAN,0,TH+0.03,0);add(root,new THREE.TorusGeometry(0.166,0.012,8,48).rotateX(Math.PI/2),LIL,0,TH+0.03,0);
+for(let i=0;i<28;i++){const a=i/28*6.283;const t=RB(root,0.016,0.03,0.02,LIL,Math.cos(a)*0.182,TH+0.03,Math.sin(a)*0.182,0.003);t.rotation.y=-a;}
+// ---------- nacelle: bed plate, glass shell with bright edges ----------
+RB(gp,0.46,0.04,1.14,VIO,0,NY-0.23,-0.1,0.014);
+{const g=new THREE.BoxGeometry(0.44,0.42,1.1);glass(gp,g,0,NY,-0.1,.12);edges(gp,g,0,NY,-0.1);}
+// drive train: main bearing on its pedestal, shaft, gearbox, brake, coupling, generator
+cylZ(gp,0.04,0.3,METAL,0,NY,0.33);RB(gp,0.2,0.24,0.1,PAN,0,NY-0.02,0.36,0.02);add(gp,new THREE.TorusGeometry(0.07,0.012,8,32),LIL,0,NY,0.412);RB(gp,0.24,0.1,0.14,VIO,0,NY-0.16,0.36,0.015);
+RB(gp,0.27,0.29,0.26,NAVY,0,NY-0.005,0.06,0.025);for(let i=0;i<5;i++)RB(gp,0.284,0.012,0.266,LIL,0,NY-0.115+i*0.055,0.06,0.004);cylZ(gp,0.1,0.03,LIL,0,NY,0.2);
+for(const s of [-1,1]){RB(gp,0.06,0.07,0.09,VIO,s*0.165,NY-0.11,0.06,0.012);add(gp,new THREE.CylinderGeometry(0.03,0.03,0.085,16),M(0xf2c230,{emissive:0xf2c230,emissiveIntensity:.2,roughness:.4}),s*0.14,NY-0.165,-0.02);}
+cylZ(gp,0.09,0.014,METAL,0,NY,-0.11);RB(gp,0.055,0.075,0.05,M(0xE01E2B,{emissive:0x500008,roughness:.4}),0,NY+0.075,-0.11,0.01);cylZ(gp,0.022,0.14,METAL,0,NY,-0.19,16);
+cylZ(gp,0.12,0.3,LIGHT,0,NY,-0.4,36);{const cu=M(0xf0a058,{metalness:.7,roughness:.3,emissive:0xb04a10,emissiveIntensity:.9});for(let i=0;i<6;i++)add(gp,new THREE.TorusGeometry(0.125,0.016,10,40),cu,0,NY,-0.525+i*0.05);}
+cylZ(gp,0.08,0.03,PAN,0,NY,-0.565);RB(gp,0.24,0.03,0.2,VIO,0,NY-0.16,-0.4,0.01);RB(gp,0.1,0.05,0.1,PAN,0,NY+0.155,-0.4,0.012);
+// control cabinet on the far wall: small screen and three status lights
+{RB(gp,0.04,0.3,0.2,PAN,-0.19,NY-0.02,-0.17,0.01);const sc=new THREE.Mesh(new THREE.PlaneGeometry(0.1,0.07),new THREE.MeshBasicMaterial({color:0x8f7cff,toneMapped:false}));sc.rotation.y=Math.PI/2;sc.position.set(-0.168,NY+0.02,-0.17);gp.add(sc);
+ [0xE01E2B,0xf2c230,0x3bd16f].forEach((c,i)=>add(gp,new THREE.SphereGeometry(0.011,10,8),new THREE.MeshBasicMaterial({color:c,toneMapped:false}),-0.168,NY-0.07,-0.21+i*0.04));}
+// roof: cooler with fins, warning light, anemometer and wind vane
+RB(gp,0.22,0.07,0.26,VIO,0,NY+0.25,-0.4,0.015);for(let i=0;i<6;i++)RB(gp,0.2,0.03,0.012,LIL,0,NY+0.295,-0.5+i*0.04,0.003);
+add(gp,new THREE.CylinderGeometry(0.03,0.036,0.03,16),DARK,0,NY+0.225,-0.14);add(gp,new THREE.SphereGeometry(0.034,20,14),REDM,0,NY+0.255,-0.14);
+rod(gp,[-0.09,NY+0.21,0.22],[-0.09,NY+0.4,0.22],0.006,LIL);for(let i=0;i<3;i++){const a=i*2.094+0.4;rod(gp,[-0.09,NY+0.4,0.22],[-0.09+Math.cos(a)*0.05,NY+0.4,0.22+Math.sin(a)*0.05],0.004,LIL);add(gp,new THREE.SphereGeometry(0.014,10,8),LIGHT,-0.09+Math.cos(a)*0.05,NY+0.4,0.22+Math.sin(a)*0.05);}
+rod(gp,[0.09,NY+0.21,0.22],[0.09,NY+0.36,0.22],0.006,LIL);rod(gp,[0.09,NY+0.36,0.16],[0.09,NY+0.36,0.3],0.005,LIL);RB(gp,0.006,0.05,0.05,M(0xE01E2B,{emissive:0x500008}),0.09,NY+0.36,0.15,0.002);
+{const p=new THREE.PointLight(0xff2030,1.4,1.6,2);p.position.set(0,NY+0.36,-0.14);gp.add(p);const p2=new THREE.PointLight(0xff5a30,1.0,1.2,2);p2.position.set(0.28,NY,-0.38);gp.add(p2);const p3=new THREE.PointLight(0x9a8cff,0.6,1.0,2);p3.position.set(0.3,NY+0.1,0.15);gp.add(p3);}
+// ---------- rotor (solid): spinner, pitch bearings, blades with red tip marks ----------
+{const rot=new THREE.Group();rot.position.set(0,NY,0.61);rot.rotation.z=+(Q.get('rz')||-0.524);gp.add(rot);
+ const hub=add(rot,new THREE.SphereGeometry(0.165,32,22),BODY,0,0,0.0);hub.scale.set(1,1,1.3);cylZ(rot,0.15,0.1,BODY,0,0,-0.11);cylZ(rot,0.158,0.016,LIL,0,0,-0.065);
+ const L=0.95;const xl=y=>lerp(-0.058,-0.012,(y-0.3)/(L-0.3)),xr=y=>lerp(0.098,0.022,(y-0.3)/(L-0.3));
+ const s=new THREE.Shape();s.moveTo(-0.042,0.1);s.lineTo(0.042,0.1);s.quadraticCurveTo(0.112,0.18,xr(0.3),0.3);s.lineTo(xr(L),L);s.lineTo(xl(L),L);s.lineTo(xl(0.3),0.3);s.quadraticCurveTo(-0.064,0.17,-0.042,0.1);
+ const bgeo=new THREE.ExtrudeGeometry(s,{depth:0.03,bevelEnabled:true,bevelThickness:0.01,bevelSize:0.01,bevelSegments:2});bgeo.translate(0,0,-0.015);
+ const band=(y0,y1)=>{const q=new THREE.Shape();q.moveTo(xl(y0)-0.011,y0);q.lineTo(xr(y0)+0.011,y0);q.lineTo(xr(y1)+0.011,y1);q.lineTo(xl(y1)-0.011,y1);q.closePath();const g=new THREE.ExtrudeGeometry(q,{depth:0.054,bevelEnabled:false});g.translate(0,0,-0.027);return g;};
+ const redB=M(0xE01E2B,{emissive:0x5a0810,emissiveIntensity:.5,roughness:.4});const b1=band(0.7,0.765),b2=band(0.83,0.895);
+ for(let i=0;i<3;i++){const G=new THREE.Group();G.rotation.z=i*Math.PI*2/3;rot.add(G);add(G,bgeo,BODY);add(G,b1,redB);add(G,b2,redB);add(G,new THREE.CylinderGeometry(0.06,0.06,0.05,24),LIL,0,0.13,0);}}
+// ---------- the red current: generator -> bed plate -> down the tower (measuring box) -> transformer -> out of the foundation -> plug in the socket ----------
+const thin=(par,pts,r)=>{const t=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(p=>new THREE.Vector3(...p)),false,'catmullrom',0.05),120,r,10),REDM);t.renderOrder=7;par.add(t);};
+thin(gp,[[0.05,NY+0.155,-0.4],[0.165,NY+0.155,-0.4],[0.165,NY-0.185,-0.4],[0.165,NY-0.185,-0.1],[0.02,NY-0.185,-0.085],[0,NY-0.26,-0.03],[0,NY-0.4,0]],0.013);
+thin(gp,[[-0.168,NY-0.11,-0.17],[-0.168,NY-0.185,-0.17],[0.02,NY-0.185,-0.17],[0.03,NY-0.185,-0.1]],0.008);
+thin(root,[[0,TH-0.08,0],[0,0.5,0],[0,0.46,0]],0.013);
+RB(root,0.1,0.07,0.07,NODE,0,0.9,0,0.01);add(root,new THREE.SphereGeometry(0.02,16,12),REDM,0.0,0.9,0.04);
+const SA=0.9,SN=[Math.sin(SA),Math.cos(SA)],SP=[-0.62,0.62],PY=0.25;const at=(d,y)=>[SP[0]+SN[0]*d,y,SP[1]+SN[1]*d];
+tube(root,[[0,0.16,0.086],[0.02,0.1,0.14],[0.1,0.045,0.3],[0.24,0.035,0.5],[0.42,0.022,0.78],[0.26,0.022,1.02],[-0.06,0.022,1.03],at(0.46,0.03),at(0.34,0.1),at(0.27,PY-0.02),at(0.21,PY)],0.018);
+// socket block (white) with the red plug in it
+{const sg=new THREE.Group();sg.position.set(SP[0],0,SP[1]);sg.rotation.y=SA;root.add(sg);RB(sg,0.42,0.05,0.18,DARK,0,0.025,0,0.012);RB(sg,0.36,0.37,0.09,LIGHT,0,PY-0.005,0,0.03);RB(sg,0.27,0.27,0.014,M(0xd4ccff,{roughness:.5}),0,PY,0.046,0.03);
+ cylZ(sg,0.105,0.02,PAN,0,PY,0.05,40);for(const s of [-1,1])RB(sg,0.02,0.03,0.012,LIL,0,PY+s*0.098,0.062,0.004);
+ const rm=M(0xE01E2B,{emissive:0x5a0810,emissiveIntensity:.6,roughness:.35});cylZ(sg,0.078,0.07,rm,0,PY,0.09,40);add(sg,new THREE.CylinderGeometry(0.078,0.05,0.035,40).rotateX(-Math.PI/2),rm,0,PY,0.142);add(sg,new THREE.CylinderGeometry(0.034,0.024,0.09,22).rotateX(Math.PI/2),rm,0,PY,0.2);
+ const p=new THREE.PointLight(0xff2030,1.0,1.2,2);p.position.set(0,0.5,0.35);sg.add(p);}
+const shp=new THREE.Mesh(new THREE.PlaneGeometry(12,12),new THREE.ShadowMaterial({opacity:.5}));shp.rotation.x=-Math.PI/2;shp.receiveShadow=true;scene.add(shp);
+const o=new THREE.Vector3(0,0,0).project(cam);cam.setViewOffset(W,H,(o.x+1)/2*W-CX,(1-o.y)/2*H-CY,W,H);cam.updateProjectionMatrix();
+renderer.render(scene,cam);
+// soft glow over everything bright (cheap bloom, keeps the transparent background)
+fg.save();fg.globalCompositeOperation='lighter';fg.filter='blur(22px) brightness(1.1)';fg.globalAlpha=.26;fg.drawImage(renderer.domElement,0,0);fg.restore();
+window.ready=true;
+</script></body></html>

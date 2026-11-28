@@ -1,0 +1,115 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>function. – Thumbnail-System neu</title>
+<style>
+@font-face{font-family:Poppins;font-weight:500;src:url(node_modules/@fontsource/poppins/files/poppins-latin-500-normal.woff2)}
+@font-face{font-family:Poppins;font-weight:600;src:url(node_modules/@fontsource/poppins/files/poppins-latin-600-normal.woff2)}
+@font-face{font-family:'Inter Tight';font-weight:600;src:url(node_modules/@fontsource/inter-tight/files/inter-tight-latin-600-normal.woff2)}
+@font-face{font-family:'Inter Tight';font-weight:800;src:url(node_modules/@fontsource/inter-tight/files/inter-tight-latin-800-normal.woff2)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#fff}
+canvas{position:absolute;left:0;top:0}
+</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script type="module">
+// Ganz neue Thumbnail-Stile für function. (Wunsch des Nutzers 22.11.2026: „muss nicht rot sein, komplett neuer Stil“), jeder als festes System für alle Videos.
+// ?s=1 Magazin · ?s=2 Sticker-Pop · ?s=3 Blaupause · ?s=4 Risographie    &v=gesetze|vermoegen
+await Promise.all(['500 60px Poppins', '600 60px Poppins', '600 40px "Inter Tight"', '800 100px "Inter Tight"'].map(f => document.fonts.load(f)));
+const Q = new URLSearchParams(location.search), S = +(Q.get('s') || 1), VID = Q.get('v') || 'gesetze';
+const W = 1080, H = 1920;
+const V = {
+  gesetze: {title: ['5 Gesetze,', 'die Deutschland', 'wütend machten'], sticker: ['5 GESETZE,', 'DIE DEUTSCHLAND', 'WÜTEND MACHTEN'], nr: '07', topic: 'Politik', proj: 'DIE 5 GRÖSSTEN AUFREGER'},
+  vermoegen: {title: ['Wem gehört', 'eigentlich', 'Deutschland?'], sticker: ['WEM GEHÖRT', 'EIGENTLICH', 'DEUTSCHLAND?'], nr: '06', topic: 'Geld', proj: 'VERMÖGEN IN DEUTSCHLAND'}}[VID];
+const g = document.getElementById('c').getContext('2d');
+const img = await new Promise(r => {const i = new Image(); i.onload = () => r(i); i.src = `motive/${VID}.png`;});
+const BB = (() => {const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; const x = c.getContext('2d'); x.drawImage(img, 0, 0);
+  const d = x.getImageData(0, 0, c.width, c.height).data; let x0 = 1e9, y0 = 1e9, x1 = -1, y1 = -1;
+  for (let y = 0; y < c.height; y += 2) for (let xx = 0; xx < c.width; xx += 2) if (d[(y * c.width + xx) * 4 + 3] > 60) {x0 = Math.min(x0, xx); x1 = Math.max(x1, xx); y0 = Math.min(y0, y); y1 = Math.max(y1, y);}
+  return {x0, y0, w: x1 - x0, h: y1 - y0};})();
+// the motif scaled into its own canvas (w × h fits inside maxW × maxH)
+function motifCanvas(maxW, maxH, pad = 0) {const s = Math.min(maxW / BB.w, maxH / BB.h), w = Math.round(BB.w * s), h = Math.round(BB.h * s);
+  const c = document.createElement('canvas'); c.width = w + 2 * pad; c.height = h + 2 * pad; c.getContext('2d').drawImage(img, BB.x0, BB.y0, BB.w, BB.h, pad, pad, w, h); return c;}
+function tinted(src, col) {const c = document.createElement('canvas'); c.width = src.width; c.height = src.height; const x = c.getContext('2d'); x.drawImage(src, 0, 0); x.globalCompositeOperation = 'source-in'; x.fillStyle = col; x.fillRect(0, 0, c.width, c.height); return c;}
+const T = (t, x, y, font, col, o = {}) => {g.save(); g.font = font; g.fillStyle = col; g.textAlign = o.align || 'left'; g.letterSpacing = o.ls || '0px'; if (o.sx) {g.translate(x, y); g.scale(o.sx, 1); g.fillText(t, 0, 0);} else g.fillText(t, x, y); g.restore();};
+const noise = (a, dark = false) => {const n = document.createElement('canvas'); n.width = 256; n.height = 256; const x = n.getContext('2d'), d = x.createImageData(256, 256);
+  for (let i = 0; i < d.data.length; i += 4) {const v = dark ? 0 : 255 * Math.random(); d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255 * a * Math.random();} x.putImageData(d, 0, 0); g.fillStyle = g.createPattern(n, 'repeat'); g.fillRect(0, 0, W, H);};
+
+if (S === 1) {
+  // „Magazin“: cream paper, black masthead, huge editorial headline, the motif as a cut-out with a soft shadow on a coloured disc, thin rules
+  g.fillStyle = '#F1ECE3'; g.fillRect(0, 0, W, H);
+  T('function.', 540, 470, '600 200px Poppins', '#111', {align: 'center', ls: '-8px'});
+  g.fillStyle = '#111'; g.fillRect(70, 510, 940, 6); g.fillRect(70, 522, 940, 2);
+  T(`NR. ${V.nr}`, 72, 570, '600 30px "Inter Tight"', '#111', {ls: '4px'}); T(V.topic.toUpperCase(), 540, 570, '600 30px "Inter Tight"', '#111', {align: 'center', ls: '4px'}); T('NOV 2026', 1008, 570, '600 30px "Inter Tight"', '#111', {align: 'right', ls: '4px'});
+  g.fillStyle = '#2F55FF'; g.beginPath(); g.arc(700, 1060, 300, 0, Math.PI * 2); g.fill();
+  const m = motifCanvas(880, 640);
+  g.save(); g.shadowColor = 'rgba(30,20,10,0.35)'; g.shadowBlur = 40; g.shadowOffsetY = 26; g.drawImage(m, 560 - m.width / 2, 1380 - m.height); g.restore();
+  V.title.forEach((t, i) => T(t, 70, 1480 + i * 70, '800 76px "Inter Tight"', '#111', {ls: '-2px'}));
+  g.fillStyle = '#111'; g.fillRect(70, 1640, 940, 2);
+  noise(0.05, true);
+}
+if (S === 2) {
+  // „Sticker-Pop“: one bright channel colour, the motif as a die-cut sticker with a thick white edge, chunky headline on white tape
+  g.fillStyle = '#FFD23F'; g.fillRect(0, 0, W, H);
+  g.fillStyle = 'rgba(255,255,255,0.35)'; for (let i = -10; i < 30; i++) {g.save(); g.translate(i * 90, 0); g.rotate(0.35); g.fillRect(0, -200, 26, 2600); g.restore();}
+  const m = motifCanvas(860, 700, 30), sil = tinted(m, '#fff'), sh = tinted(m, 'rgba(60,40,0,1)');
+  const mx = 540 - m.width / 2 + 10, my = 1540 - m.height;
+  g.save(); g.globalAlpha = 0.28; g.filter = 'blur(14px)'; g.drawImage(sh, mx + 18, my + 26); g.restore();
+  for (let a = 0; a < 32; a++) {const r = 22; g.drawImage(sil, mx + r * Math.cos(a / 32 * Math.PI * 2), my + r * Math.sin(a / 32 * Math.PI * 2));}
+  g.drawImage(m, mx, my);
+  V.sticker.forEach((t, i) => {g.save(); g.font = '800 98px "Inter Tight"'; g.letterSpacing = '-2px'; const w = g.measureText(t).width; g.translate(76, 330 + i * 128); g.rotate(-0.025 + i * 0.012);
+    g.fillStyle = i === 2 ? '#111' : '#fff'; g.fillRect(-18, -92, w + 36, 116); g.fillStyle = i === 2 ? '#FFD23F' : '#111'; g.fillText(t, 0, 0); g.restore();});
+  T('function.', 540, 1640, '600 64px Poppins', '#111', {align: 'center', ls: '-1.5px'});
+}
+if (S === 3) {
+  // „Blaupause“: every topic as a technical drawing: blue paper, grid, the motif as white line art, measurements and a title block
+  g.fillStyle = '#1D4AA8'; g.fillRect(0, 0, W, H);
+  for (const [step, a] of [[30, 0.08], [150, 0.18]]) {g.strokeStyle = `rgba(255,255,255,${a})`; g.lineWidth = step === 30 ? 1 : 1.5; for (let x = 0; x <= W; x += step) {g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke();} for (let y = 0; y <= H; y += step) {g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke();}}
+  // line art from the motif (edges of brightness and outline)
+  const m = motifCanvas(900, 760), w = m.width, h = m.height, src = m.getContext('2d').getImageData(0, 0, w, h).data;
+  const L = new Float32Array(w * h), A = new Float32Array(w * h); for (let i = 0; i < w * h; i++) {L[i] = (0.3 * src[4 * i] + 0.59 * src[4 * i + 1] + 0.11 * src[4 * i + 2]) / 255; A[i] = src[4 * i + 3] / 255;}
+  const out = new ImageData(w, h);
+  for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) {const i = y * w + x; const f = k => L[k] * A[k] + (1 - A[k]) * 0.0;
+    const gx = -f(i - w - 1) - 2 * f(i - 1) - f(i + w - 1) + f(i - w + 1) + 2 * f(i + 1) + f(i + w + 1), gy = -f(i - w - 1) - 2 * f(i - w) - f(i - w + 1) + f(i + w - 1) + 2 * f(i + w) + f(i + w + 1);
+    const ax = -A[i - 1] + A[i + 1], ay = -A[i - w] + A[i + w]; const mag = Math.min(1, Math.hypot(gx, gy) * 2.2 + Math.hypot(ax, ay) * 1.6);
+    out.data[4 * i] = out.data[4 * i + 1] = out.data[4 * i + 2] = 255; out.data[4 * i + 3] = Math.round(255 * Math.min(1, mag + A[i] * 0.07));}
+  const lc = document.createElement('canvas'); lc.width = w; lc.height = h; lc.getContext('2d').putImageData(out, 0, 0);
+  const mx = 540 - w / 2, my = 1330 - h; g.drawImage(lc, mx, my);
+  // dimension line and labels
+  g.strokeStyle = '#fff'; g.fillStyle = '#fff'; g.lineWidth = 2.5; const dy = 1380;
+  g.beginPath(); g.moveTo(mx, dy); g.lineTo(mx + w, dy); g.moveTo(mx, dy - 18); g.lineTo(mx, dy + 18); g.moveTo(mx + w, dy - 18); g.lineTo(mx + w, dy + 18); g.stroke();
+  for (const [x, d] of [[mx, 1], [mx + w, -1]]) {g.beginPath(); g.moveTo(x, dy); g.lineTo(x + 22 * d, dy - 9); g.lineTo(x + 22 * d, dy + 9); g.closePath(); g.fill();}
+  g.save(); g.fillStyle = '#1D4AA8'; g.fillRect(540 - 120, dy - 22, 240, 44); g.restore(); T('ABB. 1', 540, dy + 11, '600 30px "Inter Tight"', '#fff', {align: 'center', ls: '6px'});
+  // title at the top, like hand-lettered on the drawing
+  V.title.forEach((t, i) => T(t.toUpperCase(), 80, 330 + i * 108, '800 100px "Inter Tight"', '#fff', {ls: '1px', sx: 0.86}));
+  // title block bottom right
+  const bx = 470, by = 1450, bw = 540, bh = 210; g.strokeStyle = '#fff'; g.lineWidth = 3; g.strokeRect(bx, by, bw, bh); g.lineWidth = 1.5;
+  g.beginPath(); g.moveTo(bx, by + 70); g.lineTo(bx + bw, by + 70); g.moveTo(bx, by + 140); g.lineTo(bx + bw, by + 140); g.moveTo(bx + 330, by + 140); g.lineTo(bx + 330, by + bh); g.stroke();
+  T('PROJEKT', bx + 16, by + 26, '600 18px "Inter Tight"', 'rgba(255,255,255,.7)', {ls: '3px'}); T(V.proj, bx + 16, by + 58, '600 30px "Inter Tight"', '#fff', {ls: '2px'});
+  T('BLATT', bx + 16, by + 96, '600 18px "Inter Tight"', 'rgba(255,255,255,.7)', {ls: '3px'}); T(`NR. ${V.nr} · ${V.topic.toUpperCase()}`, bx + 16, by + 128, '600 30px "Inter Tight"', '#fff', {ls: '2px'});
+  T('function.', bx + 16, by + 194, '500 50px Poppins', '#fff', {ls: '-1px'}); T('M 1:100', bx + 350, by + 190, '600 30px "Inter Tight"', '#fff', {ls: '2px'});
+}
+if (S === 4) {
+  // „Risographie“: printed poster in two inks (blue and fluorescent pink), halftone dots, slightly misregistered, condensed headline
+  g.fillStyle = '#F4EFE6'; g.fillRect(0, 0, W, H);
+  const BLUE = [38, 62, 210], PINK = [255, 72, 150];
+  const m = motifCanvas(940, 760), w = m.width, h = m.height, d = m.getContext('2d').getImageData(0, 0, w, h).data;
+  const mx = 540 - w / 2, my = 1540 - h;
+  // big pink disc behind, printed with the pink ink
+  g.save(); g.globalCompositeOperation = 'multiply'; g.fillStyle = `rgb(${PINK})`; g.beginPath(); g.arc(560, 1200, 380, 0, Math.PI * 2); g.fill(); g.restore();
+  const lum = (x, y) => {x = Math.max(0, Math.min(w - 1, x | 0)); y = Math.max(0, Math.min(h - 1, y | 0)); const i = 4 * (y * w + x); const a = d[i + 3] / 255; return {l: (0.3 * d[i] + 0.59 * d[i + 1] + 0.11 * d[i + 2]) / 255, a};};
+  g.save(); g.globalCompositeOperation = 'multiply';
+  const step = 9;   // blue halftone, 15° screen
+  g.fillStyle = `rgb(${BLUE})`; const ang = 0.26, ca = Math.cos(ang), sa = Math.sin(ang);
+  for (let v = -h; v < 2 * h; v += step) for (let u = -w; u < 2 * w; u += step) {const x = u * ca - v * sa, y = u * sa + v * ca; if (x < 0 || y < 0 || x >= w || y >= h) continue; const p = lum(x, y); if (p.a < 0.1) continue;
+    const r = Math.sqrt(Math.max(0, 1 - p.l) * p.a) * step * 0.62; if (r > 0.4) {g.beginPath(); g.arc(mx + x, my + y, r, 0, Math.PI * 2); g.fill();}}
+  // pink ink on the bright parts of the motif, shifted a little (misregistration)
+  g.fillStyle = `rgb(${PINK})`; const ang2 = 1.31, cb = Math.cos(ang2), sb = Math.sin(ang2);
+  for (let v = -h; v < 2 * h; v += step) for (let u = -w; u < 2 * w; u += step) {const x = u * cb - v * sb, y = u * sb + v * cb; if (x < 0 || y < 0 || x >= w || y >= h) continue; const p = lum(x, y); if (p.a < 0.1) continue;
+    const r = Math.sqrt(Math.max(0, p.l - 0.25) * p.a) * step * 0.45; if (r > 0.4) {g.beginPath(); g.arc(mx + x + 5, my + y + 4, r, 0, Math.PI * 2); g.fill();}}
+  g.restore();
+  // condensed headline in blue ink with a pink offset
+  V.sticker.forEach((t, i) => {for (const [c, ox, oy] of [[`rgb(${PINK})`, 7, 6], [`rgb(${BLUE})`, 0, 0]]) {g.save(); g.globalCompositeOperation = 'multiply'; g.font = '800 132px "Inter Tight"'; g.letterSpacing = '-1px'; g.fillStyle = c; g.translate(74 + ox, 380 + i * 128 + oy); g.scale(0.74, 1); g.fillText(t, 0, 0); g.restore();}});
+  T(`function. · Nr. ${V.nr}`, 80, 1640, '600 40px Poppins', `rgb(${BLUE})`, {ls: '-0.5px'});
+  noise(0.07, true);
+}
+window.ready = true;
+</script></body></html>

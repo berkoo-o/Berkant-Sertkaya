@@ -1,0 +1,40 @@
+function. – „Der Geldautomat“ – Skriptentwurf (~60 s, 128 Wörter)
+Stand: 15.11.2026 – Stimme: ElevenLabs „Rupert“ – Look: schraffuren-Stil
+
+[1] Hook – Automat von außen, kurzer Röntgenblick auf das Geld im Inneren
+„In diesem Kasten liegen oft bis zu hunderttausend Euro. Wie kommt genau dein Schein heraus?“
+
+[2] Deutschlandkarte, Punkte leuchten auf
+„Rund 48.000 Geldautomaten stehen in Deutschland.“
+Zahl: 48.000
+
+[3] Rote Karte fährt in den Schlitz, Chip-Nahaufnahme, Linie zur Bank, grüner Haken
+„Du steckst die Karte ein. Der Automat liest den Chip und schickt deine PIN verschlüsselt an die Bank. Erst wenn sie zustimmt, geht es weiter.“
+
+[4] Gehäuse wird durchsichtig: Tresor mit vier Kassetten
+„Unten im Tresor stecken meist vier Kassetten voller Scheine.“
+Zahl: 4
+
+[5] Nahaufnahme: Walzen ziehen einen Schein ab, oranger Sensor misst, zwei klebende Scheine fallen ins Extrafach
+„Gummiwalzen ziehen sie einzeln ab. Ein Sensor misst die Dicke jedes Scheins. Kleben zwei zusammen, landen sie in einem Extrafach.“
+
+[6] Scheine fahren die weiße Bahn nach oben, Klappe öffnet sich; dann fahren sie wieder zurück
+„Bänder tragen dein Geld nach oben zum Ausgabefach. Nimmst du es nicht, zieht der Automat es wieder ein.“
+
+[7] Tresor, Farbpatrone färbt die Scheine orange ein, Zahlen zählen herunter
+„Und Diebe? Wird der Tresor gesprengt, färbt Tinte die Scheine ein. 2022 gab es fast 500 Sprengungen, 2024 noch 269.“
+Zahl: 496 → 269
+
+[8] Alter Automat von 1968 (wie ein Tresor in der Wand)
+„Der erste deutsche Geldautomat stand übrigens 1968 in Tübingen. Damals nur für tausend ausgewählte Kunden.“
+Zahl: 1968
+
+[9] Outro (themenbezogen, Variante wird noch gewählt)
+
+Quellen:
+- Deutsche Bundesbank, Zahlungsverkehrsstatistik: rund 48.000 Geldautomaten Ende 2025 (2024: rund 49.750) – vor dem Rendern noch direkt bei der Bundesbank gegenprüfen
+- BKA / Bundesregierung: 496 Sprengungen 2022, 269 Sprengungen 2024
+- Statista, Tagesspiegel: erster deutscher Geldautomat am 27.05.1968, Kreissparkasse Tübingen, 1.000 ausgewählte Kunden
+- Patentschrift EP 2 284 807: Dickensensor erkennt Mehrfachabzug, Scheine gehen in die Reject-Kassette
+- Volksbanken (vr.de): nicht entnommene Scheine werden wieder eingezogen
+- Schwächer belegt (nur Ratgeberseiten): „bis zu hunderttausend Euro“ und „meist vier Kassetten“ – vor dem Rendern noch gegenprüfen

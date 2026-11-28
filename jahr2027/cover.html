@@ -1,0 +1,31 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Poppins;font-weight:400;src:url(node_modules/@fontsource/poppins/files/poppins-latin-400-normal.woff2)}
+@font-face{font-family:Poppins;font-weight:500;src:url(node_modules/@fontsource/poppins/files/poppins-latin-500-normal.woff2)}
+@font-face{font-family:Poppins;font-weight:600;src:url(node_modules/@fontsource/poppins/files/poppins-latin-600-normal.woff2)}
+@font-face{font-family:Poppins;font-weight:700;src:url(node_modules/@fontsource/poppins/files/poppins-latin-700-normal.woff2)}
+@font-face{font-family:'Inter Tight';font-weight:800;src:url(node_modules/@fontsource/inter-tight/files/inter-tight-latin-800-normal.woff2)}
+@font-face{font-family:Caveat;font-weight:600;src:url(fonts/caveat-latin-600-normal.woff2)}
+@font-face{font-family:Caveat;font-weight:700;src:url(fonts/caveat-latin-700-normal.woff2)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;font-family:Poppins;background:#07070b}
+canvas{position:absolute;left:0;top:0}
+#vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 95% 75% at 50% 48%,rgba(0,0,0,0) 55%,rgba(3,3,6,.55) 100%)}
+#shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(to bottom,rgba(7,7,11,.86) 0,rgba(7,7,11,.68) 330px,rgba(7,7,11,0) 590px),linear-gradient(to top,rgba(7,7,11,.9) 0,rgba(7,7,11,.7) 190px,rgba(7,7,11,0) 430px)}
+#ov{position:absolute;inset:0;pointer-events:none}
+#title{position:absolute;left:78px;top:232px;color:#fff;font-family:'Inter Tight';font-weight:800;font-size:76px;line-height:1.08;letter-spacing:-1.8px;max-width:780px}
+#num{position:absolute;left:76px;top:222px;color:#E01E2B;font-family:'Inter Tight';font-weight:800;font-size:136px;line-height:1;letter-spacing:-4px;opacity:0}
+#num small{display:block;font-family:Poppins;font-size:38px;font-weight:500;letter-spacing:0;margin-top:14px;color:#f1f2f6;max-width:860px;line-height:1.25}
+#cnt{position:absolute;right:76px;top:244px;font-family:'Inter Tight';font-weight:800;font-size:54px;letter-spacing:-1px;color:rgba(255,255,255,.55);opacity:0;text-align:right}
+#cnt b{color:#E01E2B;display:inline-block}
+#subw{position:absolute;left:0;right:0;top:1330px;height:260px;padding-top:78px;box-sizing:border-box;text-align:center;background:radial-gradient(ellipse 58% 50% at 50% 50%,rgba(10,10,13,.72) 0%,rgba(10,10,13,.5) 45%,rgba(10,10,13,0) 100%)}
+#sub{display:inline-block;max-width:900px;color:#fff;font-weight:400;font-size:43px;line-height:1.28;text-shadow:0 2px 14px rgba(0,0,0,.9)}
+#src{position:absolute;left:80px;bottom:196px;color:rgba(255,255,255,.72);font-weight:600;font-size:21px;max-width:900px;line-height:1.3}
+#logo{position:absolute;left:78px;bottom:108px;color:#E01E2B;font-weight:500;font-size:58px;letter-spacing:-1px}
+.tag{position:absolute;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;border:3px solid rgba(255,255,255,.9);background:rgba(10,10,14,.55);color:#fff;font-family:'Inter Tight';font-weight:800;font-size:30px;line-height:58px;text-align:center;opacity:0;box-shadow:0 2px 14px rgba(0,0,0,.6)}
+</style></head><body>
+<div id="vig"></div><div id="shade"></div>
+<div id="ov"><div id="title"></div><div id="num"></div><div id="cnt"></div><div id="subw"><span id="sub"></span></div><div id="src"></div><div id="logo">function.</div></div>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+<script type="module" src="./src/main_cover.js"></script>
+</body></html>

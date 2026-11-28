@@ -1,0 +1,19 @@
+{
+  "page": "brutto.html",
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "jobs": [
+    {
+      "name": "Brutto_Netto_Knete",
+      "query": "",
+      "frames": 1280,
+      "audio": [
+        {"file": "mix_brutto_music.flac", "suffix": "_mit_Musik"},
+        {"file": "mix_brutto_fx.flac", "suffix": "_nur_Effekte"}
+      ]
+    }
+  ],
+  "title": "3.000 € brutto: So viel bleibt dir (Knete, Geldturm auf dem Wagen)",
+  "upload": ["_mit_Musik"]
+}

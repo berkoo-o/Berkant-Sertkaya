@@ -1,0 +1,27 @@
+{
+  "page": "modell.html",
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "jobs": [
+    {
+      "name": "Bankrun_Stil1_TiltShift",
+      "query": "?s=1",
+      "frames": 2138,
+      "audio": [
+        {
+          "file": "mix_music.flac",
+          "suffix": "_mit_Musik"
+        },
+        {
+          "file": "mix_fx.flac",
+          "suffix": "_nur_Effekte"
+        }
+      ]
+    }
+  ],
+  "title": "Bankrun Stil 1 (Tilt-Shift), gekürzt auf 71 s",
+  "upload": [
+    "_mit_Musik"
+  ]
+}

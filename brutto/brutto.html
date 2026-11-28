@@ -1,0 +1,27 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<title>function. – 3.000 € brutto: So viel bleibt dir (Knete)</title>
+<style>
+@font-face{font-family:Poppins;font-weight:400;src:url(node_modules/@fontsource/poppins/files/poppins-latin-400-normal.woff2)}
+@font-face{font-family:Poppins;font-weight:500;src:url(node_modules/@fontsource/poppins/files/poppins-latin-500-normal.woff2)}
+@font-face{font-family:Poppins;font-weight:600;src:url(node_modules/@fontsource/poppins/files/poppins-latin-600-normal.woff2)}
+@font-face{font-family:'Inter Tight';font-weight:800;src:url(node_modules/@fontsource/inter-tight/files/inter-tight-latin-800-normal.woff2)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;font-family:Poppins;background:radial-gradient(ellipse 120% 70% at 50% 46%,#2c2247 0%,#1a1430 42%,#0b0912 78%,#07070b 100%)}
+canvas{position:absolute;left:0;top:0}
+#shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(to bottom,rgba(9,7,14,.9) 0,rgba(9,7,14,.8) 360px,rgba(9,7,14,.45) 500px,rgba(9,7,14,0) 630px),linear-gradient(to top,rgba(9,7,14,.95) 0,rgba(9,7,14,.88) 330px,rgba(9,7,14,.6) 470px,rgba(9,7,14,0) 600px)}
+#ov{position:absolute;inset:0;pointer-events:none}
+#title{position:absolute;left:78px;top:232px;color:#fff;font-family:'Inter Tight';font-weight:800;font-size:76px;line-height:1.08;letter-spacing:-1.8px;max-width:920px;text-shadow:0 2px 18px rgba(0,0,0,.45)}
+#num{position:absolute;left:76px;top:222px;color:#fff;font-family:'Inter Tight';font-weight:800;font-size:136px;line-height:1;letter-spacing:-4px;opacity:0;text-shadow:0 3px 22px rgba(0,0,0,.5)}
+#num small{display:block;font-family:Poppins;font-size:36px;font-weight:500;letter-spacing:0;margin-top:14px;color:#f1f2f6;max-width:900px;line-height:1.25}
+#subw{position:absolute;left:0;right:0;top:1400px;height:240px;padding-top:62px;box-sizing:border-box;text-align:center;background:radial-gradient(ellipse 60% 46% at 50% 52%,rgba(9,7,14,.7) 0%,rgba(9,7,14,.45) 50%,rgba(9,7,14,0) 100%)}
+#sub{display:inline-block;max-width:900px;color:#fff;font-weight:400;font-size:43px;line-height:1.28;text-shadow:0 2px 14px rgba(0,0,0,.9),0 0 3px rgba(0,0,0,.6)}
+#src{position:absolute;left:80px;bottom:196px;color:rgba(255,255,255,.7);font-weight:600;font-size:21px;max-width:900px;line-height:1.3}
+#logo{position:absolute;left:78px;bottom:108px;color:#E01E2B;font-weight:500;font-size:58px;letter-spacing:-1px}
+</style></head><body>
+<canvas id="gl" width="1080" height="1920"></canvas>
+<div id="shade"></div>
+<div id="ov"><div id="title"></div><div id="num"></div><div id="subw"><span id="sub"></span></div><div id="src"></div><div id="logo">function.</div></div>
+<canvas id="end" width="1080" height="1920"></canvas>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+<script type="module" src="./src/brutto.js"></script>
+</body></html>

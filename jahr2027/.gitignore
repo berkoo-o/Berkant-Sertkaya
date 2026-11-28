@@ -1,0 +1,10 @@
+node_modules
+fr/
+fr2/
+stills/
+sfx/
+*.wav
+*.raw
+video.mp4
+render*.log
+fr3/

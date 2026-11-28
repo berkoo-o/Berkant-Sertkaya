@@ -1,0 +1,11 @@
+node_modules
+test/fr/
+test/stills/
+*.wav
+*.raw
+test/video.mp4
+test/render.log
+full/fr/
+full/stills/
+full/video.mp4
+full/fr2/

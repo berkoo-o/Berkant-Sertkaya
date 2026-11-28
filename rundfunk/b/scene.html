@@ -1,0 +1,157 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Poppins;font-weight:400;src:url(node_modules/@fontsource/poppins/files/poppins-latin-400-normal.woff2)}
+@font-face{font-family:Poppins;font-weight:500;src:url(node_modules/@fontsource/poppins/files/poppins-latin-500-normal.woff2)}
+@font-face{font-family:Poppins;font-weight:600;src:url(node_modules/@fontsource/poppins/files/poppins-latin-600-normal.woff2)}
+@font-face{font-family:'Inter Tight';font-weight:800;src:url(node_modules/@fontsource/inter-tight/files/inter-tight-latin-800-normal.woff2)}
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;font-family:Poppins;background:#0e0e10}
+canvas{position:absolute;left:0;top:0}
+#shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(to bottom,rgba(10,10,12,.8) 0,rgba(10,10,12,.55) 300px,rgba(10,10,12,0) 540px),linear-gradient(to top,rgba(10,10,12,.92) 0,rgba(10,10,12,.7) 200px,rgba(10,10,12,0) 440px)}
+#ov{position:absolute;inset:0;pointer-events:none}
+#title{position:absolute;left:78px;top:232px;color:#fff;font-family:'Inter Tight';font-weight:800;font-size:76px;line-height:1.08;letter-spacing:-1.8px;max-width:900px;opacity:0}
+#num{position:absolute;left:76px;top:222px;color:#fff;font-family:'Inter Tight';font-weight:800;font-size:136px;line-height:1;letter-spacing:-4px;opacity:0}
+#num small{display:block;font-family:Poppins;font-size:38px;font-weight:500;letter-spacing:0;margin-top:14px;color:#c9cad0;max-width:860px;line-height:1.25}
+#num.red{color:#E01E2B}
+#subw{position:absolute;left:0;right:0;top:1340px;text-align:center}
+#sub{display:inline-block;max-width:900px;color:#fff;font-weight:400;font-size:43px;line-height:1.28;text-shadow:0 2px 14px rgba(0,0,0,.9)}
+#src{position:absolute;left:80px;bottom:196px;color:rgba(255,255,255,.6);font-weight:600;font-size:21px;max-width:900px;line-height:1.3}
+#logo{position:absolute;left:78px;bottom:108px;color:#E01E2B;font-weight:500;font-size:58px;letter-spacing:-1px}
+.pl{position:absolute;transform:translate(-50%,-100%);text-align:center;opacity:0;white-space:nowrap;text-shadow:0 2px 12px rgba(0,0,0,.95)}
+.pl b{display:block;font-family:'Inter Tight';font-weight:800;font-size:46px;letter-spacing:-1px;color:#fff;line-height:1.05}
+.pl span{display:block;font-weight:500;font-size:26px;color:#c9cad0}
+.pl.red b{color:#E01E2B}
+</style></head><body>
+<div id="shade"></div>
+<canvas id="oc" width="1080" height="1920"></canvas>
+<div id="ov"><div id="title"></div><div id="num"></div><div id="subw"><span id="sub"></span></div><div id="src"></div><div id="logo">function.</div>
+<div class="pl red" id="pl0"><b></b><span>ARD</span></div><div class="pl" id="pl1"><b></b><span>ZDF</span></div><div class="pl" id="pl2"><b></b><span>Deutschlandradio</span></div><div class="pl" id="pl3"><b></b><span>Medienaufsicht</span></div></div>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+// function. – Test B „Wohin geht dein Rundfunkbeitrag?“: dunkles Studio, echte 1-Euro-Münzen, Cent-Beträge als Münzstücke (Tortenstücke)
+import * as THREE from 'three';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+await Promise.all(['400 20px Poppins','500 20px Poppins','600 30px Poppins','500 170px Poppins','800 96px "Inter Tight"'].map(f=>document.fonts.load(f)));
+const W=1080,H=1920;
+const renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});renderer.setSize(W,H);renderer.setPixelRatio(1);
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+document.body.insertBefore(renderer.domElement,document.getElementById('shade'));
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x0f0f11);scene.fog=new THREE.Fog(0x0f0f11,32,72);
+const pm=new THREE.PMREMGenerator(renderer);scene.environment=pm.fromScene(new RoomEnvironment(),0.04).texture;scene.environmentIntensity=0.35;
+const cam=new THREE.PerspectiveCamera(30,W/H,0.1,200);
+const composer=new EffectComposer(renderer,new THREE.WebGLRenderTarget(W,H,{type:THREE.HalfFloatType,samples:4}));composer.addPass(new RenderPass(scene,cam));composer.addPass(new UnrealBloomPass(new THREE.Vector2(W,H),0.35,0.5,0.9));composer.addPass(new OutputPass());
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x)),lerp=(a,b,u)=>a+(b-a)*u,ease=x=>{x=clamp(x,0,1);return x*x*(3-2*x)};
+const eo=x=>{x=clamp(x,0,1);return 1-(1-x)**3},eio=x=>{x=clamp(x,0,1);return x<.5?4*x**3:1-(-2*x+2)**3/2},ei=x=>{x=clamp(x,0,1);return x*x};
+const win=(t,a,b,f=0.25)=>Math.min(clamp((t-a)/f,0,1),clamp((b-t)/f,0,1));
+const rnd=(s=>()=>(s=(s*16807)%2147483647)/2147483647)(321);
+const RED=0xE01E2B;
+function canvasTex(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t;}
+// ---------- studio: dark slate table with a soft light falloff, dark backdrop
+{const tt=canvasTex(1024,1024,(g,w,h)=>{g.fillStyle='#16161a';g.fillRect(0,0,w,h);const r=g.createRadialGradient(w*0.5,h*0.55,0,w*0.5,h*0.55,w*0.5);r.addColorStop(0,'rgba(58,56,60,1)');r.addColorStop(0.6,'rgba(34,33,37,0.8)');r.addColorStop(1,'rgba(22,22,26,0)');g.fillStyle=r;g.fillRect(0,0,w,h);
+   for(let i=0;i<5000;i++){g.fillStyle=`rgba(255,255,255,${Math.random()*0.025})`;g.fillRect(Math.random()*w,Math.random()*h,1.5,1.5);}});
+ const fl=new THREE.Mesh(new THREE.PlaneGeometry(70,70),new THREE.MeshStandardMaterial({map:tt,roughness:.78,metalness:.05}));fl.rotation.x=-Math.PI/2;fl.position.set(0,0,-2);fl.receiveShadow=true;scene.add(fl);}
+scene.add(new THREE.HemisphereLight(0xb8bccc,0x141216,0.25));
+const key=new THREE.SpotLight(0xffe2bf,0,0,0.55,0.75,2);key.position.set(-6,15,9);key.target.position.set(0,0,-1.5);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.bias=-0.0004;key.shadow.radius=6;scene.add(key,key.target);
+const rim=new THREE.DirectionalLight(0x8fa4ff,0.6);rim.position.set(6,5,-12);scene.add(rim);
+// ---------- coins: bimetal 1-euro coins and pie-slice pieces for the cents
+const R=1.16,RI=0.81,T=0.233;
+const gold=new THREE.MeshStandardMaterial({color:0xd9b860,metalness:1,roughness:.3}),silver=new THREE.MeshStandardMaterial({color:0xd3d6dc,metalness:1,roughness:.26});
+function sector(r0,r1,frac){const s=new THREE.Shape();const a1=frac*Math.PI*2,n=Math.max(8,Math.round(64*frac));if(frac>=0.999){s.absarc(0,0,r1,0,Math.PI*2,false);if(r0>0){const h=new THREE.Path();h.absarc(0,0,r0,0,Math.PI*2,true);s.holes.push(h);}return s;}
+  if(r0>0){s.moveTo(r0,0);for(let i=0;i<=n;i++){const a=a1*i/n;s.lineTo(Math.cos(a)*r1,Math.sin(a)*r1);}for(let i=n;i>=0;i--){const a=a1*i/n;s.lineTo(Math.cos(a)*r0,Math.sin(a)*r0);}}else{s.moveTo(0,0);for(let i=0;i<=n;i++){const a=a1*i/n;s.lineTo(Math.cos(a)*r1,Math.sin(a)*r1);}}s.closePath();return s;}
+function coinGeo(frac,r0,r1,depth){const g=new THREE.ExtrudeGeometry(sector(r0,r1,frac),{depth,bevelEnabled:true,bevelThickness:0.018,bevelSize:0.018,bevelSegments:2,curveSegments:64});g.translate(0,0,-depth/2);g.rotateX(-Math.PI/2);return g;}
+const CG={};function makeCoin(frac){const G=new THREE.Group();const k=frac.toFixed(2);if(!CG[k])CG[k]=[coinGeo(frac,RI,R,T-0.04),coinGeo(frac,0,RI-0.005,T-0.07)];
+  const a=new THREE.Mesh(CG[k][0],gold),b=new THREE.Mesh(CG[k][1],silver);a.castShadow=b.castShadow=true;a.receiveShadow=b.receiveShadow=true;G.add(a,b);scene.add(G);return G;}
+// stack, bottom to top: LMA 0.35 · DLR 0.54 · ZDF 0.69 + 4 · ARD 0.78 + 12 (taken from the top, so each pile ends with its piece on top)
+const ITEMS=[];const push=(frac,dst)=>ITEMS.push({frac,dst});push(0.35,3);push(0.54,2);push(0.69,1);for(let i=0;i<4;i++)push(1,1);push(0.78,0);for(let i=0;i<12;i++)push(1,0);
+const TRAY=[[-2.0,-4.0],[2.0,-4.0],[-2.0,-7.9],[2.0,-7.9]];const TRAYH=0.24;
+const trays=TRAY.map(([x,z],i)=>{const G=new THREE.Group();G.position.set(x,0,z);scene.add(G);
+  const body=new THREE.Mesh(new THREE.CylinderGeometry(1.75,1.82,TRAYH,72),new THREE.MeshStandardMaterial({color:0x2b2c31,roughness:.55,metalness:.3}));body.position.y=TRAYH/2;body.castShadow=body.receiveShadow=true;G.add(body);
+  const top=new THREE.Mesh(new THREE.CylinderGeometry(1.55,1.55,0.02,72),new THREE.MeshStandardMaterial({color:0x1d1e22,roughness:.7}));top.position.y=TRAYH+0.002;top.receiveShadow=true;G.add(top);
+  const ledM=new THREE.MeshBasicMaterial({color:new THREE.Color(0,0,0)});const led=new THREE.Mesh(new THREE.TorusGeometry(1.79,0.025,8,96),ledM);led.rotation.x=Math.PI/2;led.position.y=TRAYH*0.55;G.add(led);
+  const sp=new THREE.SpotLight(i===0?0xffd2c8:0xfff0dc,0,0,0.42,0.8,2);sp.position.set(x,9,z+2.5);sp.target.position.set(x,0,z);scene.add(sp,sp.target);
+  return {G,ledM,sp,x,z,n:0,col:i===0?new THREE.Color(RED).multiplyScalar(2.2):new THREE.Color(0xd8e6ff).multiplyScalar(1.6)};});
+const PCOUNT=[0,0,0,0];const rr=()=>rnd();
+ITEMS.forEach((it,i)=>{it.G=makeCoin(it.frac);it.stackPos=[(rr()-0.5)*0.06,T*(i+0.5)+0.003,-0.8+(rr()-0.5)*0.06];it.stackRot=rr()*6.28;it.tDrop=0.25+i*0.13;
+  const k=PCOUNT[it.dst]++;it.pileIdx=k;});
+// departure order: from the top, ARD first, then ZDF, DLR, LMA
+{const order=[...ITEMS.keys()].reverse();const groups=[[],[],[],[]];order.forEach(i=>groups[ITEMS[i].dst].push(i));
+ const T0=[5.75,7.85,9.85,11.0],DT=[0.13,0.17,0,0];
+ groups.forEach((g,d)=>g.forEach((i,j)=>{const it=ITEMS[i];it.tGo=T0[d]+j*DT[d];it.pileK=j;const tr=TRAY[d];it.pilePos=[tr[0]+(rr()-0.5)*0.08,TRAYH+0.02+T*(j+0.5),tr[1]+(rr()-0.5)*0.08];it.pileRot=rr()*6.28;}));}
+const FLY=0.6;
+function updateCoins(t){const filled=[0,0,0,0];
+  ITEMS.forEach(it=>{const G=it.G;let p,ry=it.stackRot,rx=0;
+    if(t<it.tDrop){G.visible=false;return;}G.visible=true;
+    if(t<it.tDrop+0.32){const u=ei((t-it.tDrop)/0.32);p=[it.stackPos[0],lerp(it.stackPos[1]+5.5,it.stackPos[1],u),it.stackPos[2]];rx=(1-u)*0.6;}
+    else if(t<it.tGo){p=it.stackPos;}
+    else if(t<it.tGo+FLY){const u=eio((t-it.tGo)/FLY);const a=it.stackPos,b=it.pilePos;p=[lerp(a[0],b[0],u),lerp(a[1],b[1],u)+3.2*Math.sin(Math.PI*u),lerp(a[2],b[2],u)];rx=u*Math.PI*2;ry=lerp(it.stackRot,it.pileRot,u);}
+    else{p=it.pilePos;ry=it.pileRot;filled[it.dst]++;}
+    G.position.set(...p);G.rotation.set(rx,ry,0,'YXZ');});
+  return filled;}
+// spinning coin for the outro
+const spin=makeCoin(1);spin.children.forEach(m=>{m.material=m.material.clone();});spin.visible=false;const SPIN_P=[0,R*0.98,2.6];
+// ---------- camera
+const O=15.45,END=18.0;
+const C=(tx,ty,tz,d,az,el)=>({t:[tx,ty,tz],d,az,el});
+const SEG=[
+ [0,3.3,C(0,2.0,-0.8,15,24,18),C(0,2.1,-0.8,14,32,20),'lin'],
+ [3.3,5.5,C(0,2.1,-0.8,14,32,20),C(0,0.8,-3.4,36,10,42),'io'],
+ [5.5,7.7,C(0,0.8,-3.4,36,10,42),C(-1.0,1.0,-2.6,26,14,38),'io'],
+ [7.7,9.6,C(-1.0,1.0,-2.6,26,14,38),C(1.0,0.9,-2.8,25,4,38),'io'],
+ [9.6,12.1,C(1.0,0.9,-2.8,25,4,38),C(0,0.6,-5.6,26,-2,44),'io'],
+ [12.1,13.5,C(0,0.6,-5.6,26,-2,44),C(0.3,0.8,-4.2,35,8,44),'io'],
+ [13.5,15.45,C(0.3,0.8,-4.2,35,8,44),C(0.3,0.8,-4.2,33.5,10,44),'lin'],
+ [15.45,16.5,C(0.3,0.8,-4.2,33.5,10,44),C(0,0.4,2.6,16,6,60),'io'],
+ [16.5,END+0.1,C(0,0.4,2.6,16,6,60),C(0,0.4,2.6,15.7,6,61),'lin'],
+];
+function setCam(t){const s=SEG.find(q=>t>=q[0]&&t<q[1])||SEG[SEG.length-1];let u=clamp((t-s[0])/(s[1]-s[0]),0,1);u=s[4]==='io'?eio(u):u;const a=s[2],b=s[3];
+  const d=Math.exp(lerp(Math.log(a.d),Math.log(b.d),u)),az=lerp(a.az,b.az,u)*Math.PI/180,el=lerp(a.el,b.el,u)*Math.PI/180;const tg=[lerp(a.t[0],b.t[0],u),lerp(a.t[1],b.t[1],u),lerp(a.t[2],b.t[2],u)];
+  cam.position.set(tg[0]+d*Math.sin(az)*Math.cos(el),tg[1]+d*Math.sin(el),tg[2]+d*Math.cos(az)*Math.cos(el));cam.lookAt(...tg);
+  if(window.DBG){const [x,y,z,dd,a2,e2]=window.DBG;const A=a2*Math.PI/180,E=e2*Math.PI/180;cam.position.set(x+dd*Math.sin(A)*Math.cos(E),y+dd*Math.sin(E),z+dd*Math.cos(A)*Math.cos(E));cam.lookAt(x,y,z);}
+  cam.setViewOffset(W,H,0,90,W,H);cam.updateProjectionMatrix();cam.updateMatrixWorld();}
+const V=new THREE.Vector3();const proj=p=>{V.set(p[0],p[1],p[2]).project(cam);return [(V.x+1)/2*W,(1-V.y)/2*H];};
+// ---------- text
+const SUBS=[[0.2,3.35,'18 Euro 36 zahlt jeder Haushalt im Monat.'],[3.85,5.45,'Aber wohin geht das Geld?'],[5.72,7.72,'Fast 13 Euro an die ARD,'],[7.77,9.5,'knapp 5 ans ZDF,'],
+ [9.55,12.05,'der Rest an Deutschlandradio und die Medienaufsicht.'],[12.35,13.9,'Zu viel oder fair?'],[14.18,O+0.3,'Schreib’s in die Kommentare.']];
+const NUMS=[[0.35,3.45,'18,36 €','pro Haushalt und Monat',0],[5.7,7.7,'12,78 €','an die ARD',1],[7.75,9.5,'4,69 €','an das ZDF',0],[9.55,10.85,'0,54 €','an das Deutschlandradio',0],[10.9,12.15,'0,35 €','an die Landesmedienanstalten',0]];
+const VAL=['12,78 €','4,69 €','0,54 €','0,35 €'];
+const titleEl=document.getElementById('title'),numEl=document.getElementById('num'),subEl=document.getElementById('sub'),srcEl=document.getElementById('src'),logoEl=document.getElementById('logo');
+srcEl.innerHTML='Quellen: Beitragsservice (Jahresbericht 2025), § 9 RFinStV<br>Stand 17.11.2026';
+const PL=[0,1,2,3].map(i=>{const e=document.getElementById('pl'+i);e.querySelector('b').textContent=VAL[i];return e;});
+function setTime(t){
+  setCam(t);const o=t-O;const dim=o>0?1-ease((o-0.05)/0.6):1;
+  key.intensity=950*lerp(0.35,1,dim);key.position.set(o>0?lerp(-6,0,ease(o/0.8)):-6,15,o>0?lerp(9,6,ease(o/0.8)):9);key.target.position.set(0,0,o>0?lerp(-1.5,2.6,ease(o/0.8)):-1.5);key.angle=o>0?lerp(0.55,0.18,ease(o/0.8)):0.55;
+  const filled=updateCoins(t);
+  trays.forEach((tr,i)=>{const f=clamp(filled[i]/Math.max(1,PCOUNT[i]),0,1);const g=(f>0?0.35+0.65*f:0)*dim;tr.ledM.color.copy(tr.col).multiplyScalar(g);tr.sp.intensity=260*g;});
+  // outro coin: spins on its edge, wobbles down flat and turns red
+  if(o>-0.1){spin.visible=true;const ou=clamp((o+0.1)/1.45,0,1);const tilt=lerp(1.45,0,ei(ou));const prec=o*lerp(9,26,ou)+ou*ou*30;spin.position.set(SPIN_P[0]+Math.cos(prec)*0.05*(1-ou),R*Math.sin(tilt)*0.98+T*0.5*Math.cos(tilt),SPIN_P[2]);spin.rotation.set(0,0,0);spin.rotateY(prec);spin.rotateX(tilt);spin.rotateY(-prec*1.7);
+    const red=ease((o-1.4)/0.25);
+    spin.children.forEach((m,j)=>{const base=j===0?new THREE.Color(0xd9b860):new THREE.Color(0xd3d6dc);m.material.color.copy(base).lerp(new THREE.Color(0xe01e2b),red);m.material.emissive=new THREE.Color(RED);m.material.emissiveIntensity=0.25*red;});
+    spin.visible=o<1.75;}else spin.visible=false;
+  // texts
+  const s=SUBS.find(q=>t>=q[0]&&t<q[1]);subEl.textContent=s?s[2]:'';subEl.style.opacity=s?Math.min(1,(t-s[0])/0.15+0.2)*clamp((O+0.3-t)/0.3,0,1):0;
+  const nm=NUMS.find(q=>t>=q[0]&&t<q[1]);let nop=0;
+  if(nm){let txt=nm[2];if(txt==='18,36 €'){const n=ITEMS.filter(it=>t>=it.tDrop+0.3).length;const v=n>=ITEMS.length?18.36:Math.min(18.36,ITEMS.slice(0,n).reduce((a,it)=>a+it.frac,0));txt=v.toFixed(2).replace('.',',')+' €';}
+    numEl.innerHTML=txt+'<small>'+nm[3]+'</small>';numEl.className=nm[4]?'red':'';nop=Math.min(clamp((t-nm[0])/0.25,0,1),clamp((nm[1]-t)/0.2,0,1));}
+  numEl.style.opacity=nop;titleEl.innerHTML=t<12.2?'Wohin geht dein<br>Rundfunkbeitrag?':'Zu viel<br>oder fair?';const anyNum=NUMS.some(q=>t>=q[0]-0.3&&t<q[1]+0.3);
+  titleEl.style.opacity=(anyNum?0:1)*clamp((O+0.1-t)/0.3,0,1)*(1-nop)*(t<12.2?clamp((t-3.5)/0.4,0,1):clamp((t-12.3)/0.3,0,1));
+  PL.forEach((e,i)=>{const f=filled[i]/Math.max(1,PCOUNT[i]);const a=clamp((f-0.6)/0.3,0,1)*clamp((O+0.15-t)/0.3,0,1);if(a<0.01){e.style.opacity=0;return;}const front=i<2;const q=front?proj([TRAY[i][0],0,TRAY[i][1]+2.3]):proj([TRAY[i][0],TRAYH+T*PCOUNT[i]+0.6,TRAY[i][1]]);e.style.transform=front?'translate(-50%,0)':'translate(-50%,-100%)';e.style.left=clamp(q[0],140,W-140)+'px';e.style.top=clamp(q[1],600,1270)+'px';e.style.opacity=a;});
+  srcEl.style.opacity=0.95*clamp((O+0.2-t)/0.3,0,1);logoEl.style.opacity=1-eo((t-O)/0.3);
+}
+// ---------- outro: the spinning coin falls flat, turns red and becomes the dot of "function."
+const oc=document.getElementById('oc').getContext('2d');let LAY=null;
+function layout(){const sz=150;oc.font=`500 ${sz}px Poppins`;const all='function.'.split('');const ws=all.map(c=>oc.measureText(c).width);const tr=-0.04*sz;const tot=ws.reduce((a,b)=>a+b,0)+tr*8;let x=W/2-tot/2;const xs=[];all.forEach((c,i)=>{xs.push(x);x+=ws[i]+tr;});const m=oc.measureText('.');const base=700;
+  return {sz,xs,ws,base,dcx:xs[8]+(m.actualBoundingBoxRight-m.actualBoundingBoxLeft)/2,dcy:base-(m.actualBoundingBoxAscent-m.actualBoundingBoxDescent)/2,dr:(m.actualBoundingBoxRight+m.actualBoundingBoxLeft)/2};}
+let coinScr=null;
+function drawOutro(t){oc.clearRect(0,0,W,H);const o=t-O;if(o<1.0)return;if(!LAY)LAY=layout();const L=LAY;oc.font=`500 ${L.sz}px Poppins`;oc.textBaseline='alphabetic';
+  'function'.split('').forEach((ch,i)=>{const u=(o-1.55-i*0.05)/0.45;if(u<=0)return;const e=eo(u);oc.save();oc.globalAlpha=e;oc.filter=u<1?`blur(${(1-e)*8}px)`:'none';oc.fillStyle='#E01E2B';oc.fillText(ch,L.xs[i],L.base+(1-e)*24);oc.restore();});
+  if(o>=1.7){if(!coinScr){setCam(O+1.7);const c=proj([SPIN_P[0],T*0.5,SPIN_P[2]]),e=proj([SPIN_P[0]+R,T*0.5,SPIN_P[2]]);coinScr=[c[0],c[1],Math.hypot(e[0]-c[0],e[1]-c[1])];setCam(t);}
+    const u=eio(clamp((o-1.7)/0.5,0,1));const x=lerp(coinScr[0],L.dcx,u),y=lerp(coinScr[1],L.dcy,u),r=lerp(coinScr[2],L.dr,u);oc.save();oc.shadowColor='rgba(224,30,43,0.7)';oc.shadowBlur=lerp(30,10,u);oc.fillStyle='#E01E2B';oc.beginPath();oc.arc(x,y,r,0,7);oc.fill();oc.restore();}
+}
+window.TOTAL=Math.round(END*30);
+window.renderAt=async f=>{const t=f/30;setTime(t);composer.render();drawOutro(t);const fd=Math.min(clamp(t/0.3,0,1),clamp((END-t)/0.25,0,1));document.body.style.filter=fd<1?`brightness(${fd})`:'none';return true;};
+await window.renderAt(0);window.ready=true;
+</script></body></html>
