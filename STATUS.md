@@ -10,6 +10,8 @@
 
 | Video | Ordner | Fertiges Video | Stand |
 |---|---|---|---|
+| Was kostet ein Kind, bis es 18 ist? | `kind/` | `kind/renders/Kind_bis_18_Abendlicht_mit_Musik.mp4` und `kind/renders/Kind_bis_18_Morgen_mit_Musik.mp4` (je 42,7 s, Fassungen „nur Effekte“ daneben) | Kinderzimmer, das mit dem Kind mitwächst (kein Knete-Look, Wunsch vom 27.11.2026), in zwei Looks: Look 2 „Abendlicht“ und Look 3 „Morgen“. Auf Wunsch des Nutzers am 28.11.2026 in der Cloud gerendert (Einzelbilder verlustfrei, Handy-Fassung CRF 19), Kontaktbogen alle 0,3 s geprüft. Upload-Paket in `upload/Kind_bis_18/`, Thumbnail und Texte in `kind/social/`. |
+| A und B haben dieselbe Farbe (Schachbrett-Schatten) | `schatten/` | noch nicht gerendert | Szene, Stimme, Ton, Thumbnail und Texte fertig, Vorschau `schatten/Vorschau_Gleiche_Farbe_mit_Ton.mp4`. **Wartet auf das „Go“ des Nutzers** (PC-Auftrag über `schatten/render.json`). |
 | Diese Reihenfolge gab es noch nie (Kartenspiel, 52!) | `karten/` | `karten/renders/Kartenspiel_Noir_mit_Musik_Upload.mp4` (44,1 s, 37 MB zum Hochladen); volle PC-Qualität in drei Teilen `Kartenspiel_Noir_mit_Musik.mp4.part01–03` (zusammen 269 MB) | Look „Spieltisch Noir“ (modern, dunkel, sehr detailreich, vom Nutzer am 27.11.2026 aus drei Stiltests gewählt). Stimme, Szene, Ton, Thumbnail und Texte fertig, Kollisionsprüfung 0 Treffer. Am 27.11.2026 auf dem PC gerendert, geprüft (1.323 Bilder, −14,8 LUFS, Kontaktbogen `karten/Kontaktbogen_Render.jpg`) und geschickt. Thumbnail und Texte in `karten/social/`. |
 | Weihnachtsgeld: Warum bleibt so wenig? | `weihnachtsgeld/` | `weihnachtsgeld/renders/Weihnachtsgeld_Knete_mit_Musik.mp4` (43,2 s) | Fertig, auf dem PC gerendert, geprüft und am 26.11.2026 geschickt. Thumbnail und Texte in `weihnachtsgeld/social/`. Passt bis Anfang Dezember. |
 | Black Friday: Sind die Rabatte echt? | `blackfriday/` | `blackfriday/renders/Black_Friday_Knete_mit_Musik.mp4` (40,6 s) | Fertig, geprüft, geschickt. **Vor Freitag, 27.11.2026 hochladen.** |
@@ -34,6 +36,8 @@ Alle 19 Thumbnails im System „Galerie A“ mit Knete-Motiv liegen in `thumbs/f
 
 ## Offene Punkte
 
+- **Kinderkosten hochladen** (Look 2 oder Look 3 wählen), Texte in `kind/social/Texte.md`. Läuft jederzeit.
+- **Feld-Video „Gleiche Farbe“** wartet auf das „Go“ zum Rendern.
 - **Kartenspiel hochladen**, Texte in `karten/social/Texte.md`. Läuft jederzeit (kein Datum).
 - Hinweis: Der Filmkorn-Look macht die PC-Datei sehr groß (269 MB, in drei Teilen). Für den Upload gibt es eine Kopie mit CRF 20 (37 MB), die sich sichtbar nicht unterscheidet. Die Teile setzt man mit `cat …part01 …part02 …part03 > datei.mp4` zusammen.
 - **Weihnachtsgeld hochladen**, solange das Thema läuft (Ende November bis Anfang Dezember), Texte in `weihnachtsgeld/social/Texte.md`.
