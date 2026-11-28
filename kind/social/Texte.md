@@ -1,6 +1,6 @@
 # Texte zum Hochladen – „Was kostet ein Kind bis 18?“
 
-Stand: 27.11.2026 · Video: `kind/renders/` (nach dem PC-Render, Abendlicht oder Morgen) · Thumbnail: `Thumbnail_Kind_bis_18_9x16.png`
+Stand: 27.11.2026 · Video: `kind/renders/Kind_bis_18_Abendlicht_mit_Musik.mp4` oder `kind/renders/Kind_bis_18_Morgen_mit_Musik.mp4` · Thumbnail: `Thumbnail_Kind_bis_18_9x16.png`
 
 ## TikTok – Titel
 
